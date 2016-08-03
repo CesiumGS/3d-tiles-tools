@@ -1,0 +1,9 @@
+/coverage
+/specs
+/TypeScriptDefinitions
+/.idea
+.jshintrc
+.npmignore
+.travis.yml
+gulpfile.js
+*.tgz
