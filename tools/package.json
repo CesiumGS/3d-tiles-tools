@@ -46,5 +46,8 @@
     "test-watch": "gulp test-watch",
     "coverage": "gulp coverage",
     "update-ts-definitions": "gulp update-ts-definitions"
+  },
+  "bin": {
+    "gzipTileset": "./bin/gzipTileset.js"
   }
 }
