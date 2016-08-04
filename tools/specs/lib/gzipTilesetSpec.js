@@ -20,6 +20,15 @@ function isGzipped(data) {
 }
 
 describe('gzipTileset', function() {
+    afterEach(function(done) {
+        Promise.all([
+            fsExtraRemove(gzippedDirectory),
+            fsExtraRemove(gunzippedDirectory)
+        ]).then(function() {
+            done();
+        });
+    });
+
     it('gzips uncompressed tileset', function (done) {
         expect(gzipTileset(tilesetDirectory, gzippedDirectory)
             .then(function() {
@@ -27,9 +36,6 @@ describe('gzipTileset', function() {
                     .then(function(data) {
                         expect(isGzipped(data)).toBe(true);
                     });
-            })
-            .finally(function() {
-                return fsExtraRemove(gzippedDirectory);
             }), done).toResolve();
     });
 
@@ -43,12 +49,6 @@ describe('gzipTileset', function() {
                                 expect(isGzipped(data)).toBe(false);
                             });
                     });
-            })
-            .finally(function() {
-                return Promise.all([
-                    fsExtraRemove(gzippedDirectory),
-                    fsExtraRemove(gunzippedDirectory)
-                ]);
             }), done).toResolve();
     });
 
@@ -59,9 +59,6 @@ describe('gzipTileset', function() {
                     .then(function(data) {
                         expect(isGzipped(data)).toBe(true);
                     });
-            })
-            .finally(function() {
-                return fsExtraRemove(gzippedDirectory);
             }), done).toResolve();
     });
 
@@ -72,9 +69,6 @@ describe('gzipTileset', function() {
                     .then(function(data) {
                         expect(isGzipped(data)).toBe(true);
                     });
-            })
-            .finally(function() {
-                return fsExtraRemove(gzippedDirectory);
             }), done).toResolve();
     });
 
