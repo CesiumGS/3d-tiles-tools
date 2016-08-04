@@ -9,6 +9,8 @@ Clone this repo and install [Node.js](http://nodejs.org/).  From the root direct
 npm install
 ```
 
+## Tools
+
 ### gzipTileset
 
 Detects whether the tileset is compressed or not and does the opposite.
