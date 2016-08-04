@@ -10,6 +10,8 @@ var fsExtraEnsureDir = Promise.promisify(fsExtra.ensureDir);
 var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
 
 var defaultValue = Cesium.defaultValue;
+var defined = Cesium.defined;
+var DeveloperError = Cesium.DeveloperError;
 
 module.exports = gzipTileset;
 
@@ -22,6 +24,9 @@ module.exports = gzipTileset;
  */
 function gzipTileset(inputPath, outputDirectory, verbose) {
     return new Promise(function(resolve, reject) {
+        if (!defined(inputPath)) {
+            reject(new DeveloperError('inputPath is required'));
+        }
         inputPath = path.normalize(inputPath);
 
         var tilesetPath = inputPath;
@@ -65,14 +70,11 @@ function gzipTileset(inputPath, outputDirectory, verbose) {
                                 });
                         }, {concurrency: 1024})
                             .then(resolve)
-                            .catch(function (err) {
-                                reject(err);
-                            });
-                    });
+                            .catch(reject);
+                    })
+                    .on('error', reject);
             })
-            .catch(function (err) {
-                reject(err);
-            });
+            .catch(reject);
     });
 }
 

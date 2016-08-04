@@ -27,9 +27,6 @@ describe('gzipTileset', function() {
                     .then(function(data) {
                         expect(isGzipped(data)).toBe(true);
                     })
-                    .catch(function(err) {
-                        throw err;
-                    })
                     .finally(function() {
                         return fsExtraRemove(gzippedDirectory);
                     });
@@ -44,9 +41,6 @@ describe('gzipTileset', function() {
                         return fsExtraReadFile(gunzippedJson)
                             .then(function(data) {
                                 expect(isGzipped(data)).toBe(false);
-                            })
-                            .catch(function(err) {
-                                throw err;
                             })
                             .finally(function() {
                                 return Promise.all([
@@ -65,9 +59,6 @@ describe('gzipTileset', function() {
                     .then(function(data) {
                         expect(isGzipped(data)).toBe(true);
                     })
-                    .catch(function(err) {
-                        throw err;
-                    })
                     .finally(function() {
                         return fsExtraRemove(gzippedDirectory);
                     });
@@ -81,13 +72,14 @@ describe('gzipTileset', function() {
                     .then(function(data) {
                         expect(isGzipped(data)).toBe(true);
                     })
-                    .catch(function(err) {
-                        throw err;
-                    })
                     .finally(function() {
                         return fsExtraRemove(gzippedDirectory);
                     });
             }), done).toResolve();
+    });
+
+    it('throws error when no input tileset is given ', function (done) {
+        expect(gzipTileset(), done).toRejectWith(Error);
     });
 
     it('throws error when input tileset does not exist', function (done) {
