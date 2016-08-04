@@ -74,6 +74,22 @@ describe('gzipTileset', function() {
             }), done).toResolve();
     });
 
+    it('works when no output directory is supplied', function (done) {
+        expect(gzipTileset(tilesetDirectory)
+            .then(function() {
+                return fsExtraReadFile(gzippedJson)
+                    .then(function(data) {
+                        expect(isGzipped(data)).toBe(true);
+                    })
+                    .catch(function(err) {
+                        throw err;
+                    })
+                    .finally(function() {
+                        return fsExtraRemove(gzippedDirectory);
+                    });
+            }), done).toResolve();
+    });
+
     it('throws error when input tileset does not exist', function (done) {
         expect(gzipTileset('non-existent-tileset', gzippedDirectory), done).toRejectWith(Error);
     });
