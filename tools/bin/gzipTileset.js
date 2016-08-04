@@ -20,7 +20,4 @@ var argv = yargs
 gzipTileset(argv.input, argv.output, true)
     .then(function() {
         console.log('Done');
-    })
-    .catch(function(err) {
-        throw err;
     });
