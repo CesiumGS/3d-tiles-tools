@@ -26,10 +26,10 @@ describe('gzipTileset', function() {
                 return fsExtraReadFile(gzippedJson)
                     .then(function(data) {
                         expect(isGzipped(data)).toBe(true);
-                    })
-                    .finally(function() {
-                        return fsExtraRemove(gzippedDirectory);
                     });
+            })
+            .finally(function() {
+                return fsExtraRemove(gzippedDirectory);
             }), done).toResolve();
     });
 
@@ -41,14 +41,14 @@ describe('gzipTileset', function() {
                         return fsExtraReadFile(gunzippedJson)
                             .then(function(data) {
                                 expect(isGzipped(data)).toBe(false);
-                            })
-                            .finally(function() {
-                                return Promise.all([
-                                    fsExtraRemove(gzippedDirectory),
-                                    fsExtraRemove(gunzippedDirectory)
-                                ]);
                             });
                     });
+            })
+            .finally(function() {
+                return Promise.all([
+                    fsExtraRemove(gzippedDirectory),
+                    fsExtraRemove(gunzippedDirectory)
+                ]);
             }), done).toResolve();
     });
 
@@ -58,10 +58,10 @@ describe('gzipTileset', function() {
                 return fsExtraReadFile(gzippedJson)
                     .then(function(data) {
                         expect(isGzipped(data)).toBe(true);
-                    })
-                    .finally(function() {
-                        return fsExtraRemove(gzippedDirectory);
                     });
+            })
+            .finally(function() {
+                return fsExtraRemove(gzippedDirectory);
             }), done).toResolve();
     });
 
@@ -71,10 +71,10 @@ describe('gzipTileset', function() {
                 return fsExtraReadFile(gzippedJson)
                     .then(function(data) {
                         expect(isGzipped(data)).toBe(true);
-                    })
-                    .finally(function() {
-                        return fsExtraRemove(gzippedDirectory);
                     });
+            })
+            .finally(function() {
+                return fsExtraRemove(gzippedDirectory);
             }), done).toResolve();
     });
 
