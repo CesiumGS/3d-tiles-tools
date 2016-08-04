@@ -36,22 +36,6 @@ describe('gzipTileset', function() {
             }), done).toResolve();
     });
 
-    it('gzips uncompressed tileset when inputting json file instead or directory', function (done) {
-        expect(gzipTileset(tilesetJson, gzippedDirectory)
-            .then(function() {
-                return fsExtraReadFile(gzippedJson)
-                    .then(function(data) {
-                        expect(isGzipped(data)).toBe(true);
-                    })
-                    .catch(function(err) {
-                        throw err;
-                    })
-                    .finally(function() {
-                        return fsExtraRemove(gzippedDirectory);
-                    });
-            }), done).toResolve();
-    });
-
     it('ungzips compressed tileset', function (done) {
         expect(gzipTileset(tilesetDirectory, gzippedDirectory)
             .then(function() {
@@ -70,6 +54,22 @@ describe('gzipTileset', function() {
                                     fsExtraRemove(gunzippedDirectory)
                                 ]);
                             });
+                    });
+            }), done).toResolve();
+    });
+
+    it('works when supplying a json file instead of a directory', function (done) {
+        expect(gzipTileset(tilesetJson, gzippedDirectory)
+            .then(function() {
+                return fsExtraReadFile(gzippedJson)
+                    .then(function(data) {
+                        expect(isGzipped(data)).toBe(true);
+                    })
+                    .catch(function(err) {
+                        throw err;
+                    })
+                    .finally(function() {
+                        return fsExtraRemove(gzippedDirectory);
                     });
             }), done).toResolve();
     });
