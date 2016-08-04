@@ -1,3 +1,3 @@
 module.exports = {
-    gzipTileset : require('./bin/gzipTileset')
+    gzipTileset : require('./lib/gzipTileset')
 };

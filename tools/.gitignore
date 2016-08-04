@@ -8,5 +8,6 @@ npm-debug.log
 
 # Generated files
 coverage
+output
 *.tgz
 *.zip
