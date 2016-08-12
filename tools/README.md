@@ -13,8 +13,16 @@ npm install
 
 ### gzipTileset
 
-Detects whether the tileset is compressed or not and does the opposite.
+Gzips the input tileset.
 
 ```
 node ./bin/gzipTileset.js -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-gzipped/
+```
+
+### gunzipTileset
+
+Gunzips the input tileset.
+
+```
+node ./bin/gunzipTileset.js -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-gunzipped/
 ```

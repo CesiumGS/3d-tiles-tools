@@ -17,7 +17,7 @@ var argv = yargs
     .alias('output', 'o')
     .argv;
 
-gzipTileset(argv.input, argv.output, true, true)
+gzipTileset(argv.input, argv.output, false, true)
     .then(function() {
         console.log('Done');
     });
