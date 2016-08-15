@@ -48,6 +48,6 @@
     "update-ts-definitions": "gulp update-ts-definitions"
   },
   "bin": {
-    "gzipTileset": "./bin/gzipTileset.js"
+    "3d-tiles-tools": "./bin/3d-tiles-tools.js"
   }
 }

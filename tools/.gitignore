@@ -11,3 +11,6 @@ coverage
 output
 *.tgz
 *.zip
+
+# User files
+test

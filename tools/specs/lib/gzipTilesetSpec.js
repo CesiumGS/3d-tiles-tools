@@ -1,8 +1,6 @@
 'use strict';
-
 var fsExtra = require('fs-extra');
 var Promise = require('bluebird');
-
 var gzipTileset = require('../../lib/gzipTileset');
 
 var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
@@ -22,6 +20,14 @@ function isGzipped(path) {
         });
 }
 
+var gzipOptions = {
+    gzip : true
+};
+
+var gunzipOptions = {
+    gzip : false
+};
+
 describe('gzipTileset', function() {
     afterEach(function(done) {
         Promise.all([
@@ -33,7 +39,7 @@ describe('gzipTileset', function() {
     });
 
     it('gzips uncompressed tileset', function (done) {
-        expect(gzipTileset(tilesetDirectory, gzippedDirectory, true)
+        expect(gzipTileset(tilesetDirectory, gzippedDirectory, gzipOptions)
             .then(function() {
                 return isGzipped(gzippedJson)
                     .then(function(isGzipped) {
@@ -43,9 +49,9 @@ describe('gzipTileset', function() {
     });
 
     it('gunzips compressed tileset', function (done) {
-        expect(gzipTileset(tilesetDirectory, gzippedDirectory, true)
+        expect(gzipTileset(tilesetDirectory, gzippedDirectory, gzipOptions)
             .then(function() {
-                return gzipTileset(gzippedDirectory, gunzippedDirectory, false)
+                return gzipTileset(gzippedDirectory, gunzippedDirectory, gunzipOptions)
                     .then(function() {
                         return isGzipped(gunzippedJson)
                             .then(function(isGzipped) {
@@ -65,10 +71,10 @@ describe('gzipTileset', function() {
             }), done).toResolve();
     });
 
-    it('Does not gzip already gzipped tileset', function (done) {
-        expect(gzipTileset(tilesetDirectory, gzippedDirectory, true)
+    it('does not gzip already gzipped tileset', function (done) {
+        expect(gzipTileset(tilesetDirectory, gzippedDirectory, gzipOptions)
             .then(function() {
-                return gzipTileset(gzippedDirectory, gunzippedDirectory, true)
+                return gzipTileset(gzippedDirectory, gunzippedDirectory, gzipOptions)
                     .then(function() {
                         var promises = [
                             fsExtraReadFile(gzippedJson),
@@ -82,8 +88,8 @@ describe('gzipTileset', function() {
             }), done).toResolve();
     });
 
-    it('Does not gunzip already gunzipped tileset', function (done) {
-        expect(gzipTileset(tilesetDirectory, gunzippedDirectory, false)
+    it('does not gunzip already gunzipped tileset', function (done) {
+        expect(gzipTileset(tilesetDirectory, gunzippedDirectory, gunzipOptions)
             .then(function() {
                 var promises = [
                     fsExtraReadFile(tilesetJson),
@@ -96,7 +102,21 @@ describe('gzipTileset', function() {
             }), done).toResolve();
     });
 
-    it('throws error when no input tileset is given ', function (done) {
+    it('only gzips tiles when tilesOnly is true', function (done) {
+        var options = {
+            tilesOnly : true
+        };
+
+        expect(gzipTileset(tilesetDirectory, gzippedDirectory, options)
+            .then(function() {
+                return isGzipped(gzippedJson)
+                    .then(function(isGzipped) {
+                        expect(isGzipped).toBe(false);
+                    });
+            }), done).toResolve();
+    });
+
+    it('throws error when no input tileset is given', function (done) {
         expect(gzipTileset(), done).toRejectWith(Error);
     });
 
@@ -105,11 +125,13 @@ describe('gzipTileset', function() {
     });
 
     it('writes debug info to console when verbose is true', function (done) {
+        var options = {
+            verbose : true
+        };
         var spy = spyOn(console, 'log').and.callFake(function(){});
-        expect(gzipTileset(tilesetDirectory, gzippedDirectory, true, true)
+        expect(gzipTileset(tilesetDirectory, gzippedDirectory, options)
             .then(function() {
                 expect(spy).toHaveBeenCalled();
-                return fsExtraRemove(gzippedDirectory);
             }), done).toResolve();
     });
 });

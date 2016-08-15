@@ -1,5 +1,4 @@
 'use strict';
-
 var Cesium = require('cesium');
 var fsExtra = require('fs-extra');
 var path = require('path');
@@ -19,14 +18,19 @@ module.exports = gzipTileset;
 /**
  * gzips or gunzips the input tileset.
  *
- * @param {String} inputDirectory Path to the tileset directory.
+ * @param {String} inputDirectory Path to the input directory.
  * @param {Object} [outputDirectory] Path to the output directory.
- * @param {Boolean} [gzip=true] Whether to gzip or gunzip the tileset.
- * @param {Boolean} [verbose=false] If true prints out debug messages to the console.
+ * @param {Object} [options] Object with the following properties:
+ * @param {Boolean} [options.gzip=true] Whether to gzip or gunzip the tileset.
+ * @param {Boolean} [options.tilesOnly=false] Only gzip tiles, does not gzip tileset.json or other files.
+ * @param {Boolean} [options.verbose=false] If true prints out debug messages to the console.
  */
-function gzipTileset(inputDirectory, outputDirectory, gzip, verbose) {
+function gzipTileset(inputDirectory, outputDirectory, options) {
     return new Promise(function(resolve, reject) {
-        gzip = defaultValue(gzip, true);
+        options = defaultValue(options, defaultValue.EMPTY_OBJECT);
+        var gzip = defaultValue(options.gzip, true);
+        var tilesOnly = defaultValue(options.tilesOnly, false);
+        var verbose = defaultValue(options.verbose, false);
 
         if (!defined(inputDirectory)) {
             reject(new DeveloperError('inputDirectory is required'));
@@ -56,6 +60,10 @@ function gzipTileset(inputDirectory, outputDirectory, gzip, verbose) {
                     var inputFile = path.join(inputDirectory, file);
                     var outputFile = path.join(outputDirectory, file);
 
+                    if (gzip && tilesOnly && !isTile(inputFile)) {
+                        return fsExtraCopy(inputFile, outputFile);
+                    }
+
                     return isGzipped(inputFile)
                         .then(function(fileIsGzipped) {
                             if (fileIsGzipped === gzip) {
@@ -78,8 +86,17 @@ function gzipTileset(inputDirectory, outputDirectory, gzip, verbose) {
     });
 }
 
-function isGzipped(path) {
-    return fsExtraReadFile(path)
+function isTile(file) {
+    var extension = path.extname(file);
+    return extension === '.b3dm' ||
+           extension === '.i3dm' ||
+           extension === '.pnts' ||
+           extension === '.cmpt' ||
+           extension === '.vctr';
+}
+
+function isGzipped(file) {
+    return fsExtraReadFile(file)
         .then(function (data) {
             return (data[0] === 0x1f) && (data[1] === 0x8b);
         });

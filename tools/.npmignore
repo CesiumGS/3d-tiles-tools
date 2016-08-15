@@ -1,5 +1,6 @@
 /coverage
 /output
+/test
 /specs
 /TypeScriptDefinitions
 /.idea
