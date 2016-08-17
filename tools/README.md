@@ -1,6 +1,6 @@
 # 3D Tiles Tools
 
-Library and command-line tools for processing and converting 3D Tiles tilesets.
+Node.js library and command-line tools for processing and converting 3D Tiles tilesets.
 
 ## Instructions
 
