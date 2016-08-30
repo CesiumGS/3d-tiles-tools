@@ -1,21 +1,14 @@
 'use strict';
 var fsExtra = require('fs-extra');
 var Promise = require('bluebird');
+var isGzipped = require('../../lib/isGzipped');
 var runPipeline = require('../../lib/runPipeline');
 
-var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
 var fsExtraRemove = Promise.promisify(fsExtra.remove);
 
 var inputDirectory = './specs/data/TilesetOfTilesets/';
 var outputDirectory = './specs/data/TilesetOfTilesets-processed';
 var outputJson = './specs/data/TilesetOfTilesets-processed/tileset.json';
-
-function isGzipped(path) {
-    return fsExtraReadFile(path)
-        .then(function (data) {
-            return (data[0] === 0x1f) && (data[1] === 0x8b);
-        });
-}
 
 describe('runPipeline', function() {
     afterEach(function(done) {

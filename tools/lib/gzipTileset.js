@@ -4,10 +4,10 @@ var fsExtra = require('fs-extra');
 var path = require('path');
 var Promise = require('bluebird');
 var zlib = require('zlib');
+var isGzipped = require('./isGzipped');
 
 var fsExtraCopy = Promise.promisify(fsExtra.copy);
 var fsExtraEnsureDir = Promise.promisify(fsExtra.ensureDir);
-var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
 
 var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
@@ -93,13 +93,6 @@ function isTile(file) {
            extension === '.pnts' ||
            extension === '.cmpt' ||
            extension === '.vctr';
-}
-
-function isGzipped(file) {
-    return fsExtraReadFile(file)
-        .then(function (data) {
-            return (data[0] === 0x1f) && (data[1] === 0x8b);
-        });
 }
 
 function streamToPromise(stream) {

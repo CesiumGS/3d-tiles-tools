@@ -65,7 +65,7 @@ function runPipeline(pipeline, options) {
             }
             stageOptions = stage;
         }
-        stageOptions.verbose = verbose;
+        stageOptions.verbose = defaultValue(stageOptions.verbose, verbose);
         var stageFunction = getStageFunction(stageName, stageOptions);
         if (!defined(stageFunction)) {
             throw new DeveloperError('Stage "' + stageName + '" does not exist');

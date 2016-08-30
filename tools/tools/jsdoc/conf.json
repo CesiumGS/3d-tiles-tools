@@ -1,0 +1,21 @@
+{
+    "tags": {
+        "allowUnknownTags": false
+    },
+    "source": {
+        "include": ["lib"],
+        "includePattern": ".+\\.js(doc)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "templates": {
+        "cleverLinks": true,
+        "default": {
+            "outputSourceFiles": false
+        },
+        "sourceUrl": "https://github.com/AnalyticalGraphicsInc/3d-tiles-tools/blob/{version}/lib/{filename}"
+    },
+    "opts": {
+        "destination": "doc",
+        "recurse": true
+    }
+}

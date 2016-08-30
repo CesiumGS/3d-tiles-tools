@@ -22,7 +22,7 @@ if (process.argv.length < 4 || defined(argv.h) || defined(argv.help) || !defined
         '        -i --input, input=PATH The input tileset directory.\n' +
         '        -o --output, output=PATH The output tileset directory.\n' +
         '        -t --tilesOnly, Only gzip tiles.\n' +
-        '    ungzip  ungzips the input tileset.\n' +
+        '    ungzip  Ungzips the input tileset.\n' +
         '        -i --input, input=PATH The input tileset directory.\n' +
         '        -o --output, output=PATH The output tileset directory.\n';
     console.log(help);
@@ -30,7 +30,7 @@ if (process.argv.length < 4 || defined(argv.h) || defined(argv.help) || !defined
 }
 
 var command = argv._[0];
-var inputPath = defaultValue(argv.i, argv.input);
+var inputPath = defaultValue(argv.i, argv.input, argv._[1]);
 
 if (!defined(inputPath)) {
     console.log('-i or --input argument is required. See --help for details.');
@@ -62,7 +62,7 @@ if (command === 'pipeline') {
     return;
 }
 
-var outputPath = defaultValue(argv.o, argv.output);
+var outputPath = defaultValue(argv.o, argv.output, argv._[2]);
 outputPath = path.normalize(defaultValue(outputPath,
     path.join(path.dirname(inputPath), path.basename(inputPath) + '-processed')));
 
@@ -87,7 +87,7 @@ function getStage(stageName, argv) {
     switch (stageName) {
         case 'gzip':
         case 'ungzip':
-            if (defined(argv.t) || defined(argv['tilesOnly'])) {
+            if (defined(argv.t) || defined(argv.tilesOnly)) {
                 stage.tilesOnly = true;
             }
             break;

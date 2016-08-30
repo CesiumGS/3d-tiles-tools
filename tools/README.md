@@ -11,11 +11,51 @@ npm install
 
 ## Command line tools
 
-### pipeline
+### gzip
 
+Gzips the input tileset.
+
+```
+node ./bin/3d-tiles-tools.js gzip ./specs/data/TilesetOfTilesets/ ./output/TilesetOfTilesets-gzipped/
+```
+```
+node ./bin/3d-tiles-tools.js gzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-gzipped/
+```
+
+|Flag|Description|Required|
+|----|-----------|--------|
+|`-i`, `--input`|Input directory of the tileset.| :white_check_mark: Yes|
+|`-o`, `--output`|Output directory of the processed tileset.|No|
+|`-t`, `--tilesOnly`|Only gzip tiles.|No, default `false`|
+
+### ungzip
+
+Ungzips the input tileset.
+
+```
+node ./bin/3d-tiles-tools.js ungzip ./specs/data/TilesetOfTilesets/ ./output/TilesetOfTilesets-ungzipped/
+```
+```
+node ./bin/3d-tiles-tools.js ungzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-ungzipped/
+```
+
+|Flag|Description|Required|
+|----|-----------|--------|
+|`-i`, `--input`|Input directory of the tileset.| :white_check_mark: Yes|
+|`-o`, `--output`|Output directory of the processed tileset.|No|
+
+## Pipeline
+
+```
+node ./bin/3d-tiles-tools.js pipeline ./specs/data/pipeline.json
+```
 ```
 node ./bin/3d-tiles-tools.js pipeline -i ./specs/data/pipeline.json
 ```
+
+|Flag|Description|Required|
+|----|-----------|--------|
+|`-i`, `--input`|Input pipeline JSON file.| :white_check_mark: Yes|
 
 Executes a pipeline JSON file containing an input path, output path, and list of stages to run.
 A stage can be a string specifying the stage name or an object specifying the stage name and any additional parameters.
@@ -47,22 +87,64 @@ This pipeline uncompresses the input tileset and then compresses all the tiles. 
 }
 ```
 
+###Pipeline Stages
 
-It is also possible to run stages individually:
-
-### gzip
+####gzip
 
 Gzips the input tileset.
 
+**Properties**
+
+|   |Type|Description|Required|
+|---|----|-----------|--------|
+|**tilesOnly**|`boolean`|Only gzip tiles.|No, default: `false`|
+|**verbose**|`boolean`|Prints out debug messages to the console.|No, default: `false`|
+
+####ungzip
+
+Ungzips the input tileset.
+
+**Properties**
+
+|   |Type|Description|Required|
+|---|----|-----------|--------|
+|**verbose**|`boolean`|Prints out debug messages to the console.|No, default: `false`|
+
+## Build Instructions
+
+Run the tests:
 ```
-node ./bin/3d-tiles-tools.js gzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-gzipped/
+npm run test
+```
+To run JSHint on the entire codebase, run:
+```
+npm run jsHint
+```
+To run JSHint automatically when a file is saved, run the following and leave it open in a console window:
+```
+npm run jsHint-watch
 ```
 
-### ungzip
+### Running Test Coverage
 
-ungzips the input tileset.
-
+Coverage uses [istanbul](https://github.com/gotwarlost/istanbul).  Run:
 ```
-node ./bin/3d-tiles-tools.js ungzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-ungzipped/
-
+npm run coverage
 ```
+For complete coverage details, open `coverage/lcov-report/index.html`.
+
+The tests and coverage covers the Node.js module; it does not cover the command-line interface.
+
+## Generating Documentation
+
+To generate the documentation:
+```
+npm run jsDoc
+```
+
+The documentation will be placed in the `doc` folder.
+
+### Debugging
+
+* To debug the tests in Webstorm, open the Gulp tab, right click the `test` task, and click `Debug 'test'`.
+* To run a single test, change the test function from `it` to `fit`.

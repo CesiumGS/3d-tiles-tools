@@ -1,6 +1,7 @@
 'use strict';
 var fsExtra = require('fs-extra');
 var Promise = require('bluebird');
+var isGzipped = require('../../lib/isGzipped');
 var gzipTileset = require('../../lib/gzipTileset');
 
 var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
@@ -12,13 +13,6 @@ var gzippedDirectory = './specs/data/TilesetOfTilesets-gzipped';
 var gzippedJson = './specs/data/TilesetOfTilesets-gzipped/tileset.json';
 var ungzippedDirectory = './specs/data/TilesetOfTilesets-ungzipped';
 var ungzippedJson = './specs/data/TilesetOfTilesets-ungzipped/tileset.json';
-
-function isGzipped(path) {
-    return fsExtraReadFile(path)
-        .then(function (data) {
-            return (data[0] === 0x1f) && (data[1] === 0x8b);
-        });
-}
 
 var gzipOptions = {
     gzip : true
