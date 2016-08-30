@@ -38,7 +38,7 @@ This pipeline uncompresses the input tileset and then compresses all the tiles. 
     "input": "Tileset/",
     "output": "TilesetGzipped/",
     "stages": [
-        "gunzip",
+        "ungzip",
         {
             "name": "gzip",
             "tilesOnly": true
@@ -58,11 +58,11 @@ Gzips the input tileset.
 node ./bin/3d-tiles-tools.js gzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-gzipped/
 ```
 
-### gunzip
+### ungzip
 
-Gunzips the input tileset.
+ungzips the input tileset.
 
 ```
-node ./bin/3d-tiles-tools.js gunzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-gunzipped/
+node ./bin/3d-tiles-tools.js ungzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-ungzipped/
 
 ```

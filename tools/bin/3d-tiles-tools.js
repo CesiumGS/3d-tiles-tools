@@ -22,7 +22,7 @@ if (process.argv.length < 4 || defined(argv.h) || defined(argv.help) || !defined
         '        -i --input, input=PATH The input tileset directory.\n' +
         '        -o --output, output=PATH The output tileset directory.\n' +
         '        -t --tilesOnly, Only gzip tiles.\n' +
-        '    gunzip  Gunzips the input tileset.\n' +
+        '    ungzip  ungzips the input tileset.\n' +
         '        -i --input, input=PATH The input tileset directory.\n' +
         '        -o --output, output=PATH The output tileset directory.\n';
     console.log(help);
@@ -86,7 +86,7 @@ function getStage(stageName, argv) {
     };
     switch (stageName) {
         case 'gzip':
-        case 'gunzip':
+        case 'ungzip':
             if (defined(argv.t) || defined(argv['tilesOnly'])) {
                 stage.tilesOnly = true;
             }

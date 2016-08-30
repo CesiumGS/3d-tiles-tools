@@ -16,12 +16,12 @@ var DeveloperError = Cesium.DeveloperError;
 module.exports = gzipTileset;
 
 /**
- * gzips or gunzips the input tileset.
+ * gzips or ungzips the input tileset.
  *
  * @param {String} inputDirectory Path to the input directory.
  * @param {Object} [outputDirectory] Path to the output directory.
  * @param {Object} [options] Object with the following properties:
- * @param {Boolean} [options.gzip=true] Whether to gzip or gunzip the tileset.
+ * @param {Boolean} [options.gzip=true] Whether to gzip or ungzip the tileset.
  * @param {Boolean} [options.tilesOnly=false] Only gzip tiles, does not gzip tileset.json or other files.
  * @param {Boolean} [options.verbose=false] If true prints out debug messages to the console.
  */
@@ -37,7 +37,7 @@ function gzipTileset(inputDirectory, outputDirectory, options) {
         }
         inputDirectory = path.normalize(inputDirectory);
         outputDirectory = path.normalize(defaultValue(outputDirectory,
-            path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-' + (gzip ? 'gzipped' : 'gunzipped'))));
+            path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-' + (gzip ? 'gzipped' : 'ungzipped'))));
 
         if (verbose) {
             console.log('Input directory: ' + inputDirectory);

@@ -48,7 +48,7 @@ describe('runPipeline', function() {
         var pipeline = {
             input : inputDirectory,
             output : outputDirectory,
-            stages : ['gzip', 'gunzip']
+            stages : ['gzip', 'ungzip']
         };
         expect(runPipeline(pipeline)
             .then(function() {
@@ -63,7 +63,7 @@ describe('runPipeline', function() {
         var pipeline = {
             input : inputDirectory,
             output : outputDirectory,
-            stages : ['gzip', 'gunzip', 'gzip']
+            stages : ['gzip', 'ungzip', 'gzip']
         };
         expect(runPipeline(pipeline)
             .then(function() {
@@ -78,7 +78,7 @@ describe('runPipeline', function() {
         var pipeline = {
             input : inputDirectory,
             output : outputDirectory,
-            stages : ['gzip', 'gunzip', 'gzip', 'gunzip']
+            stages : ['gzip', 'ungzip', 'gzip', 'ungzip']
         };
         expect(runPipeline(pipeline)
             .then(function() {
@@ -113,7 +113,7 @@ describe('runPipeline', function() {
             output : outputDirectory,
             stages : [
                 'gzip',
-                'gunzip',
+                'ungzip',
                 {
                     name : 'gzip',
                     tilesOnly : true

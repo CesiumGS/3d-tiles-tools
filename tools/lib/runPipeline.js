@@ -102,7 +102,7 @@ function getStageFunction(stageName, stageOptions) {
         case 'gzip':
             stageOptions.gzip = true;
             return gzipTileset;
-        case 'gunzip':
+        case 'ungzip':
             stageOptions.gzip = false;
             return gzipTileset;
         default:
