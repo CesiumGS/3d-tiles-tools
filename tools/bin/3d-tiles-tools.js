@@ -30,14 +30,14 @@ if (process.argv.length < 4 || defined(argv.h) || defined(argv.help) || !defined
 }
 
 var command = argv._[0];
-var inputPath = defaultValue(argv.i, argv.input, argv._[1]);
+var inputDirectory = defaultValue(defaultValue(argv.i, argv.input), argv._[1]);
 
-if (!defined(inputPath)) {
+if (!defined(inputDirectory)) {
     console.log('-i or --input argument is required. See --help for details.');
     return;
 }
 
-inputPath = path.normalize(inputPath);
+inputDirectory = path.normalize(inputDirectory);
 
 var options = {
     verbose : true
@@ -45,14 +45,14 @@ var options = {
 
 if (command === 'pipeline') {
     console.time('Total');
-    fsExtraReadJson(inputPath)
+    fsExtraReadJson(inputDirectory)
         .then(function(pipeline) {
             // Make input and output relative to the root directory
             if (defined(pipeline.input)) {
-                pipeline.input = path.join(path.dirname(inputPath), pipeline.input);
+                pipeline.input = path.join(path.dirname(inputDirectory), pipeline.input);
             }
             if (defined(pipeline.output)) {
-                pipeline.output = path.join(path.dirname(inputPath), pipeline.output);
+                pipeline.output = path.join(path.dirname(inputDirectory), pipeline.output);
             }
             runPipeline(pipeline, options)
                 .then(function() {
@@ -62,15 +62,15 @@ if (command === 'pipeline') {
     return;
 }
 
-var outputPath = defaultValue(argv.o, argv.output, argv._[2]);
-outputPath = path.normalize(defaultValue(outputPath,
-    path.join(path.dirname(inputPath), path.basename(inputPath) + '-processed')));
+var outputDirectory = defaultValue(defaultValue(argv.o, argv.output), argv._[2]);
+outputDirectory = path.normalize(defaultValue(outputDirectory,
+    path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-processed')));
 
 var stage = getStage(command, argv);
 
 var pipeline = {
-    input : inputPath,
-    output : outputPath,
+    input : inputDirectory,
+    output : outputDirectory,
     stages : [stage]
 };
 

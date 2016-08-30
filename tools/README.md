@@ -57,7 +57,7 @@ node ./bin/3d-tiles-tools.js pipeline -i ./specs/data/pipeline.json
 |----|-----------|--------|
 |`-i`, `--input`|Input pipeline JSON file.| :white_check_mark: Yes|
 
-Executes a pipeline JSON file containing an input path, output path, and list of stages to run.
+Executes a pipeline JSON file containing an input directory, output directory, and list of stages to run.
 A stage can be a string specifying the stage name or an object specifying the stage name and any additional parameters.
 Stages are executed in the order listed.
 

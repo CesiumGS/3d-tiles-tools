@@ -18,16 +18,18 @@ module.exports = gzipTileset;
 /**
  * gzips or ungzips the input tileset.
  *
- * @param {String} inputDirectory Path to the input directory.
- * @param {Object} [outputDirectory] Path to the output directory.
- * @param {Object} [options] Object with the following properties:
+ * @param {Object} options Object with the following properties:
+ * @param {String} options.inputDirectory Path to the input directory.
+ * @param {Object} [options.outputDirectory] Path to the output directory.
  * @param {Boolean} [options.gzip=true] Whether to gzip or ungzip the tileset.
  * @param {Boolean} [options.tilesOnly=false] Only gzip tiles, does not gzip tileset.json or other files.
  * @param {Boolean} [options.verbose=false] If true prints out debug messages to the console.
  */
-function gzipTileset(inputDirectory, outputDirectory, options) {
+function gzipTileset(options) {
     return new Promise(function(resolve, reject) {
         options = defaultValue(options, defaultValue.EMPTY_OBJECT);
+        var inputDirectory = options.inputDirectory;
+        var outputDirectory = options.outputDirectory;
         var gzip = defaultValue(options.gzip, true);
         var tilesOnly = defaultValue(options.tilesOnly, false);
         var verbose = defaultValue(options.verbose, false);

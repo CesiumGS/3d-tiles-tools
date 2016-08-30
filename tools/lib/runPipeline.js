@@ -3,6 +3,7 @@ var Cesium = require('cesium');
 var fsExtra = require('fs-extra');
 var path = require('path');
 var Promise = require('bluebird');
+var getWorkingDirectory = require('./getWorkingDirectory');
 var gzipTileset = require('./gzipTileset');
 
 var defaultValue = Cesium.defaultValue;
@@ -27,26 +28,26 @@ module.exports = runPipeline;
  */
 function runPipeline(pipeline, options) {
     pipeline = defaultValue(pipeline, defaultValue.EMPTY_OBJECT);
-    var inputPath = pipeline.input;
-    var outputPath = pipeline.output;
+    var inputDirectory = pipeline.input;
+    var outputDirectory = pipeline.output;
     var stages = pipeline.stages;
-    if (!defined(inputPath)) {
+    if (!defined(inputDirectory)) {
         throw new DeveloperError('pipeline.input is required');
     }
 
-    inputPath = path.normalize(inputPath);
-    outputPath = path.normalize(defaultValue(outputPath,
-        path.join(path.dirname(inputPath), path.basename(inputPath) + '-processed')));
+    inputDirectory = path.normalize(inputDirectory);
+    outputDirectory = path.normalize(defaultValue(outputDirectory,
+        path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-processed')));
 
     if (!defined(stages)) {
-        return fsExtraCopy(inputPath, outputPath);
+        return fsExtraCopy(inputDirectory, outputDirectory);
     }
 
     options = defaultValue(options, defaultValue.EMPTY_OBJECT);
     var verbose = defaultValue(options.verbose, false);
 
-    var workingDirectory1 = path.join(path.dirname(inputPath), path.basename(inputPath) + '-working1');
-    var workingDirectory2 = path.join(path.dirname(inputPath), path.basename(inputPath) + '-working2');
+    var workingDirectory1 = getWorkingDirectory();
+    var workingDirectory2 = getWorkingDirectory();
 
     var stageObjects = [];
 
@@ -65,19 +66,21 @@ function runPipeline(pipeline, options) {
             }
             stageOptions = stage;
         }
+
+        // Ping-pong between the two working directories when multiple stages are run
+        var stageInputDirectory = (i === 0) ? inputDirectory : ((i % 2 === 0) ? workingDirectory2 : workingDirectory1);
+        var stageOutputDirectory = (i === stagesLength - 1) ? outputDirectory : ((i % 2 === 0) ? workingDirectory1 : workingDirectory2);
+
+        stageOptions.inputDirectory = stageInputDirectory;
+        stageOptions.outputDirectory = stageOutputDirectory;
         stageOptions.verbose = defaultValue(stageOptions.verbose, verbose);
+
         var stageFunction = getStageFunction(stageName, stageOptions);
         if (!defined(stageFunction)) {
             throw new DeveloperError('Stage "' + stageName + '" does not exist');
         }
 
-        // Ping-pong between the two working directories when multiple stages are run
-        var stageInput = (i === 0) ? inputPath : ((i % 2 === 0) ? workingDirectory2 : workingDirectory1);
-        var stageOutput = (i === stagesLength - 1) ? outputPath : ((i % 2 === 0) ? workingDirectory1 : workingDirectory2);
-
         stageObjects.push({
-            input : stageInput,
-            output : stageOutput,
             options : stageOptions,
             stageFunction : stageFunction
         });
@@ -85,11 +88,11 @@ function runPipeline(pipeline, options) {
 
     // Run the stages in sequence
     return Promise.each(stageObjects, function(stage) {
-        return fsExtraEmptyDir(stage.output)
+        return fsExtraEmptyDir(stage.options.outputDirectory)
             .then(function() {
-                return stage.stageFunction(stage.input, stage.output, stage.options);
+                return stage.stageFunction(stage.options);
             });
-    }).then(function() {
+    }).all(function() {
         return Promise.all([
             fsExtraRemove(workingDirectory1),
             fsExtraRemove(workingDirectory2)

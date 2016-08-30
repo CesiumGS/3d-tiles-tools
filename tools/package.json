@@ -25,6 +25,7 @@
     "bluebird": "3.4.1",
     "cesium": "1.24",
     "fs-extra": "0.30.0",
+    "uuid": "2.0.2",
     "yargs": "4.8.1"
   },
   "devDependencies": {
