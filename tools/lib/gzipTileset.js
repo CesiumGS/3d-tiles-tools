@@ -41,11 +41,6 @@ function gzipTileset(options) {
         outputDirectory = path.normalize(defaultValue(outputDirectory,
             path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-' + (gzip ? 'gzipped' : 'ungzipped'))));
 
-        if (verbose) {
-            console.log('Input directory: ' + inputDirectory);
-            console.log('Output directory: ' + outputDirectory);
-        }
-
         var files = [];
         fsExtra.walk(inputDirectory)
             .on('data', function (item) {

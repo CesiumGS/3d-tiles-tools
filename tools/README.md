@@ -27,6 +27,8 @@ node ./bin/3d-tiles-tools.js gzip -i ./specs/data/TilesetOfTilesets/ -o ./output
 |`-i`, `--input`|Input directory of the tileset.| :white_check_mark: Yes|
 |`-o`, `--output`|Output directory of the processed tileset.|No|
 |`-t`, `--tilesOnly`|Only gzip tiles.|No, default `false`|
+|`-f`, `--force`|Overwrite output directory if it exists.|No, default `false`|
+
 
 ### ungzip
 
@@ -43,6 +45,7 @@ node ./bin/3d-tiles-tools.js ungzip -i ./specs/data/TilesetOfTilesets/ -o ./outp
 |----|-----------|--------|
 |`-i`, `--input`|Input directory of the tileset.| :white_check_mark: Yes|
 |`-o`, `--output`|Output directory of the processed tileset.|No|
+|`-f`, `--force`|Overwrite output directory if it exists.|No, default `false`|
 
 ## Pipeline
 
@@ -56,6 +59,7 @@ node ./bin/3d-tiles-tools.js pipeline -i ./specs/data/pipeline.json
 |Flag|Description|Required|
 |----|-----------|--------|
 |`-i`, `--input`|Input pipeline JSON file.| :white_check_mark: Yes|
+|`-f`, `--force`|Overwrite output directory if it exists.|No, default `false`|
 
 Executes a pipeline JSON file containing an input directory, output directory, and list of stages to run.
 A stage can be a string specifying the stage name or an object specifying the stage name and any additional parameters.
