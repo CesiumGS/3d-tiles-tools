@@ -5,13 +5,13 @@ var Promise = require('bluebird');
 
 var fsReadFile = Promise.promisify(fs.readFile);
 
-var gltfPath = './specs/data/CesiumTexturedBox/CesiumTexturedBox.glb';
+var glbPath = './specs/data/CesiumTexturedBox/CesiumTexturedBox.glb';
 
 describe('glbToB3dm', function() {
 
     var glbBuffer;
     beforeAll(function(done) {
-        fsReadFile(gltfPath)
+        fsReadFile(glbPath)
             .then(function(data) {
                 glbBuffer = data;
                 done();

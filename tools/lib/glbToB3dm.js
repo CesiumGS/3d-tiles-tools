@@ -10,7 +10,7 @@ module.exports = glbToB3dm;
  * Generates a new Buffer representing a b3dm file with a plain header.
  *
  * @param {Buffer} glbBuffer a buffer representing a binary gltf
- * @returns {Buffer}
+ * @returns {Buffer} buffer representing the b3dm
  */
 function glbToB3dm(glbBuffer) {
     if (!defined(glbBuffer)) {
