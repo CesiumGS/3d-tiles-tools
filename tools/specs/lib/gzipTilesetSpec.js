@@ -1,9 +1,11 @@
 'use strict';
 var fsExtra = require('fs-extra');
+var path = require('path');
 var Promise = require('bluebird');
 var isGzipped = require('../../lib/isGzipped');
 var gzipTileset = require('../../lib/gzipTileset');
 
+var fsExtraOutputFile = Promise.promisify(fsExtra.outputFile);
 var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
 var fsExtraRemove = Promise.promisify(fsExtra.remove);
 
@@ -15,7 +17,7 @@ var ungzippedDirectory = './specs/data/TilesetOfTilesets-ungzipped';
 var ungzippedJson = './specs/data/TilesetOfTilesets-ungzipped/tileset.json';
 
 describe('gzipTileset', function() {
-    afterEach(function(done) {
+    afterEach(function (done) {
         Promise.all([
             fsExtraRemove(gzippedDirectory),
             fsExtraRemove(ungzippedDirectory)
@@ -138,8 +140,10 @@ describe('gzipTileset', function() {
             }), done).toResolve();
     });
 
-    it('throws error when no input tileset is given', function (done) {
-        expect(gzipTileset(), done).toRejectWith(Error);
+    it('throws error when no input tileset is given', function () {
+        expect(function() {
+            gzipTileset();
+        }).toThrowDeveloperError();
     });
 
     it('throws error when input tileset does not exist', function (done) {
@@ -151,13 +155,55 @@ describe('gzipTileset', function() {
         expect(gzipTileset(gzipOptions), done).toRejectWith(Error);
     });
 
-    it('writes debug info to console when verbose is true', function (done) {
+    it('accepts custom writeCallback that does not return a promise', function (done) {
+        var writeCallback = function(file, data) {
+            console.log('Save file ' + file + ' with data ' + data);
+        };
+        var gzipOptions = {
+            inputDirectory : tilesetDirectory,
+            gzip : true,
+            writeCallback : writeCallback
+        };
+
+        var spy = spyOn(console, 'log').and.callFake(function(){});
+        expect(gzipTileset(gzipOptions)
+            .then(function() {
+                expect(spy).toHaveBeenCalled();
+            }), done).toResolve();
+    });
+
+    it('accepts custom writeCallback that returns a promise', function (done) {
+        var outputDirectory = gzippedDirectory;
+        var writeCallback = function(file, data) {
+            var outputFile = path.join(outputDirectory, file);
+            return fsExtraOutputFile(outputFile, data);
+        };
+        var gzipOptions = {
+            inputDirectory : tilesetDirectory,
+            gzip : true,
+            writeCallback : writeCallback
+        };
+        expect(gzipTileset(gzipOptions)
+            .then(function() {
+                return isGzipped(gzippedJson)
+                    .then(function(isGzipped) {
+                        expect(isGzipped).toBe(true);
+                    });
+            }), done).toResolve();
+    });
+
+    it('logs debug messages', function (done) {
+        var logCallback = function(message) {
+            console.log(message);
+        };
+
         var gzipOptions = {
             inputDirectory : tilesetDirectory,
             outputDirectory : gzippedDirectory,
             gzip : true,
-            verbose : true
+            logCallback : logCallback
         };
+
         var spy = spyOn(console, 'log').and.callFake(function(){});
         expect(gzipTileset(gzipOptions)
             .then(function() {

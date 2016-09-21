@@ -58,6 +58,10 @@ if (command === 'pipeline') {
         });
 }
 
+function logCallback(message) {
+    console.log(message);
+}
+
 function processPipeline(inputFile) {
     return fsExtraReadJson(inputFile)
         .then(function(pipeline) {
@@ -87,7 +91,7 @@ function processPipeline(inputFile) {
                     pipeline.output = outputDirectory;
 
                     var options = {
-                        verbose : true
+                        logCallback : logCallback
                     };
 
                     return runPipeline(pipeline, options);
@@ -116,7 +120,7 @@ function processStage(inputDirectory, force, command, argv) {
             };
 
             var options = {
-                verbose : true
+                logCallback : logCallback
             };
 
             return runPipeline(pipeline, options);

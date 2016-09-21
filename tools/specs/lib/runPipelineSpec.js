@@ -1,9 +1,11 @@
 'use strict';
 var fsExtra = require('fs-extra');
+var path = require('path');
 var Promise = require('bluebird');
 var isGzipped = require('../../lib/isGzipped');
 var runPipeline = require('../../lib/runPipeline');
 
+var fsExtraOutputFile = Promise.promisify(fsExtra.outputFile);
 var fsExtraRemove = Promise.promisify(fsExtra.remove);
 
 var inputDirectory = './specs/data/TilesetOfTilesets/';
@@ -173,16 +175,46 @@ describe('runPipeline', function() {
             }), done).toResolve();
     });
 
-    it('writes debug info to console when verbose is true', function (done) {
-        var spy = spyOn(console, 'log').and.callFake(function(){});
+    it('accepts custom writeCallback', function (done) {
+        var writeCallback = function(file, data) {
+            var outputFile = path.join(outputDirectory, file);
+            return fsExtraOutputFile(outputFile, data);
+        };
+
+        var pipeline = {
+            input : inputDirectory,
+            stages : ['gzip']
+        };
+
+        var options = {
+            writeCallback : writeCallback
+        };
+
+        expect(runPipeline(pipeline, options)
+            .then(function() {
+                return isGzipped(outputJson)
+                    .then(function(isGzipped) {
+                        expect(isGzipped).toBe(true);
+                    });
+            }), done).toResolve();
+    });
+
+    it('logs debug messages', function (done) {
+        var logCallback = function(message) {
+            console.log(message);
+        };
+
         var pipeline = {
             input : inputDirectory,
             output : outputDirectory,
             stages : ['gzip']
         };
+
         var options = {
-            verbose : true
+            logCallback : logCallback
         };
+
+        var spy = spyOn(console, 'log').and.callFake(function(){});
         expect(runPipeline(pipeline, options)
             .then(function() {
                 expect(spy).toHaveBeenCalled();

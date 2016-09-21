@@ -102,17 +102,10 @@ Gzips the input tileset.
 |   |Type|Description|Required|
 |---|----|-----------|--------|
 |**tilesOnly**|`boolean`|Only gzip tiles.|No, default: `false`|
-|**verbose**|`boolean`|Prints out debug messages to the console.|No, default: `false`|
 
 ####ungzip
 
 Ungzips the input tileset.
-
-**Properties**
-
-|   |Type|Description|Required|
-|---|----|-----------|--------|
-|**verbose**|`boolean`|Prints out debug messages to the console.|No, default: `false`|
 
 ## Build Instructions
 

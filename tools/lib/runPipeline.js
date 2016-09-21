@@ -24,7 +24,8 @@ module.exports = runPipeline;
  * @param {String} [pipeline.output] Output tileset path.
  * @param {Array<Object|String>} [pipeline.stages] The stages to run on the tileset.
  * @param {Object} [options] An object with the following properties:
- * @param {Boolean} [options.verbose] If true prints out debug messages to the console.
+ * @param {WriteCallback} [options.writeCallback] A callback function that writes files after they have been processed.
+ * @param {LogCallback} [options.logCallback] A callback function that logs messages.
  */
 function runPipeline(pipeline, options) {
     pipeline = defaultValue(pipeline, defaultValue.EMPTY_OBJECT);
@@ -44,7 +45,9 @@ function runPipeline(pipeline, options) {
     }
 
     options = defaultValue(options, defaultValue.EMPTY_OBJECT);
-    var verbose = defaultValue(options.verbose, false);
+
+    var writeCallback = options.writeCallback;
+    var logCallback = options.logCallback;
 
     var workingDirectory1 = getWorkingDirectory();
     var workingDirectory2 = getWorkingDirectory();
@@ -73,7 +76,13 @@ function runPipeline(pipeline, options) {
 
         stageOptions.inputDirectory = stageInputDirectory;
         stageOptions.outputDirectory = stageOutputDirectory;
-        stageOptions.verbose = defaultValue(stageOptions.verbose, verbose);
+        stageOptions.logCallback = logCallback;
+
+        if (i === stagesLength - 1) {
+            // TODO : Not sure if this is the right approach. Should the writeCallback also have control over the temp directories? How would that work?
+            // Only allow the write callback to act on the last stage. The intermediary stages always write to temp directories.
+            stageOptions.writeCallback = writeCallback;
+        }
 
         var stageFunction = getStageFunction(stageName, stageOptions);
         if (!defined(stageFunction)) {
@@ -82,7 +91,8 @@ function runPipeline(pipeline, options) {
 
         stageObjects.push({
             options : stageOptions,
-            stageFunction : stageFunction
+            stageFunction : stageFunction,
+            name : stageName
         });
     }
 
@@ -90,9 +100,12 @@ function runPipeline(pipeline, options) {
     return Promise.each(stageObjects, function(stage) {
         return fsExtraEmptyDir(stage.options.outputDirectory)
             .then(function() {
+                if (defined(logCallback)) {
+                    logCallback('Running ' + stage.name);
+                }
                 return stage.stageFunction(stage.options);
             });
-    }).all(function() {
+    }).finally(function() {
         return Promise.all([
             fsExtraRemove(workingDirectory1),
             fsExtraRemove(workingDirectory2)
@@ -113,3 +126,18 @@ function getStageFunction(stageName, stageOptions) {
     }
 }
 
+/**
+ * A callback function that writes files after they have been processed.
+ * @callback WriteCallback
+ *
+ * @param {String} file Relative path of the file.
+ * @param {Buffer} buffer A buffer storing the processed file's data.
+ * @returns {Promise} A promise that resolves when the callback is complete.
+ */
+
+/**
+ * A callback function that logs messages.
+ * @callback LogCallback
+ *
+ * @param {String} message A log message.
+ */
