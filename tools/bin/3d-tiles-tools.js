@@ -15,7 +15,7 @@ var defined = Cesium.defined;
 
 if (process.argv.length < 4 || defined(argv.h) || defined(argv.help) || !defined(argv._[0])) {
     var help =
-        'Usage: node ' + path.basename(__filename) + ' command [args]\n' +
+        'Usage: 3d-tiles-tools command [args]\n' +
         'Possible commands:\n' +
         '    pipeline  Execute the input pipeline JSON file.\n' +
         '        -i --input, input=PATH The input pipeline JSON file.\n' +
