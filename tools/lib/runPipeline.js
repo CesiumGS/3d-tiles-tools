@@ -3,6 +3,7 @@ var Cesium = require('cesium');
 var fsExtra = require('fs-extra');
 var path = require('path');
 var Promise = require('bluebird');
+var combineTileset = require('./combineTileset');
 var getWorkingDirectory = require('./getWorkingDirectory');
 var gzipTileset = require('./gzipTileset');
 
@@ -121,6 +122,8 @@ function getStageFunction(stageName, stageOptions) {
         case 'ungzip':
             stageOptions.gzip = false;
             return gzipTileset;
+        case 'combine':
+            return combineTileset;
         default:
             return undefined;
     }

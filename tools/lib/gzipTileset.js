@@ -6,6 +6,7 @@ var Promise = require('bluebird');
 var zlib = require('zlib');
 var getDefaultWriteCallback = require('./getDefaultWriteCallback');
 var isGzipped = require('./isGzipped');
+var walkDirectory = require('./walkDirectory');
 
 var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
 
@@ -25,6 +26,8 @@ module.exports = gzipTileset;
  * @param {Boolean} [options.tilesOnly=false] Only gzip tiles, does not gzip tileset.json or other files.
  * @param {WriteCallback} [options.writeCallback] A callback function that writes files after they have been processed.
  * @param {LogCallback} [options.logCallback] A callback function that logs messages.
+ *
+ * @returns {Promise} A promise that resolves with the operation completes.
  */
 function gzipTileset(options) {
     options = defaultValue(options, defaultValue.EMPTY_OBJECT);
@@ -48,41 +51,15 @@ function gzipTileset(options) {
     }
 
     var operation = gzip ? zlib.gzipSync : zlib.gunzipSync;
-
-    return new Promise(function(resolve, reject) {
-        getNumberOfFilesInDirectory(inputDirectory)
-            .then(function(numberOfFiles) {
-                var writeFile = getWriteFile(writeCallback, numberOfFiles, resolve, reject);
-                fsExtra.walk(inputDirectory)
-                    .on('data', function (item) {
-                        if (!item.stats.isDirectory()) {
-                            var inputFile = item.path;
-                            var file = path.relative(inputDirectory, item.path);
-
-                            if (gzip && tilesOnly && !isTile(inputFile)) {
-                                copyFile(inputFile, file, writeFile);
-                            } else {
-                                isGzipped(inputFile)
-                                    .then(function(fileIsGzipped) {
-                                        if (fileIsGzipped === gzip) {
-                                            // File is already in the correct state
-                                            copyFile(inputFile, file, writeFile);
-                                        } else {
-                                            fsExtraReadFile(inputFile)
-                                                .then(function(data) {
-                                                    data = operation(data);
-                                                    writeFile(file, data);
-                                                })
-                                                .catch(reject);
-                                        }
-                                    })
-                                    .catch(reject);
-                            }
-                        }
-                    })
-                    .on('error', reject);
-            })
-            .catch(reject);
+    return walkDirectory(inputDirectory, function(file) {
+        return fsExtraReadFile(file)
+            .then(function(data) {
+                if (!(gzip && tilesOnly && !isTile(file)) && (isGzipped(data) !== gzip)) {
+                    data = operation(data);
+                }
+                var relativePath = path.relative(inputDirectory, file);
+                return writeCallback(relativePath, data);
+            });
     });
 }
 
@@ -93,47 +70,4 @@ function isTile(file) {
            extension === '.pnts' ||
            extension === '.cmpt' ||
            extension === '.vctr';
-}
-
-function getNumberOfFilesInDirectory(directory) {
-    return new Promise(function(resolve, reject) {
-        var numberOfFiles = 0;
-        fsExtra.walk(directory)
-            .on('data', function (item) {
-                if (!item.stats.isDirectory()) {
-                    ++numberOfFiles;
-                }
-            })
-            .on('end', function () {
-                resolve(numberOfFiles);
-            })
-            .on('error', reject);
-    });
-}
-
-function getWriteFile(writeCallback, numberOfFiles, resolve, reject) {
-    var numberComplete = 0;
-    function complete() {
-        ++numberComplete;
-        if (numberComplete === numberOfFiles) {
-            resolve();
-        }
-    }
-    return function(file, data) {
-        var promise = writeCallback(file, data);
-        if (defined(promise)) {
-            promise
-                .then(complete)
-                .catch(reject);
-        } else {
-            complete();
-        }
-    };
-}
-
-function copyFile(inputFile, file, writeFile) {
-    return fsExtraReadFile(inputFile)
-        .then(function(data) {
-            return writeFile(file, data);
-        });
 }

@@ -47,6 +47,17 @@ node ./bin/3d-tiles-tools.js ungzip -i ./specs/data/TilesetOfTilesets/ -o ./outp
 |`-o`, `--output`|Output directory of the processed tileset.|No|
 |`-f`, `--force`|Overwrite output directory if it exists.|No, default `false`|
 
+### combine
+
+Combines all external tilesets into a single tileset.json file.
+
+```
+node ./bin/3d-tiles-tools.js combine ./specs/data/TilesetOfTilesets/ ./output/TilesetOfTilesets-combined/
+```
+```
+node ./bin/3d-tiles-tools.js combine -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-combined/
+```
+
 ## Pipeline
 
 ```

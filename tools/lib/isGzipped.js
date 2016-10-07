@@ -1,17 +1,12 @@
 'use strict';
-var fsExtra = require('fs-extra');
-var Promise = require('bluebird');
-
-var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
-
 module.exports = isGzipped;
 
 /**
- * @private
+ * Test if the provided data is gzipped.
+ *
+ * @param {Buffer} data A buffer containing the data to test.
+ * @returns {Boolean} True if the data is gzipped, False if not.
  */
-function isGzipped(file) {
-    return fsExtraReadFile(file)
-        .then(function (data) {
-            return (data[0] === 0x1f) && (data[1] === 0x8b);
-        });
+function isGzipped(data) {
+    return data[0] === 0x1f && data[1] === 0x8b;
 }

@@ -28,7 +28,12 @@ if (process.argv.length < 4 || defined(argv.h) || defined(argv.help) || !defined
         '    ungzip  Ungzips the input tileset.\n' +
         '        -i --input, input=PATH The input tileset directory.\n' +
         '        -o --output, output=PATH The output tileset directory.\n' +
-        '        -f --force, Overwrite output directory if it exists.\n';
+        '        -f --force, Overwrite output directory if it exists.\n' +
+        '    combine  Combines all external tilesets into a single tileset.json file.\n' +
+        '        -i --input, input=PATH The input tileset directory.\n' +
+        '        -o --output, output=PATH The output tileset directory.\n' +
+        '        -r --rootJson, rootJson=PATH Relative path to the root json. If omitted, "tileset.json" is used.\n' +
+        '        -f --force, Overwrite output directory if it exists.\n' +
     console.log(help);
     return;
 }
@@ -137,6 +142,8 @@ function getStage(stageName, argv) {
                 stage.tilesOnly = true;
             }
             break;
+        case 'combine':
+            stage.rootJson = defaultValue(argv.r, argv.rootJson);
     }
     return stage;
 }
