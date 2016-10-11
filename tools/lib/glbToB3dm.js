@@ -7,7 +7,7 @@ var DeveloperError = Cesium.DeveloperError;
 module.exports = glbToB3dm;
 
 /**
- * Generates a new Buffer representing a b3dm file with a plain header.
+ * Generates a new Buffer representing a b3dm file with a basic header.
  *
  * @param {Buffer} glbBuffer a buffer representing a binary gltf
  * @returns {Buffer} buffer representing the b3dm

@@ -23,22 +23,23 @@
   },
   "dependencies": {
     "bluebird": "3.4.1",
-    "cesium": "1.24"
+    "cesium": "1.24",
+    "fs-extra": "0.30.0",
+    "uuid": "2.0.2",
+    "yargs": "4.8.1"
   },
   "devDependencies": {
-    "fs-extra": "0.30.0",
     "gulp": "3.9.1",
     "gulp-jshint": "2.0.1",
     "istanbul": "0.4.4",
     "jasmine": "2.4.1",
     "jasmine-spec-reporter": "2.5.0",
+    "jsdoc": "3.4.0",
     "jshint": "2.9.2",
     "jshint-stylish": "2.2.0",
     "open": "0.0.5",
     "request": "2.74.0",
-    "requirejs": "2.2.0",
-    "rimraf": "2.5.4",
-    "yargs": "4.8.1"
+    "requirejs": "2.2.0"
   },
   "scripts": {
     "jsHint": "gulp jsHint",
@@ -46,6 +47,10 @@
     "test": "gulp test",
     "test-watch": "gulp test-watch",
     "coverage": "gulp coverage",
-    "update-ts-definitions": "gulp update-ts-definitions"
+    "update-ts-definitions": "gulp update-ts-definitions",
+    "jsDoc": "gulp jsDoc"
+  },
+  "bin": {
+    "3d-tiles-tools": "./bin/3d-tiles-tools.js"
   }
 }

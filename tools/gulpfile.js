@@ -9,6 +9,7 @@ var Jasmine = require('jasmine');
 var JasmineSpecReporter = require('jasmine-spec-reporter');
 var open = require('open');
 var path = require('path');
+var Promise = require('bluebird');
 var request = require('request');
 var yargs = require('yargs');
 
@@ -21,7 +22,7 @@ var environmentSeparator = process.platform === 'win32' ? ';' : ':';
 var nodeBinaries = path.join(__dirname, 'node_modules', '.bin');
 process.env.PATH += environmentSeparator + nodeBinaries;
 
-var jsHintFiles = ['**/*.js', '!node_modules/**', '!coverage/**'];
+var jsHintFiles = ['**/*.js', '!node_modules/**', '!coverage/**', '!doc/**'];
 var specFiles = ['**/*.js', '!node_modules/**', '!coverage/**'];
 
 gulp.task('jsHint', function () {
@@ -54,8 +55,8 @@ gulp.task('test', function (done) {
 
 gulp.task('test-watch', function () {
     gulp.watch(specFiles).on('change', function () {
-        //We can't simply depend on the test task because Jasmine
-        //does not like being run multiple times in the same process.
+        // We can't simply depend on the test task because Jasmine
+        // does not like being run multiple times in the same process.
         try {
             child_process.execSync('jasmine JASMINE_CONFIG_PATH=specs/jasmine.json', {
                 stdio: [process.stdin, process.stdout, process.stderr]
@@ -72,7 +73,7 @@ gulp.task('coverage', function () {
         ' cover' +
         ' --include-all-sources' +
         ' --dir coverage' +
-        ' -x "specs/** coverage/** index.js gulpfile.js"' +
+        ' -x "bin/** doc/** specs/** coverage/** index.js gulpfile.js"' +
         ' node_modules/jasmine/bin/jasmine.js' +
         ' JASMINE_CONFIG_PATH=specs/jasmine.json', {
         stdio: [process.stdin, process.stdout, process.stderr]
@@ -103,4 +104,18 @@ gulp.task('update-ts-definitions', function () {
     var packageJson = require('./package.json');
     Object.keys(packageJson.dependencies).forEach(copyModule);
     Object.keys(packageJson.devDependencies).forEach(copyModule);
+});
+
+gulp.task('jsDoc', function() {
+    return new Promise(function(resolve, reject) {
+        child_process.exec('jsdoc --configure tools/jsdoc/conf.json', function(error, stdout, stderr) {
+            if (error) {
+                console.log(stderr);
+                return reject(error);
+            }
+            console.log(stdout);
+            open('doc/index.html');
+            resolve();
+        });
+    });
 });

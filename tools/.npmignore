@@ -1,5 +1,9 @@
 /coverage
+/doc
+/output
+/test
 /specs
+/tools
 /TypeScriptDefinitions
 /.idea
 .jshintrc

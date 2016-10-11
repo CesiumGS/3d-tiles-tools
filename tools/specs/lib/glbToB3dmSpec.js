@@ -1,14 +1,13 @@
 'use strict';
-var glbToB3dm = require('../../lib/glbToB3dm');
 var fs = require('fs');
 var Promise = require('bluebird');
+var glbToB3dm = require('../../lib/glbToB3dm');
 
 var fsReadFile = Promise.promisify(fs.readFile);
 
 var glbPath = './specs/data/CesiumTexturedBox/CesiumTexturedBox.glb';
 
 describe('glbToB3dm', function() {
-
     var glbBuffer;
     beforeAll(function(done) {
         fsReadFile(glbPath)
