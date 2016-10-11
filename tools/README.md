@@ -47,6 +47,24 @@ node ./bin/3d-tiles-tools.js ungzip -i ./specs/data/TilesetOfTilesets/ -o ./outp
 |`-o`, `--output`|Output directory of the processed tileset.|No|
 |`-f`, `--force`|Overwrite output directory if it exists.|No, default `false`|
 
+### glbToB3dm
+
+Creates a b3dm from a glb with an empty batch table. Since this tool does not
+process an entire tileset, it cannot be used with the Pipeline tool.
+
+```
+node ./bin/3d-tiles-tools.js glbToB3dm ./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb ./output/CesiumTexturedBox.b3dm
+```
+```
+node ./bin/3d-tiles-tools.js glbToB3dm -i ./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb -o ./output/CesiumTexturedBox.b3dm
+```
+
+| Flag | Description | Required |
+| ---- | ----------- | -------- |
+|`-i`, `--input`| Input path of the `.glb`| :white_check_mark: Yes |
+|`-o`, `--output`| Output path of the resulting `.b3dm` | No |
+|`-f`, `--force`|Overwrite output file if it exists.|No, default `false`|
+
 ## Pipeline
 
 ```

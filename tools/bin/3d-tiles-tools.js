@@ -5,10 +5,13 @@ var Cesium = require('cesium');
 var fsExtra = require('fs-extra');
 var path = require('path');
 var Promise = require('bluebird');
+var glbToB3dm = require('../lib/glbToB3dm');
 var runPipeline = require('../lib/runPipeline');
 
 var fsExtraReadJson = Promise.promisify(fsExtra.readJson);
 var fsStat = Promise.promisify(fsExtra.stat);
+var fsReadFile = Promise.promisify(fsExtra.readFile);
+var fsWriteFile = Promise.promisify(fsExtra.outputFile);
 
 var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
@@ -20,6 +23,10 @@ if (process.argv.length < 4 || defined(argv.h) || defined(argv.help) || !defined
         '    pipeline  Execute the input pipeline JSON file.\n' +
         '        -i --input, input=PATH The input pipeline JSON file.\n' +
         '        -f --force, Overwrite output directory if it exists.\n' +
+        '    glbToB3dm  Repackage the input glb as a b3dm with a basic header.\n' +
+        '        -i --input, input=PATH The input glb path.\n' +
+        '        -o --output, output=PATH The output b3dm path.\n' +
+        '        -f --force, Overwrite output file if it exists.\n' +
         '    gzip  Gzips the input tileset.\n' +
         '        -i --input, input=PATH The input tileset directory.\n' +
         '        -o --output, output=PATH The output tileset directory.\n' +
@@ -51,6 +58,9 @@ if (command === 'pipeline') {
         .then(function() {
             console.timeEnd('Total');
         });
+} else if (command === 'glbToB3dm') {
+    // glbToB3dm is not a pipeline tool, so handle it separately.
+    readGlbWriteB3dm(input, force, argv);
 } else {
     processStage(input, force, command, argv)
         .then(function() {
@@ -153,5 +163,37 @@ function directoryExists(directory) {
                 throw err;
             }
             return false;
+        });
+}
+
+function fileExists(filePath) {
+    return fsStat(filePath)
+        .then(function(stats) {
+            return stats.isFile();
+        })
+        .catch(function(err) {
+            // If the file doesn't exist the error code is ENOENT.
+            // Otherwise something else went wrong - permission issues, etc.
+            if (err.code !== 'ENOENT') {
+                throw err;
+            }
+            return false;
+        });
+}
+
+function readGlbWriteB3dm(inputPath, force, argv) {
+    var outputPath = defaultValue(
+        defaultValue(argv.o, argv.output),
+        defaultValue(argv._[2], inputPath.slice(0, inputPath.length - 3) + 'b3dm'));
+    return fileExists(outputPath)
+        .then(function(exists) {
+            if (!force && exists) {
+                console.log('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
+                return;
+            }
+            return fsReadFile(inputPath)
+                .then(function(data) {
+                    return fsWriteFile(outputPath, glbToB3dm(data));
+                });
         });
 }
