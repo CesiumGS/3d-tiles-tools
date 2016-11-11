@@ -5,7 +5,7 @@ var path = require('path');
 var Promise = require('bluebird');
 var zlib = require('zlib');
 var getDefaultWriteCallback = require('./getDefaultWriteCallback');
-var isGzipped = require('./isGzipped');
+var isGzippedFile = require('./isGzippedFile');
 
 var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
 
@@ -62,7 +62,7 @@ function gzipTileset(options) {
                             if (gzip && tilesOnly && !isTile(inputFile)) {
                                 copyFile(inputFile, file, writeFile);
                             } else {
-                                isGzipped(inputFile)
+                                isGzippedFile(inputFile)
                                     .then(function(fileIsGzipped) {
                                         if (fileIsGzipped === gzip) {
                                             // File is already in the correct state

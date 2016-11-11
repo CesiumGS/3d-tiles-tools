@@ -19,7 +19,18 @@ var parseBinaryGltf = GltfPipeline.parseBinaryGltf;
 
 module.exports = optimizeB3dm;
 
+/**
+ * Given an input, possibly gzipped buffer containing a b3dm, optimize it using gltf-pipeline with the provided options
+ *
+ * @param {Buffer} buffer The buffer containing the b3dm.
+ * @param {Object} [options] Options specifying custom gltf-pipeline behavior.
+ * @returns {Buffer} The optimized b3dm buffer.
+ */
 function optimizeB3dm(buffer, options) {
+    if (!defined(buffer)) {
+        throw new DeveloperError('buffer is not defined.');
+    }
+    options = defaultValue(options, {});
     var resolveDataPromise = Promise.resolve(buffer);
     if (isGzipped(buffer)) {
         resolveDataPromise = zlibGunzip(buffer);
@@ -38,7 +49,7 @@ function optimizeB3dm(buffer, options) {
             }
             var version = buffer.readUInt32LE(4);
             if (version !== 1) {
-                throw new DeveloperError('Invalid version. Only "1" is valid, got: "' + version + '".');
+                throw new DeveloperError('Invalid version, only "1" is valid, got: "' + version + '".');
             }
             byteLength = buffer.readUInt32LE(8);
             batchTableJSONByteLength = buffer.readUInt32LE(12);

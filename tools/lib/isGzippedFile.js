@@ -1,16 +1,16 @@
 'use strict';
 var Promise = require('bluebird');
 var fsExtra = require('fs-extra');
-var isGzipped = requrie('./isGzipped');
+var isGzipped = require('./isGzipped');
 
 var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
 
-module.exports = isGzipped;
+module.exports = isGzippedFile;
 
 /**
  * @private
  */
-function isGzipped(buffer) {
+function isGzippedFile(file) {
     return fsExtraReadFile(file)
         .then(function (buffer) {
             return isGzipped(buffer)
