@@ -1,55 +1,103 @@
 #!/usr/bin/env node
 'use strict';
-var argv = require('yargs').argv;
 var Cesium = require('cesium');
+var GltfPipeline = require('gltf-pipeline');
+var Promise = require('bluebird');
 var fsExtra = require('fs-extra');
 var path = require('path');
-var Promise = require('bluebird');
+var yargs = require('yargs');
+var zlib = require('zlib');
 var glbToB3dm = require('../lib/glbToB3dm');
+var optimizeB3dm = require('../lib/optimizeB3dm');
 var runPipeline = require('../lib/runPipeline');
 
 var fsExtraReadJson = Promise.promisify(fsExtra.readJson);
 var fsStat = Promise.promisify(fsExtra.stat);
 var fsReadFile = Promise.promisify(fsExtra.readFile);
 var fsWriteFile = Promise.promisify(fsExtra.outputFile);
+var zlibGzip = Promise.promisify(zlib.gzip);
 
 var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
 
-if (process.argv.length < 4 || defined(argv.h) || defined(argv.help) || !defined(argv._[0])) {
-    var help =
-        'Usage: 3d-tiles-tools command [args]\n' +
-        'Possible commands:\n' +
-        '    pipeline  Execute the input pipeline JSON file.\n' +
-        '        -i --input, input=PATH The input pipeline JSON file.\n' +
-        '        -f --force, Overwrite output directory if it exists.\n' +
-        '    glbToB3dm  Repackage the input glb as a b3dm with a basic header.\n' +
-        '        -i --input, input=PATH The input glb path.\n' +
-        '        -o --output, output=PATH The output b3dm path.\n' +
-        '        -f --force, Overwrite output file if it exists.\n' +
-        '    gzip  Gzips the input tileset.\n' +
-        '        -i --input, input=PATH The input tileset directory.\n' +
-        '        -o --output, output=PATH The output tileset directory.\n' +
-        '        -t --tilesOnly, Only gzip tiles.\n' +
-        '        -f --force, Overwrite output directory if it exists.\n' +
-        '    ungzip  Ungzips the input tileset.\n' +
-        '        -i --input, input=PATH The input tileset directory.\n' +
-        '        -o --output, output=PATH The output tileset directory.\n' +
-        '        -f --force, Overwrite output directory if it exists.\n';
-    console.log(help);
-    return;
+var index = -1;
+for (var i = 0; i < process.argv.length; i++) {
+    if (process.argv[i] === '--options') {
+        index = i;
+        break;
+    }
 }
 
+var args;
+var optionArgs;
+if (index < 0) {
+    args = process.argv.slice(2);
+} else {
+    args = process.argv.slice(2, index);
+    optionArgs = process.argv.slice(index + 1);
+}
+
+var argv = yargs
+    .usage('Usage: $0 <command> [options]')
+    .help('h')
+    .alias('h', 'help')
+    .options({
+        'i': {
+            alias: 'input',
+            description: 'Input path for the command.',
+            global: true,
+            normalize: true,
+            type: 'string'
+        },
+        'o': {
+            alias: 'output',
+            description: 'Output path for the command.',
+            global: true,
+            normalize: true,
+            type: 'string'
+        },
+        'f': {
+            alias: 'force',
+            default: false,
+            description: 'Output can be overwritten if it already exists.',
+            global: true,
+            type: 'boolean'
+        }
+    })
+    .command('pipeline', 'Execute the input pipeline JSON file.')
+    .command('glbToB3dm', 'Repackage the input glb as a b3dm with a basic header.')
+    .command('optimizeB3dm', 'Pass the input b3dm through gltf-pipeline.', {
+        'z': {
+            alias: 'zip',
+            default: false,
+            description: 'Gzip the output b3dm.',
+            type: 'boolean'
+        },
+        'options': {
+            description: 'All arguments after this flag will be passed to gltf-pipeline as command line options.'
+        }
+    })
+    .command('gzip', 'Gzips the input tileset directory.', {
+        't': {
+            alias: 'tilesOnly',
+            description: 'Only tile files (.b3dm, .i3dm, .pnts, .vctr) should be gzipped.'
+        }
+    })
+    .command('ungzip', 'Ungzips the input tileset directory.')
+    .demand(1)
+    .recommendCommands()
+    .strict()
+    .parse(args);
+
 var command = argv._[0];
-var input = defaultValue(defaultValue(argv.i, argv.input), argv._[1]);
-var force = defined(argv.f) || defined(argv.force);
+var input = defaultValue(argv.i, argv._[1]);
+var output = defaultValue(argv.o, argv._[2]);
+var force = argv.f;
 
 if (!defined(input)) {
     console.log('-i or --input argument is required. See --help for details.');
     return;
 }
-
-input = path.normalize(input);
 
 console.time('Total');
 
@@ -60,7 +108,40 @@ if (command === 'pipeline') {
         });
 } else if (command === 'glbToB3dm') {
     // glbToB3dm is not a pipeline tool, so handle it separately.
-    readGlbWriteB3dm(input, force, argv);
+    readGlbWriteB3dm(input, output, force);
+} else if (command === 'optimizeB3dm') {
+    // optimizeB3dm is not a pipeline tool, so handle it separately.
+    var options = {};
+    if (defined(optionArgs)) {
+        // Specify input for argument parsing even though it won't be used
+        optionArgs.push('-i');
+        optionArgs.push('null');
+        options = GltfPipeline.parseArguments(optionArgs);
+    }
+    output = defaultValue(output, input.slice(0, input.length - 4) + 'b3dm');
+    fileExists(output)
+        .then(function(exists) {
+            if (exists && !force) {
+                throw new Error('File ' + output + ' already exists. Specify -f or --force to overwrite existing file.');
+            } else {
+                return fsReadFile(input);
+            }
+        })
+        .then(function(fileBuffer) {
+            return optimizeB3dm(fileBuffer, options);
+        })
+        .then(function(b3dmBuffer) {
+            if (argv.z) {
+                return zlibGzip(b3dmBuffer);
+            }
+            return b3dmBuffer;
+        })
+        .then(function(buffer) {
+            return fsWriteFile(output, buffer);
+        })
+        .catch(function(err) {
+            console.log(err);
+        });
 } else {
     processStage(input, force, command, argv)
         .then(function() {
@@ -181,10 +262,8 @@ function fileExists(filePath) {
         });
 }
 
-function readGlbWriteB3dm(inputPath, force, argv) {
-    var outputPath = defaultValue(
-        defaultValue(argv.o, argv.output),
-        defaultValue(argv._[2], inputPath.slice(0, inputPath.length - 3) + 'b3dm'));
+function readGlbWriteB3dm(inputPath, outputPath, force) {
+    outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 3) + 'b3dm');
     return fileExists(outputPath)
         .then(function(exists) {
             if (!force && exists) {
