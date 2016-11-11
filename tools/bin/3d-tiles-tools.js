@@ -66,7 +66,7 @@ var argv = yargs
     })
     .command('pipeline', 'Execute the input pipeline JSON file.')
     .command('glbToB3dm', 'Repackage the input glb as a b3dm with a basic header.')
-    .command('optimizeB3dm', 'Pass the input b3dm through gltf-pipeline.', {
+    .command('optimizeB3dm', 'Pass the input b3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)', {
         'z': {
             alias: 'zip',
             default: false,
