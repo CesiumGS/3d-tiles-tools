@@ -7,8 +7,10 @@ var fsExtra = require('fs-extra');
 var path = require('path');
 var yargs = require('yargs');
 var zlib = require('zlib');
+var extractB3dm = require('../lib/extractB3dm');
 var glbToB3dm = require('../lib/glbToB3dm');
-var optimizeB3dm = require('../lib/optimizeB3dm');
+var isGzipped = require('../lib/isGzipped');
+var optimizeGlb = require('../lib/optimizeGlb');
 var runPipeline = require('../lib/runPipeline');
 
 var fsExtraReadJson = Promise.promisify(fsExtra.readJson);
@@ -16,6 +18,7 @@ var fsStat = Promise.promisify(fsExtra.stat);
 var fsReadFile = Promise.promisify(fsExtra.readFile);
 var fsWriteFile = Promise.promisify(fsExtra.outputFile);
 var zlibGzip = Promise.promisify(zlib.gzip);
+var zlibGunzip = Promise.promisify(zlib.gunzip);
 
 var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
@@ -66,6 +69,7 @@ var argv = yargs
     })
     .command('pipeline', 'Execute the input pipeline JSON file.')
     .command('glbToB3dm', 'Repackage the input glb as a b3dm with a basic header.')
+    .command('b3dmToGlb', 'Extract the binary glTF asset from the input b3dm.')
     .command('optimizeB3dm', 'Pass the input b3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)', {
         'z': {
             alias: 'zip',
@@ -109,39 +113,12 @@ if (command === 'pipeline') {
 } else if (command === 'glbToB3dm') {
     // glbToB3dm is not a pipeline tool, so handle it separately.
     readGlbWriteB3dm(input, output, force);
+} else if (command === 'b3dmToGlb') {
+    // b3dmToGlb is not a pipeline tool, so handle it separately.
+    readB3dmWriteGlb(input, output, force);
 } else if (command === 'optimizeB3dm') {
     // optimizeB3dm is not a pipeline tool, so handle it separately.
-    var options = {};
-    if (defined(optionArgs)) {
-        // Specify input for argument parsing even though it won't be used
-        optionArgs.push('-i');
-        optionArgs.push('null');
-        options = GltfPipeline.parseArguments(optionArgs);
-    }
-    output = defaultValue(output, input.slice(0, input.length - 4) + 'b3dm');
-    fileExists(output)
-        .then(function(exists) {
-            if (exists && !force) {
-                throw new Error('File ' + output + ' already exists. Specify -f or --force to overwrite existing file.');
-            } else {
-                return fsReadFile(input);
-            }
-        })
-        .then(function(fileBuffer) {
-            return optimizeB3dm(fileBuffer, options);
-        })
-        .then(function(b3dmBuffer) {
-            if (argv.z) {
-                return zlibGzip(b3dmBuffer);
-            }
-            return b3dmBuffer;
-        })
-        .then(function(buffer) {
-            return fsWriteFile(output, buffer);
-        })
-        .catch(function(err) {
-            console.log(err);
-        });
+    readAndOptimizeB3dm(input, output, force);
 } else {
     processStage(input, force, command, argv)
         .then(function() {
@@ -274,5 +251,63 @@ function readGlbWriteB3dm(inputPath, outputPath, force) {
                 .then(function(data) {
                     return fsWriteFile(outputPath, glbToB3dm(data));
                 });
+        });
+}
+
+function readB3dmWriteGlb(inputPath, outputPath, force) {
+    outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 4) + 'glb');
+    return fileExists(outputPath)
+        .then(function(exists) {
+            if (!force && exists) {
+                console.log('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
+                return;
+            }
+            return fsReadFile(inputPath)
+                .then(function(data) {
+                    return fsWriteFile(outputPath, extractB3dm(data).glb);
+                });
+        });
+}
+
+function readAndOptimizeB3dm(inputPath, outputPath, force) {
+    var options = {};
+    if (defined(optionArgs)) {
+        // Specify input for argument parsing even though it won't be used
+        optionArgs.push('-i');
+        optionArgs.push('null');
+        options = GltfPipeline.parseArguments(optionArgs);
+    }
+    outputPath = defaultValue(outputPath, inputPath);
+    var b3dm;
+    fileExists(outputPath)
+        .then(function(exists) {
+            if (exists && !force) {
+                throw new Error('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
+            } else {
+                return fsReadFile(inputPath);
+            }
+        })
+        .then(function(fileBuffer) {
+            if (isGzipped(fileBuffer)) {
+                return zlibGunzip(fileBuffer);
+            }
+            return fileBuffer;
+        })
+        .then(function(fileBuffer) {
+            b3dm = extractB3dm(fileBuffer);
+            return optimizeGlb(b3dm.glb, options);
+        })
+        .then(function(glbBuffer) {
+            var b3dmBuffer = glbToB3dm(glbBuffer, b3dm.batchTable.JSON, b3dm.batchTable.binary, b3dm.header.batchLength);
+            if (argv.z) {
+                return zlibGzip(b3dmBuffer);
+            }
+            return b3dmBuffer;
+        })
+        .then(function(buffer) {
+            return fsWriteFile(outputPath, buffer);
+        })
+        .catch(function(err) {
+            console.log(err);
         });
 }

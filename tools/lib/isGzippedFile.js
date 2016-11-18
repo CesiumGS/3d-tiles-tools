@@ -13,6 +13,6 @@ module.exports = isGzippedFile;
 function isGzippedFile(file) {
     return fsExtraReadFile(file)
         .then(function (buffer) {
-            return isGzipped(buffer)
+            return isGzipped(buffer);
         });
 }
