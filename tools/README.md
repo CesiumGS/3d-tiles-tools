@@ -65,18 +65,33 @@ node ./bin/3d-tiles-tools.js glbToB3dm -i ./specs/data/CesiumTexturedBox/CesiumT
 |`-o`, `--output`| Output path of the resulting `.b3dm` | No |
 |`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
 
+### b3dmToGlb
+
+Creates a glb from a b3dm. Since this tool does not process an entire tileset,
+it cannot be used with the Pipeline tool.
+
+```
+node ./bin/3d-tiles-tools.js b3dmToGlb -i ./specs/data/batchedWithBatchTableBinary.b3dm -o ./output/extracted.glb
+```
+
+| Flag | Description | Required |
+| ---- | ----------- | -------- |
+|`-i`, `--input`| Input path of the `.glb`| :white_check_mark: Yes |
+|`-o`, `--output`| Output path of the resulting `.b3dm` | No |
+|`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
+
 ### optimizeB3dm
 
 Optimize a b3dm using [gltf-pipeline](https://github.com/AnalyticalGraphicsInc/gltf-pipeline/blob/master/README.md). Since this tool does not
 process an entire tileset, it cannot be used with the Pipeline tool.
 
 ```
-node ./bin/3d-tiles-tools.js optimizeB3dm -i ./specs/data/batchedWithBatchTable.b3dm -o ./output/optimized.b3dm
+node ./bin/3d-tiles-tools.js optimizeB3dm -i ./specs/data/batchedWithBatchTableBinary.b3dm -o ./output/optimized.b3dm
 ```
 
 Quantize floating-point attributes and oct-encode normals
 ```
-node ./bin/3d-tiles-tools.js optimizeB3dm -i ./specs/data/batchedWithBatchTable.b3dm -o ./output/optimized.b3dm --options -q -n
+node ./bin/3d-tiles-tools.js optimizeB3dm -i ./specs/data/batchedWithBatchTableBinary.b3dm -o ./output/optimized.b3dm --options -q -n
 ```
 
 | Flag | Description | Required |
