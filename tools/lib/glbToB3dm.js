@@ -11,7 +11,7 @@ module.exports = glbToB3dm;
  * Generates a new Buffer representing a b3dm asset.
  *
  * @param {Buffer} glbBuffer A buffer containing a binary glTF asset.
- * @param {Buffer} [batchTableJSONBuffer] A buffer containign the batch table to use for the b3dm asset.
+ * @param {Buffer} [batchTableJSONBuffer] A buffer containing the batch table to use for the b3dm asset.
  * @param {Buffer} [batchTableBinaryBuffer] A buffer containing the accompanying binary batch table section for the b3dm asset.
  * @param {Number} [batchLength] The number of features in the batch declared in the header.
  * @returns {Buffer} Buffer representing the b3dm asset.
