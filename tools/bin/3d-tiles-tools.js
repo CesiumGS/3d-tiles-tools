@@ -277,7 +277,7 @@ function readAndOptimizeB3dm(inputPath, outputPath, force) {
         optionArgs.push('null');
         options = GltfPipeline.parseArguments(optionArgs);
     }
-    outputPath = defaultValue(outputPath, inputPath);
+    outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 5) + '-optimized.b3dm');
     var b3dm;
     fileExists(outputPath)
         .then(function(exists) {

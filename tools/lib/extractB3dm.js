@@ -40,7 +40,7 @@ function extractB3dm(b3dmBuffer) {
             batchLength : batchLength
         },
         batchTable : {
-            JSON : batchTableJSONBuffer,
+            json : batchTableJSONBuffer,
             binary : batchTableBinaryBuffer
         },
         glb : glbBuffer
