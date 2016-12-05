@@ -22,7 +22,7 @@ describe('extractB3dm', function() {
         expect(b3dm.header.magic).toBe('b3dm');
         expect(b3dm.header.version).toBe(1);
         expect(b3dm.header.batchLength).toBe(10);
-        expect(b3dm.batchTable.JSON.length).toBe(760);
+        expect(b3dm.batchTable.json.length).toBe(760);
         expect(b3dm.batchTable.binary.length).toBe(256);
         expect(b3dm.glb.length).toBe(14466);
     });

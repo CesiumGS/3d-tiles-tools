@@ -298,7 +298,7 @@ function readAndOptimizeB3dm(inputPath, outputPath, force) {
             return optimizeGlb(b3dm.glb, options);
         })
         .then(function(glbBuffer) {
-            var b3dmBuffer = glbToB3dm(glbBuffer, b3dm.batchTable.JSON, b3dm.batchTable.binary, b3dm.header.batchLength);
+            var b3dmBuffer = glbToB3dm(glbBuffer, b3dm.batchTable.json, b3dm.batchTable.binary, b3dm.header.batchLength);
             if (argv.z) {
                 return zlibGzip(b3dmBuffer);
             }
