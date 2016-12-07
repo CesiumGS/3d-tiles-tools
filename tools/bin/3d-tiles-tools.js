@@ -6,6 +6,7 @@ var fsExtra = require('fs-extra');
 var path = require('path');
 var Promise = require('bluebird');
 var glbToB3dm = require('../lib/glbToB3dm');
+var i3dmToGlb = require('../lib/i3dmToGlb');
 var runPipeline = require('../lib/runPipeline');
 
 var fsExtraReadJson = Promise.promisify(fsExtra.readJson);
@@ -27,6 +28,10 @@ if (process.argv.length < 4 || defined(argv.h) || defined(argv.help) || !defined
         '        -i --input, input=PATH The input glb path.\n' +
         '        -o --output, output=PATH The output b3dm path.\n' +
         '        -f --force, Overwrite output file if it exists.\n' +
+	'    i3dmToGlb Repackage the input i3dm as a glb.\n' +
+	'        -i --input, input=PATH The input i3dm path.\n' +
+	'        -o --output, output=PATH The output glb path.\n' +
+	'        -f --force, Overwrite output file if it exists.\n' +
         '    gzip  Gzips the input tileset.\n' +
         '        -i --input, input=PATH The input tileset directory.\n' +
         '        -o --output, output=PATH The output tileset directory.\n' +
@@ -61,6 +66,9 @@ if (command === 'pipeline') {
 } else if (command === 'glbToB3dm') {
     // glbToB3dm is not a pipeline tool, so handle it separately.
     readGlbWriteB3dm(input, force, argv);
+} else if (command === 'i3dmToGlb') {
+    // i3dmToGlb is not a pipeline tool, so handle it separately.
+    readI3dmWriteGlb(input, force, argv);
 } else {
     processStage(input, force, command, argv)
         .then(function() {
@@ -194,6 +202,23 @@ function readGlbWriteB3dm(inputPath, force, argv) {
             return fsReadFile(inputPath)
                 .then(function(data) {
                     return fsWriteFile(outputPath, glbToB3dm(data));
+                });
+        });
+}
+
+function readI3dmWriteGlb(inputPath, force, argv) {
+    var outputPath = defaultValue(
+        defaultValue(argv.o, argv.output),
+        defaultValue(argv._[2], inputPath.slice(0, inputPath.length - 3) + 'glb'));
+    return fileExists(outputPath)
+        .then(function(exists) {
+            if (!force && exists) {
+                console.log('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
+                return;
+            }
+            return fsReadFile(inputPath)
+                .then(function(data) {
+                    return fsWriteFile(outputPath, i3dmToGlb(data));
                 });
         });
 }
