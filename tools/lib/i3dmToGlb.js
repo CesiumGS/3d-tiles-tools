@@ -3,7 +3,6 @@
 var Cesium = require('cesium');
 var defined = Cesium.defined;
 var DeveloperError = Cesium.DeveloperError;
-var getMagic = Cesium.getMagic;
 
 module.exports = i3dmToGlb;
 
@@ -18,7 +17,7 @@ function i3dmToGlb(buffer) {
     magicArray[2] = buffer.readUInt8(2);
     magicArray[3] = buffer.readUInt8(3);
 
-    var magic = getMagic(magicArray, 0);
+    var magic = buffer.toString('utf8', 0, 4);;
     if (magic !== 'i3dm') {
         throw new DeveloperError('i3dm is required.');
     }
@@ -44,7 +43,5 @@ function i3dmToGlb(buffer) {
         throw new DeveloperError('glTF byte length is zero, i3dm must have a glTF to instance.');
     }
 
-    var glbBuffer = new Buffer(gltfByteLength);
-    buffer.copy(glbBuffer, 0, byteOffset);
-    return glbBuffer;
+    return buffer.slice(byteOffset, gltfByteLength);
 }

@@ -76,8 +76,23 @@ node ./bin/3d-tiles-tools.js b3dmToGlb -i ./specs/data/batchedWithBatchTableBina
 
 | Flag | Description | Required |
 | ---- | ----------- | -------- |
-|`-i`, `--input`| Input path of the `.glb`| :white_check_mark: Yes |
-|`-o`, `--output`| Output path of the resulting `.b3dm` | No |
+|`-i`, `--input`| Input path of the `.b3dm`| :white_check_mark: Yes |
+|`-o`, `--output`| Output path of the resulting `.glb` | No |
+|`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
+
+### i3dmToGlb
+
+Creates a glb from a i3dm. Since this tool does not process an entire tileset,
+it cannot be used with the Pipeline tool.
+
+```
+node ./bin/3d-tiles-tools.js i3dmToGlb -i ./specs/data/instancedTile.i3dm -o ./output/extracted.glb
+```
+
+| Flag | Description | Required |
+| ---- | ----------- | -------- |
+|`-i`, `--input`| Input path of the `.i3dm`| :white_check_mark: Yes |
+|`-o`, `--output`| Output path of the resulting `.glb` | No |
 |`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
 
 ### optimizeB3dm
