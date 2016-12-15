@@ -9,9 +9,9 @@ module.exports = i3dmToGlb;
 
 function i3dmToGlb(buffer) {
     if (!defined(buffer)) {
-	throw new DeveloperError('buffer is not defined.');
+        throw new DeveloperError('buffer is not defined.');
     }
-    
+
     var magicArray = new Uint8Array(4);
     magicArray[0] = buffer.readUInt8(0);
     magicArray[1] = buffer.readUInt8(1);
@@ -20,7 +20,7 @@ function i3dmToGlb(buffer) {
 
     var magic = getMagic(magicArray, 0);
     if (magic !== 'i3dm') {
-	throw new DeveloperError('i3dm is required.');
+        throw new DeveloperError('i3dm is required.');
     }
 
     var byteLength = buffer.readUInt32LE(8);
@@ -31,7 +31,7 @@ function i3dmToGlb(buffer) {
     var gltfFormat = buffer.readUInt32LE(28);
 
     if (gltfFormat !== 1) {
-	throw new DeveloperError('Only embedded binary glTF is supported.');
+        throw new DeveloperError('Only embedded binary glTF is supported.');
     }
 
     var byteOffset = 32;
@@ -41,7 +41,7 @@ function i3dmToGlb(buffer) {
 
     var gltfByteLength = byteLength - byteOffset;
     if (gltfByteLength === 0) {
-	throw new DeveloperError('glTF byte length is zero, i3dm must have a glTF to instance.');
+        throw new DeveloperError('glTF byte length is zero, i3dm must have a glTF to instance.');
     }
 
     var glbBuffer = new Buffer(gltfByteLength);
