@@ -25,8 +25,9 @@
     "bluebird": "3.4.1",
     "cesium": "1.24",
     "fs-extra": "0.30.0",
+    "gltf-pipeline": "0.1.0-alpha6",
     "uuid": "2.0.2",
-    "yargs": "4.8.1"
+    "yargs": "6.3.0"
   },
   "devDependencies": {
     "gulp": "3.9.1",

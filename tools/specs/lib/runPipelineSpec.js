@@ -2,7 +2,7 @@
 var fsExtra = require('fs-extra');
 var path = require('path');
 var Promise = require('bluebird');
-var isGzipped = require('../../lib/isGzipped');
+var isGzippedFile = require('../../lib/isGzippedFile');
 var runPipeline = require('../../lib/runPipeline');
 
 var fsExtraOutputFile = Promise.promisify(fsExtra.outputFile);
@@ -32,9 +32,9 @@ describe('runPipeline', function() {
         };
         expect(runPipeline(pipeline)
             .then(function() {
-                return isGzipped(outputJson)
-                    .then(function(isGzipped) {
-                        expect(isGzipped).toBe(true);
+                return isGzippedFile(outputJson)
+                    .then(function(isGzippedFile) {
+                        expect(isGzippedFile).toBe(true);
                     });
             }), done).toResolve();
     });
@@ -47,9 +47,9 @@ describe('runPipeline', function() {
         };
         expect(runPipeline(pipeline)
             .then(function() {
-                return isGzipped(outputJson)
-                    .then(function(isGzipped) {
-                        expect(isGzipped).toBe(false);
+                return isGzippedFile(outputJson)
+                    .then(function(isGzippedFile) {
+                        expect(isGzippedFile).toBe(false);
                     });
             }), done).toResolve();
     });
@@ -62,9 +62,9 @@ describe('runPipeline', function() {
         };
         expect(runPipeline(pipeline)
             .then(function() {
-                return isGzipped(outputJson)
-                    .then(function(isGzipped) {
-                        expect(isGzipped).toBe(true);
+                return isGzippedFile(outputJson)
+                    .then(function(isGzippedFile) {
+                        expect(isGzippedFile).toBe(true);
                     });
             }), done).toResolve();
     });
@@ -77,9 +77,9 @@ describe('runPipeline', function() {
         };
         expect(runPipeline(pipeline)
             .then(function() {
-                return isGzipped(outputJson)
-                    .then(function(isGzipped) {
-                        expect(isGzipped).toBe(false);
+                return isGzippedFile(outputJson)
+                    .then(function(isGzippedFile) {
+                        expect(isGzippedFile).toBe(false);
                     });
             }), done).toResolve();
     });
@@ -95,9 +95,9 @@ describe('runPipeline', function() {
         };
         expect(runPipeline(pipeline)
             .then(function() {
-                return isGzipped(outputJson)
-                    .then(function(isGzipped) {
-                        expect(isGzipped).toBe(false);
+                return isGzippedFile(outputJson)
+                    .then(function(isGzippedFile) {
+                        expect(isGzippedFile).toBe(false);
                     });
             }), done).toResolve();
     });
@@ -117,9 +117,9 @@ describe('runPipeline', function() {
         };
         expect(runPipeline(pipeline)
             .then(function() {
-                return isGzipped(outputJson)
-                    .then(function(isGzipped) {
-                        expect(isGzipped).toBe(false);
+                return isGzippedFile(outputJson)
+                    .then(function(isGzippedFile) {
+                        expect(isGzippedFile).toBe(false);
                     });
             }), done).toResolve();
     });
@@ -153,9 +153,9 @@ describe('runPipeline', function() {
         };
         expect(runPipeline(pipeline)
             .then(function() {
-                return isGzipped(outputJson)
-                    .then(function(isGzipped) {
-                        expect(isGzipped).toBe(true);
+                return isGzippedFile(outputJson)
+                    .then(function(isGzippedFile) {
+                        expect(isGzippedFile).toBe(true);
                     });
             }), done).toResolve();
     });
@@ -168,9 +168,9 @@ describe('runPipeline', function() {
         // Doesn't do any processing, just copies files to the output directory
         expect(runPipeline(pipeline)
             .then(function() {
-                return isGzipped(outputJson)
-                    .then(function(isGzipped) {
-                        expect(isGzipped).toBe(false);
+                return isGzippedFile(outputJson)
+                    .then(function(isGzippedFile) {
+                        expect(isGzippedFile).toBe(false);
                     });
             }), done).toResolve();
     });
@@ -192,9 +192,9 @@ describe('runPipeline', function() {
 
         expect(runPipeline(pipeline, options)
             .then(function() {
-                return isGzipped(outputJson)
-                    .then(function(isGzipped) {
-                        expect(isGzipped).toBe(true);
+                return isGzippedFile(outputJson)
+                    .then(function(isGzippedFile) {
+                        expect(isGzippedFile).toBe(true);
                     });
             }), done).toResolve();
     });

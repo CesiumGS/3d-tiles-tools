@@ -29,6 +29,18 @@ describe('glbToB3dm', function() {
         expect(b3dmBuffer.length).toEqual(glbBuffer.length + 24);
     });
 
+    it('generates a b3dm with batch table placeholder', function() {
+        var b3dmBuffer = glbToB3dm(glbBuffer, new Buffer(20), new Buffer(40), 4);
+        var header = b3dmBuffer.slice(0, 24);
+        expect(header.toString('utf8', 0, 4)).toEqual('b3dm'); // magic
+        expect(header.readUInt32LE(4)).toEqual(1); // version
+        expect(header.readUInt32LE(8)).toEqual(glbBuffer.length + 24 + 60); // byteLength - length of entire tile, including header
+        expect(header.readUInt32LE(12)).toEqual(20); // batchTableJSONByteLength - length of batch table json in bytes
+        expect(header.readUInt32LE(16)).toEqual(40); // batchTableBinaryByteLength - length of batch table binary in bytes
+        expect(header.readUInt32LE(20)).toEqual(4); // batchLength - number of models in the batch (0 for basic, no batches)
+        expect(b3dmBuffer.length).toEqual(glbBuffer.length + 24 + 60);
+    });
+
     it('throws an error if no glbBuffer is provided', function() {
         expect(function() {
             glbToB3dm();
