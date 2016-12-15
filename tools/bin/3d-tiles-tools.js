@@ -12,6 +12,7 @@ var glbToB3dm = require('../lib/glbToB3dm');
 var isGzipped = require('../lib/isGzipped');
 var optimizeGlb = require('../lib/optimizeGlb');
 var runPipeline = require('../lib/runPipeline');
+var tileset2sqlite3 = require('../lib/tileset2sqlite3');
 
 var fsExtraReadJson = Promise.promisify(fsExtra.readJson);
 var fsStat = Promise.promisify(fsExtra.stat);
@@ -68,6 +69,7 @@ var argv = yargs
         }
     })
     .command('pipeline', 'Execute the input pipeline JSON file.')
+    .command('tileset2sqlite3', 'Create a sqlite database for a tileset.')
     .command('glbToB3dm', 'Repackage the input glb as a b3dm with a basic header.')
     .command('b3dmToGlb', 'Extract the binary glTF asset from the input b3dm.')
     .command('optimizeB3dm', 'Pass the input b3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)', {
@@ -119,6 +121,9 @@ if (command === 'pipeline') {
 } else if (command === 'optimizeB3dm') {
     // optimizeB3dm is not a pipeline tool, so handle it separately.
     readAndOptimizeB3dm(input, output, force);
+} else if (command === 'tileset2sqlite3') {
+    // tileset2sqlite3 is not a pipeline tool, so handle it separately.
+    tileset2sqlite3(input, output, force);
 } else {
     processStage(input, force, command, argv)
         .then(function() {
