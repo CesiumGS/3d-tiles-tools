@@ -8,6 +8,7 @@ var path = require('path');
 var yargs = require('yargs');
 var zlib = require('zlib');
 var extractB3dm = require('../lib/extractB3dm');
+var fileExists = require('../lib/fileExists');
 var glbToB3dm = require('../lib/glbToB3dm');
 var isGzipped = require('../lib/isGzipped');
 var optimizeGlb = require('../lib/optimizeGlb');
@@ -221,21 +222,6 @@ function directoryExists(directory) {
         })
         .catch(function(err) {
             // If the directory doesn't exist the error code is ENOENT.
-            // Otherwise something else went wrong - permission issues, etc.
-            if (err.code !== 'ENOENT') {
-                throw err;
-            }
-            return false;
-        });
-}
-
-function fileExists(filePath) {
-    return fsStat(filePath)
-        .then(function(stats) {
-            return stats.isFile();
-        })
-        .catch(function(err) {
-            // If the file doesn't exist the error code is ENOENT.
             // Otherwise something else went wrong - permission issues, etc.
             if (err.code !== 'ENOENT') {
                 throw err;

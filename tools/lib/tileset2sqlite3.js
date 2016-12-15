@@ -10,12 +10,23 @@ var sqlite3 = require('sqlite3');
 var zlib = require('zlib');
 var isGzipped = require('../lib/isGzipped');
 
+var fsReadFile = Promise.promisify(fs.readFile);
+
+var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
+var DeveloperError = Cesium.DeveloperError;
 
 module.exports = tileset2sqlite3;
 
 function tileset2sqlite3(inputDirectory, outputFile, force) {
-    var fsReadFile = Promise.promisify(fs.readFile);
+    if (!defined(inputDirectory)) {
+        throw new DeveloperError('inputDirectory is required.');
+    }
+    if (!defined(outputFile)) {
+        throw new DeveloperError('outputFile is required.');
+    }
+
+    force = defaultValue(force, false);
 
     if (!/\.3dtiles$/.test(outputFile)) {
         outputFile += '.3dtiles';
@@ -32,7 +43,7 @@ function tileset2sqlite3(inputDirectory, outputFile, force) {
     var dbRun = Promise.promisify(db.run, {context : db});
 
     //Disable journaling and create the table.
-    dbRun("PRAGMA journal_mode=off;")
+    return dbRun("PRAGMA journal_mode=off;")
         .then(function() {
             return dbRun('BEGIN');
         })
