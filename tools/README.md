@@ -103,7 +103,11 @@ node ./bin/3d-tiles-tools.js optimizeB3dm -i ./specs/data/batchedWithBatchTableB
 
 ### tileset2sqlite3
 
-Generates a sqlite database for a tileset. This tool cannot be used with the Pipeline tool.
+Generates a sqlite database for a tileset.
+
+This tool cannot be used with the Pipeline tool.
+
+Each tile is stored gzipped in the database.  The specification for the tables in the database is not final, see [3d-tiles/#89](https://github.com/AnalyticalGraphicsInc/3d-tiles/issues/89).
 
 ```
 node ./bin/3d-tiles-tools.js tileset2sqlite3 ./tileset/ ./output/tileset.3dtiles
