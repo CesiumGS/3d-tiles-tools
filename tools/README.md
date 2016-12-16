@@ -101,6 +101,27 @@ node ./bin/3d-tiles-tools.js optimizeB3dm -i ./specs/data/batchedWithBatchTableB
 |`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
 |`--options`|All arguments past this flag are consumed by gltf-pipeline.| No |
 
+### tileset2sqlite3
+
+Generates a sqlite database for a tileset.
+
+This tool cannot be used with the Pipeline tool.
+
+Each tile is stored gzipped in the database.  The specification for the tables in the database is not final, see [3d-tiles/#89](https://github.com/AnalyticalGraphicsInc/3d-tiles/issues/89).
+
+```
+node ./bin/3d-tiles-tools.js tileset2sqlite3 ./tileset/ ./output/tileset.3dtiles
+```
+```
+node ./bin/3d-tiles-tools.js tileset2sqlite3 -i ./tileset/ -o ./output/tileset.3dtiles
+```
+
+| Flag | Description | Required |
+| ---- | ----------- | -------- |
+|`-i`, `--input`| Input directory of the tileset. | :white_check_mark: Yes |
+|`-o`, `--output`| Output path of the resulting `.3dtiles` | :white_check_mark: Yes |
+|`-f`, `--force`| Overwrite output file if it exists. | No, default `false` |
+
 ## Pipeline
 
 ```
