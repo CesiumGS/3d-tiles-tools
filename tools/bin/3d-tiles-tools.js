@@ -8,6 +8,7 @@ var path = require('path');
 var yargs = require('yargs');
 var zlib = require('zlib');
 var extractB3dm = require('../lib/extractB3dm');
+var extractI3dm = require('../lib/extractI3dm');
 var fileExists = require('../lib/fileExists');
 var glbToB3dm = require('../lib/glbToB3dm');
 var isGzipped = require('../lib/isGzipped');
@@ -73,6 +74,7 @@ var argv = yargs
     .command('tileset2sqlite3', 'Create a sqlite database for a tileset.')
     .command('glbToB3dm', 'Repackage the input glb as a b3dm with a basic header.')
     .command('b3dmToGlb', 'Extract the binary glTF asset from the input b3dm.')
+    .command('i3dmToGlb', 'Extract the binary glTF asset from the input i3dm.')
     .command('optimizeB3dm', 'Pass the input b3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)', {
         'z': {
             alias: 'zip',
@@ -122,6 +124,9 @@ if (command === 'pipeline') {
 } else if (command === 'optimizeB3dm') {
     // optimizeB3dm is not a pipeline tool, so handle it separately.
     readAndOptimizeB3dm(input, output, force);
+} else if (command === 'i3dmToGlb') {
+    // i3dmToGlb is not a pipeline tool, so handle it separately.
+    readI3dmWriteGlb(input, output, force);
 } else if (command === 'tileset2sqlite3') {
     // tileset2sqlite3 is not a pipeline tool, so handle it separately.
     tileset2sqlite3(input, output, force);
@@ -302,3 +307,19 @@ function readAndOptimizeB3dm(inputPath, outputPath, force) {
             console.log(err);
         });
 }
+
+function readI3dmWriteGlb(inputPath, outputPath, force) {
+    outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 4) + 'glb');
+    return fileExists(outputPath)
+        .then(function(exists) {
+            if (!force && exists) {
+                console.log('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
+                return;
+            }
+            return fsReadFile(inputPath)
+                .then(function(data) {
+                    return fsWriteFile(outputPath, extractI3dm(data).glb);
+                });
+        });
+}
+
