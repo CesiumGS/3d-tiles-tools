@@ -8,10 +8,10 @@ var path = require('path');
 var yargs = require('yargs');
 var zlib = require('zlib');
 var extractB3dm = require('../lib/extractB3dm');
+var extractI3dm = require('../lib/extractI3dm');
 var glbToB3dm = require('../lib/glbToB3dm');
 var isGzipped = require('../lib/isGzipped');
 var optimizeGlb = require('../lib/optimizeGlb');
-var i3dmToGlb = require('../lib/i3dmToGlb');
 var runPipeline = require('../lib/runPipeline');
 
 var fsExtraReadJson = Promise.promisify(fsExtra.readJson);
@@ -327,7 +327,7 @@ function readI3dmWriteGlb(inputPath, outputPath, force) {
             }
             return fsReadFile(inputPath)
                 .then(function(data) {
-                    return fsWriteFile(outputPath, i3dmToGlb(data));
+                    return fsWriteFile(outputPath, extractI3dm(data).glb);
                 });
         });
 }
