@@ -33,8 +33,7 @@ function tileset2sqlite3(inputDirectory, outputFile, force) {
     }
 
     if (!force && fs.existsSync(outputFile)) {
-        console.log();
-        console.log('Refusing to overwrite existing database.');
+        console.log('\nRefusing to overwrite existing database.');
         return;
     }
 
