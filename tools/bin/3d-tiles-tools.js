@@ -8,6 +8,7 @@ var path = require('path');
 var yargs = require('yargs');
 var zlib = require('zlib');
 var extractB3dm = require('../lib/extractB3dm');
+var extractCmpt = require('../lib/extractCmpt');
 var extractI3dm = require('../lib/extractI3dm');
 var fileExists = require('../lib/fileExists');
 var glbToB3dm = require('../lib/glbToB3dm');
@@ -75,6 +76,7 @@ var argv = yargs
     .command('glbToB3dm', 'Repackage the input glb as a b3dm with a basic header.')
     .command('b3dmToGlb', 'Extract the binary glTF asset from the input b3dm.')
     .command('i3dmToGlb', 'Extract the binary glTF asset from the input i3dm.')
+    .command('cmptToGlb', 'Extract the binary glTF assets from the input cmpt.')
     .command('optimizeB3dm', 'Pass the input b3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)', {
         'z': {
             alias: 'zip',
@@ -116,17 +118,15 @@ if (command === 'pipeline') {
             console.timeEnd('Total');
         });
 } else if (command === 'glbToB3dm') {
-    // glbToB3dm is not a pipeline tool, so handle it separately.
     readGlbWriteB3dm(input, output, force);
 } else if (command === 'b3dmToGlb') {
-    // b3dmToGlb is not a pipeline tool, so handle it separately.
     readB3dmWriteGlb(input, output, force);
 } else if (command === 'optimizeB3dm') {
-    // optimizeB3dm is not a pipeline tool, so handle it separately.
     readAndOptimizeB3dm(input, output, force);
 } else if (command === 'i3dmToGlb') {
-    // i3dmToGlb is not a pipeline tool, so handle it separately.
     readI3dmWriteGlb(input, output, force);
+} else if (command === 'cmptToGlb') {
+    readCmptWriteGlb(input, output, force);
 } else if (command === 'tileset2sqlite3') {
     // tileset2sqlite3 is not a pipeline tool, so handle it separately.
     tileset2sqlite3(input, output, force);
@@ -265,6 +265,53 @@ function readB3dmWriteGlb(inputPath, outputPath, force) {
         });
 }
 
+function readI3dmWriteGlb(inputPath, outputPath, force) {
+    outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 4) + 'glb');
+    return fileExists(outputPath)
+        .then(function(exists) {
+            if (!force && exists) {
+                console.log('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
+                return;
+            }
+            return fsReadFile(inputPath)
+                .then(function(data) {
+                    return fsWriteFile(outputPath, extractI3dm(data).glb);
+                });
+        });
+}
+
+function readCmptWriteGlb(inputPath, outputPath, force) {
+    outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 5));
+    return fsReadFile(inputPath)
+        .then(function(data) {
+            var tiles = extractCmpt(data);
+            var tilesLength = tiles.length;
+            var tilePaths = new Array(tilesLength);
+            if (tilesLength === 0) {
+                console.log('No glbs found in this cmpt tile.');
+                return;
+            } else if (tilesLength === 1) {
+                tilePaths[0] = [outputPath + '.glb'];
+            } else {
+                for (var i = 0; i < tilesLength; ++i) {
+                    tilePaths[i] = outputPath + '_' + i + '.glb';
+                }
+            }
+            return Promise.map(tilePaths, function(tilePath) {
+                return fileExists(tilePath);
+            }).then(function(exists) {
+                var index = exists.indexOf(true);
+                if (!force && (index > -1)) {
+                    console.log('File ' + tilePaths[index] + ' already exists. Specify -f or --force to overwrite existing file.');
+                    return;
+                }
+                return Promise.map(tilePaths, function(tilePath, index) {
+                    return fsWriteFile(tilePath, tiles[index].glb);
+                });
+            });
+        });
+}
+
 function readAndOptimizeB3dm(inputPath, outputPath, force) {
     var options = {};
     if (defined(optionArgs)) {
@@ -307,19 +354,3 @@ function readAndOptimizeB3dm(inputPath, outputPath, force) {
             console.log(err);
         });
 }
-
-function readI3dmWriteGlb(inputPath, outputPath, force) {
-    outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 4) + 'glb');
-    return fileExists(outputPath)
-        .then(function(exists) {
-            if (!force && exists) {
-                console.log('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
-                return;
-            }
-            return fsReadFile(inputPath)
-                .then(function(data) {
-                    return fsWriteFile(outputPath, extractI3dm(data).glb);
-                });
-        });
-}
-

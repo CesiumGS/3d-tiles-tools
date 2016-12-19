@@ -6,16 +6,16 @@ var DeveloperError = Cesium.DeveloperError;
 
 module.exports = extractI3dm;
 
+/**
+ * Extracts information and sections from an i3dm buffer.
+ *
+ * @param {Buffer} buffer A buffer containing an i3dm asset.
+ * @returns {Object} An object containing the header and sections of the i3dm asset.
+ */
 function extractI3dm(buffer) {
     if (!defined(buffer)) {
         throw new DeveloperError('buffer is not defined.');
     }
-
-    var magicArray = new Uint8Array(4);
-    magicArray[0] = buffer.readUInt8(0);
-    magicArray[1] = buffer.readUInt8(1);
-    magicArray[2] = buffer.readUInt8(2);
-    magicArray[3] = buffer.readUInt8(3);
 
     var magic = buffer.toString('utf8', 0, 4);
     if (magic !== 'i3dm') {
