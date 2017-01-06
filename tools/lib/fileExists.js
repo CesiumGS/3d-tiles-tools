@@ -1,12 +1,13 @@
-#!/usr/bin/env node
 'use strict';
-
 var Promise = require('bluebird');
 var fsExtra = require('fs-extra');
 var fsStat = Promise.promisify(fsExtra.stat);
 
 module.exports = fileExists;
 
+/**
+ * @private
+ */
 function fileExists(filePath) {
     return fsStat(filePath)
         .then(function(stats) {
