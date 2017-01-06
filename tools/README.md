@@ -95,6 +95,21 @@ node ./bin/3d-tiles-tools.js i3dmToGlb -i ./specs/data/instancedTile.i3dm -o ./o
 |`-o`, `--output`| Output path of the resulting `.glb` | No |
 |`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
 
+### cmptToGlb
+
+Extracts the glb models from a cmpt tile. If multiple models are found a number will be appended to the
+output file name. Since this tool does not process an entire tileset, it cannot be used with the Pipeline tool.
+
+```
+node ./bin/3d-tiles-tools.js cmptToGlb -i ./specs/data/composite.cmpt -o ./output/extracted.glb
+```
+
+| Flag | Description | Required |
+| ---- | ----------- | -------- |
+|`-i`, `--input`| Input path of the `.cmpt`| :white_check_mark: Yes |
+|`-o`, `--output`| Output path of the resulting `.glb` | No |
+|`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
+
 ### optimizeB3dm
 
 Optimize a b3dm using [gltf-pipeline](https://github.com/AnalyticalGraphicsInc/gltf-pipeline/blob/master/README.md). Since this tool does not
