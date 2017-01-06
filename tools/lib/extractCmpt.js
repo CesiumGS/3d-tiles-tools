@@ -1,8 +1,5 @@
 'use strict';
-
 var Cesium = require('cesium');
-var extractB3dm = require('./extractB3dm');
-var extractI3dm = require('./extractI3dm');
 
 var defined = Cesium.defined;
 var DeveloperError = Cesium.DeveloperError;
@@ -13,7 +10,7 @@ module.exports = extractCmpt;
  * Extracts interior tiles from a cmpt buffer. This operates recursively on interior cmpt tiles.
  *
  * @param {Buffer} buffer A buffer containing a cmpt asset.
- * @returns {Object[]} An array containing extracted data from interior tiles.
+ * @returns {Buffer[]} An array containing interior tiles.
  */
 function extractCmpt(buffer) {
     var results = [];
@@ -45,12 +42,10 @@ function extractCmptInner(buffer, results) {
         var innerBuffer = buffer.slice(byteOffset, byteOffset + innerByteLength);
         byteOffset += innerByteLength;
 
-        if (innerMagic === 'b3dm') {
-            results.push(extractB3dm(innerBuffer));
-        } else if (innerMagic === 'i3dm') {
-            results.push(extractI3dm(innerBuffer));
-        } else if (innerMagic === 'cmpt') {
+        if (innerMagic === 'cmpt') {
             extractCmptInner(innerBuffer, results);
+        } else {
+            results.push(innerBuffer);
         }
     }
 }

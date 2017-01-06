@@ -26,20 +26,20 @@ describe('extractCmpt', function() {
 
     it('extracts a b3dm and i3dm from composite buffer', function() {
         var innerTiles = extractCmpt(compositeBuffer);
+        var b3dmMagic = innerTiles[0].toString('utf8', 0, 4);
+        var i3dmMagic = innerTiles[1].toString('utf8', 0, 4);
         expect(innerTiles.length).toBe(2);
-        expect(innerTiles[0].header.magic).toBe('b3dm');
-        expect(innerTiles[0].glb.length).toBe(9973);
-        expect(innerTiles[1].header.magic).toBe('i3dm');
-        expect(innerTiles[1].glb.length).toBe(5337);
+        expect(b3dmMagic).toBe('b3dm');
+        expect(i3dmMagic).toBe('i3dm');
     });
 
     it('extracts a b3dm and i3dm from composite-of-composite buffer', function() {
-        var innerTiles = extractCmpt(compositeOfCompositeBuffer);
+        var innerTiles = extractCmpt(compositeBuffer);
+        var b3dmMagic = innerTiles[0].toString('utf8', 0, 4);
+        var i3dmMagic = innerTiles[1].toString('utf8', 0, 4);
         expect(innerTiles.length).toBe(2);
-        expect(innerTiles[0].header.magic).toBe('b3dm');
-        expect(innerTiles[0].glb.length).toBe(9973);
-        expect(innerTiles[1].header.magic).toBe('i3dm');
-        expect(innerTiles[1].glb.length).toBe(5337);
+        expect(b3dmMagic).toBe('b3dm');
+        expect(i3dmMagic).toBe('i3dm');
     });
 
     it('throws an error if no buffer is provided', function() {

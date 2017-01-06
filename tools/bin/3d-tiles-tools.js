@@ -280,33 +280,50 @@ function readI3dmWriteGlb(inputPath, outputPath, force) {
         });
 }
 
+function extractGlbs(tiles) {
+    var glbs = [];
+    var tilesLength = tiles.length;
+    for (var i = 0; i < tilesLength; ++i) {
+        var tile = tiles[i];
+        var magic = tile.toString('utf8', 0, 4);
+        if (magic === 'i3dm') {
+            glbs.push(extractI3dm(tile).glb);
+        } else if (magic === 'b3dm') {
+            glbs.push(extractB3dm(tile).glb);
+        }
+    }
+    return glbs;
+}
+
 function readCmptWriteGlb(inputPath, outputPath, force) {
-    outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 5));
+    outputPath = defaultValue(outputPath, inputPath);
+    outputPath = outputPath.slice(0, -path.extname(outputPath).length);
     return fsReadFile(inputPath)
         .then(function(data) {
             var tiles = extractCmpt(data);
-            var tilesLength = tiles.length;
-            var tilePaths = new Array(tilesLength);
-            if (tilesLength === 0) {
-                console.log('No glbs found in this cmpt tile.');
+            var glbs = extractGlbs(tiles);
+            var glbsLength = glbs.length;
+            var glbPaths = new Array(glbsLength);
+            if (glbsLength === 0) {
+                console.log('No glbs found in ' + inputPath + '.');
                 return;
-            } else if (tilesLength === 1) {
-                tilePaths[0] = [outputPath + '.glb'];
+            } else if (glbsLength === 1) {
+                glbPaths[0] = [outputPath + '.glb'];
             } else {
-                for (var i = 0; i < tilesLength; ++i) {
-                    tilePaths[i] = outputPath + '_' + i + '.glb';
+                for (var i = 0; i < glbsLength; ++i) {
+                    glbPaths[i] = outputPath + '_' + i + '.glb';
                 }
             }
-            return Promise.map(tilePaths, function(tilePath) {
-                return fileExists(tilePath);
+            return Promise.map(glbPaths, function(glbPath) {
+                return fileExists(glbPath);
             }).then(function(exists) {
                 var index = exists.indexOf(true);
                 if (!force && (index > -1)) {
-                    console.log('File ' + tilePaths[index] + ' already exists. Specify -f or --force to overwrite existing file.');
+                    console.log('File ' + glbPaths[index] + ' already exists. Specify -f or --force to overwrite existing file.');
                     return;
                 }
-                return Promise.map(tilePaths, function(tilePath, index) {
-                    return fsWriteFile(tilePath, tiles[index].glb);
+                return Promise.map(glbPaths, function(glbPath, index) {
+                    return fsWriteFile(glbPath, glbs[index]);
                 });
             });
         });
