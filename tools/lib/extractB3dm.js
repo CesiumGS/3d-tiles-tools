@@ -24,14 +24,26 @@ function extractB3dm(b3dmBuffer) {
     if (version !== 1) {
         throw new DeveloperError('Invalid version, only "1" is valid, got: "' + version + '".');
     }
+    var headerByteLength = 24;
     var byteLength = b3dmBuffer.readUInt32LE(8);
     var batchTableJSONByteLength = b3dmBuffer.readUInt32LE(12);
     var batchTableBinaryByteLength = b3dmBuffer.readUInt32LE(16);
     var batchLength = b3dmBuffer.readUInt32LE(20);
 
-    var batchTableJSONBuffer = b3dmBuffer.slice(24, 24 + batchTableJSONByteLength);
-    var batchTableBinaryBuffer = b3dmBuffer.slice(24 + batchTableJSONByteLength, 24 + batchTableJSONByteLength + batchTableBinaryByteLength);
-    var glbBuffer = b3dmBuffer.slice(24 + batchTableJSONByteLength + batchTableBinaryByteLength, byteLength);
+    // Keep this legacy check in for now since a lot of tilesets are still using the old header.
+    // Legacy header:  [batchLength] [batchTableByteLength]
+    // Current header: [batchTableJsonByteLength] [batchTableBinaryByteLength] [batchLength]
+    // If the header is in the legacy format 'batchLength' will be the start of the JSON string (a quotation mark) or the glTF magic.
+    // Accordingly the first byte of uint32 will be either 0x22 or 0x67 and so the uint32 will exceed any reasonable 'batchLength'.
+    if (batchLength > 10000000) {
+        headerByteLength = 20;
+        batchTableJSONByteLength = batchTableBinaryByteLength;
+        batchTableBinaryByteLength = 0;
+    }
+
+    var batchTableJSONBuffer = b3dmBuffer.slice(headerByteLength, headerByteLength + batchTableJSONByteLength);
+    var batchTableBinaryBuffer = b3dmBuffer.slice(headerByteLength + batchTableJSONByteLength, headerByteLength + batchTableJSONByteLength + batchTableBinaryByteLength);
+    var glbBuffer = b3dmBuffer.slice(headerByteLength + batchTableJSONByteLength + batchTableBinaryByteLength, byteLength);
 
     return {
         header : {
