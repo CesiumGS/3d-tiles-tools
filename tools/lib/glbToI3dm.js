@@ -27,6 +27,7 @@ function glbToI3dm(glbBuffer, featureTableJSONBuffer, featureTableBinaryBuffer, 
     batchTableBinaryBuffer = defaultValue(batchTableBinaryBuffer, new Buffer(0));
     featureTableJSONBuffer = defaultValue(featureTableJSONBuffer, new Buffer(0));
     featureTableBinaryBuffer = defaultValue(featureTableBinaryBuffer, new Buffer(0));
+    gltfFormat = defaultValue(gltfFormat, 1);
 
     var byteLength = 32 + glbBuffer.length + featureTableJSONBuffer.length + featureTableBinaryBuffer.length + batchTableJSONBuffer.length + batchTableBinaryBuffer.length;
 
