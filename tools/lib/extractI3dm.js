@@ -61,7 +61,8 @@ function extractI3dm(buffer) {
     return {
         header : {
             magic : magic,
-            version : version
+            version : version,
+            gltfFormat : gltfFormat
         },
         featureTable : {
             json : featureTableJsonBuffer,
