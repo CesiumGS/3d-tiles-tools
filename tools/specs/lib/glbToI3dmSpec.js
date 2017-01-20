@@ -19,7 +19,7 @@ describe('glbToI3dm', function() {
             });
     });
 
-    it('generates a basic I3dm header for a given buffer representing a glb', function() {
+    it('generates a basic i3dm header for a given buffer representing a glb', function() {
         var i3dmBuffer = glbToI3dm(glbBuffer);
         var header = i3dmBuffer.slice(0, 32);
         expect(header.toString('utf8', 0, 4)).toEqual('i3dm'); // magic
@@ -52,19 +52,13 @@ describe('glbToI3dm', function() {
         }).toThrowError('glbBuffer is not defined.');
     });
 
-    it('convert I3dm to glb and back to I3dm', function() {
-        fsReadFile(i3dmPath)
-            .then(function(fileBuffer) {
-                var i3dm = extractI3dm(fileBuffer);
-                var i3dmOut = glbToI3dm(i3dm.glb, i3dm.featureTable.json, i3dm.featureTable.binary,
-                                        i3dm.batchTable.json, i3dm.batchTable.binary, i3dm.header.gltfFormat);
-                expect(i3dm).toEqual(i3dmOut);
-            });
-    });
-
-    it('throws an error if no glbBuffer is provided', function() {
-        expect(function() {
-            glbToI3dm();
-        }).toThrowError('glbBuffer is not defined.');
+    it('convert i3dm to glb and back to i3dm', function() {
+        expect(fsReadFile(i3dmPath)
+                .then(function(fileBuffer) {
+                    var i3dm = extractI3dm(fileBuffer);
+                    var i3dmOut = glbToI3dm(i3dm.glb, i3dm.featureTable.json, i3dm.featureTable.binary,
+                            i3dm.batchTable.json, i3dm.batchTable.binary, i3dm.header.gltfFormat);
+                    expect(i3dm).toEqual(i3dmOut)
+                }), done).toResolve();
     });
 });

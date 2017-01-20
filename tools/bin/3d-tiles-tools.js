@@ -91,6 +91,12 @@ var argv = yargs
         }
     })
     .command('optimizeI3dm', 'Pass the input i3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)')
+    .command('gzip', 'Gzips the input tileset directory.', {
+        't': {
+            alias: 'tilesOnly',
+            description: 'Only tile files (.b3dm, .i3dm, .pnts, .vctr) should be gzipped.'
+        }
+    })
     .command('ungzip', 'Ungzips the input tileset directory.')
     .demand(1)
     .recommendCommands()
