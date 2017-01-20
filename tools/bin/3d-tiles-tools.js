@@ -423,7 +423,7 @@ function readAndOptimizeI3dm(inputPath, outputPath, force) {
             return optimizeGlb(i3dm.glb, options);
         })
         .then(function(glbBuffer) {
-            var i3dmBuffer = glbToI3dm(glbBuffer, i3dm.featureTable.json, i3dm.featureTable.binary, i3dm.batchTable.json, i3dm.batchTable.binary, i3dm.header.gltfFormat);
+            var i3dmBuffer = glbToI3dm(glbBuffer, i3dm.featureTable.json, i3dm.featureTable.binary, i3dm.batchTable.json, i3dm.batchTable.binary);
             if (argv.z) {
                 return zlibGzip(i3dmBuffer);
             }

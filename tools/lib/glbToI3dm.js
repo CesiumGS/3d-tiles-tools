@@ -15,10 +15,9 @@ module.exports = glbToI3dm;
  * @param {Buffer} [featureTableBinaryBuffer] A buffer containing the accompanying binary batch table section for the i3dm asset.
  * @param {Buffer} [batchTableJSONBuffer] A buffer containing the batch table to use for the i3dm asset.
  * @param {Buffer} [batchTableBinaryBuffer] A buffer containing the accompanying binary batch table section for the i3dm asset.
- * @param {Number} [gltfFormat] The gltf format for the body of the glTF field.
  * @returns {Buffer} Buffer representing the i3dm asset.
  */
-function glbToI3dm(glbBuffer, featureTableJSONBuffer, featureTableBinaryBuffer, batchTableJSONBuffer, batchTableBinaryBuffer, gltfFormat) {
+function glbToI3dm(glbBuffer, featureTableJSONBuffer, featureTableBinaryBuffer, batchTableJSONBuffer, batchTableBinaryBuffer) {
     if (!defined(glbBuffer)) {
         throw new DeveloperError('glbBuffer is not defined.');
     }
@@ -27,9 +26,9 @@ function glbToI3dm(glbBuffer, featureTableJSONBuffer, featureTableBinaryBuffer, 
     batchTableBinaryBuffer = defaultValue(batchTableBinaryBuffer, Buffer.alloc(0));
     featureTableJSONBuffer = defaultValue(featureTableJSONBuffer, Buffer.alloc(0));
     featureTableBinaryBuffer = defaultValue(featureTableBinaryBuffer, Buffer.alloc(0));
-    gltfFormat = defaultValue(gltfFormat, 1);
 
     var byteLength = 32 + glbBuffer.length + featureTableJSONBuffer.length + featureTableBinaryBuffer.length + batchTableJSONBuffer.length + batchTableBinaryBuffer.length;
+    var gltfFormat = 1;
 
     var header = Buffer.alloc(32);
     header.write('i3dm', 0); // magic
