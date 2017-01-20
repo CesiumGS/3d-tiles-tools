@@ -23,15 +23,15 @@ function glbToI3dm(glbBuffer, featureTableJSONBuffer, featureTableBinaryBuffer, 
         throw new DeveloperError('glbBuffer is not defined.');
     }
 
-    batchTableJSONBuffer = defaultValue(batchTableJSONBuffer, new Buffer(0));
-    batchTableBinaryBuffer = defaultValue(batchTableBinaryBuffer, new Buffer(0));
-    featureTableJSONBuffer = defaultValue(featureTableJSONBuffer, new Buffer(0));
-    featureTableBinaryBuffer = defaultValue(featureTableBinaryBuffer, new Buffer(0));
+    batchTableJSONBuffer = defaultValue(batchTableJSONBuffer, Buffer.alloc(0));
+    batchTableBinaryBuffer = defaultValue(batchTableBinaryBuffer, Buffer.alloc(0));
+    featureTableJSONBuffer = defaultValue(featureTableJSONBuffer, Buffer.alloc(0));
+    featureTableBinaryBuffer = defaultValue(featureTableBinaryBuffer, Buffer.alloc(0));
     gltfFormat = defaultValue(gltfFormat, 1);
 
     var byteLength = 32 + glbBuffer.length + featureTableJSONBuffer.length + featureTableBinaryBuffer.length + batchTableJSONBuffer.length + batchTableBinaryBuffer.length;
 
-    var header = new Buffer(32);
+    var header = Buffer.alloc(32);
     header.write('i3dm', 0); // magic
     header.writeUInt32LE(1, 4); // version
     header.writeUInt32LE(byteLength, 8); // byteLength - length of entire tile, including header, in bytes

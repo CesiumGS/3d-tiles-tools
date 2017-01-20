@@ -34,7 +34,7 @@ describe('glbToI3dm', function() {
     });
 
     it('generates a i3dm with batch table placeholder', function() {
-        var i3dmBuffer = glbToI3dm(glbBuffer, new Buffer(10), new Buffer(16), new Buffer(20), new Buffer(40), 1);
+        var i3dmBuffer = glbToI3dm(glbBuffer, Buffer.alloc(10), Buffer.alloc(16), Buffer.alloc(20), Buffer.alloc(40), 1);
         var header = i3dmBuffer.slice(0, 32);
         expect(header.toString('utf8', 0, 4)).toEqual('i3dm'); // magic
         expect(header.readUInt32LE(4)).toEqual(1); // version
