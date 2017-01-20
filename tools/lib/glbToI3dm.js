@@ -22,10 +22,16 @@ function glbToI3dm(glbBuffer, featureTableJSONBuffer, featureTableBinaryBuffer, 
         throw new DeveloperError('glbBuffer is not defined.');
     }
 
+    if (!defined(featureTableJSONBuffer)) {
+        throw new DeveloperError('featureTableJSONBuffer is not defined.');
+    }
+
+    if (!defined(featureTableBinaryBuffer)) {
+        throw new DeveloperError('featureTableBinaryBuffer is not defined.');
+    }
+
     batchTableJSONBuffer = defaultValue(batchTableJSONBuffer, Buffer.alloc(0));
     batchTableBinaryBuffer = defaultValue(batchTableBinaryBuffer, Buffer.alloc(0));
-    featureTableJSONBuffer = defaultValue(featureTableJSONBuffer, Buffer.alloc(0));
-    featureTableBinaryBuffer = defaultValue(featureTableBinaryBuffer, Buffer.alloc(0));
 
     var byteLength = 32 + glbBuffer.length + featureTableJSONBuffer.length + featureTableBinaryBuffer.length + batchTableJSONBuffer.length + batchTableBinaryBuffer.length;
     var gltfFormat = 1;

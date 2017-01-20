@@ -267,7 +267,15 @@ function readGlbWriteI3dm(inputPath, outputPath, force) {
             }
             return fsReadFile(inputPath)
                 .then(function(data) {
-                    return fsWriteFile(outputPath, glbToI3dm(data));
+                    // Set I3dm spec requirements
+                    var featureTable = { INSTANCES_LENGTH : 0,
+                                         EAST_NORTH_UP : true,
+                                         POSITION : { byteOffset : 0 }
+                                       };
+                    var featureTableJSONBuffer = Buffer.alloc(JSON.stringify(featureTable));
+                    var featureTableBinaryBuffer = Buffer.alloc(3, 0); // [0, 0, 0]
+
+                    return fsWriteFile(outputPath, glbToI3dm(data, featureTableJSONBuffer, featureTableBinaryBuffer));
                 });
         });
 }
