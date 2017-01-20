@@ -17,13 +17,15 @@ describe('glbToI3dm', function() {
         fsReadFile(glbPath)
             .then(function(data) {
                 glbBuffer = data;
-                var featureTable = { INSTANCES_LENGTH : 0,
-                                     EAST_NORTH_UP : true,
-                                     POSITION : { byteOffset : 0 }
-                                   };
+                var featureTable = {
+                    INSTANCES_LENGTH : 0,
+                    POSITION : {
+                        byteOffset : 0
+                    }
+                };
                 var featureTableString = JSON.stringify(featureTable);
-                featureTableJSONBuffer = Buffer.alloc(featureTableString.length, featureTableString);
-                featureTableBinaryBuffer = Buffer.alloc(3, 0); // [0, 0, 0]
+                featureTableJSONBuffer = Buffer.from(featureTableString);
+                featureTableBinaryBuffer = Buffer.alloc(12, 0); // [0, 0, 0]
                 done();
             });
     });
@@ -59,18 +61,6 @@ describe('glbToI3dm', function() {
         expect(function() {
             glbToI3dm();
         }).toThrowError('glbBuffer is not defined.');
-    });
-
-    it('throws an error if no featureTableJSONBuffer is provided', function() {
-        expect(function() {
-            glbToI3dm(glbBuffer);
-        }).toThrowError('featureTableJSONBuffer is not defined.');
-    });
-
-    it('throws an error if no featureTableBinaryBuffer is provided', function() {
-        expect(function() {
-            glbToI3dm(glbBuffer, featureTableJSONBuffer);
-        }).toThrowError('featureTableBinaryBuffer is not defined.');
     });
 
     it('convert i3dm to glb and back to i3dm', function(done) {
