@@ -269,7 +269,7 @@ function readGlbWriteI3dm(inputPath, outputPath, force) {
                 .then(function(data) {
                     // Set I3dm spec requirements
                     var featureTable = {
-                        INSTANCES_LENGTH : 0,
+                        INSTANCES_LENGTH : 1,
                         POSITION : {
                             byteOffset : 0
                         }

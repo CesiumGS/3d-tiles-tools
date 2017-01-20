@@ -18,7 +18,7 @@ describe('glbToI3dm', function() {
             .then(function(data) {
                 glbBuffer = data;
                 var featureTable = {
-                    INSTANCES_LENGTH : 0,
+                    INSTANCES_LENGTH : 1,
                     POSITION : {
                         byteOffset : 0
                     }
