@@ -11,6 +11,8 @@ var extractB3dm = require('../lib/extractB3dm');
 var extractCmpt = require('../lib/extractCmpt');
 var extractI3dm = require('../lib/extractI3dm');
 var fileExists = require('../lib/fileExists');
+var getBufferPadded = require('../lib/getBufferPadded');
+var getJsonBufferPadded = require('../lib/getJsonBufferPadded');
 var glbToB3dm = require('../lib/glbToB3dm');
 var glbToI3dm = require('../lib/glbToI3dm');
 var isGzipped = require('../lib/isGzipped');
@@ -274,8 +276,8 @@ function readGlbWriteI3dm(inputPath, outputPath, force) {
                             byteOffset : 0
                         }
                     };
-                    var featureTableJSONBuffer = Buffer.from(JSON.stringify(featureTable));
-                    var featureTableBinaryBuffer = Buffer.alloc(12, 0); // [0, 0, 0]
+                    var featureTableJSONBuffer = getJsonBufferPadded(featureTable);
+                    var featureTableBinaryBuffer = getBufferPadded(Buffer.alloc(12, 0)); // [0, 0, 0]
 
                     return fsWriteFile(outputPath, glbToI3dm(data, featureTableJSONBuffer, featureTableBinaryBuffer));
                 });
