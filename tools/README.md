@@ -67,11 +67,11 @@ node ./bin/3d-tiles-tools.js glbToB3dm -i ./specs/data/CesiumTexturedBox/CesiumT
 
 ### glbToI3dm
 
-Creates a i3dm from a glb with a single point `[0, 0, 0]` and an empty batch table. Since this tool does not
+Creates a i3dm from a glb with a single instance at position `[0, 0, 0]` and an empty batch table. Since this tool does not
 process an entire tileset, it cannot be used with the Pipeline tool.
 
 ```
-node ./bin/3d-tiles-tools.js glbToI3dm ./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb ./output/CesiumTexturedBox.b3dm
+node ./bin/3d-tiles-tools.js glbToI3dm ./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb ./output/CesiumTexturedBox.i3dm
 ```
 ```
 node ./bin/3d-tiles-tools.js glbToI3dm -i ./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb -o ./output/CesiumTexturedBox.i3dm
@@ -155,12 +155,12 @@ Optimize a i3dm using [gltf-pipeline](https://github.com/AnalyticalGraphicsInc/g
 Since this tool does not process an entire tileset, it cannot be used with the Pipeline tool.
 
 ```
-node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/batchedWithBatchTableBinary.i3dm -o ./output/optimized.i3dm
+node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/instancedTile.i3dm -o ./output/optimized.i3dm
 ```
 
 Quantize floating-point attributes and oct-encode normals
 ```
-node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/batchedWithBatchTableBinary.i3dm -o ./output/optimized.i3dm --options -q -n
+node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/instancedTile.i3dm -o ./output/optimized.i3dm --options -q -n
 ```
 
 | Flag | Description | Required |

@@ -2,6 +2,8 @@
 var fs = require('fs');
 var Promise = require('bluebird');
 var extractI3dm = require('../../lib/extractI3dm');
+var getBufferPadded = require('../../lib/getBufferPadded');
+var getJsonBufferPadded = require('../../lib/getJsonBufferPadded');
 var glbToI3dm = require('../../lib/glbToI3dm');
 
 var fsReadFile = Promise.promisify(fs.readFile);
@@ -23,9 +25,8 @@ describe('glbToI3dm', function() {
                         byteOffset : 0
                     }
                 };
-                var featureTableString = JSON.stringify(featureTable);
-                featureTableJSONBuffer = Buffer.from(featureTableString);
-                featureTableBinaryBuffer = Buffer.alloc(12, 0); // [0, 0, 0]
+                featureTableJSONBuffer = getJsonBufferPadded(featureTable);
+                featureTableBinaryBuffer = getBufferPadded(Buffer.alloc(12, 0)); // [0, 0, 0]
                 done();
             });
     });
@@ -65,12 +66,11 @@ describe('glbToI3dm', function() {
 
     it('convert i3dm to glb and back to i3dm', function(done) {
         expect(fsReadFile(i3dmPath)
-                .then(function(fileBuffer) {
-                    var i3dm = extractI3dm(fileBuffer);
-                    var i3dmOut = glbToI3dm(i3dm.glb, i3dm.featureTable.json, i3dm.featureTable.binary,
-                                            i3dm.batchTable.json, i3dm.batchTable.binary);
-                    expect(i3dm).toEqual(extractI3dm(i3dmOut));
-                    expect(i3dmOut).toEqual(fileBuffer);
-                }), done).toResolve();
+            .then(function(fileBuffer) {
+                var i3dm = extractI3dm(fileBuffer);
+                var i3dmOut = glbToI3dm(i3dm.glb, i3dm.featureTable.json, i3dm.featureTable.binary, i3dm.batchTable.json, i3dm.batchTable.binary);
+                expect(i3dm).toEqual(extractI3dm(i3dmOut));
+                expect(i3dmOut).toEqual(fileBuffer);
+            }), done).toResolve();
     });
 });
