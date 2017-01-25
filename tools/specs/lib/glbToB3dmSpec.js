@@ -30,7 +30,7 @@ describe('glbToB3dm', function() {
     });
 
     it('generates a b3dm with batch table placeholder', function() {
-        var b3dmBuffer = glbToB3dm(glbBuffer, new Buffer(20), new Buffer(40), 4);
+        var b3dmBuffer = glbToB3dm(glbBuffer, Buffer.alloc(20), Buffer.alloc(40), 4);
         var header = b3dmBuffer.slice(0, 24);
         expect(header.toString('utf8', 0, 4)).toEqual('b3dm'); // magic
         expect(header.readUInt32LE(4)).toEqual(1); // version

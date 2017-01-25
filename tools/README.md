@@ -65,6 +65,24 @@ node ./bin/3d-tiles-tools.js glbToB3dm -i ./specs/data/CesiumTexturedBox/CesiumT
 |`-o`, `--output`| Output path of the resulting `.b3dm` | No |
 |`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
 
+### glbToI3dm
+
+Creates a i3dm from a glb with a single instance at position `[0, 0, 0]` and an empty batch table. Since this tool does not
+process an entire tileset, it cannot be used with the Pipeline tool.
+
+```
+node ./bin/3d-tiles-tools.js glbToI3dm ./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb ./output/CesiumTexturedBox.i3dm
+```
+```
+node ./bin/3d-tiles-tools.js glbToI3dm -i ./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb -o ./output/CesiumTexturedBox.i3dm
+```
+
+| Flag | Description | Required |
+| ---- | ----------- | -------- |
+|`-i`, `--input`| Input path of the `.glb`| :white_check_mark: Yes |
+|`-o`, `--output`| Output path of the resulting `.i3dm` | No |
+|`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
+
 ### b3dmToGlb
 
 Creates a glb from a b3dm. Since this tool does not process an entire tileset,
@@ -128,6 +146,27 @@ node ./bin/3d-tiles-tools.js optimizeB3dm -i ./specs/data/batchedWithBatchTableB
 | ---- | ----------- | -------- |
 |`-i`, `--input`| Input path of the `.b3dm`| :white_check_mark: Yes |
 |`-o`, `--output`| Output path of the resulting `.b3dm` | No |
+|`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
+|`--options`|All arguments past this flag are consumed by gltf-pipeline.| No |
+
+### optimizeI3dm
+
+Optimize a i3dm using [gltf-pipeline](https://github.com/AnalyticalGraphicsInc/gltf-pipeline/blob/master/README.md).
+Since this tool does not process an entire tileset, it cannot be used with the Pipeline tool.
+
+```
+node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/instancedTile.i3dm -o ./output/optimized.i3dm
+```
+
+Quantize floating-point attributes and oct-encode normals
+```
+node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/instancedTile.i3dm -o ./output/optimized.i3dm --options -q -n
+```
+
+| Flag | Description | Required |
+| ---- | ----------- | -------- |
+|`-i`, `--input`| Input path of the `.i3dm`| :white_check_mark: Yes |
+|`-o`, `--output`| Output path of the resulting `.i3dm` | No |
 |`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
 |`--options`|All arguments past this flag are consumed by gltf-pipeline.| No |
 

@@ -11,7 +11,10 @@ var extractB3dm = require('../lib/extractB3dm');
 var extractCmpt = require('../lib/extractCmpt');
 var extractI3dm = require('../lib/extractI3dm');
 var fileExists = require('../lib/fileExists');
+var getBufferPadded = require('../lib/getBufferPadded');
+var getJsonBufferPadded = require('../lib/getJsonBufferPadded');
 var glbToB3dm = require('../lib/glbToB3dm');
+var glbToI3dm = require('../lib/glbToI3dm');
 var isGzipped = require('../lib/isGzipped');
 var optimizeGlb = require('../lib/optimizeGlb');
 var runPipeline = require('../lib/runPipeline');
@@ -74,6 +77,7 @@ var argv = yargs
     .command('pipeline', 'Execute the input pipeline JSON file.')
     .command('tileset2sqlite3', 'Create a sqlite database for a tileset.')
     .command('glbToB3dm', 'Repackage the input glb as a b3dm with a basic header.')
+    .command('glbToI3dm', 'Repackage the input glb as a i3dm with a basic header.')
     .command('b3dmToGlb', 'Extract the binary glTF asset from the input b3dm.')
     .command('i3dmToGlb', 'Extract the binary glTF asset from the input i3dm.')
     .command('cmptToGlb', 'Extract the binary glTF assets from the input cmpt.')
@@ -88,6 +92,7 @@ var argv = yargs
             description: 'All arguments after this flag will be passed to gltf-pipeline as command line options.'
         }
     })
+    .command('optimizeI3dm', 'Pass the input i3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)')
     .command('gzip', 'Gzips the input tileset directory.', {
         't': {
             alias: 'tilesOnly',
@@ -123,8 +128,12 @@ if (command === 'pipeline') {
     readB3dmWriteGlb(input, output, force);
 } else if (command === 'optimizeB3dm') {
     readAndOptimizeB3dm(input, output, force);
+} else if (command === 'glbToI3dm') {
+    readGlbWriteI3dm(input, output, force);
 } else if (command === 'i3dmToGlb') {
     readI3dmWriteGlb(input, output, force);
+} else if (command === 'optimizeI3dm') {
+    readAndOptimizeI3dm(input, output, force);
 } else if (command === 'cmptToGlb') {
     readCmptWriteGlb(input, output, force);
 } else if (command === 'tileset2sqlite3') {
@@ -250,6 +259,31 @@ function readGlbWriteB3dm(inputPath, outputPath, force) {
         });
 }
 
+function readGlbWriteI3dm(inputPath, outputPath, force) {
+    outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 3) + 'i3dm');
+    return fileExists(outputPath)
+        .then(function(exists) {
+            if (!force && exists) {
+                console.log('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
+                return;
+            }
+            return fsReadFile(inputPath)
+                .then(function(data) {
+                    // Set I3dm spec requirements
+                    var featureTable = {
+                        INSTANCES_LENGTH : 1,
+                        POSITION : {
+                            byteOffset : 0
+                        }
+                    };
+                    var featureTableJSONBuffer = getJsonBufferPadded(featureTable);
+                    var featureTableBinaryBuffer = getBufferPadded(Buffer.alloc(12, 0)); // [0, 0, 0]
+
+                    return fsWriteFile(outputPath, glbToI3dm(data, featureTableJSONBuffer, featureTableBinaryBuffer));
+                });
+        });
+}
+
 function readB3dmWriteGlb(inputPath, outputPath, force) {
     outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 4) + 'glb');
     return fileExists(outputPath)
@@ -363,6 +397,49 @@ function readAndOptimizeB3dm(inputPath, outputPath, force) {
                 return zlibGzip(b3dmBuffer);
             }
             return b3dmBuffer;
+        })
+        .then(function(buffer) {
+            return fsWriteFile(outputPath, buffer);
+        })
+        .catch(function(err) {
+            console.log(err);
+        });
+}
+
+function readAndOptimizeI3dm(inputPath, outputPath, force) {
+    var options = {};
+    if (defined(optionArgs)) {
+        // Specify input for argument parsing even though it won't be used
+        optionArgs.push('-i');
+        optionArgs.push('null');
+        options = GltfPipeline.parseArguments(optionArgs);
+    }
+    outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 5) + '-optimized.i3dm');
+    var i3dm;
+    fileExists(outputPath)
+        .then(function(exists) {
+            if (exists && !force) {
+                throw new Error('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
+            } else {
+                return fsReadFile(inputPath);
+            }
+        })
+        .then(function(fileBuffer) {
+            if (isGzipped(fileBuffer)) {
+                return zlibGunzip(fileBuffer);
+            }
+            return fileBuffer;
+        })
+        .then(function(fileBuffer) {
+            i3dm = extractI3dm(fileBuffer);
+            return optimizeGlb(i3dm.glb, options);
+        })
+        .then(function(glbBuffer) {
+            var i3dmBuffer = glbToI3dm(glbBuffer, i3dm.featureTable.json, i3dm.featureTable.binary, i3dm.batchTable.json, i3dm.batchTable.binary);
+            if (argv.z) {
+                return zlibGzip(i3dmBuffer);
+            }
+            return i3dmBuffer;
         })
         .then(function(buffer) {
             return fsWriteFile(outputPath, buffer);

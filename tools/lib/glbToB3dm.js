@@ -20,11 +20,11 @@ function glbToB3dm(glbBuffer, batchTableJSONBuffer, batchTableBinaryBuffer, batc
     if (!defined(glbBuffer)) {
         throw new DeveloperError('glbBuffer is not defined.');
     }
-    batchTableJSONBuffer = defaultValue(batchTableJSONBuffer, new Buffer(0));
-    batchTableBinaryBuffer = defaultValue(batchTableBinaryBuffer, new Buffer(0));
+    batchTableJSONBuffer = defaultValue(batchTableJSONBuffer, Buffer.alloc(0));
+    batchTableBinaryBuffer = defaultValue(batchTableBinaryBuffer, Buffer.alloc(0));
     batchLength = defaultValue(batchLength, 0);
     var byteLength = 24 + glbBuffer.length + batchTableJSONBuffer.length + batchTableBinaryBuffer.length;
-    var header = new Buffer(24);
+    var header = Buffer.alloc(24);
     header.write('b3dm', 0); // magic
     header.writeUInt32LE(1, 4); // version
     header.writeUInt32LE(byteLength, 8); // byteLength - length of entire tile, including header, in bytes
