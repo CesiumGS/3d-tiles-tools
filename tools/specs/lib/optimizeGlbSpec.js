@@ -24,24 +24,12 @@ describe('optimizeGlb', function() {
             }), done).toResolve();
     });
 
-    it('optimizes and compresses a glb using the gltf-pipeline', function(done) {
-        var compressionOptions = { aoOptions: undefined,
-            binary: false,
-            compressTextureCoordinates: false,
-            embed: true,
-            embedImage: true,
-            encodeNormals: false,
-            faceNormals: false,
-            tangentsBitangents: false,
-            stats: false,
-            inputPath: 'null',
-            kmcOptions: undefined,
-            optimizeForCesium: false,
-            outputPath: 'null-optimized.gltf',
-            preserve: false,
-            quantize: false,
-            removeNormals: false,
-            textureCompressionOptions: [ { quality: 10, format: 'dxt1' } ]
+    it('compresses textures in a glb using the gltf-pipeline', function(done) {
+        var compressionOptions = {
+            textureCompressionOptions: [ {
+                format: 'dxt1',
+                quality: 10
+            } ]
         };
 
         var promises = [];

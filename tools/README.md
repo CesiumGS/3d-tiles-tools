@@ -150,9 +150,8 @@ node ./bin/3d-tiles-tools.js optimizeB3dm -i ./specs/data/batchedWithBatchTableB
 |`--options`|All arguments past this flag are consumed by gltf-pipeline.| No |
 
 To use tileset texture compression, pass the [`texcomp` flags](https://github.com/AnalyticalGraphicsInc/gltf-pipeline/blob/master/README.md#command-line-flags)
-from [gltf-pipeline](https://github.com/AnalyticalGraphicsInc/gltf-pipeline/blob/master/README.md) under the `--options` flag.
 ```
-node ./bin/3d-tiles-tools.js optimizeB3dm -i ./specs/data/Textures/batchedTextured.b3dm -o ./output/optimized.b3dm --options --texcomp.dxt1.enable --texcomp.dxt1.quality=5 --texcomp.etc1.enable
+node ./bin/3d-tiles-tools.js optimizeB3dm -i ./specs/data/Textured/batchedTextured.b3dm -o ./output/optimized.b3dm --options --texcomp.dxt1.enable --texcomp.dxt1.quality=5 --texcomp.etc1.enable
 ```
 This example optimizes the b3dm and compresses the textures into `dxt1` and `etc1` formats.
 
@@ -177,12 +176,11 @@ node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/instancedTile.i3dm -o 
 |`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
 |`--options`|All arguments past this flag are consumed by gltf-pipeline.| No |
 
-To use tileset texture compression, pass the [`texcomp` flags](https://github.com/AnalyticalGraphicsInc/gltf-pipeline/blob/master/README.md#command-line-flags)
-from [gltf-pipeline](https://github.com/AnalyticalGraphicsInc/gltf-pipeline/blob/master/README.md) under the `--options` flag.
+To use tileset texture compression, pass the [`texcomp` flags](https://github.com/AnalyticalGraphicsInc/gltf-pipeline/blob/master/README.md#command-line-flags).
 ```
 node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/Textured/instancedTextured.i3dm -o ./output/optimized.i3dm --options --texcomp.dxt1.enable --texcomp.dxt1.quality=5 --texcomp.etc1.enable
 ```
-This example optimizes the b3dm and compresses the textures into `dxt1` and `etc1` formats.
+This example optimizes the i3dm and compresses the textures into `dxt1` and `etc1` formats.
 
 ### tileset2sqlite3
 
