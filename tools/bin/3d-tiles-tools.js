@@ -137,8 +137,7 @@ if (command === 'pipeline') {
 } else if (command === 'cmptToGlb') {
     readCmptWriteGlb(input, output, force);
 } else if (command === 'tileset2sqlite3') {
-    // tileset2sqlite3 is not a pipeline tool, so handle it separately.
-    tileset2sqlite3(input, output, force);
+    tilesetToSqlite3(input, output, force);
 } else {
     processStage(input, force, command, argv)
         .then(function() {
@@ -241,6 +240,19 @@ function directoryExists(directory) {
                 throw err;
             }
             return false;
+        });
+}
+
+function tilesetToSqlite3(inputDirectory, outputPath, force) {
+    outputPath = path.normalize(defaultValue(outputPath,
+        path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '.3dtiles')));
+    return fileExists(outputPath)
+        .then(function(exists) {
+            if (!force && exists) {
+                console.log('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
+                return;
+            }
+            return tileset2sqlite3(inputDirectory, outputPath);
         });
 }
 

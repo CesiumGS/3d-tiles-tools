@@ -188,7 +188,7 @@ node ./bin/3d-tiles-tools.js tileset2sqlite3 -i ./tileset/ -o ./output/tileset.3
 | Flag | Description | Required |
 | ---- | ----------- | -------- |
 |`-i`, `--input`| Input directory of the tileset. | :white_check_mark: Yes |
-|`-o`, `--output`| Output path of the resulting `.3dtiles` | :white_check_mark: Yes |
+|`-o`, `--output`| Output path of the resulting `.3dtiles` | No |
 |`-f`, `--force`| Overwrite output file if it exists. | No, default `false` |
 
 ## Pipeline
