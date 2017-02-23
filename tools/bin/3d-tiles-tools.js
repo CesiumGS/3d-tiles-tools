@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 'use strict';
 var Cesium = require('cesium');
-var GltfPipeline = require('gltf-pipeline');
-var Promise = require('bluebird');
 var fsExtra = require('fs-extra');
+var GltfPipeline = require('gltf-pipeline');
 var path = require('path');
+var Promise = require('bluebird');
 var yargs = require('yargs');
 var zlib = require('zlib');
+var directoryExists = require('../lib/directoryExists');
 var extractB3dm = require('../lib/extractB3dm');
 var extractCmpt = require('../lib/extractCmpt');
 var extractI3dm = require('../lib/extractI3dm');
@@ -21,14 +22,14 @@ var runPipeline = require('../lib/runPipeline');
 var tileset2sqlite3 = require('../lib/tileset2sqlite3');
 
 var fsExtraReadJson = Promise.promisify(fsExtra.readJson);
-var fsStat = Promise.promisify(fsExtra.stat);
 var fsReadFile = Promise.promisify(fsExtra.readFile);
 var fsWriteFile = Promise.promisify(fsExtra.outputFile);
-var zlibGzip = Promise.promisify(zlib.gzip);
 var zlibGunzip = Promise.promisify(zlib.gunzip);
+var zlibGzip = Promise.promisify(zlib.gzip);
 
 var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
+var DeveloperError = Cesium.DeveloperError;
 
 var index = -1;
 for (var i = 0; i < process.argv.length; i++) {
@@ -42,10 +43,15 @@ var args;
 var optionArgs;
 if (index < 0) {
     args = process.argv.slice(2);
+    optionArgs = [];
 } else {
     args = process.argv.slice(2, index);
     optionArgs = process.argv.slice(index + 1);
 }
+
+// Specify input for argument parsing even though it won't be used
+optionArgs.push('-i');
+optionArgs.push('null');
 
 var argv = yargs
     .usage('Usage: $0 <command> [options]')
@@ -82,21 +88,21 @@ var argv = yargs
     .command('i3dmToGlb', 'Extract the binary glTF asset from the input i3dm.')
     .command('cmptToGlb', 'Extract the binary glTF assets from the input cmpt.')
     .command('optimizeB3dm', 'Pass the input b3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)', {
-        'z': {
-            alias: 'zip',
-            default: false,
-            description: 'Gzip the output b3dm.',
-            type: 'boolean'
-        },
         'options': {
             description: 'All arguments after this flag will be passed to gltf-pipeline as command line options.'
         }
     })
-    .command('optimizeI3dm', 'Pass the input i3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)')
+    .command('optimizeI3dm', 'Pass the input i3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)', {
+        'options': {
+            description: 'All arguments after this flag will be passed to gltf-pipeline as command line options.'
+        }
+    })
     .command('gzip', 'Gzips the input tileset directory.', {
         't': {
             alias: 'tilesOnly',
-            description: 'Only tile files (.b3dm, .i3dm, .pnts, .vctr) should be gzipped.'
+            default: false,
+            description: 'Only tile files (.b3dm, .i3dm, .pnts, .vctr) should be gzipped.',
+            type: 'boolean'
         }
     })
     .command('ungzip', 'Ungzips the input tileset directory.')
@@ -116,32 +122,75 @@ if (!defined(input)) {
 }
 
 console.time('Total');
+runCommand(command, input, output, force, argv)
+    .then(function() {
+        console.timeEnd('Total');
+    })
+    .catch(function(error) {
+        console.log(error.message);
+    });
 
-if (command === 'pipeline') {
-    processPipeline(input, force)
-        .then(function() {
-            console.timeEnd('Total');
-        });
-} else if (command === 'glbToB3dm') {
-    readGlbWriteB3dm(input, output, force);
-} else if (command === 'b3dmToGlb') {
-    readB3dmWriteGlb(input, output, force);
-} else if (command === 'optimizeB3dm') {
-    readAndOptimizeB3dm(input, output, force);
-} else if (command === 'glbToI3dm') {
-    readGlbWriteI3dm(input, output, force);
-} else if (command === 'i3dmToGlb') {
-    readI3dmWriteGlb(input, output, force);
-} else if (command === 'optimizeI3dm') {
-    readAndOptimizeI3dm(input, output, force);
-} else if (command === 'cmptToGlb') {
-    readCmptWriteGlb(input, output, force);
-} else if (command === 'tileset2sqlite3') {
-    tilesetToSqlite3(input, output, force);
-} else {
-    processStage(input, force, command, argv)
-        .then(function() {
-            console.timeEnd('Total');
+function runCommand(command, input, output, force, argv) {
+    if (command === 'pipeline') {
+        return processPipeline(input, force);
+    } else if (command === 'gzip') {
+        return processStage(input, output, force, command, argv);
+    } else if (command === 'ungzip') {
+        return processStage(input, output, force, command, argv);
+    } else if (command === 'b3dmToGlb') {
+        return readB3dmWriteGlb(input, output, force);
+    } else if (command === 'i3dmToGlb') {
+        return readI3dmWriteGlb(input, output, force);
+    } else if (command === 'cmptToGlb') {
+        return readCmptWriteGlb(input, output, force);
+    } else if (command === 'glbToB3dm') {
+        return readGlbWriteB3dm(input, output, force);
+    } else if (command === 'glbToI3dm') {
+        return readGlbWriteI3dm(input, output, force);
+    } else if (command === 'optimizeB3dm') {
+        return readAndOptimizeB3dm(input, output, force, optionArgs);
+    } else if (command === 'optimizeI3dm') {
+        return readAndOptimizeI3dm(input, output, force, optionArgs);
+    } else if (command === 'tileset2sqlite3') {
+        return tilesetToSqlite3(input, output, force);
+    } else {
+        throw new DeveloperError('Invalid command: ' + command);
+    }
+}
+
+function checkDirectoryOverwritable(directory, force) {
+    if (force) {
+        return Promise.resolve();
+    } else {
+        return directoryExists(directory)
+            .then(function(exists) {
+                if (exists) {
+                    throw new DeveloperError('Directory ' + directory + ' already exists. Specify -f or --force to overwrite existing files.');
+                }
+            });
+    }
+}
+
+function checkFileOverwritable(file, force) {
+    if (force) {
+        return Promise.resolve();
+    } else {
+        return fileExists(file)
+            .then(function (exists) {
+                if (exists) {
+                    throw new DeveloperError('File ' + file + ' already exists. Specify -f or --force to overwrite existing files.');
+                }
+            });
+    }
+}
+
+function readFile(file) {
+    return fsReadFile(file)
+        .then(function(fileBuffer) {
+            if (isGzipped(fileBuffer)) {
+                return zlibGunzip(fileBuffer);
+            }
+            return fileBuffer;
         });
 }
 
@@ -156,24 +205,17 @@ function processPipeline(inputFile) {
             var outputDirectory = pipeline.output;
 
             if (!defined(inputDirectory)) {
-                console.log('pipeline.input is required.');
-                return;
+                throw new DeveloperError('pipeline.input is required.');
             }
 
-            outputDirectory = path.normalize(defaultValue(outputDirectory,
-                path.join(path.dirname(inputDirectory), path.basename(input) + '-processed')));
+            outputDirectory = path.normalize(defaultValue(outputDirectory, path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-processed')));
 
             // Make input and output relative to the root directory
             inputDirectory = path.join(path.dirname(inputFile), inputDirectory);
             outputDirectory = path.join(path.dirname(inputFile), outputDirectory);
 
-            return directoryExists(outputDirectory)
-                .then(function(exists) {
-                    if (!force && exists) {
-                        console.log('Directory ' + outputDirectory + ' already exists. Specify -f or --force to overwrite existing files.');
-                        return;
-                    }
-
+            return checkDirectoryOverwritable(outputDirectory, force)
+                .then(function() {
                     pipeline.input = inputDirectory;
                     pipeline.output = outputDirectory;
 
@@ -186,18 +228,10 @@ function processPipeline(inputFile) {
         });
 }
 
-function processStage(inputDirectory, force, command, argv) {
-    var outputDirectory = defaultValue(defaultValue(argv.o, argv.output), argv._[2]);
-    outputDirectory = path.normalize(defaultValue(outputDirectory,
-        path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-processed')));
-
-    return directoryExists(outputDirectory)
-        .then(function(exists) {
-            if (!force && exists) {
-                console.log('Directory ' + outputDirectory + ' already exists. Specify -f or --force to overwrite existing files.');
-                return;
-            }
-
+function processStage(inputDirectory, outputDirectory, force, command, argv) {
+    outputDirectory = defaultValue(outputDirectory, path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-processed'));
+    return checkDirectoryOverwritable(outputDirectory, force)
+        .then(function() {
             var stage = getStage(command, argv);
 
             var pipeline = {
@@ -220,67 +254,37 @@ function getStage(stageName, argv) {
     };
     switch (stageName) {
         case 'gzip':
-            if (defined(argv.t) || defined(argv.tilesOnly)) {
-                stage.tilesOnly = true;
-            }
+            stage.tilesOnly = argv.tilesOnly;
             break;
     }
     return stage;
 }
 
-function directoryExists(directory) {
-    return fsStat(directory)
-        .then(function(stats) {
-            return stats.isDirectory();
-        })
-        .catch(function(err) {
-            // If the directory doesn't exist the error code is ENOENT.
-            // Otherwise something else went wrong - permission issues, etc.
-            if (err.code !== 'ENOENT') {
-                throw err;
-            }
-            return false;
-        });
-}
-
 function tilesetToSqlite3(inputDirectory, outputPath, force) {
-    outputPath = path.normalize(defaultValue(outputPath,
-        path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '.3dtiles')));
-    return fileExists(outputPath)
-        .then(function(exists) {
-            if (!force && exists) {
-                console.log('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
-                return;
-            }
+    outputPath = defaultValue(outputPath, path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '.3dtiles'));
+    return checkFileOverwritable(outputPath, force)
+        .then(function() {
             return tileset2sqlite3(inputDirectory, outputPath);
         });
 }
 
 function readGlbWriteB3dm(inputPath, outputPath, force) {
     outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 3) + 'b3dm');
-    return fileExists(outputPath)
-        .then(function(exists) {
-            if (!force && exists) {
-                console.log('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
-                return;
-            }
-            return fsReadFile(inputPath)
-                .then(function(data) {
-                    return fsWriteFile(outputPath, glbToB3dm(data));
+    return checkFileOverwritable(outputPath, force)
+        .then(function() {
+            return readFile(inputPath)
+                .then(function(glb) {
+                    return fsWriteFile(outputPath, glbToB3dm(glb));
                 });
         });
 }
 
 function readGlbWriteI3dm(inputPath, outputPath, force) {
     outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 3) + 'i3dm');
-    return fileExists(outputPath)
-        .then(function(exists) {
-            if (!force && exists) {
-                console.log('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
-                return;
-            }
-            return fsReadFile(inputPath)
-                .then(function(data) {
+    return checkFileOverwritable(outputPath, force)
+        .then(function() {
+            return readFile(inputPath)
+                .then(function(glb) {
                     // Set I3dm spec requirements
                     var featureTable = {
                         INSTANCES_LENGTH : 1,
@@ -291,38 +295,30 @@ function readGlbWriteI3dm(inputPath, outputPath, force) {
                     var featureTableJSONBuffer = getJsonBufferPadded(featureTable);
                     var featureTableBinaryBuffer = getBufferPadded(Buffer.alloc(12, 0)); // [0, 0, 0]
 
-                    return fsWriteFile(outputPath, glbToI3dm(data, featureTableJSONBuffer, featureTableBinaryBuffer));
+                    return fsWriteFile(outputPath, glbToI3dm(glb, featureTableJSONBuffer, featureTableBinaryBuffer));
                 });
         });
 }
 
 function readB3dmWriteGlb(inputPath, outputPath, force) {
     outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 4) + 'glb');
-    return fileExists(outputPath)
-        .then(function(exists) {
-            if (!force && exists) {
-                console.log('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
-                return;
-            }
-            return fsReadFile(inputPath)
-                .then(function(data) {
-                    return fsWriteFile(outputPath, extractB3dm(data).glb);
-                });
+    return checkFileOverwritable(outputPath, force)
+        .then(function() {
+            return readFile(inputPath);
+        })
+        .then(function(b3dm) {
+            return fsWriteFile(outputPath, extractB3dm(b3dm).glb);
         });
 }
 
 function readI3dmWriteGlb(inputPath, outputPath, force) {
     outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 4) + 'glb');
-    return fileExists(outputPath)
-        .then(function(exists) {
-            if (!force && exists) {
-                console.log('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
-                return;
-            }
-            return fsReadFile(inputPath)
-                .then(function(data) {
-                    return fsWriteFile(outputPath, extractI3dm(data).glb);
-                });
+    return checkFileOverwritable(outputPath, force)
+        .then(function() {
+            return readFile(inputPath);
+        })
+        .then(function(i3dm) {
+            return fsWriteFile(outputPath, extractI3dm(i3dm).glb);
         });
 }
 
@@ -342,17 +338,15 @@ function extractGlbs(tiles) {
 }
 
 function readCmptWriteGlb(inputPath, outputPath, force) {
-    outputPath = defaultValue(outputPath, inputPath);
-    outputPath = outputPath.slice(0, -path.extname(outputPath).length);
-    return fsReadFile(inputPath)
-        .then(function(data) {
-            var tiles = extractCmpt(data);
+    outputPath = defaultValue(outputPath, inputPath).slice(0, inputPath.length - 5);
+    return readFile(inputPath)
+        .then(function(cmpt) {
+            var tiles = extractCmpt(cmpt);
             var glbs = extractGlbs(tiles);
             var glbsLength = glbs.length;
             var glbPaths = new Array(glbsLength);
             if (glbsLength === 0) {
-                console.log('No glbs found in ' + inputPath + '.');
-                return;
+                throw new DeveloperError('No glbs found in ' + inputPath + '.');
             } else if (glbsLength === 1) {
                 glbPaths[0] = [outputPath + '.glb'];
             } else {
@@ -361,13 +355,8 @@ function readCmptWriteGlb(inputPath, outputPath, force) {
                 }
             }
             return Promise.map(glbPaths, function(glbPath) {
-                return fileExists(glbPath);
-            }).then(function(exists) {
-                var index = exists.indexOf(true);
-                if (!force && (index > -1)) {
-                    console.log('File ' + glbPaths[index] + ' already exists. Specify -f or --force to overwrite existing file.');
-                    return;
-                }
+                return checkFileOverwritable(glbPath, force);
+            }).then(function() {
                 return Promise.map(glbPaths, function(glbPath, index) {
                     return fsWriteFile(glbPath, glbs[index]);
                 });
@@ -375,25 +364,17 @@ function readCmptWriteGlb(inputPath, outputPath, force) {
         });
 }
 
-function readAndOptimizeB3dm(inputPath, outputPath, force) {
-    var options = {};
-    if (defined(optionArgs)) {
-        // Specify input for argument parsing even though it won't be used
-        optionArgs.push('-i');
-        optionArgs.push('null');
-        options = GltfPipeline.parseArguments(optionArgs);
-    }
+function readAndOptimizeB3dm(inputPath, outputPath, force, optionArgs) {
+    var options = GltfPipeline.parseArguments(optionArgs);
     outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 5) + '-optimized.b3dm');
+    var gzipped;
     var b3dm;
-    fileExists(outputPath)
-        .then(function(exists) {
-            if (exists && !force) {
-                throw new Error('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
-            } else {
-                return fsReadFile(inputPath);
-            }
+    return checkFileOverwritable(outputPath, force)
+        .then(function() {
+            return fsReadFile(inputPath);
         })
         .then(function(fileBuffer) {
+            gzipped = isGzipped(fileBuffer);
             if (isGzipped(fileBuffer)) {
                 return zlibGunzip(fileBuffer);
             }
@@ -405,38 +386,27 @@ function readAndOptimizeB3dm(inputPath, outputPath, force) {
         })
         .then(function(glbBuffer) {
             var b3dmBuffer = glbToB3dm(glbBuffer, b3dm.batchTable.json, b3dm.batchTable.binary, b3dm.header.batchLength);
-            if (argv.z) {
+            if (gzipped) {
                 return zlibGzip(b3dmBuffer);
             }
             return b3dmBuffer;
         })
         .then(function(buffer) {
             return fsWriteFile(outputPath, buffer);
-        })
-        .catch(function(err) {
-            console.log(err);
         });
 }
 
-function readAndOptimizeI3dm(inputPath, outputPath, force) {
-    var options = {};
-    if (defined(optionArgs)) {
-        // Specify input for argument parsing even though it won't be used
-        optionArgs.push('-i');
-        optionArgs.push('null');
-        options = GltfPipeline.parseArguments(optionArgs);
-    }
+function readAndOptimizeI3dm(inputPath, outputPath, force, optionArgs) {
+    var options = GltfPipeline.parseArguments(optionArgs);
     outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 5) + '-optimized.i3dm');
+    var gzipped;
     var i3dm;
-    fileExists(outputPath)
-        .then(function(exists) {
-            if (exists && !force) {
-                throw new Error('File ' + outputPath + ' already exists. Specify -f or --force to overwrite existing file.');
-            } else {
-                return fsReadFile(inputPath);
-            }
+    return checkFileOverwritable(outputPath, force)
+        .then(function() {
+            return fsReadFile(inputPath);
         })
         .then(function(fileBuffer) {
+            gzipped = isGzipped(fileBuffer);
             if (isGzipped(fileBuffer)) {
                 return zlibGunzip(fileBuffer);
             }
@@ -448,15 +418,12 @@ function readAndOptimizeI3dm(inputPath, outputPath, force) {
         })
         .then(function(glbBuffer) {
             var i3dmBuffer = glbToI3dm(glbBuffer, i3dm.featureTable.json, i3dm.featureTable.binary, i3dm.batchTable.json, i3dm.batchTable.binary);
-            if (argv.z) {
+            if (gzipped) {
                 return zlibGzip(i3dmBuffer);
             }
             return i3dmBuffer;
         })
         .then(function(buffer) {
             return fsWriteFile(outputPath, buffer);
-        })
-        .catch(function(err) {
-            console.log(err);
         });
 }
