@@ -20,6 +20,7 @@ module.exports = optimizeGlb;
  * @param {Buffer} buffer The buffer containing the binary glTF.
  * @param {Object} [options] Options specifying custom gltf-pipeline behavior.
  * @returns {Promise} A promise that resolves to the optimized binary glTF.
+ * @private
  */
 function optimizeGlb(glbBuffer, options) {
     if (!defined(options)) {
