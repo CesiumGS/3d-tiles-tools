@@ -25,7 +25,7 @@
     "bluebird": "3.4.1",
     "cesium": "1.24",
     "fs-extra": "0.30.0",
-    "gltf-pipeline": "0.1.0-alpha6",
+    "gltf-pipeline": "0.1.0-alpha11",
     "sqlite3": "^3.1.8",
     "uuid": "2.0.2",
     "yargs": "6.3.0"

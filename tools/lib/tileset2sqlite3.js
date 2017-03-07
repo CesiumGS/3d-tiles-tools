@@ -81,9 +81,6 @@ function tileset2sqlite3(inputDirectory, outputFile) {
                 .then(function() {
                     return dbRun('COMMIT');
                 })
-                .catch(function(error) {
-                    console.log(error);
-                })
                 .finally(function() {
                     db.close();
                 });

@@ -24,6 +24,25 @@ describe('optimizeGlb', function() {
             }), done).toResolve();
     });
 
+    it('compresses textures in a glb using the gltf-pipeline', function(done) {
+        var compressionOptions = {
+            textureCompressionOptions : {
+                format: 'dxt1',
+                quality: 10
+            }
+        };
+
+        var promises = [];
+        promises.push(optimizeGlb(buffer));
+        promises.push(optimizeGlb(buffer, compressionOptions));
+
+        expect(Promise.all(promises)
+            .then(function(optimizedGlbs) {
+                expect(optimizedGlbs.length).toEqual(2);
+                expect(optimizedGlbs[0]).not.toEqual(optimizedGlbs[1]);
+            }), done).toResolve();
+    });
+
     it('throws an error if no buffer is provided', function() {
         expect(function() {
             optimizeGlb();
