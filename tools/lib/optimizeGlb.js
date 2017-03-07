@@ -7,10 +7,11 @@ var DeveloperError = Cesium.DeveloperError;
 var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
 
-var Pipeline = GltfPipeline.Pipeline;
 var addCesiumRTC = GltfPipeline.addCesiumRTC;
 var getBinaryGltf = GltfPipeline.getBinaryGltf;
+var loadGltfUris = GltfPipeline.loadGltfUris;
 var parseBinaryGltf = GltfPipeline.parseBinaryGltf;
+var Pipeline = GltfPipeline.Pipeline;
 
 module.exports = optimizeGlb;
 
@@ -39,18 +40,18 @@ function optimizeGlb(glbBuffer, options) {
             rtcPosition = Cartesian3.unpack(cesiumRTC.center);
         }
     }
-    return Pipeline.processJSONWithExtras(gltf, options)
-        .then(function(gltf) {
-            if (defined(rtcPosition)) {
-                addCesiumRTC(gltf, {
-                    position: rtcPosition
+    return loadGltfUris(gltf)
+        .then(function() {
+            return Pipeline.processJSONWithExtras(gltf, options)
+                .then(function(gltf) {
+                    if (defined(rtcPosition)) {
+                        addCesiumRTC(gltf, {
+                            position: rtcPosition
+                        });
+                    }
+                    var embed = defaultValue(options.embed, true);
+                    var embedImage = defaultValue(options.embedImage, true);
+                    return getBinaryGltf(gltf, embed, embedImage).glb;
                 });
-            }
-            var embed = defaultValue(options.embed, true);
-            var embedImage = defaultValue(options.embedImage, true);
-            return getBinaryGltf(gltf, embed, embedImage).glb;
-        })
-        .catch(function(err) {
-            console.log(err);
         });
 }
