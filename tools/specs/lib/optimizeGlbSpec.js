@@ -26,10 +26,10 @@ describe('optimizeGlb', function() {
 
     it('compresses textures in a glb using the gltf-pipeline', function(done) {
         var compressionOptions = {
-            textureCompressionOptions: [ {
+            textureCompressionOptions : {
                 format: 'dxt1',
                 quality: 10
-            } ]
+            }
         };
 
         var promises = [];
