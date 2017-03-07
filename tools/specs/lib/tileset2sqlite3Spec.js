@@ -64,9 +64,13 @@ describe('tileset2sqlite3', function() {
         }).toThrowError('inputDirectory is required.');
     });
 
-    it('throws an error if no output file is provided', function() {
-        expect(function() {
-            tileset2sqlite3(inputDirectory, undefined);
-        }).toThrowError('outputFile is required.');
+    it('works when no output file is provided', function(done) {
+        expect(tileset2sqlite3(inputDirectory)
+            .then(function() {
+                return fileExists(outputFile)
+                    .then(function(exists) {
+                        expect(exists).toBe(true);
+                    });
+            }), done).toResolve();
     });
 });
