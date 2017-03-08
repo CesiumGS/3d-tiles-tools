@@ -24,33 +24,37 @@ function databaseToTileset(inputFile, outputDirectory) {
 
     // Open the database.
     var db = new sqlite3.Database(inputFile, sqlite3.OPEN_READWRITE);
-    var dbGet = Promise.promisify(db.get, {context : db});
+    var dbAll = Promise.promisify(db.all, {context : db});
 
-    // Get number of rows
-    return dbGet('SELECT Count(*) AS total FROM media')
-        .then(function(row) {
-            return row.total;
-        })
-        .then(function(total) {
-            var promises = new Array(total);
-            for (var i = 0; i < total; ++i) {
-                promises[i] = readAndWriteFile(outputDirectory, dbGet, i);
-            }
-            return Promise.all(promises);
-        })
-        .finally(function() {
-            db.close();
-        });
+    // Read a chunk of rows from the database at a time. Since the row contents contain tile blobs the limit should not be too high.
+    var offset = 0;
+    var limit = 100;
+    var processChunk = function() {
+        return dbAll('SELECT * FROM media LIMIT ? OFFSET ?', limit, offset)
+            .then(function(rows) {
+                if (rows.length === 0) {
+                    // No more rows left
+                    return Promise.resolve();
+                }
+                return Promise.map(rows, function(row) {
+                    offset += limit;
+                    return writeFile(outputDirectory, row.key, row.content);
+                })
+                    .then(function () {
+                        return processChunk();
+                    });
+            });
+    };
+
+    return processChunk().finally(function() {
+        db.close();
+    });
 }
 
-function readAndWriteFile(outputDirectory, dbGet, index) {
-    return dbGet('SELECT * FROM media LIMIT 1 OFFSET ?', index)
-        .then(function(row) {
-            var filePath = path.normalize(path.join(outputDirectory, row.key));
-            var data = row.content;
-            if (isGzipped(data)) {
-                data = zlib.gunzipSync(data);
-            }
-            return fsExtraOutputFile(filePath, data);
-        });
+function writeFile(outputDirectory, file, data) {
+    var filePath = path.normalize(path.join(outputDirectory, file));
+    if (isGzipped(data)) {
+        data = zlib.gunzipSync(data);
+    }
+    return fsExtraOutputFile(filePath, data);
 }
