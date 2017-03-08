@@ -37,7 +37,7 @@ function databaseToTileset(inputFile, outputDirectory) {
                     return Promise.resolve();
                 }
                 return Promise.map(rows, function(row) {
-                    offset += limit;
+                    ++offset;
                     return writeFile(outputDirectory, row.key, row.content);
                 })
                     .then(function () {
