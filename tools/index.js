@@ -1,4 +1,5 @@
 module.exports = {
+    databaseToTileset : require('./lib/databaseToTileset'),
     extractB3dm : require('./lib/extractB3dm'),
     extractCmpt : require('./lib/extractCmpt'),
     extractI3dm : require('./lib/extractI3dm'),

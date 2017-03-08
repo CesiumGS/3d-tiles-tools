@@ -1,6 +1,4 @@
-#!/usr/bin/env node
 'use strict';
-
 var Cesium = require('cesium');
 var fsExtra = require('fs-extra');
 var path = require('path');
@@ -9,6 +7,7 @@ var sqlite3 = require('sqlite3');
 var zlib = require('zlib');
 var fileExists = require('../lib/fileExists');
 var isGzipped = require('../lib/isGzipped');
+var isTile = require('../lib/isTile');
 
 var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
 var fsExtraRemove = Promise.promisify(fsExtra.remove);
@@ -49,13 +48,13 @@ function tilesetToDatabase(inputDirectory, outputFile) {
                 })
                 .then(function() {
                     //Build the collection of file paths to be inserted.
-                    var filepaths = [];
+                    var filePaths = [];
                     var stream = fsExtra.walk(inputDirectory);
                     stream.on('readable', function() {
                         var filePath = stream.read();
                         while (defined(filePath)) {
                             if (filePath.stats.isFile()) {
-                                filepaths.push(filePath.path);
+                                filePaths.push(filePath.path);
                             }
                             filePath = stream.read();
                         }
@@ -64,17 +63,19 @@ function tilesetToDatabase(inputDirectory, outputFile) {
                     return new Promise(function(resolve, reject) {
                         stream.on('error', reject);
                         stream.on('end', resolve);
-                    }).thenReturn(filepaths);
+                    }).thenReturn(filePaths);
                 })
-                .then(function(filepaths) {
-                    return Promise.map(filepaths, function(filepath) {
-                        return fsExtraReadFile(filepath)
+                .then(function(filePaths) {
+                    return Promise.map(filePaths, function(filePath) {
+                        return fsExtraReadFile(filePath)
                             .then(function(data) {
-                                filepath = path.normalize(path.relative(inputDirectory, filepath)).replace(/\\/g, '/');
-                                if (!isGzipped(data)) {
+                                filePath = path.normalize(path.relative(inputDirectory, filePath)).replace(/\\/g, '/');
+                                // Only gzip tiles and json files. Other files like external textures should not be gzipped.
+                                var shouldGzip = isTile(filePath) || path.extname(filePath) === '.json';
+                                if (shouldGzip && !isGzipped(data)) {
                                     data = zlib.gzipSync(data);
                                 }
-                                return dbRun('INSERT INTO media VALUES (?, ?)', [filepath, data]);
+                                return dbRun('INSERT INTO media VALUES (?, ?)', [filePath, data]);
                             });
                     }, {concurrency : 100});
                 })
