@@ -220,9 +220,9 @@ node ./bin/3d-tiles-tools.js databaseToTileset -i ./specs/data/tileset.3dtiles -
 
 | Flag | Description | Required |
 | ---- | ----------- | -------- |
-|`-i`, `--input`| Input directory of the tileset. | :white_check_mark: Yes |
-|`-o`, `--output`| Output path of the resulting `.3dtiles` | No |
-|`-f`, `--force`| Overwrite output file if it exists. | No, default `false` |
+|`-i`, `--input`| Input .3dtiles database file. | :white_check_mark: Yes |
+|`-o`, `--output`| Output directory of the unpacked tileset | No |
+|`-f`, `--force`| Overwrite output directory if it exists. | No, default `false` |
 
 ## Pipeline
 

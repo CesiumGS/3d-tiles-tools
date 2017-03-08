@@ -13,9 +13,9 @@ var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
 var DeveloperError = Cesium.DeveloperError;
 
-module.exports = tilesetToDatabase;
+module.exports = databaseToTileset;
 
-function tilesetToDatabase(inputFile, outputDirectory) {
+function databaseToTileset(inputFile, outputDirectory) {
     if (!defined(inputFile)) {
         throw new DeveloperError('inputFile is required.');
     }
