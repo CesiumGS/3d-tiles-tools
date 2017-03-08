@@ -182,7 +182,7 @@ node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/Textured/instancedText
 ```
 This example optimizes the i3dm and compresses the textures into `dxt1` and `etc1` formats.
 
-### tileset2sqlite3
+### tilesetToDatabase
 
 Generates a sqlite database for a tileset.
 
@@ -191,10 +191,10 @@ This tool cannot be used with the Pipeline tool.
 Each tile is stored gzipped in the database.  The specification for the tables in the database is not final, see [3d-tiles/#89](https://github.com/AnalyticalGraphicsInc/3d-tiles/issues/89).
 
 ```
-node ./bin/3d-tiles-tools.js tileset2sqlite3 ./tileset/ ./output/tileset.3dtiles
+node ./bin/3d-tiles-tools.js tilesetToDatabase ./tileset/ ./output/tileset.3dtiles
 ```
 ```
-node ./bin/3d-tiles-tools.js tileset2sqlite3 -i ./tileset/ -o ./output/tileset.3dtiles
+node ./bin/3d-tiles-tools.js tilesetToDatabase -i ./tileset/ -o ./output/tileset.3dtiles
 ```
 
 | Flag | Description | Required |

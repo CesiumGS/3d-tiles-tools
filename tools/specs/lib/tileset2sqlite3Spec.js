@@ -6,7 +6,7 @@ var sqlite3 = require('sqlite3');
 var zlib = require('zlib');
 var fileExists = require('../../lib/fileExists');
 var isGzipped = require('../../lib/isGzipped');
-var tileset2sqlite3 = require('../../lib/tileset2sqlite3');
+var tilesetToDatabase = require('../../lib/tilesetToDatabase');
 
 var fsExtraReadJson = Promise.promisify(fsExtra.readJson);
 var fsExtraRemove = Promise.promisify(fsExtra.remove);
@@ -18,7 +18,7 @@ var inputDirectory = './specs/data/TilesetOfTilesets/';
 var tilesetJsonFile = './specs/data/TilesetOfTilesets/tileset.json';
 var outputFile = './specs/data/TilesetOfTilesets.3dtiles';
 
-describe('tileset2sqlite3', function() {
+describe('tilesetToDatabase', function() {
     afterEach(function (done) {
         fsExtraRemove(outputFile)
             .then(function() {
@@ -27,7 +27,7 @@ describe('tileset2sqlite3', function() {
     });
 
     it('creates a sqlite database from a tileset', function(done) {
-        expect(tileset2sqlite3(inputDirectory, outputFile)
+        expect(tilesetToDatabase(inputDirectory, outputFile)
             .then(function() {
                 var db;
                 return fileExists(outputFile)
@@ -60,12 +60,12 @@ describe('tileset2sqlite3', function() {
 
     it('throws an error if no input directory is provided', function() {
         expect(function() {
-            tileset2sqlite3(undefined, outputFile);
+            tilesetToDatabase(undefined, outputFile);
         }).toThrowError('inputDirectory is required.');
     });
 
     it('works when no output file is provided', function(done) {
-        expect(tileset2sqlite3(inputDirectory)
+        expect(tilesetToDatabase(inputDirectory)
             .then(function() {
                 return fileExists(outputFile)
                     .then(function(exists) {
