@@ -83,7 +83,7 @@ var argv = yargs
     })
     .command('pipeline', 'Execute the input pipeline JSON file.')
     .command('tilesetToDatabase', 'Create a sqlite database for a tileset.')
-    .command('databaseToTileset', 'Unpack a tileset database to a tileset folder')
+    .command('databaseToTileset', 'Unpack a tileset database to a tileset folder.')
     .command('glbToB3dm', 'Repackage the input glb as a b3dm with a basic header.')
     .command('glbToI3dm', 'Repackage the input glb as a i3dm with a basic header.')
     .command('b3dmToGlb', 'Extract the binary glTF asset from the input b3dm.')
