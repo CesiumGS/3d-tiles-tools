@@ -1,6 +1,15 @@
 Change Log
 ==========
 
+### 0.1.1 - ???
+
+* Breaking changes
+    * Renamed `tileset2sqlite3` to `tilesetToDatabase`.
+* Added `databaseToTileset` for unpacking a .3dtiles file to a tileset directory. [#62](https://github.com/AnalyticalGraphicsInc/3d-tiles-tools/pull/62)
+* Added  `glbToI3dm` and `optimizeI3dm` command line tools. [#46](https://github.com/AnalyticalGraphicsInc/3d-tiles-tools/pull/46)
+* Handle b3dm tiles with the legacy 20-byte header. [#45](https://github.com/AnalyticalGraphicsInc/3d-tiles-tools/pull/45)
+* Added `extractCmpt` to extract inner tiles from a cmpt tile and the `cmptToGlb` command line tool. [#42](https://github.com/AnalyticalGraphicsInc/3d-tiles-tools/pull/42)
+
 ### 0.1.0 - 2016-12-16
 
-* Initial release
+* Initial release.
