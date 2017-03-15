@@ -18,7 +18,7 @@ module.exports = optimizeGlb;
 /**
  * Given an input buffer containing a binary glTF asset, optimize it using gltf-pipeline with the provided options
  *
- * @param {Buffer} buffer The buffer containing the binary glTF.
+ * @param {Buffer} glbBuffer The buffer containing the binary glTF.
  * @param {Object} [options] Options specifying custom gltf-pipeline behavior.
  * @returns {Promise} A promise that resolves to the optimized binary glTF.
  * @private
