@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-### 0.1.1 - ???
+### 0.1.1 - 2017-03-15
 
 * Breaking changes
     * Renamed `tileset2sqlite3` to `tilesetToDatabase`.
