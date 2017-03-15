@@ -81,31 +81,6 @@ gulp.task('coverage', function () {
     open('coverage/lcov-report/index.html');
 });
 
-function copyModule(module) {
-    var tsName = module + '.d.ts';
-    var srcUrl = 'https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/' + module + '/' + tsName;
-    var desPath = path.join('TypeScriptDefinitions', tsName);
-
-    request.get({
-        url: srcUrl
-    }, function (error, response) {
-        if (defined(error)) {
-            console.log(error);
-            return;
-        }
-        if (response.statusCode >= 200 && response.statusCode < 300) {
-            fsExtra.outputFileSync(desPath, response.body);
-        }
-    });
-}
-
-gulp.task('update-ts-definitions', function () {
-    fsExtra.removeSync('TypeScriptDefinitions');
-    var packageJson = require('./package.json');
-    Object.keys(packageJson.dependencies).forEach(copyModule);
-    Object.keys(packageJson.devDependencies).forEach(copyModule);
-});
-
 gulp.task('jsDoc', function() {
     return new Promise(function(resolve, reject) {
         child_process.exec('jsdoc --configure tools/jsdoc/conf.json', function(error, stdout, stderr) {
