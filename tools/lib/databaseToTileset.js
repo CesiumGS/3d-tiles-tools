@@ -15,6 +15,13 @@ var DeveloperError = Cesium.DeveloperError;
 
 module.exports = databaseToTileset;
 
+/**
+ * Unpacks a .3dtiles database to a tileset folder.
+ *
+ * @param {String} inputFile The input .3dtiles database file.
+ * @param {String} [outputDirectory] The output directory of the tileset.
+ * @returns {Promise} A promise that resolves when the tileset is written.
+ */
 function databaseToTileset(inputFile, outputDirectory) {
     if (!defined(inputFile)) {
         throw new DeveloperError('inputFile is required.');

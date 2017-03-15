@@ -14,6 +14,8 @@ module.exports = getJsonBufferPadded;
  *
  * @param {Object} json The JSON object.
  * @returns {Buffer} The padded JSON buffer.
+ *
+ * @private
  */
 function getJsonBufferPadded(json) {
     if (!defined(json)) {

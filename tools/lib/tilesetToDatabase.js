@@ -18,6 +18,14 @@ var DeveloperError = Cesium.DeveloperError;
 
 module.exports = tilesetToDatabase;
 
+
+/**
+ * Generates a sqlite database for a tileset, saved as a .3dtiles file.
+ *
+ * @param {String} inputDirectory The input directory of the tileset.
+ * @param {String} [outputFile] The output .3dtiles database file.
+ * @returns {Promise} A promise that resolves when the database is written.
+ */
 function tilesetToDatabase(inputDirectory, outputFile) {
     if (!defined(inputDirectory)) {
         throw new DeveloperError('inputDirectory is required.');

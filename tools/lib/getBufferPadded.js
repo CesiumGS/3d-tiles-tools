@@ -11,6 +11,8 @@ module.exports = getBufferPadded;
  *
  * @param {Buffer} buffer The buffer.
  * @returns {Buffer} The padded buffer.
+ *
+ * @private
  */
 function getBufferPadded(buffer) {
     if (!defined(buffer)) {

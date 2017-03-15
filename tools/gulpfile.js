@@ -10,7 +10,6 @@ var JasmineSpecReporter = require('jasmine-spec-reporter');
 var open = require('open');
 var path = require('path');
 var Promise = require('bluebird');
-var request = require('request');
 var yargs = require('yargs');
 
 var defined = Cesium.defined;
