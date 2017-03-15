@@ -73,37 +73,12 @@ gulp.task('coverage', function () {
         ' cover' +
         ' --include-all-sources' +
         ' --dir coverage' +
-        ' -x "bin/** doc/** specs/** coverage/** index.js gulpfile.js"' +
+        ' -x "bin/** -x doc/** -x specs/** -x coverage/** -x index.js -x gulpfile.js"' +
         ' node_modules/jasmine/bin/jasmine.js' +
         ' JASMINE_CONFIG_PATH=specs/jasmine.json', {
         stdio: [process.stdin, process.stdout, process.stderr]
     });
     open('coverage/lcov-report/index.html');
-});
-
-function copyModule(module) {
-    var tsName = module + '.d.ts';
-    var srcUrl = 'https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/' + module + '/' + tsName;
-    var desPath = path.join('TypeScriptDefinitions', tsName);
-
-    request.get({
-        url: srcUrl
-    }, function (error, response) {
-        if (defined(error)) {
-            console.log(error);
-            return;
-        }
-        if (response.statusCode >= 200 && response.statusCode < 300) {
-            fsExtra.outputFileSync(desPath, response.body);
-        }
-    });
-}
-
-gulp.task('update-ts-definitions', function () {
-    fsExtra.removeSync('TypeScriptDefinitions');
-    var packageJson = require('./package.json');
-    Object.keys(packageJson.dependencies).forEach(copyModule);
-    Object.keys(packageJson.devDependencies).forEach(copyModule);
 });
 
 gulp.task('jsDoc', function() {
