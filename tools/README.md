@@ -104,7 +104,7 @@ Creates a glb from a i3dm. Since this tool does not process an entire tileset,
 it cannot be used with the Pipeline tool.
 
 ```
-node ./bin/3d-tiles-tools.js i3dmToGlb -i ./specs/data/instancedTile.i3dm -o ./output/extracted.glb
+node ./bin/3d-tiles-tools.js i3dmToGlb -i ./specs/data/instancedWithBatchTableBinary.i3dm -o ./output/extracted.glb
 ```
 
 | Flag | Description | Required |
@@ -161,12 +161,12 @@ Optimize a i3dm using [gltf-pipeline](https://github.com/AnalyticalGraphicsInc/g
 Since this tool does not process an entire tileset, it cannot be used with the Pipeline tool.
 
 ```
-node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/instancedTile.i3dm -o ./output/optimized.i3dm
+node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/instancedWithBatchTableBinary.i3dm -o ./output/optimized.i3dm
 ```
 
 Quantize floating-point attributes and oct-encode normals
 ```
-node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/instancedTile.i3dm -o ./output/optimized.i3dm --options -q -n
+node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/instancedWithBatchTableBinary.i3dm -o ./output/optimized.i3dm --options -q -n
 ```
 
 | Flag | Description | Required |

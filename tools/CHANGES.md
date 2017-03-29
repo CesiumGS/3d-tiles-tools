@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+### 0.1.2 - ???
+* Breaking changes
+    * `extractB3dm` and `extractI3dm` now return the feature table JSON and batch table JSON instead of buffers.
+    * `glbToB3dm` and `glbToI3dm` now take feature table JSON and batch table JSON instead of buffers.
+* Handle b3dm tiles with the legacy 24-byte header.
+
 ### 0.1.1 - 2017-03-15
 
 * Breaking changes

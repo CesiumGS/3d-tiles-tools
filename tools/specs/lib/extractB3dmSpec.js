@@ -1,30 +1,26 @@
 'use strict';
 var fs = require('fs');
-var Promise = require('bluebird');
 var extractB3dm = require('../../lib/extractB3dm');
-
-var fsReadFile = Promise.promisify(fs.readFile);
 
 var b3dmPath = './specs/data/batchedWithBatchTableBinary.b3dm';
 
 describe('extractB3dm', function() {
-    var buffer;
-    beforeAll(function(done) {
-        fsReadFile(b3dmPath)
-            .then(function(data) {
-                buffer = data;
-                done();
-            });
+    var b3dmBuffer;
+    beforeAll(function() {
+        b3dmBuffer = fs.readFileSync(b3dmPath);
     });
 
     it('extracts a b3dm from buffer', function() {
-        var b3dm = extractB3dm(buffer);
+        var b3dm = extractB3dm(b3dmBuffer);
         expect(b3dm.header.magic).toBe('b3dm');
         expect(b3dm.header.version).toBe(1);
-        expect(b3dm.header.batchLength).toBe(10);
-        expect(b3dm.batchTable.json.length).toBe(760);
+        expect(b3dm.featureTable.json).toBeDefined();
+        expect(b3dm.featureTable.json.BATCH_LENGTH).toBe(10);
+        expect(b3dm.featureTable.binary.length).toBe(0);
+        expect(b3dm.batchTable.json).toBeDefined();
+        expect(b3dm.batchTable.json.Height).toBeDefined();
         expect(b3dm.batchTable.binary.length).toBe(256);
-        expect(b3dm.glb.length).toBe(14466);
+        expect(b3dm.glb.length).toBe(14141);
     });
 
     it('throws an error if no buffer is provided', function() {

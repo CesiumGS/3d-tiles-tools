@@ -1,6 +1,7 @@
 'use strict';
-
 var Cesium = require('cesium');
+var bufferToJson = require('./bufferToJson');
+
 var defined = Cesium.defined;
 var DeveloperError = Cesium.DeveloperError;
 
@@ -24,36 +25,63 @@ function extractB3dm(b3dmBuffer) {
     if (version !== 1) {
         throw new DeveloperError('Invalid version, only "1" is valid, got: "' + version + '".');
     }
-    var headerByteLength = 24;
+    var headerByteLength = 28;
     var byteLength = b3dmBuffer.readUInt32LE(8);
-    var batchTableJSONByteLength = b3dmBuffer.readUInt32LE(12);
-    var batchTableBinaryByteLength = b3dmBuffer.readUInt32LE(16);
-    var batchLength = b3dmBuffer.readUInt32LE(20);
+    var featureTableJsonByteLength = b3dmBuffer.readUInt32LE(12);
+    var featureTableBinaryByteLength = b3dmBuffer.readUInt32LE(16);
+    var batchTableJsonByteLength = b3dmBuffer.readUInt32LE(20);
+    var batchTableBinaryByteLength = b3dmBuffer.readUInt32LE(24);
 
     // Keep this legacy check in for now since a lot of tilesets are still using the old header.
-    // Legacy header:  [batchLength] [batchTableByteLength]
-    // Current header: [batchTableJsonByteLength] [batchTableBinaryByteLength] [batchLength]
-    // If the header is in the legacy format 'batchLength' will be the start of the JSON string (a quotation mark) or the glTF magic.
-    // Accordingly the first byte of uint32 will be either 0x22 or 0x67 and so the uint32 will exceed any reasonable 'batchLength'.
-    if (batchLength > 10000000) {
+    // Legacy header #1: [batchLength] [batchTableByteLength]
+    // Legacy header #2: [batchTableJsonByteLength] [batchTableBinaryByteLength] [batchLength]
+    // Current header: [featureTableJsonByteLength] [featureTableBinaryByteLength] [batchTableJsonByteLength] [batchTableBinaryByteLength]
+    // If the header is in the first legacy format 'batchTableJsonByteLength' will be the start of the JSON string (a quotation mark) or the glTF magic.
+    // Accordingly its first byte will be either 0x22 or 0x67, and so the minimum uint32 expected is 0x22000000 = 570425344 = 570MB. It is unlikely that the feature table Json will exceed this length.
+    // The check for the second legacy format is similar, except it checks 'batchTableBinaryByteLength' instead
+    if (batchTableJsonByteLength >= 570425344) {
+        // First legacy check
         headerByteLength = 20;
-        batchTableJSONByteLength = batchTableBinaryByteLength;
+        batchTableJsonByteLength = featureTableBinaryByteLength;
         batchTableBinaryByteLength = 0;
+        featureTableJsonByteLength = 0;
+        featureTableBinaryByteLength = 0;
+    } else if (batchTableBinaryByteLength >= 570425344) {
+        // Second legacy check
+        headerByteLength = 24;
+        batchTableJsonByteLength = featureTableJsonByteLength;
+        batchTableBinaryByteLength = featureTableBinaryByteLength;
+        featureTableJsonByteLength = 0;
+        featureTableBinaryByteLength = 0;
     }
 
-    var batchTableJSONBuffer = b3dmBuffer.slice(headerByteLength, headerByteLength + batchTableJSONByteLength);
-    var batchTableBinaryBuffer = b3dmBuffer.slice(headerByteLength + batchTableJSONByteLength, headerByteLength + batchTableJSONByteLength + batchTableBinaryByteLength);
-    var glbBuffer = b3dmBuffer.slice(headerByteLength + batchTableJSONByteLength + batchTableBinaryByteLength, byteLength);
+    var featureTableJsonByteOffset = headerByteLength;
+    var featureTableBinaryByteOffset = featureTableJsonByteOffset + featureTableJsonByteLength;
+    var batchTableJsonByteOffset = featureTableBinaryByteOffset + featureTableBinaryByteLength;
+    var batchTableBinaryByteOffset = batchTableJsonByteOffset + batchTableJsonByteLength;
+    var glbByteOffset = batchTableBinaryByteOffset + batchTableBinaryByteLength;
+
+    var featureTableJsonBuffer = b3dmBuffer.slice(featureTableJsonByteOffset, featureTableBinaryByteOffset);
+    var featureTableBinary = b3dmBuffer.slice(featureTableBinaryByteOffset, batchTableJsonByteOffset);
+    var batchTableJsonBuffer = b3dmBuffer.slice(batchTableJsonByteOffset, batchTableBinaryByteOffset);
+    var batchTableBinary = b3dmBuffer.slice(batchTableBinaryByteOffset, glbByteOffset);
+    var glbBuffer = b3dmBuffer.slice(glbByteOffset, byteLength);
+
+    var featureTableJson = bufferToJson(featureTableJsonBuffer);
+    var batchTableJson = bufferToJson(batchTableJsonBuffer);
 
     return {
         header : {
             magic : magic,
-            version : version,
-            batchLength : batchLength
+            version : version
+        },
+        featureTable : {
+            json : featureTableJson,
+            binary : featureTableBinary
         },
         batchTable : {
-            json : batchTableJSONBuffer,
-            binary : batchTableBinaryBuffer
+            json : batchTableJson,
+            binary : batchTableBinary
         },
         glb : glbBuffer
     };

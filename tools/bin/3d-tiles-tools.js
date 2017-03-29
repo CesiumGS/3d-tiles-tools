@@ -286,7 +286,11 @@ function readGlbWriteB3dm(inputPath, outputPath, force) {
         .then(function() {
             return readFile(inputPath)
                 .then(function(glb) {
-                    return fsWriteFile(outputPath, glbToB3dm(glb));
+                    // Set b3dm spec requirements
+                    var featureTableJson = {
+                        BATCH_LENGTH : 0
+                    };
+                    return fsWriteFile(outputPath, glbToB3dm(glb, featureTableJson));
                 });
         });
 }
@@ -297,17 +301,17 @@ function readGlbWriteI3dm(inputPath, outputPath, force) {
         .then(function() {
             return readFile(inputPath)
                 .then(function(glb) {
-                    // Set I3dm spec requirements
+                    // Set i3dm spec requirements
                     var featureTable = {
                         INSTANCES_LENGTH : 1,
                         POSITION : {
                             byteOffset : 0
                         }
                     };
-                    var featureTableJSONBuffer = getJsonBufferPadded(featureTable);
+                    var featureTableJsonBuffer = getJsonBufferPadded(featureTable);
                     var featureTableBinaryBuffer = getBufferPadded(Buffer.alloc(12, 0)); // [0, 0, 0]
 
-                    return fsWriteFile(outputPath, glbToI3dm(glb, featureTableJSONBuffer, featureTableBinaryBuffer));
+                    return fsWriteFile(outputPath, glbToI3dm(glb, featureTableJsonBuffer, featureTableBinaryBuffer));
                 });
         });
 }
@@ -397,7 +401,7 @@ function readAndOptimizeB3dm(inputPath, outputPath, force, optionArgs) {
             return optimizeGlb(b3dm.glb, options);
         })
         .then(function(glbBuffer) {
-            var b3dmBuffer = glbToB3dm(glbBuffer, b3dm.batchTable.json, b3dm.batchTable.binary, b3dm.header.batchLength);
+            var b3dmBuffer = glbToB3dm(glbBuffer, b3dm.featureTable.json, b3dm.featureTable.binary, b3dm.batchTable.json, b3dm.batchTable.binary);
             if (gzipped) {
                 return zlibGzip(b3dmBuffer);
             }
