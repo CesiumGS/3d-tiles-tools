@@ -3,7 +3,6 @@ var Cesium = require('cesium');
 var getBufferPadded = require('./getBufferPadded');
 var getJsonBufferPadded = require('./getJsonBufferPadded');
 
-var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
 var DeveloperError = Cesium.DeveloperError;
 
