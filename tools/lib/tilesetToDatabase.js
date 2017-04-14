@@ -1,6 +1,7 @@
 'use strict';
 var Cesium = require('cesium');
 var fsExtra = require('fs-extra');
+var klaw = require('klaw');
 var path = require('path');
 var Promise = require('bluebird');
 var sqlite3 = require('sqlite3');
@@ -57,7 +58,7 @@ function tilesetToDatabase(inputDirectory, outputFile) {
                 .then(function() {
                     //Build the collection of file paths to be inserted.
                     var filePaths = [];
-                    var stream = fsExtra.walk(inputDirectory);
+                    var stream = klaw(inputDirectory);
                     stream.on('readable', function() {
                         var filePath = stream.read();
                         while (defined(filePath)) {
