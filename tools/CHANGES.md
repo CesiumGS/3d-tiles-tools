@@ -1,7 +1,12 @@
 Change Log
 ==========
 
+### 0.1.3 - 2017-04-14
+
+* Cleaned up project files and upgraded dependencies. [#70](https://github.com/AnalyticalGraphicsInc/3d-tiles-tools/pull/70)
+
 ### 0.1.2 - 2017-04-07
+
 * Breaking changes
     * `extractB3dm` and `extractI3dm` now return the feature table JSON and batch table JSON instead of buffers.
     * `glbToB3dm` and `glbToI3dm` now take feature table JSON and batch table JSON instead of buffers.
