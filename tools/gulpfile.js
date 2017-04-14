@@ -6,7 +6,7 @@ var fsExtra = require('fs-extra');
 var gulp = require('gulp');
 var gulpJshint = require('gulp-jshint');
 var Jasmine = require('jasmine');
-var JasmineSpecReporter = require('jasmine-spec-reporter');
+var jasmineSpecReporter = require('jasmine-spec-reporter');
 var open = require('open');
 var path = require('path');
 var Promise = require('bluebird');
@@ -43,7 +43,7 @@ gulp.task('jsHint-watch', function () {
 gulp.task('test', function (done) {
     var jasmine = new Jasmine();
     jasmine.loadConfigFile('specs/jasmine.json');
-    jasmine.addReporter(new JasmineSpecReporter({
+    jasmine.addReporter(new jasmineSpecReporter.SpecReporter({
         displaySuccessfulSpec: !defined(argv.suppressPassed) || !argv.suppressPassed
     }));
     jasmine.execute();
@@ -72,7 +72,11 @@ gulp.task('coverage', function () {
         ' cover' +
         ' --include-all-sources' +
         ' --dir coverage' +
-        ' -x "bin/** -x doc/** -x specs/** -x coverage/** -x index.js -x gulpfile.js"' +
+        ' -x "doc/**"' +
+        ' -x "specs/**"' +
+        ' -x "coverage/**"' +
+        ' -x "gulpfile.js"' +
+        ' -x "index.js"' +
         ' node_modules/jasmine/bin/jasmine.js' +
         ' JASMINE_CONFIG_PATH=specs/jasmine.json', {
         stdio: [process.stdin, process.stdout, process.stderr]

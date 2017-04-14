@@ -1,6 +1,7 @@
 'use strict';
 var Cesium = require('cesium');
 var fsExtra = require('fs-extra');
+var klaw = require('klaw');
 var path = require('path');
 var Promise = require('bluebird');
 var zlib = require('zlib');
@@ -54,7 +55,7 @@ function gzipTileset(options) {
         getNumberOfFilesInDirectory(inputDirectory)
             .then(function(numberOfFiles) {
                 var writeFile = getWriteFile(writeCallback, numberOfFiles, resolve, reject);
-                fsExtra.walk(inputDirectory)
+                klaw(inputDirectory)
                     .on('data', function (item) {
                         if (!item.stats.isDirectory()) {
                             var inputFile = item.path;
@@ -90,7 +91,7 @@ function gzipTileset(options) {
 function getNumberOfFilesInDirectory(directory) {
     return new Promise(function(resolve, reject) {
         var numberOfFiles = 0;
-        fsExtra.walk(directory)
+        klaw(directory)
             .on('data', function (item) {
                 if (!item.stats.isDirectory()) {
                     ++numberOfFiles;
