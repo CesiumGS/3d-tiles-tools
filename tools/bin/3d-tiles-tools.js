@@ -22,9 +22,6 @@ var optimizeGlb = require('../lib/optimizeGlb');
 var runPipeline = require('../lib/runPipeline');
 var tilesetToDatabase = require('../lib/tilesetToDatabase');
 
-var fsExtraReadJson = Promise.promisify(fsExtra.readJson);
-var fsReadFile = Promise.promisify(fsExtra.readFile);
-var fsWriteFile = Promise.promisify(fsExtra.outputFile);
 var zlibGunzip = Promise.promisify(zlib.gunzip);
 var zlibGzip = Promise.promisify(zlib.gzip);
 
@@ -189,7 +186,7 @@ function checkFileOverwritable(file, force) {
 }
 
 function readFile(file) {
-    return fsReadFile(file)
+    return fsExtra.readFile(file)
         .then(function(fileBuffer) {
             if (isGzipped(fileBuffer)) {
                 return zlibGunzip(fileBuffer);
@@ -203,7 +200,7 @@ function logCallback(message) {
 }
 
 function processPipeline(inputFile) {
-    return fsExtraReadJson(inputFile)
+    return fsExtra.readJson(inputFile)
         .then(function(pipeline) {
             var inputDirectory = pipeline.input;
             var outputDirectory = pipeline.output;
@@ -290,7 +287,7 @@ function readGlbWriteB3dm(inputPath, outputPath, force) {
                     var featureTableJson = {
                         BATCH_LENGTH : 0
                     };
-                    return fsWriteFile(outputPath, glbToB3dm(glb, featureTableJson));
+                    return fsExtra.outputFile(outputPath, glbToB3dm(glb, featureTableJson));
                 });
         });
 }
@@ -311,7 +308,7 @@ function readGlbWriteI3dm(inputPath, outputPath, force) {
                     var featureTableJsonBuffer = getJsonBufferPadded(featureTable);
                     var featureTableBinaryBuffer = getBufferPadded(Buffer.alloc(12, 0)); // [0, 0, 0]
 
-                    return fsWriteFile(outputPath, glbToI3dm(glb, featureTableJsonBuffer, featureTableBinaryBuffer));
+                    return fsExtra.outputFile(outputPath, glbToI3dm(glb, featureTableJsonBuffer, featureTableBinaryBuffer));
                 });
         });
 }
@@ -323,7 +320,7 @@ function readB3dmWriteGlb(inputPath, outputPath, force) {
             return readFile(inputPath);
         })
         .then(function(b3dm) {
-            return fsWriteFile(outputPath, extractB3dm(b3dm).glb);
+            return fsExtra.outputFile(outputPath, extractB3dm(b3dm).glb);
         });
 }
 
@@ -334,7 +331,7 @@ function readI3dmWriteGlb(inputPath, outputPath, force) {
             return readFile(inputPath);
         })
         .then(function(i3dm) {
-            return fsWriteFile(outputPath, extractI3dm(i3dm).glb);
+            return fsExtra.outputFile(outputPath, extractI3dm(i3dm).glb);
         });
 }
 
@@ -374,7 +371,7 @@ function readCmptWriteGlb(inputPath, outputPath, force) {
                 return checkFileOverwritable(glbPath, force);
             }).then(function() {
                 return Promise.map(glbPaths, function(glbPath, index) {
-                    return fsWriteFile(glbPath, glbs[index]);
+                    return fsExtra.outputFile(glbPath, glbs[index]);
                 });
             });
         });
@@ -387,7 +384,7 @@ function readAndOptimizeB3dm(inputPath, outputPath, force, optionArgs) {
     var b3dm;
     return checkFileOverwritable(outputPath, force)
         .then(function() {
-            return fsReadFile(inputPath);
+            return fsExtra.readFile(inputPath);
         })
         .then(function(fileBuffer) {
             gzipped = isGzipped(fileBuffer);
@@ -408,7 +405,7 @@ function readAndOptimizeB3dm(inputPath, outputPath, force, optionArgs) {
             return b3dmBuffer;
         })
         .then(function(buffer) {
-            return fsWriteFile(outputPath, buffer);
+            return fsExtra.outputFile(outputPath, buffer);
         });
 }
 
@@ -419,7 +416,7 @@ function readAndOptimizeI3dm(inputPath, outputPath, force, optionArgs) {
     var i3dm;
     return checkFileOverwritable(outputPath, force)
         .then(function() {
-            return fsReadFile(inputPath);
+            return fsExtra.readFile(inputPath);
         })
         .then(function(fileBuffer) {
             gzipped = isGzipped(fileBuffer);
@@ -440,6 +437,6 @@ function readAndOptimizeI3dm(inputPath, outputPath, force, optionArgs) {
             return i3dmBuffer;
         })
         .then(function(buffer) {
-            return fsWriteFile(outputPath, buffer);
+            return fsExtra.outputFile(outputPath, buffer);
         });
 }

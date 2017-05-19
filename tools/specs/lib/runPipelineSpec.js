@@ -1,12 +1,8 @@
 'use strict';
 var fsExtra = require('fs-extra');
 var path = require('path');
-var Promise = require('bluebird');
 var isGzippedFile = require('../../lib/isGzippedFile');
 var runPipeline = require('../../lib/runPipeline');
-
-var fsExtraOutputFile = Promise.promisify(fsExtra.outputFile);
-var fsExtraRemove = Promise.promisify(fsExtra.remove);
 
 var inputDirectory = './specs/data/TilesetOfTilesets/';
 var outputDirectory = './specs/data/TilesetOfTilesets-processed';
@@ -14,7 +10,7 @@ var outputJson = './specs/data/TilesetOfTilesets-processed/tileset.json';
 
 describe('runPipeline', function() {
     afterEach(function(done) {
-        fsExtraRemove(outputDirectory)
+        fsExtra.remove(outputDirectory)
             .then(done);
     });
 
@@ -178,7 +174,7 @@ describe('runPipeline', function() {
     it('accepts custom writeCallback', function (done) {
         var writeCallback = function(file, data) {
             var outputFile = path.join(outputDirectory, file);
-            return fsExtraOutputFile(outputFile, data);
+            return fsExtra.outputFile(outputFile, data);
         };
 
         var pipeline = {

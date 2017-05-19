@@ -1,7 +1,5 @@
 'use strict';
-var Promise = require('bluebird');
 var fsExtra = require('fs-extra');
-var fsStat = Promise.promisify(fsExtra.stat);
 
 module.exports = fileExists;
 
@@ -9,7 +7,7 @@ module.exports = fileExists;
  * @private
  */
 function fileExists(filePath) {
-    return fsStat(filePath)
+    return fsExtra.stat(filePath)
         .then(function(stats) {
             return stats.isFile();
         })

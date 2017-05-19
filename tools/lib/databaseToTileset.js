@@ -7,8 +7,6 @@ var sqlite3 = require('sqlite3');
 var zlib = require('zlib');
 var isGzipped = require('../lib/isGzipped');
 
-var fsExtraOutputFile = Promise.promisify(fsExtra.outputFile);
-
 var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
 var DeveloperError = Cesium.DeveloperError;
@@ -63,5 +61,5 @@ function writeFile(outputDirectory, file, data) {
     if (isGzipped(data)) {
         data = zlib.gunzipSync(data);
     }
-    return fsExtraOutputFile(filePath, data);
+    return fsExtra.outputFile(filePath, data);
 }

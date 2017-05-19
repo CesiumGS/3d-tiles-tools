@@ -1,7 +1,5 @@
 'use strict';
-var Promise = require('bluebird');
 var fsExtra = require('fs-extra');
-var fsStat = Promise.promisify(fsExtra.stat);
 
 module.exports = directoryExists;
 
@@ -9,7 +7,7 @@ module.exports = directoryExists;
  * @private
  */
 function directoryExists(directory) {
-    return fsStat(directory)
+    return fsExtra.stat(directory)
         .then(function(stats) {
             return stats.isDirectory();
         })

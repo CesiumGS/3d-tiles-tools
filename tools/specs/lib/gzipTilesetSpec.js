@@ -5,10 +5,6 @@ var Promise = require('bluebird');
 var isGzippedFile = require('../../lib/isGzippedFile');
 var gzipTileset = require('../../lib/gzipTileset');
 
-var fsExtraOutputFile = Promise.promisify(fsExtra.outputFile);
-var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
-var fsExtraRemove = Promise.promisify(fsExtra.remove);
-
 var tilesetDirectory = './specs/data/TilesetOfTilesets/';
 var tilesetJson = './specs/data/TilesetOfTilesets/tileset.json';
 var gzippedDirectory = './specs/data/TilesetOfTilesets-gzipped';
@@ -19,8 +15,8 @@ var ungzippedJson = './specs/data/TilesetOfTilesets-ungzipped/tileset.json';
 describe('gzipTileset', function() {
     afterEach(function (done) {
         Promise.all([
-            fsExtraRemove(gzippedDirectory),
-            fsExtraRemove(ungzippedDirectory)
+            fsExtra.remove(gzippedDirectory),
+            fsExtra.remove(ungzippedDirectory)
         ]).then(function() {
             done();
         });
@@ -94,8 +90,8 @@ describe('gzipTileset', function() {
                 return gzipTileset(gzipAgainOptions)
                     .then(function() {
                         var promises = [
-                            fsExtraReadFile(gzippedJson),
-                            fsExtraReadFile(ungzippedJson)
+                            fsExtra.readFile(gzippedJson),
+                            fsExtra.readFile(ungzippedJson)
                         ];
                         return Promise.all(promises)
                             .then(function(contents) {
@@ -114,8 +110,8 @@ describe('gzipTileset', function() {
         expect(gzipTileset(ungzipOptions)
             .then(function() {
                 var promises = [
-                    fsExtraReadFile(tilesetJson),
-                    fsExtraReadFile(ungzippedJson)
+                    fsExtra.readFile(tilesetJson),
+                    fsExtra.readFile(ungzippedJson)
                 ];
                 return Promise.all(promises)
                     .then(function(contents) {
@@ -176,7 +172,7 @@ describe('gzipTileset', function() {
         var outputDirectory = gzippedDirectory;
         var writeCallback = function(file, data) {
             var outputFile = path.join(outputDirectory, file);
-            return fsExtraOutputFile(outputFile, data);
+            return fsExtra.outputFile(outputFile, data);
         };
         var gzipOptions = {
             inputDirectory : tilesetDirectory,
