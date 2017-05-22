@@ -1,12 +1,8 @@
 'use strict';
 var fsExtra = require('fs-extra');
-var Promise = require('bluebird');
 var databaseToTileset = require('../../lib/databaseToTileset');
 var fileExists = require('../../lib/fileExists');
 var isGzipped = require('../../lib/isGzipped');
-
-var fsExtraReadFile = Promise.promisify(fsExtra.readJson);
-var fsExtraRemove = Promise.promisify(fsExtra.remove);
 
 var inputFile = './specs/data/tileset.3dtiles';
 var outputDirectory = './specs/data/Tileset/';
@@ -14,7 +10,7 @@ var tilesetJsonFile = './specs/data/TilesetOfTilesets/tileset.json';
 
 describe('databaseToTileset', function() {
     afterEach(function (done) {
-        fsExtraRemove(outputDirectory)
+        fsExtra.remove(outputDirectory)
             .then(function() {
                 done();
             });
@@ -26,7 +22,7 @@ describe('databaseToTileset', function() {
                 return fileExists(tilesetJsonFile)
                     .then(function(exists) {
                         expect(exists).toEqual(true);
-                        return fsExtraReadFile(tilesetJsonFile);
+                        return fsExtra.readJson(tilesetJsonFile);
                     }).then(function(data) {
                         expect(isGzipped(data)).toBe(false);
                     });

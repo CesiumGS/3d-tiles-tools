@@ -9,8 +9,6 @@ var getDefaultWriteCallback = require('./getDefaultWriteCallback');
 var isGzippedFile = require('./isGzippedFile');
 var isTile = require('./isTile');
 
-var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
-
 var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
 var DeveloperError = Cesium.DeveloperError;
@@ -70,7 +68,7 @@ function gzipTileset(options) {
                                             // File is already in the correct state
                                             copyFile(inputFile, file, writeFile);
                                         } else {
-                                            fsExtraReadFile(inputFile)
+                                            fsExtra.readFile(inputFile)
                                                 .then(function(data) {
                                                     data = operation(data);
                                                     writeFile(file, data);
@@ -125,7 +123,7 @@ function getWriteFile(writeCallback, numberOfFiles, resolve, reject) {
 }
 
 function copyFile(inputFile, file, writeFile) {
-    return fsExtraReadFile(inputFile)
+    return fsExtra.readFile(inputFile)
         .then(function(data) {
             return writeFile(file, data);
         });

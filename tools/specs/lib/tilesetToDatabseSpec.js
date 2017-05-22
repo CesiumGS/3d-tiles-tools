@@ -8,10 +8,7 @@ var fileExists = require('../../lib/fileExists');
 var isGzipped = require('../../lib/isGzipped');
 var tilesetToDatabase = require('../../lib/tilesetToDatabase');
 
-var fsExtraReadJson = Promise.promisify(fsExtra.readJson);
-var fsExtraRemove = Promise.promisify(fsExtra.remove);
 var zlibGunzip = Promise.promisify(zlib.gunzip);
-
 var getStringFromTypedArray = Cesium.getStringFromTypedArray;
 
 var inputDirectory = './specs/data/TilesetOfTilesets/';
@@ -20,17 +17,16 @@ var outputFile = './specs/data/TilesetOfTilesets.3dtiles';
 
 describe('tilesetToDatabase', function() {
     afterEach(function (done) {
-        fsExtraRemove(outputFile)
-            .then(function() {
-                done();
-            });
+        fsExtra.remove(outputFile)
+            .then(done)
+            .catch(done.fail);
     });
 
     it('creates a sqlite database from a tileset', function(done) {
         expect(tilesetToDatabase(inputDirectory, outputFile)
             .then(function() {
                 var db;
-                return fileExists(outputFile)
+                return Promise.resolve(fileExists(outputFile))
                     .then(function(exists) {
                         expect(exists).toEqual(true);
                     }).then(function() {
@@ -45,7 +41,7 @@ describe('tilesetToDatabase', function() {
 
                         return Promise.all([
                             zlibGunzip(content),
-                            fsExtraReadJson(tilesetJsonFile)
+                            fsExtra.readJson(tilesetJsonFile)
                         ]).then(function(data) {
                             var jsonStr = getStringFromTypedArray(data[0]);
                             var dbTilesetJson = JSON.parse(jsonStr);
