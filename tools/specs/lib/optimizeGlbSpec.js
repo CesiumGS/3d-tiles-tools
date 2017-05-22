@@ -1,16 +1,14 @@
 'use strict';
-var fs = require('fs');
+var fsExtra = require('fs-extra');
 var Promise = require('bluebird');
 var optimizeGlb = require('../../lib/optimizeGlb');
-
-var fsReadFile = Promise.promisify(fs.readFile);
 
 var glbPath = './specs/data/CesiumTexturedBox/CesiumTexturedBox.glb';
 
 describe('optimizeGlb', function() {
     var buffer;
     beforeAll(function(done) {
-        fsReadFile(glbPath)
+        fsExtra.readFile(glbPath)
             .then(function(data) {
                 buffer = data;
                 done();
