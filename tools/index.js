@@ -1,3 +1,4 @@
+'use strict';
 module.exports = {
     databaseToTileset : require('./lib/databaseToTileset'),
     extractB3dm : require('./lib/extractB3dm'),
