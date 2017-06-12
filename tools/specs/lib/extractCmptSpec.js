@@ -8,7 +8,7 @@ var compositeOfCompositePath = './specs/data/compositeOfComposite.cmpt';
 
 describe('extractCmpt', function() {
     var compositeBuffer;
-    var compositeOfCompositeBuffer;
+    var compositeOfCompositeBuffer; //eslint-disable-line no-unused-vars
     beforeAll(function(done) {
         Promise.all([
             fsExtra.readFile(compositePath)

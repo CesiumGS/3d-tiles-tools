@@ -5,7 +5,7 @@
 /specs
 /tools
 /.idea
-.jshintrc
+.eslintrc.json
 .npmignore
 .travis.yml
 gulpfile.js
