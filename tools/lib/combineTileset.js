@@ -5,15 +5,15 @@ var path = require('path');
 var Promise = require('bluebird');
 var zlib = require('zlib');
 var getDefaultWriteCallback = require('./getDefaultWriteCallback');
+var getJsonBufferPadded =require('./getJsonBufferPadded');
 var isGzippedFile = require('./isGzippedFile');
+var isJson = require('./isJson');
 var readTileset = require('./readTileset');
 var walkDirectory = require('./walkDirectory');
 
-var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
-
+var Check = Cesium.Check;
 var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
-var DeveloperError = Cesium.DeveloperError;
 
 module.exports = combineTileset;
 
@@ -35,9 +35,7 @@ function combineTileset(options) {
     var outputDirectory = options.outputDirectory;
     var rootJsonFile = defaultValue(options.rootJson, 'tileset.json');
 
-    if (!defined(inputDirectory)) {
-        throw new DeveloperError('inputPath is required');
-    }
+    Check.typeOf.string('options.inputDiretory', inputDirectory);
 
     inputDirectory = path.normalize(inputDirectory);
     outputDirectory = path.normalize(defaultValue(outputDirectory,
@@ -56,7 +54,10 @@ function combineTileset(options) {
             // If the root json is originally gzipped, save the output json as gzipped
             var writeRootJsonPromise = isGzippedFile(rootJsonFile)
                 .then(function (gzipped) {
-                    var data = getJsonBuffer(json, gzipped);
+                    var data = getJsonBufferPadded(json, gzipped);
+                    if (gzipped) {
+                        data = zlib.gzipSync(data);
+                    }
                     var relativePath = path.relative(inputDirectory, rootJsonFile);
                     return writeCallback(relativePath, data);
                 });
@@ -93,9 +94,8 @@ function combine(jsonFile, inputDirectory, parentTile, tilesets) {
                             var promise = combine(url, inputDirectory, tile, tilesets);
                             promises.push(promise);
                         } else {
-                            // Make all content urls relative to the input directory
-                            url = path.normalize(path.relative(inputDirectory, path.join(tilesetDirectory, tile.content.url)));
-                            tile.content.url = url.replace(/\\/g, '/'); // Use forward slashes in the json
+                            var contentUrl = path.join(tilesetDirectory, url);
+                            tile.content.url = getRelativePath(inputDirectory, contentUrl);
                         }
                     }
                     // Push children to the stack
@@ -118,7 +118,7 @@ function combine(jsonFile, inputDirectory, parentTile, tilesets) {
 
 function getRelativePath(inputDirectory, file) {
     var relative = path.relative(inputDirectory, file);
-    return relative.replace(/\\/g, '/');
+    return relative.replace(/\\/g, '/'); // Use forward slashes in the JSON
 }
 
 function isTileset(inputDirectory, file, tilesets) {
@@ -133,24 +133,11 @@ function copyFiles(inputDirectory, tilesets, writeCallback) {
     // Copy all files except tilesets
     return walkDirectory(inputDirectory, function(file) {
         if (!isTileset(inputDirectory, file, tilesets)) {
-            return fsExtraReadFile(file)
+            return fsExtra.readFile(file)
                 .then(function (data) {
                     var relativePath = getRelativePath(inputDirectory, file);
                     return writeCallback(relativePath, data);
                 });
         }
     });
-}
-
-function getJsonBuffer(json, gzipped) {
-    var jsonString = JSON.stringify(json);
-    var buffer = new Buffer(jsonString);
-    if (gzipped) {
-        buffer = zlib.gzipSync(buffer);
-    }
-    return buffer;
-}
-
-function isJson(file) {
-    return path.extname(file) === '.json';
 }

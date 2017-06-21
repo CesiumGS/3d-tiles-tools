@@ -7,10 +7,6 @@ var getFilesInDirectory = require('../../lib/getFilesInDirectory');
 var gzipTileset = require('../../lib/gzipTileset');
 var isGzippedFile = require('../../lib/isGzippedFile');
 
-var fsExtraOutputFile = Promise.promisify(fsExtra.outputFile);
-var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
-var fsExtraRemove = Promise.promisify(fsExtra.remove);
-
 var tilesetDirectory = './specs/data/TilesetOfTilesets/';
 var combinedDirectory = './specs/data/TilesetOfTilesets-combined';
 var combinedJson = './specs/data/TilesetOfTilesets-combined/tileset.json';
@@ -48,8 +44,8 @@ function getNumberOfTilesets(directory) {
 describe('combineTileset', function() {
     afterEach(function(done) {
         Promise.all([
-            fsExtraRemove(gzippedDirectory),
-            fsExtraRemove(combinedDirectory)
+            fsExtra.remove(gzippedDirectory),
+            fsExtra.remove(combinedDirectory)
         ]).then(function() {
             done();
         });
@@ -62,15 +58,15 @@ describe('combineTileset', function() {
         };
         expect(combineTileset(combineOptions)
             .then(function() {
-                return getNumberOfTilesets(combinedDirectory)
-                    .then(function(numberOfTilesets){
-                        expect(numberOfTilesets).toBe(1);
-                        return fsExtraReadFile(combinedJson, 'utf8')
-                            .then(function(contents) {
-                                var matches = getContentUrls(contents);
-                                expect(matches).toEqual(['parent.b3dm', 'tileset3/ll.b3dm', 'lr.b3dm', 'ur.b3dm', 'ul.b3dm']);
-                            });
-                    });
+                return getNumberOfTilesets(combinedDirectory);
+            })
+            .then(function(numberOfTilesets) {
+                expect(numberOfTilesets).toBe(1);
+                return fsExtra.readFile(combinedJson, 'utf8');
+            })
+            .then(function(contents) {
+                var matches = getContentUrls(contents);
+                expect(matches).toEqual(['parent.b3dm', 'tileset3/ll.b3dm', 'lr.b3dm', 'ur.b3dm', 'ul.b3dm']);
             }), done).toResolve();
     });
 
@@ -81,31 +77,31 @@ describe('combineTileset', function() {
         expect(combineTileset(combineOptions)
             .then(function() {
                 // Just check that the output file exists
-                return fsExtraReadFile(combinedJson);
+                return fsExtra.readFile(combinedJson);
             }), done).toResolve();
     });
 
-    // it('gzips if the original tileset.json is gzipped', function (done) {
-    //     var gzipOptions = {
-    //         inputDirectory : tilesetDirectory,
-    //         outputDirectory : gzippedDirectory,
-    //         gzip : true
-    //     };
-    //     var combineOptions = {
-    //         inputDirectory : gzippedDirectory,
-    //         outputDirectory : combinedDirectory
-    //     };
-    //     expect(gzipTileset(gzipOptions)
-    //         .then(function() {
-    //             return combineTileset(combineOptions)
-    //                 .then(function() {
-    //                     return isGzippedFile(combinedJson)
-    //                         .then(function(gzipped) {
-    //                             expect(gzipped).toBe(true);
-    //                         });
-    //                 });
-    //         }), done).toResolve();
-    // });
+    it('gzips if the original tileset.json is gzipped', function (done) {
+        var gzipOptions = {
+            inputDirectory : tilesetDirectory,
+            outputDirectory : gzippedDirectory,
+            gzip : true
+        };
+        var combineOptions = {
+            inputDirectory : gzippedDirectory,
+            outputDirectory : combinedDirectory
+        };
+        expect(gzipTileset(gzipOptions)
+            .then(function() {
+                return combineTileset(combineOptions);
+            })
+            .then(function() {
+                return isGzippedFile(combinedJson);
+            })
+            .then(function(gzipped) {
+                expect(gzipped).toBe(true);
+            }), done).toResolve();
+    });
 
     it('uses a different rootJson', function (done) {
         var combineOptions = {
@@ -115,11 +111,11 @@ describe('combineTileset', function() {
         };
         expect(combineTileset(combineOptions)
             .then(function() {
-                return getNumberOfTilesets(combinedDirectory)
-                    .then(function(numberOfTilesets) {
-                        // tileset3 is combined into tileset2
-                        expect(numberOfTilesets).toEqual(2);
-                    });
+                return getNumberOfTilesets(combinedDirectory);
+            })
+            .then(function(numberOfTilesets) {
+                // tileset3 is combined into tileset2
+                expect(numberOfTilesets).toEqual(2);
             }), done).toResolve();
     });
 
@@ -157,7 +153,7 @@ describe('combineTileset', function() {
         var outputDirectory = combinedDirectory;
         var writeCallback = function(file, data) {
             var outputFile = path.join(outputDirectory, file);
-            return fsExtraOutputFile(outputFile, data);
+            return fsExtra.outputFile(outputFile, data);
         };
         var combineOptions = {
             inputDirectory : tilesetDirectory,
@@ -166,9 +162,8 @@ describe('combineTileset', function() {
         expect(combineTileset(combineOptions)
             .then(function() {
                 // Just check that the output file exists
-                return fsExtraReadFile(combinedJson);
+                return fsExtra.readFile(combinedJson);
             }), done).toResolve();
-
     });
 
     it('logs debug messages', function (done) {
@@ -188,5 +183,4 @@ describe('combineTileset', function() {
                 expect(spy).toHaveBeenCalled();
             }), done).toResolve();
     });
-
 });

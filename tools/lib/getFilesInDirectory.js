@@ -1,5 +1,5 @@
 'use strict';
-var fsExtra = require('fs-extra');
+var klaw = require('klaw');
 var Promise = require('bluebird');
 
 module.exports = getFilesInDirectory;
@@ -10,7 +10,7 @@ module.exports = getFilesInDirectory;
 function getFilesInDirectory(directory) {
     return new Promise(function (resolve, reject) {
         var files = [];
-        fsExtra.walk(directory)
+        klaw(directory)
             .on('data', function (item) {
                 if (!item.stats.isDirectory()) {
                     files.push(item.path);

@@ -1,10 +1,7 @@
 'use strict';
 var fsExtra = require('fs-extra');
-var Promise = require('bluebird');
 var zlib = require('zlib');
 var isGzipped = require('./isGzipped');
-
-var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
 
 module.exports = readTileset;
 
@@ -15,10 +12,10 @@ module.exports = readTileset;
  * @returns {Promise} A promise that resolves with the JSON when the read operation completes.
  */
 function readTileset(filePath) {
-    return fsExtraReadFile(filePath)
+    return fsExtra.readFile(filePath)
         .then(function (data) {
             if (isGzipped(data)) {
-                data = zlib.gzip(data);
+                data = zlib.gunzipSync(data);
             }
             return JSON.parse(data.toString());
         });

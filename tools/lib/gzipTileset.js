@@ -2,13 +2,11 @@
 var Cesium = require('cesium');
 var fsExtra = require('fs-extra');
 var path = require('path');
-var Promise = require('bluebird');
 var zlib = require('zlib');
 var getDefaultWriteCallback = require('./getDefaultWriteCallback');
 var isGzipped = require('./isGzipped');
+var isTile = require('./isTile');
 var walkDirectory = require('./walkDirectory');
-
-var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
 
 var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
@@ -27,7 +25,7 @@ module.exports = gzipTileset;
  * @param {WriteCallback} [options.writeCallback] A callback function that writes files after they have been processed.
  * @param {LogCallback} [options.logCallback] A callback function that logs messages.
  *
- * @returns {Promise} A promise that resolves with the operation completes.
+ * @returns {Promise} A promise that resolves when the operation completes.
  */
 function gzipTileset(options) {
     options = defaultValue(options, defaultValue.EMPTY_OBJECT);
@@ -52,7 +50,7 @@ function gzipTileset(options) {
 
     var operation = gzip ? zlib.gzipSync : zlib.gunzipSync;
     return walkDirectory(inputDirectory, function(file) {
-        return fsExtraReadFile(file)
+        return fsExtra.readFile(file)
             .then(function(data) {
                 if (!(gzip && tilesOnly && !isTile(file)) && (isGzipped(data) !== gzip)) {
                     data = operation(data);
@@ -61,13 +59,4 @@ function gzipTileset(options) {
                 return writeCallback(relativePath, data);
             });
     });
-}
-
-function isTile(file) {
-    var extension = path.extname(file);
-    return extension === '.b3dm' ||
-           extension === '.i3dm' ||
-           extension === '.pnts' ||
-           extension === '.cmpt' ||
-           extension === '.vctr';
 }
