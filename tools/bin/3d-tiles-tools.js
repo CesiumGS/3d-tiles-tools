@@ -14,6 +14,7 @@ var extractCmpt = require('../lib/extractCmpt');
 var extractI3dm = require('../lib/extractI3dm');
 var fileExists = require('../lib/fileExists');
 var getBufferPadded = require('../lib/getBufferPadded');
+var getMagic = require('../lib/getMagic');
 var getJsonBufferPadded = require('../lib/getJsonBufferPadded');
 var glbToB3dm = require('../lib/glbToB3dm');
 var glbToI3dm = require('../lib/glbToI3dm');
@@ -114,6 +115,7 @@ var argv = yargs
             type: 'string'
         }
     })
+    .command('upgrade', 'Upgrades the input tileset to the latest version of the 3D Tiles spec. Embedded glTF models will be upgraded to glTF 2.0.')
     .demand(1)
     .recommendCommands()
     .strict()
@@ -146,6 +148,8 @@ function runCommand(command, input, output, force, argv) {
     } else if (command === 'ungzip') {
         return processStage(input, output, force, command, argv);
     } else if (command === 'combine') {
+        return processStage(input, output, force, command, argv);
+    } else if (command === 'upgrade') {
         return processStage(input, output, force, command, argv);
     } else if (command === 'b3dmToGlb') {
         return readB3dmWriteGlb(input, output, force);
@@ -353,7 +357,7 @@ function extractGlbs(tiles) {
     var tilesLength = tiles.length;
     for (var i = 0; i < tilesLength; ++i) {
         var tile = tiles[i];
-        var magic = tile.toString('utf8', 0, 4);
+        var magic = getMagic(tile);
         if (magic === 'i3dm') {
             glbs.push(extractI3dm(tile).glb);
         } else if (magic === 'b3dm') {

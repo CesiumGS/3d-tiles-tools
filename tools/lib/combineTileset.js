@@ -8,7 +8,7 @@ var getDefaultWriteCallback = require('./getDefaultWriteCallback');
 var getJsonBufferPadded =require('./getJsonBufferPadded');
 var isGzippedFile = require('./isGzippedFile');
 var isJson = require('./isJson');
-var readTileset = require('./readTileset');
+var readFile = require('./readFile');
 var walkDirectory = require('./walkDirectory');
 
 var Check = Cesium.Check;
@@ -67,7 +67,7 @@ function combineTileset(options) {
 }
 
 function combine(jsonFile, inputDirectory, parentTile, tilesets) {
-    return readTileset(jsonFile)
+    return readFile(jsonFile, 'json')
         .then(function (json) {
             var tilesetDirectory = path.dirname(jsonFile);
             var promises = [];

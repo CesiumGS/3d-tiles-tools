@@ -6,6 +6,7 @@ var Promise = require('bluebird');
 var combineTileset = require('./combineTileset');
 var getWorkingDirectory = require('./getWorkingDirectory');
 var gzipTileset = require('./gzipTileset');
+var upgradeTileset = require('./upgradeTileset');
 
 var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
@@ -120,6 +121,8 @@ function getStageFunction(stageName, stageOptions) {
             return gzipTileset;
         case 'combine':
             return combineTileset;
+        case 'upgrade':
+            return upgradeTileset;
         default:
             return undefined;
     }

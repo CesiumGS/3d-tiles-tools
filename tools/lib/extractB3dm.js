@@ -1,6 +1,7 @@
 'use strict';
 var Cesium = require('cesium');
 var bufferToJson = require('./bufferToJson');
+var getMagic = require('./getMagic');
 
 var defined = Cesium.defined;
 var DeveloperError = Cesium.DeveloperError;
@@ -17,7 +18,7 @@ function extractB3dm(b3dmBuffer) {
     if (!defined(b3dmBuffer)) {
         throw new DeveloperError('b3dmBuffer is not defined.');
     }
-    var magic = b3dmBuffer.toString('utf8', 0, 4);
+    var magic = getMagic(b3dmBuffer);
     if (magic !== 'b3dm') {
         throw new DeveloperError('Invalid magic, expected "b3dm", got: "' + magic + '".');
     }
@@ -31,6 +32,7 @@ function extractB3dm(b3dmBuffer) {
     var featureTableBinaryByteLength = b3dmBuffer.readUInt32LE(16);
     var batchTableJsonByteLength = b3dmBuffer.readUInt32LE(20);
     var batchTableBinaryByteLength = b3dmBuffer.readUInt32LE(24);
+    var batchLength = 0;
 
     // Keep this legacy check in for now since a lot of tilesets are still using the old header.
     // Legacy header #1: [batchLength] [batchTableByteLength]
@@ -42,6 +44,7 @@ function extractB3dm(b3dmBuffer) {
     if (batchTableJsonByteLength >= 570425344) {
         // First legacy check
         headerByteLength = 20;
+        batchLength = featureTableJsonByteLength;
         batchTableJsonByteLength = featureTableBinaryByteLength;
         batchTableBinaryByteLength = 0;
         featureTableJsonByteLength = 0;
@@ -49,6 +52,7 @@ function extractB3dm(b3dmBuffer) {
     } else if (batchTableBinaryByteLength >= 570425344) {
         // Second legacy check
         headerByteLength = 24;
+        batchLength = batchTableJsonByteLength;
         batchTableJsonByteLength = featureTableJsonByteLength;
         batchTableBinaryByteLength = featureTableBinaryByteLength;
         featureTableJsonByteLength = 0;
@@ -66,9 +70,16 @@ function extractB3dm(b3dmBuffer) {
     var batchTableJsonBuffer = b3dmBuffer.slice(batchTableJsonByteOffset, batchTableBinaryByteOffset);
     var batchTableBinary = b3dmBuffer.slice(batchTableBinaryByteOffset, glbByteOffset);
     var glbBuffer = b3dmBuffer.slice(glbByteOffset, byteLength);
+    glbBuffer = alignGlb(glbBuffer, glbByteOffset);
 
     var featureTableJson = bufferToJson(featureTableJsonBuffer);
     var batchTableJson = bufferToJson(batchTableJsonBuffer);
+
+    if (Object.keys(featureTableJson).length === 0) {
+        featureTableJson = {
+            BATCH_LENGTH : batchLength
+        };
+    }
 
     return {
         header : {
@@ -85,4 +96,11 @@ function extractB3dm(b3dmBuffer) {
         },
         glb : glbBuffer
     };
+}
+
+function alignGlb(buffer, byteOffset) {
+    if (byteOffset % 4 === 0) {
+        return buffer;
+    }
+    return Buffer.from(buffer);
 }
