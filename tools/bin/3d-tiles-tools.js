@@ -154,35 +154,32 @@ function runCommand(command, input, output, force, argv) {
         return convertTilesetToDatabase(input, output, force);
     } else if (command === 'databaseToTileset') {
         return convertDatabaseToTileset(input, output, force);
-    } else {
-        throw new DeveloperError('Invalid command: ' + command);
     }
+    throw new DeveloperError('Invalid command: ' + command);
 }
 
 function checkDirectoryOverwritable(directory, force) {
     if (force) {
         return Promise.resolve();
-    } else {
-        return directoryExists(directory)
-            .then(function(exists) {
-                if (exists) {
-                    throw new DeveloperError('Directory ' + directory + ' already exists. Specify -f or --force to overwrite existing files.');
-                }
-            });
     }
+    return directoryExists(directory)
+        .then(function(exists) {
+            if (exists) {
+                throw new DeveloperError('Directory ' + directory + ' already exists. Specify -f or --force to overwrite existing files.');
+            }
+        });
 }
 
 function checkFileOverwritable(file, force) {
     if (force) {
         return Promise.resolve();
-    } else {
-        return fileExists(file)
-            .then(function (exists) {
-                if (exists) {
-                    throw new DeveloperError('File ' + file + ' already exists. Specify -f or --force to overwrite existing files.');
-                }
-            });
     }
+    return fileExists(file)
+        .then(function (exists) {
+            if (exists) {
+                throw new DeveloperError('File ' + file + ' already exists. Specify -f or --force to overwrite existing files.');
+            }
+        });
 }
 
 function readFile(file) {
