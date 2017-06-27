@@ -32,9 +32,9 @@
     "yargs": "^8.0.1"
   },
   "devDependencies": {
-    "eslint-config-cesium": "^1.0.0",
+    "eslint": "^4.1.1",
+    "eslint-config-cesium": "^2.0.0",
     "gulp": "^3.9.1",
-    "gulp-eslint": "^4.0.0",
     "istanbul": "^0.4.5",
     "jasmine": "^2.5.3",
     "jasmine-spec-reporter": "^4.1.0",
@@ -44,8 +44,7 @@
     "requirejs": "^2.3.3"
   },
   "scripts": {
-    "eslint": "gulp eslint",
-    "eslint-watch": "gulp eslint-watch",
+    "eslint": "eslint \"./**/*.js\" --cache --quiet",
     "test": "gulp test",
     "test-watch": "gulp test-watch",
     "coverage": "gulp coverage",
