@@ -105,6 +105,15 @@ var argv = yargs
         }
     })
     .command('ungzip', 'Ungzips the input tileset directory.')
+    .command('combine', 'Combines all external tilesets into a single tileset.json file.', {
+        'r': {
+            alias: 'rootJson',
+            default: 'tileset.json',
+            description: 'Relative path to the root tileset.json file.',
+            normalize: true,
+            type: 'string'
+        }
+    })
     .demand(1)
     .recommendCommands()
     .strict()
@@ -135,6 +144,8 @@ function runCommand(command, input, output, force, argv) {
     } else if (command === 'gzip') {
         return processStage(input, output, force, command, argv);
     } else if (command === 'ungzip') {
+        return processStage(input, output, force, command, argv);
+    } else if (command === 'combine') {
         return processStage(input, output, force, command, argv);
     } else if (command === 'b3dmToGlb') {
         return readB3dmWriteGlb(input, output, force);
@@ -254,6 +265,8 @@ function getStage(stageName, argv) {
         case 'gzip':
             stage.tilesOnly = argv.tilesOnly;
             break;
+        case 'combine':
+            stage.rootJson = argv.rootJson;
     }
     return stage;
 }

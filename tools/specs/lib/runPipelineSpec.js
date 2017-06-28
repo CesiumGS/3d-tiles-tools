@@ -29,8 +29,8 @@ describe('runPipeline', function() {
         expect(runPipeline(pipeline)
             .then(function() {
                 return isGzippedFile(outputJson)
-                    .then(function(isGzippedFile) {
-                        expect(isGzippedFile).toBe(true);
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(true);
                     });
             }), done).toResolve();
     });
@@ -39,13 +39,13 @@ describe('runPipeline', function() {
         var pipeline = {
             input : inputDirectory,
             output : outputDirectory,
-            stages : ['gzip', 'ungzip']
+            stages : ['combine', 'gzip']
         };
         expect(runPipeline(pipeline)
             .then(function() {
                 return isGzippedFile(outputJson)
-                    .then(function(isGzippedFile) {
-                        expect(isGzippedFile).toBe(false);
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(true);
                     });
             }), done).toResolve();
     });
@@ -54,13 +54,13 @@ describe('runPipeline', function() {
         var pipeline = {
             input : inputDirectory,
             output : outputDirectory,
-            stages : ['gzip', 'ungzip', 'gzip']
+            stages : ['combine', 'gzip', 'ungzip']
         };
         expect(runPipeline(pipeline)
             .then(function() {
                 return isGzippedFile(outputJson)
-                    .then(function(isGzippedFile) {
-                        expect(isGzippedFile).toBe(true);
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(false);
                     });
             }), done).toResolve();
     });
@@ -69,13 +69,13 @@ describe('runPipeline', function() {
         var pipeline = {
             input : inputDirectory,
             output : outputDirectory,
-            stages : ['gzip', 'ungzip', 'gzip', 'ungzip']
+            stages : ['combine', 'gzip', 'ungzip', 'gzip']
         };
         expect(runPipeline(pipeline)
             .then(function() {
                 return isGzippedFile(outputJson)
-                    .then(function(isGzippedFile) {
-                        expect(isGzippedFile).toBe(false);
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(true);
                     });
             }), done).toResolve();
     });
@@ -92,8 +92,8 @@ describe('runPipeline', function() {
         expect(runPipeline(pipeline)
             .then(function() {
                 return isGzippedFile(outputJson)
-                    .then(function(isGzippedFile) {
-                        expect(isGzippedFile).toBe(false);
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(false);
                     });
             }), done).toResolve();
     });
@@ -114,8 +114,8 @@ describe('runPipeline', function() {
         expect(runPipeline(pipeline)
             .then(function() {
                 return isGzippedFile(outputJson)
-                    .then(function(isGzippedFile) {
-                        expect(isGzippedFile).toBe(false);
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(false);
                     });
             }), done).toResolve();
     });
@@ -150,8 +150,8 @@ describe('runPipeline', function() {
         expect(runPipeline(pipeline)
             .then(function() {
                 return isGzippedFile(outputJson)
-                    .then(function(isGzippedFile) {
-                        expect(isGzippedFile).toBe(true);
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(true);
                     });
             }), done).toResolve();
     });
@@ -165,8 +165,8 @@ describe('runPipeline', function() {
         expect(runPipeline(pipeline)
             .then(function() {
                 return isGzippedFile(outputJson)
-                    .then(function(isGzippedFile) {
-                        expect(isGzippedFile).toBe(false);
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(false);
                     });
             }), done).toResolve();
     });
@@ -189,8 +189,8 @@ describe('runPipeline', function() {
         expect(runPipeline(pipeline, options)
             .then(function() {
                 return isGzippedFile(outputJson)
-                    .then(function(isGzippedFile) {
-                        expect(isGzippedFile).toBe(true);
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(true);
                     });
             }), done).toResolve();
     });

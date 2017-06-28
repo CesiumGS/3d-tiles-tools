@@ -29,7 +29,6 @@ node ./bin/3d-tiles-tools.js gzip -i ./specs/data/TilesetOfTilesets/ -o ./output
 |`-t`, `--tilesOnly`|Only gzip tiles.|No, default `false`|
 |`-f`, `--force`|Overwrite output directory if it exists.|No, default `false`|
 
-
 ### ungzip
 
 Ungzips the input tileset.
@@ -46,6 +45,24 @@ node ./bin/3d-tiles-tools.js ungzip -i ./specs/data/TilesetOfTilesets/ -o ./outp
 |`-i`, `--input`|Input directory of the tileset.| :white_check_mark: Yes|
 |`-o`, `--output`|Output directory of the processed tileset.|No|
 |`-f`, `--force`|Overwrite output directory if it exists.|No, default `false`|
+
+### combine
+
+Combines all external tilesets into a single tileset.json file.
+
+```
+node ./bin/3d-tiles-tools.js combine ./specs/data/TilesetOfTilesets/ ./output/TilesetOfTilesets-combined/
+```
+```
+node ./bin/3d-tiles-tools.js combine -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-combined/
+```
+
+|Flag|Description|Required|
+|----|-----------|--------|
+|`-i`, `--input`|Input directory of the tileset.| :white_check_mark: Yes|
+|`-o`, `--output`|Output directory of the processed tileset.|No|
+|`-r`, `--rootJson`|Relative path to the root tileset.json file.|No, default `tileset.json`|
+|`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
 
 ### glbToB3dm
 

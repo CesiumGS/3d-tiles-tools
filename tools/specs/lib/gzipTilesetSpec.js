@@ -31,8 +31,8 @@ describe('gzipTileset', function() {
         expect(gzipTileset(gzipOptions)
             .then(function() {
                 return isGzippedFile(gzippedJson)
-                    .then(function(isGzippedFile) {
-                        expect(isGzippedFile).toBe(true);
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(true);
                     });
             }), done).toResolve();
     });
@@ -53,8 +53,8 @@ describe('gzipTileset', function() {
                 return gzipTileset(ungzipOptions)
                     .then(function() {
                         return isGzippedFile(ungzippedJson)
-                            .then(function(isGzippedFile) {
-                                expect(isGzippedFile).toBe(false);
+                            .then(function(gzipped) {
+                                expect(gzipped).toBe(false);
                             });
                     });
             }), done).toResolve();
@@ -68,8 +68,8 @@ describe('gzipTileset', function() {
         expect(gzipTileset(gzipOptions)
             .then(function() {
                 return isGzippedFile(gzippedJson)
-                    .then(function(isGzippedFile) {
-                        expect(isGzippedFile).toBe(true);
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(true);
                     });
             }), done).toResolve();
     });
@@ -130,8 +130,8 @@ describe('gzipTileset', function() {
         expect(gzipTileset(gzipOptions)
             .then(function() {
                 return isGzippedFile(gzippedJson)
-                    .then(function(isGzippedFile) {
-                        expect(isGzippedFile).toBe(false);
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(false);
                     });
             }), done).toResolve();
     });
@@ -182,8 +182,8 @@ describe('gzipTileset', function() {
         expect(gzipTileset(gzipOptions)
             .then(function() {
                 return isGzippedFile(gzippedJson)
-                    .then(function(isGzippedFile) {
-                        expect(isGzippedFile).toBe(true);
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(true);
                     });
             }), done).toResolve();
     });
