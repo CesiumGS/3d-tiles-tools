@@ -4,7 +4,6 @@ var Cesium = require('cesium');
 var child_process = require('child_process');
 var fsExtra = require('fs-extra');
 var gulp = require('gulp');
-var eslint = require('gulp-eslint');
 var Jasmine = require('jasmine');
 var jasmineSpecReporter = require('jasmine-spec-reporter');
 var open = require('open');
@@ -21,27 +20,7 @@ var environmentSeparator = process.platform === 'win32' ? ';' : ':';
 var nodeBinaries = path.join(__dirname, 'node_modules', '.bin');
 process.env.PATH += environmentSeparator + nodeBinaries;
 
-var esLintFiles = ['**/*.js', '!node_modules/**', '!coverage/**', '!doc/**'];
 var specFiles = ['**/*.js', '!node_modules/**', '!coverage/**'];
-
-gulp.task('eslint', function () {
-    var stream = gulp.src(esLintFiles)
-        .pipe(eslint())
-        .pipe(eslint.format());
-    if (argv.failTaskOnError) {
-        stream = stream.pipe(eslint.failAfterError());
-    }
-
-    return stream;
-});
-
-gulp.task('eslint-watch', function() {
-    gulp.watch(esLintFiles).on('change', function(event) {
-        gulp.src(event.path)
-            .pipe(eslint())
-            .pipe(eslint.format());
-    });
-});
 
 gulp.task('test', function (done) {
     var jasmine = new Jasmine();
