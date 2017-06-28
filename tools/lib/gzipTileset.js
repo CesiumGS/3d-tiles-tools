@@ -34,7 +34,7 @@ function gzipTileset(options) {
     var gzip = defaultValue(options.gzip, true);
     var tilesOnly = defaultValue(options.tilesOnly, false);
 
-    Check.typeOf.string('options.inputDiretory', inputDirectory);
+    Check.typeOf.string('options.inputDirectory', inputDirectory);
 
     inputDirectory = path.normalize(inputDirectory);
     outputDirectory = path.normalize(defaultValue(outputDirectory,
