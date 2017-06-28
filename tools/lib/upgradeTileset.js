@@ -7,8 +7,8 @@ var getDefaultWriteCallback = require('./getDefaultWriteCallback');
 var getMagic = require('./getMagic');
 var glbToB3dm = require('./glbToB3dm');
 var isGzippedFile = require('./isGzippedFile');
+var isJson = require('./isJson');
 var isTile = require('./isTile');
-var isTileset = require('./isTileset');
 var optimizeGlb = require('./optimizeGlb');
 var readFile = require('./readFile');
 var walkDirectory = require('./walkDirectory');
@@ -64,13 +64,12 @@ function upgradeTileset(options) {
 }
 
 function upgradeFile(file) {
-    if (isTileset(file)) {
+    if (isJson(file)) {
         return upgradeTilesetJson(file);
     } else if (isTile(file)) {
         return upgradeTile(file);
-    } else {
-        return readFile(file);
     }
+    return readFile(file);
 }
 
 function upgradeTilesetJson(file) {
@@ -97,9 +96,8 @@ function upgradeTile(file) {
                     .then(function(glb) {
                         return glbToB3dm(glb, b3dm.featureTable.json, b3dm.featureTable.binary, b3dm.batchTable.json, b3dm.batchTable.binary);
                     });
-            } else {
-                return buffer;
             }
+            return buffer;
         });
 }
 
