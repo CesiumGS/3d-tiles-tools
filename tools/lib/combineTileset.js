@@ -35,7 +35,7 @@ function combineTileset(options) {
     var outputDirectory = options.outputDirectory;
     var rootJsonFile = defaultValue(options.rootJson, 'tileset.json');
 
-    Check.typeOf.string('options.inputDiretory', inputDirectory);
+    Check.typeOf.string('options.inputDirectory', inputDirectory);
 
     inputDirectory = path.normalize(inputDirectory);
     outputDirectory = path.normalize(defaultValue(outputDirectory,
