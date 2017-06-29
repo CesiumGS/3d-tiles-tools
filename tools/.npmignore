@@ -11,3 +11,4 @@
 gulpfile.js
 *.tgz
 .eslintcache
+.nyc_output
