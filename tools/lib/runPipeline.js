@@ -3,16 +3,13 @@ var Cesium = require('cesium');
 var fsExtra = require('fs-extra');
 var path = require('path');
 var Promise = require('bluebird');
+var combineTileset = require('./combineTileset');
 var getWorkingDirectory = require('./getWorkingDirectory');
 var gzipTileset = require('./gzipTileset');
 
 var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
 var DeveloperError = Cesium.DeveloperError;
-
-var fsExtraCopy = Promise.promisify(fsExtra.copy);
-var fsExtraEmptyDir = Promise.promisify(fsExtra.emptyDir);
-var fsExtraRemove = Promise.promisify(fsExtra.remove);
 
 module.exports = runPipeline;
 
@@ -41,7 +38,7 @@ function runPipeline(pipeline, options) {
         path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-processed')));
 
     if (!defined(stages)) {
-        return fsExtraCopy(inputDirectory, outputDirectory);
+        return fsExtra.copy(inputDirectory, outputDirectory);
     }
 
     options = defaultValue(options, defaultValue.EMPTY_OBJECT);
@@ -98,7 +95,7 @@ function runPipeline(pipeline, options) {
 
     // Run the stages in sequence
     return Promise.each(stageObjects, function(stage) {
-        return fsExtraEmptyDir(stage.options.outputDirectory)
+        return fsExtra.emptyDir(stage.options.outputDirectory)
             .then(function() {
                 if (defined(logCallback)) {
                     logCallback('Running ' + stage.name);
@@ -107,8 +104,8 @@ function runPipeline(pipeline, options) {
             });
     }).finally(function() {
         return Promise.all([
-            fsExtraRemove(workingDirectory1),
-            fsExtraRemove(workingDirectory2)
+            fsExtra.remove(workingDirectory1),
+            fsExtra.remove(workingDirectory2)
         ]);
     });
 }
@@ -121,6 +118,8 @@ function getStageFunction(stageName, stageOptions) {
         case 'ungzip':
             stageOptions.gzip = false;
             return gzipTileset;
+        case 'combine':
+            return combineTileset;
         default:
             return undefined;
     }

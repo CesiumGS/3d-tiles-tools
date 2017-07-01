@@ -4,10 +4,11 @@
 /test
 /specs
 /tools
-/TypeScriptDefinitions
 /.idea
-.jshintrc
+.eslintrc.json
 .npmignore
 .travis.yml
 gulpfile.js
 *.tgz
+.eslintcache
+.nyc_output

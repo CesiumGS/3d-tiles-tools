@@ -2,12 +2,8 @@
 var fsExtra = require('fs-extra');
 var path = require('path');
 var Promise = require('bluebird');
-var isGzipped = require('../../lib/isGzipped');
+var isGzippedFile = require('../../lib/isGzippedFile');
 var gzipTileset = require('../../lib/gzipTileset');
-
-var fsExtraOutputFile = Promise.promisify(fsExtra.outputFile);
-var fsExtraReadFile = Promise.promisify(fsExtra.readFile);
-var fsExtraRemove = Promise.promisify(fsExtra.remove);
 
 var tilesetDirectory = './specs/data/TilesetOfTilesets/';
 var tilesetJson = './specs/data/TilesetOfTilesets/tileset.json';
@@ -19,8 +15,8 @@ var ungzippedJson = './specs/data/TilesetOfTilesets-ungzipped/tileset.json';
 describe('gzipTileset', function() {
     afterEach(function (done) {
         Promise.all([
-            fsExtraRemove(gzippedDirectory),
-            fsExtraRemove(ungzippedDirectory)
+            fsExtra.remove(gzippedDirectory),
+            fsExtra.remove(ungzippedDirectory)
         ]).then(function() {
             done();
         });
@@ -34,9 +30,9 @@ describe('gzipTileset', function() {
         };
         expect(gzipTileset(gzipOptions)
             .then(function() {
-                return isGzipped(gzippedJson)
-                    .then(function(isGzipped) {
-                        expect(isGzipped).toBe(true);
+                return isGzippedFile(gzippedJson)
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(true);
                     });
             }), done).toResolve();
     });
@@ -56,9 +52,9 @@ describe('gzipTileset', function() {
             .then(function() {
                 return gzipTileset(ungzipOptions)
                     .then(function() {
-                        return isGzipped(ungzippedJson)
-                            .then(function(isGzipped) {
-                                expect(isGzipped).toBe(false);
+                        return isGzippedFile(ungzippedJson)
+                            .then(function(gzipped) {
+                                expect(gzipped).toBe(false);
                             });
                     });
             }), done).toResolve();
@@ -71,9 +67,9 @@ describe('gzipTileset', function() {
         };
         expect(gzipTileset(gzipOptions)
             .then(function() {
-                return isGzipped(gzippedJson)
-                    .then(function(isGzipped) {
-                        expect(isGzipped).toBe(true);
+                return isGzippedFile(gzippedJson)
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(true);
                     });
             }), done).toResolve();
     });
@@ -94,8 +90,8 @@ describe('gzipTileset', function() {
                 return gzipTileset(gzipAgainOptions)
                     .then(function() {
                         var promises = [
-                            fsExtraReadFile(gzippedJson),
-                            fsExtraReadFile(ungzippedJson)
+                            fsExtra.readFile(gzippedJson),
+                            fsExtra.readFile(ungzippedJson)
                         ];
                         return Promise.all(promises)
                             .then(function(contents) {
@@ -114,8 +110,8 @@ describe('gzipTileset', function() {
         expect(gzipTileset(ungzipOptions)
             .then(function() {
                 var promises = [
-                    fsExtraReadFile(tilesetJson),
-                    fsExtraReadFile(ungzippedJson)
+                    fsExtra.readFile(tilesetJson),
+                    fsExtra.readFile(ungzippedJson)
                 ];
                 return Promise.all(promises)
                     .then(function(contents) {
@@ -133,9 +129,9 @@ describe('gzipTileset', function() {
         };
         expect(gzipTileset(gzipOptions)
             .then(function() {
-                return isGzipped(gzippedJson)
-                    .then(function(isGzipped) {
-                        expect(isGzipped).toBe(false);
+                return isGzippedFile(gzippedJson)
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(false);
                     });
             }), done).toResolve();
     });
@@ -176,7 +172,7 @@ describe('gzipTileset', function() {
         var outputDirectory = gzippedDirectory;
         var writeCallback = function(file, data) {
             var outputFile = path.join(outputDirectory, file);
-            return fsExtraOutputFile(outputFile, data);
+            return fsExtra.outputFile(outputFile, data);
         };
         var gzipOptions = {
             inputDirectory : tilesetDirectory,
@@ -185,9 +181,9 @@ describe('gzipTileset', function() {
         };
         expect(gzipTileset(gzipOptions)
             .then(function() {
-                return isGzipped(gzippedJson)
-                    .then(function(isGzipped) {
-                        expect(isGzipped).toBe(true);
+                return isGzippedFile(gzippedJson)
+                    .then(function(gzipped) {
+                        expect(gzipped).toBe(true);
                     });
             }), done).toResolve();
     });

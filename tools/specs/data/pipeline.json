@@ -1,7 +1,8 @@
 {
     "input": "TilesetOfTilesets/",
-    "output": "TilesetOfTilesets-gzipped/",
+    "output": "TilesetOfTilesets-output/",
     "stages": [
+        "combine",
         {
             "name": "gzip",
             "tilesOnly": true
