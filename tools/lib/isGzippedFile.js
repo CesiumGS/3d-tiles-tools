@@ -19,6 +19,7 @@ function isGzippedFile(file) {
         readStream.on('error', reject);
         readStream.on('data', function(chunk) {
             resolve(isGzipped(chunk));
+            readStream.destroy();
         });
     });
 }

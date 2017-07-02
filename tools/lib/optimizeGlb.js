@@ -63,13 +63,9 @@ function fixBatchIdSemantic(gltf) {
             var primitivesLength = primitives.length;
             for (var i = 0; i < primitivesLength; ++i) {
                 var attributes = primitives[i].attributes;
-                for (var semantic in attributes) {
-                    if (attributes.hasOwnProperty(semantic)) {
-                        if (semantic === 'BATCHID') {
-                            attributes._BATCHID = attributes.BATCHID;
-                            delete attributes.BATCHID;
-                        }
-                    }
+                if (defined(attributes.BATCHID)) {
+                    attributes._BATCHID = attributes.BATCHID;
+                    delete attributes.BATCHID;
                 }
             }
         }

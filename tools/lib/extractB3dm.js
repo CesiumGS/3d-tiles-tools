@@ -99,7 +99,9 @@ function extractB3dm(b3dmBuffer) {
 }
 
 function alignGlb(buffer, byteOffset) {
-    if (byteOffset % 4 === 0) {
+    // The glb may not be aligned to an 8-byte boundary within the tile, causing gltf-pipeline operations to fail.
+    // If unaligned, copy the glb to a new buffer.
+    if (byteOffset % 8 === 0) {
         return buffer;
     }
     return Buffer.from(buffer);
