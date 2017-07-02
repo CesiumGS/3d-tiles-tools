@@ -1,14 +1,17 @@
 'use strict';
 var Cesium = require('cesium');
 var path = require('path');
+var Promise = require('bluebird');
 var zlib = require('zlib');
 var extractB3dm = require('./extractB3dm');
+var extractCmpt = require('./extractCmpt');
 var getDefaultWriteCallback = require('./getDefaultWriteCallback');
 var getMagic = require('./getMagic');
 var glbToB3dm = require('./glbToB3dm');
 var isGzippedFile = require('./isGzippedFile');
 var isJson = require('./isJson');
 var isTile = require('./isTile');
+var makeCompositeTile = require('./makeCompositeTile');
 var optimizeGlb = require('./optimizeGlb');
 var readFile = require('./readFile');
 var walkDirectory = require('./walkDirectory');
@@ -89,15 +92,25 @@ var optimizeOptions = {
 function upgradeTile(file) {
     return readFile(file)
         .then(function(buffer) {
-            var magic = getMagic(buffer);
-            if (magic === 'b3dm') {
-                var b3dm = extractB3dm(buffer);
-                return optimizeGlb(b3dm.glb, optimizeOptions)
-                    .then(function(glb) {
-                        return glbToB3dm(glb, b3dm.featureTable.json, b3dm.featureTable.binary, b3dm.batchTable.json, b3dm.batchTable.binary);
-                    });
-            }
-            return buffer;
+            return upgradeTileContent(buffer);
         });
 }
 
+function upgradeTileContent(buffer) {
+    var magic = getMagic(buffer);
+    if (magic === 'b3dm') {
+        var b3dm = extractB3dm(buffer);
+        return optimizeGlb(b3dm.glb, optimizeOptions)
+            .then(function(glb) {
+                return glbToB3dm(glb, b3dm.featureTable.json, b3dm.featureTable.binary, b3dm.batchTable.json, b3dm.batchTable.binary);
+            });
+    } else if (magic === 'cmpt') {
+        var tiles = extractCmpt(buffer);
+        return Promise.map(tiles, function(tile) {
+            return upgradeTileContent(tile);
+        }).then(function(upgradedTiles) {
+            return makeCompositeTile(upgradedTiles);
+        });
+    }
+    return buffer;
+}
