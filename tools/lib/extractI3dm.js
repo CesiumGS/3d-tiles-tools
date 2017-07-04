@@ -2,6 +2,7 @@
 
 var Cesium = require('cesium');
 var bufferToJson = require('./bufferToJson');
+var getMagic = require('./getMagic');
 
 var defined = Cesium.defined;
 var DeveloperError = Cesium.DeveloperError;
@@ -18,7 +19,7 @@ function extractI3dm(buffer) {
     if (!defined(buffer)) {
         throw new DeveloperError('buffer is not defined.');
     }
-    var magic = buffer.toString('utf8', 0, 4);
+    var magic = getMagic(buffer);
     if (magic !== 'i3dm') {
         throw new DeveloperError('Invalid magic, expected "i3dm", got: "' + magic + '".');
     }
@@ -55,6 +56,7 @@ function extractI3dm(buffer) {
     var batchTableJsonBuffer = buffer.slice(batchTableJsonByteOffset, batchTableBinaryByteOffset);
     var batchTableBinaryBuffer = buffer.slice(batchTableBinaryByteOffset, gltfByteOffset);
     var glbBuffer = buffer.slice(gltfByteOffset, byteLength);
+    glbBuffer = alignGlb(glbBuffer, gltfByteOffset);
 
     var featureTableJson = bufferToJson(featureTableJsonBuffer);
     var batchTableJson = bufferToJson(batchTableJsonBuffer);
@@ -75,4 +77,11 @@ function extractI3dm(buffer) {
         },
         glb : glbBuffer
     };
+}
+
+function alignGlb(buffer, byteOffset) {
+    if (byteOffset % 4 === 0) {
+        return buffer;
+    }
+    return Buffer.from(buffer);
 }

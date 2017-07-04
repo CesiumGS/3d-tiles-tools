@@ -64,6 +64,23 @@ node ./bin/3d-tiles-tools.js combine -i ./specs/data/TilesetOfTilesets/ -o ./out
 |`-r`, `--rootJson`|Relative path to the root tileset.json file.|No, default `tileset.json`|
 |`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
 
+### upgrade
+
+Upgrades the input tileset to the latest version of the 3D Tiles spec. Embedded glTF models will be upgraded to glTF 2.0.
+
+```
+node ./bin/3d-tiles-tools.js upgrade ./specs/data/TilesetOfTilesets/ ./output/TilesetOfTilesets-upgraded/
+```
+```
+node ./bin/3d-tiles-tools.js upgrade -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-upgraded/
+```
+
+|Flag|Description|Required|
+|----|-----------|--------|
+|`-i`, `--input`|Input directory of the tileset.| :white_check_mark: Yes|
+|`-o`, `--output`|Output directory of the processed tileset.|No|
+|`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
+
 ### glbToB3dm
 
 Creates a b3dm from a glb with an empty batch table. Since this tool does not

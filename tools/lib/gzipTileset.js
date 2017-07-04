@@ -8,9 +8,9 @@ var isGzipped = require('./isGzipped');
 var isTile = require('./isTile');
 var walkDirectory = require('./walkDirectory');
 
+var Check = Cesium.Check;
 var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
-var DeveloperError = Cesium.DeveloperError;
 
 module.exports = gzipTileset;
 
@@ -34,9 +34,8 @@ function gzipTileset(options) {
     var gzip = defaultValue(options.gzip, true);
     var tilesOnly = defaultValue(options.tilesOnly, false);
 
-    if (!defined(inputDirectory)) {
-        throw new DeveloperError('inputDirectory is required');
-    }
+    Check.typeOf.string('options.inputDirectory', inputDirectory);
+
     inputDirectory = path.normalize(inputDirectory);
     outputDirectory = path.normalize(defaultValue(outputDirectory,
         path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-' + (gzip ? 'gzipped' : 'ungzipped'))));
