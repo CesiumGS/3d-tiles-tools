@@ -27,7 +27,7 @@ module.exports = upgradeTileset;
  *
  * @param {Object} options Object with the following properties:
  * @param {String} options.inputDirectory Path to the input directory.
- * @param {Object} [options.outputDirectory] Path to the output directory.
+ * @param {String} [options.outputDirectory] Path to the output directory.
  * @param {WriteCallback} [options.writeCallback] A callback function that writes files after they have been processed.
  * @param {LogCallback} [options.logCallback] A callback function that logs messages.
  *

@@ -19,6 +19,7 @@ var getJsonBufferPadded = require('../lib/getJsonBufferPadded');
 var glbToB3dm = require('../lib/glbToB3dm');
 var glbToI3dm = require('../lib/glbToI3dm');
 var isGzipped = require('../lib/isGzipped');
+var mergeTilesets = require('../lib/mergeTilesets');
 var optimizeGlb = require('../lib/optimizeGlb');
 var runPipeline = require('../lib/runPipeline');
 var tilesetToDatabase = require('../lib/tilesetToDatabase');
@@ -57,13 +58,14 @@ var argv = yargs
     .help('h')
     .alias('h', 'help')
     .options({
-        'i': {
-            alias: 'input',
-            description: 'Input path for the command.',
-            global: true,
-            normalize: true,
-            type: 'string'
-        },
+        // 'i' : {
+        //     alias: 'input',
+        //     description: 'Input path for the command.',
+        //     global: true,
+        //     normalize: true,
+        //     type: 'string',
+        //     demandOptions: true
+        // },
         'o': {
             alias: 'output',
             description: 'Output path for the command.',
@@ -115,6 +117,15 @@ var argv = yargs
             type: 'string'
         }
     })
+    .command('merge', 'Merge any number of tilesets together into a single tileset.', {
+        'i': {
+            alias: 'input',
+            description: 'Input tileset directories. Multiple directories may be supplied by repeating the -i flag.',
+            normalize: true,
+            type: 'array',
+            demandOption: true
+        }
+    })
     .command('upgrade', 'Upgrades the input tileset to the latest version of the 3D Tiles spec. Embedded glTF models will be upgraded to glTF 2.0.')
     .demand(1)
     .recommendCommands()
@@ -122,23 +133,19 @@ var argv = yargs
     .parse(args);
 
 var command = argv._[0];
-var input = defaultValue(argv.i, argv._[1]);
-var output = defaultValue(argv.o, argv._[2]);
-var force = argv.f;
-
-if (!defined(input)) {
-    console.log('-i or --input argument is required. See --help for details.');
-    return;
-}
 
 console.time('Total');
-runCommand(command, input, output, force, argv)
-    .then(function() {
-        console.timeEnd('Total');
-    })
-    .catch(function(error) {
-        console.log(error.message);
-    });
+try {
+    runCommand(command, argv.input, argv.output, argv.force, argv)
+        .then(function() {
+            console.timeEnd('Total');
+        })
+        .catch(function(error) {
+            console.log(error);
+        });
+} catch (error) {
+    console.log(error);
+}
 
 function runCommand(command, input, output, force, argv) {
     if (command === 'pipeline') {
@@ -151,6 +158,8 @@ function runCommand(command, input, output, force, argv) {
         return processStage(input, output, force, command, argv);
     } else if (command === 'upgrade') {
         return processStage(input, output, force, command, argv);
+    } else if (command === 'merge') {
+        return runMergeTilesets(input, output, force);
     } else if (command === 'b3dmToGlb') {
         return readB3dmWriteGlb(input, output, force);
     } else if (command === 'i3dmToGlb') {
@@ -211,7 +220,7 @@ function logCallback(message) {
     console.log(message);
 }
 
-function processPipeline(inputFile) {
+function processPipeline(inputFile, force) {
     return fsExtra.readJson(inputFile)
         .then(function(pipeline) {
             var inputDirectory = pipeline.input;
@@ -273,6 +282,20 @@ function getStage(stageName, argv) {
             stage.rootJson = argv.rootJson;
     }
     return stage;
+}
+
+function runMergeTilesets(inputDirectories, outputDirectory, force) {
+    if (inputDirectories.length < 2) {
+        throw new DeveloperError('Must supply at least two input directories for the merge command.');
+    }
+    outputDirectory = defaultValue(outputDirectory, path.join(path.dirname(inputDirectories[0]), path.basename(inputDirectories[0]) + '-merged'));
+    return checkDirectoryOverwritable(outputDirectory, force)
+        .then(function() {
+            return mergeTilesets({
+                inputDirectories : inputDirectories,
+                outputDirectory : outputDirectory
+            });
+        });
 }
 
 function convertTilesetToDatabase(inputDirectory, outputPath, force) {

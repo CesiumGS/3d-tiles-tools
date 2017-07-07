@@ -22,12 +22,12 @@ module.exports = combineTileset;
  *
  * @param {Object} options Object with the following properties:
  * @param {String} options.inputDirectory Path to the input directory.
- * @param {Object} [options.outputDirectory] Path to the output directory.
+ * @param {String} [options.outputDirectory] Path to the output directory.
  * @param {String} [options.rootJson='tileset.json'] Relative path to the root json.
  * @param {WriteCallback} [options.writeCallback] A callback function that writes files after they have been processed.
  * @param {LogCallback} [options.logCallback] A callback function that logs messages.
  *
- * @returns {Promise} A promise that resolves with the operation completes.
+ * @returns {Promise} A promise that resolves when the operation completes.
  */
 function combineTileset(options) {
     options = defaultValue(options, defaultValue.EMPTY_OBJECT);

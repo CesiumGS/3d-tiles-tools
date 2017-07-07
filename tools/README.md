@@ -16,9 +16,6 @@ npm install
 Gzips the input tileset.
 
 ```
-node ./bin/3d-tiles-tools.js gzip ./specs/data/TilesetOfTilesets/ ./output/TilesetOfTilesets-gzipped/
-```
-```
 node ./bin/3d-tiles-tools.js gzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-gzipped/
 ```
 
@@ -34,9 +31,6 @@ node ./bin/3d-tiles-tools.js gzip -i ./specs/data/TilesetOfTilesets/ -o ./output
 Ungzips the input tileset.
 
 ```
-node ./bin/3d-tiles-tools.js ungzip ./specs/data/TilesetOfTilesets/ ./output/TilesetOfTilesets-ungzipped/
-```
-```
 node ./bin/3d-tiles-tools.js ungzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-ungzipped/
 ```
 
@@ -50,9 +44,6 @@ node ./bin/3d-tiles-tools.js ungzip -i ./specs/data/TilesetOfTilesets/ -o ./outp
 
 Combines all external tilesets into a single tileset.json file.
 
-```
-node ./bin/3d-tiles-tools.js combine ./specs/data/TilesetOfTilesets/ ./output/TilesetOfTilesets-combined/
-```
 ```
 node ./bin/3d-tiles-tools.js combine -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-combined/
 ```
@@ -69,9 +60,6 @@ node ./bin/3d-tiles-tools.js combine -i ./specs/data/TilesetOfTilesets/ -o ./out
 Upgrades the input tileset to the latest version of the 3D Tiles spec. Embedded glTF models will be upgraded to glTF 2.0.
 
 ```
-node ./bin/3d-tiles-tools.js upgrade ./specs/data/TilesetOfTilesets/ ./output/TilesetOfTilesets-upgraded/
-```
-```
 node ./bin/3d-tiles-tools.js upgrade -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-upgraded/
 ```
 
@@ -81,14 +69,25 @@ node ./bin/3d-tiles-tools.js upgrade -i ./specs/data/TilesetOfTilesets/ -o ./out
 |`-o`, `--output`|Output directory of the processed tileset.|No|
 |`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
 
+### merge
+
+Merge any number of tilesets together into a single tileset.
+
+```
+node ./bin/3d-tiles-tools.js merge -i ./specs/data/TilesetOfTilesets/ -i ./specs/data/Tileset/ -o ./output/TilesetOfTilesets-merged/
+```
+
+|Flag|Description|Required|
+|----|-----------|--------|
+|`-i`, `--input`|Input tileset directories. Multiple directories may be supplied by repeating the -i flag.| :white_check_mark: Yes|
+|`-o`, `--output`|Output directory of the processed tileset.|No|
+|`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
+
 ### glbToB3dm
 
 Creates a b3dm from a glb with an empty batch table. Since this tool does not
 process an entire tileset, it cannot be used with the Pipeline tool.
 
-```
-node ./bin/3d-tiles-tools.js glbToB3dm ./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb ./output/CesiumTexturedBox.b3dm
-```
 ```
 node ./bin/3d-tiles-tools.js glbToB3dm -i ./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb -o ./output/CesiumTexturedBox.b3dm
 ```
@@ -104,9 +103,6 @@ node ./bin/3d-tiles-tools.js glbToB3dm -i ./specs/data/CesiumTexturedBox/CesiumT
 Creates a i3dm from a glb with a single instance at position `[0, 0, 0]` and an empty batch table. Since this tool does not
 process an entire tileset, it cannot be used with the Pipeline tool.
 
-```
-node ./bin/3d-tiles-tools.js glbToI3dm ./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb ./output/CesiumTexturedBox.i3dm
-```
 ```
 node ./bin/3d-tiles-tools.js glbToI3dm -i ./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb -o ./output/CesiumTexturedBox.i3dm
 ```
@@ -225,9 +221,6 @@ This tool cannot be used with the Pipeline tool.
 Each tile is stored gzipped in the database.  The specification for the tables in the database is not final, see [3d-tiles/#89](https://github.com/AnalyticalGraphicsInc/3d-tiles/issues/89).
 
 ```
-node ./bin/3d-tiles-tools.js tilesetToDatabase ./specs/data/TilesetOfTilesets/ ./output/tileset.3dtiles
-```
-```
 node ./bin/3d-tiles-tools.js tilesetToDatabase -i ./specs/data/TilesetOfTilesets/ -o ./output/tileset.3dtiles
 ```
 
@@ -246,9 +239,6 @@ This tool cannot be used with the Pipeline tool.
 Each tile is stored gzipped in the database, and unzipped when unpacked.  The specification for the tables in the database is not final, see [3d-tiles/#89](https://github.com/AnalyticalGraphicsInc/3d-tiles/issues/89).
 
 ```
-node ./bin/3d-tiles-tools.js databaseToTileset ./specs/data/tileset.3dtiles ./output/Tileset
-```
-```
 node ./bin/3d-tiles-tools.js databaseToTileset -i ./specs/data/tileset.3dtiles -o ./output/Tileset
 ```
 
@@ -260,9 +250,6 @@ node ./bin/3d-tiles-tools.js databaseToTileset -i ./specs/data/tileset.3dtiles -
 
 ## Pipeline
 
-```
-node ./bin/3d-tiles-tools.js pipeline ./specs/data/pipeline.json
-```
 ```
 node ./bin/3d-tiles-tools.js pipeline -i ./specs/data/pipeline.json
 ```
