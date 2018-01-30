@@ -32,6 +32,7 @@
     "yargs": "^10.0.3"
   },
   "devDependencies": {
+    "cloc": "^2.3.3",
     "eslint": "^4.10.0",
     "eslint-config-cesium": "^2.0.1",
     "gulp": "^3.9.1",
@@ -48,7 +49,8 @@
     "test": "gulp test",
     "test-watch": "gulp test-watch",
     "coverage": "gulp coverage",
-    "jsDoc": "gulp jsDoc"
+    "jsDoc": "gulp jsDoc",
+    "cloc": "gulp cloc"
   },
   "bin": {
     "3d-tiles-tools": "./bin/3d-tiles-tools.js"
