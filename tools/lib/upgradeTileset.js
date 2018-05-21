@@ -42,7 +42,7 @@ function upgradeTileset(options) {
 
     inputDirectory = path.normalize(inputDirectory);
     outputDirectory = path.normalize(defaultValue(outputDirectory,
-        path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-upgrades')));
+        path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-upgraded')));
 
     var writeCallback = defaultValue(options.writeCallback, getDefaultWriteCallback(outputDirectory));
     var logCallback = options.logCallback;
@@ -81,6 +81,7 @@ function upgradeTilesetJson(file) {
             contents = contents.replace(/"version": ".*"/g, '"version": "1.0"');
             contents = contents.replace(/"add"/g, '"ADD"');
             contents = contents.replace(/"replace"/g, '"REPLACE"');
+            contents = contents.replace(/""\/"/g, '"'); // Remove leading slashes from url
             return Buffer.from(contents);
         });
 }
@@ -100,6 +101,12 @@ function upgradeTileContent(buffer, basePath) {
     var magic = getMagic(buffer);
     if (magic === 'b3dm') {
         var b3dm = extractB3dm(buffer);
+        var featureTableJson = b3dm.featureTable.json;
+        var batchTableHierarchy = featureTableJson.HIERARHCY;
+        if (defined(batchTableHierarchy)) {
+            featureTableJson.extensions = defaultValue(featureTableJson.extensions, {});
+            featureTableJson.extensions['3DTILES_batch_table_hierarchy'] = batchTableHierarchy;
+        }
         return optimizeGlb(b3dm.glb, Object.assign({}, optimizeOptions, {basePath: basePath}))
             .then(function(glb) {
                 return glbToB3dm(glb, b3dm.featureTable.json, b3dm.featureTable.binary, b3dm.batchTable.json, b3dm.batchTable.binary);
