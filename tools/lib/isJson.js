@@ -31,5 +31,4 @@ function isJson(file) {
         });
             // If the file doesn't have an extension try reading it as json
             // Returns false if JSON.parse throws an error
-        });
 }
