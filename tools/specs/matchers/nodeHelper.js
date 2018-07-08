@@ -21,7 +21,7 @@ var env = jasmine.getEnv();
 customizeJasmine(env);
 
 var oldExpect = global.expect;
-global.expect = function (promise, done) {
+global.expect = function(promise, done) {
     //We can't use instanceof Promise here because promise
     //may not be a bluebird-defined Promise
     if (promise && promise.then && done) {

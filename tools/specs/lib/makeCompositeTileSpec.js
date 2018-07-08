@@ -1,7 +1,7 @@
 'use strict';
 var fsExtra = require('fs-extra');
 var getMagic = require('../../lib/getMagic');
-var makeCompositeTile = require('../../lib/makeCompositeTile');
+var makeCompositeTile = require('../../lib/createCmpt');
 
 var b3dmPath = './specs/data/batchedWithBatchTableBinary.b3dm';
 var i3dmPath = './specs/data/instancedWithBatchTableBinary.i3dm';

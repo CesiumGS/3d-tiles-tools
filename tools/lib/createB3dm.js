@@ -1,33 +1,42 @@
 'use strict';
 var Cesium = require('cesium');
 var getBufferPadded = require('./getBufferPadded');
+var getGlbPadded = require('./getGlbPadded');
 var getJsonBufferPadded = require('./getJsonBufferPadded');
 
-var defined = Cesium.defined;
-var DeveloperError = Cesium.DeveloperError;
+var Check = Cesium.Check;
 
-module.exports = glbToB3dm;
+module.exports = createB3dm;
 
 /**
- * Generates a new Buffer representing a b3dm asset.
+ * Create a Batched 3D Model (b3dm) tile from a binary glTF and per-feature metadata.
  *
- * @param {Buffer} glbBuffer A buffer containing a binary glTF asset.
- * @param {Object} [featureTableJson] The feature table JSON.
- * @param {Buffer} [featureTableBinary] The feature table binary.
- * @param {Object} [batchTableJson] The batch table JSON.
- * @param {Buffer} [batchTableBinary] The batch table binary.
+ * @param {Object} options An object with the following properties:
+ * @param {Buffer} options.glb A buffer containing a binary glTF asset.
+ * @param {Object} options.featureTableJson The feature table JSON.
+ * @param {Buffer} [options.featureTableBinary] The feature table binary.
+ * @param {Object} [options.batchTableJson] The batch table JSON.
+ * @param {Buffer} [options.batchTableBinary] The batch table binary.
+ *
  * @returns {Buffer} Buffer representing the b3dm asset.
  */
-function glbToB3dm(glbBuffer, featureTableJson, featureTableBinary, batchTableJson, batchTableBinary) {
-    if (!defined(glbBuffer)) {
-        throw new DeveloperError('glbBuffer is not defined.');
-    }
+function createB3dm(options) {
+    Check.typeOf.object('options', options);
+    Check.typeOf.object('options.glb', options.glb);
+    Check.typeOf.object('options.featureTableJson', options.featureTableJson);
+
+    var glb = options.glb;
+    var featureTableJson = options.featureTableJson;
+    var featureTableBinary = options.featureTableBinary;
+    var batchTableJson = options.batchTableJson;
+    var batchTableBinary = options.batchTableBinary;
 
     var headerByteLength = 28;
     var featureTableJsonBuffer = getJsonBufferPadded(featureTableJson, headerByteLength);
     var featureTableBinaryBuffer = getBufferPadded(featureTableBinary);
     var batchTableJsonBuffer = getJsonBufferPadded(batchTableJson);
     var batchTableBinaryBuffer = getBufferPadded(batchTableBinary);
+    var glbBuffer = getGlbPadded(glb);
 
     var byteLength = headerByteLength + featureTableJsonBuffer.length + featureTableBinaryBuffer.length + batchTableJsonBuffer.length + batchTableBinaryBuffer.length + glbBuffer.length;
     var header = Buffer.alloc(headerByteLength);

@@ -11,22 +11,25 @@ module.exports = readFile;
 /**
  * Reads the contents of a file.
  *
- * @param {String} filePath The file path to read from.
- * @param {String} [type=binary] Whether to read the file as 'binary', 'text', or 'json'.
+ * @param {String} file The file to read from.
+ * @param {String} [type='binary'] Whether to read the file as 'binary', 'text', or 'json'.
+ *
  * @returns {Promise} A promise that resolves with the file contents as either a Buffer, String, or JSON object.
+ *
+ * @private
  */
-function readFile(filePath, type) {
+function readFile(file, type) {
     type = defaultValue(type, 'binary');
-    return fsExtra.readFile(filePath)
-        .then(function (data) {
-            if (isGzipped(data)) {
-                data = zlib.gunzipSync(data);
+    return fsExtra.readFile(file)
+        .then(function(contents) {
+            if (isGzipped(contents)) {
+                contents = zlib.gunzipSync(contents);
             }
             if (type === 'text') {
-                return data.toString();
+                return contents.toString();
             } else if (type === 'json') {
-                return JSON.parse(data.toString());
+                return JSON.parse(contents.toString());
             }
-            return data;
+            return contents;
         });
 }

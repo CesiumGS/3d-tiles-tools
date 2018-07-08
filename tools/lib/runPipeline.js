@@ -4,10 +4,13 @@ var fsExtra = require('fs-extra');
 var path = require('path');
 var Promise = require('bluebird');
 var combineTileset = require('./combineTileset');
+var getDefaultLogger = require('./getDefaultLogger');
+var getDefaultWriter = require('./getDefaultWriter');
 var getWorkingDirectory = require('./getWorkingDirectory');
 var gzipTileset = require('./gzipTileset');
 var upgradeTileset = require('./upgradeTileset');
 
+var Check = Cesium.Check;
 var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
 var DeveloperError = Cesium.DeveloperError;
@@ -15,37 +18,32 @@ var DeveloperError = Cesium.DeveloperError;
 module.exports = runPipeline;
 
 /**
- * Run an input pipeline.
+ * Run a pipeline.
  *
  * @param {Object} pipeline A JSON object containing an input, output, and list of stages to run.
- * @param {String} pipeline.input Input tileset path.
- * @param {String} [pipeline.output] Output tileset path.
+ * @param {String} pipeline.input Input tileset directory.
+ * @param {String} [pipeline.output] Output tileset directory.
  * @param {Array<Object|String>} [pipeline.stages] The stages to run on the tileset.
  * @param {Object} [options] An object with the following properties:
- * @param {WriteCallback} [options.writeCallback] A callback function that writes files after they have been processed.
- * @param {LogCallback} [options.logCallback] A callback function that logs messages.
+ * @param {Writer} [options.writer] A callback function that writes files after they have been processed.
+ * @param {Logger} [options.logger] A callback function that logs messages. Defaults to console.log.
+ *
+ * @returns {Promise} A promise that resolves when the pipeline is finished.
  */
 function runPipeline(pipeline, options) {
     pipeline = defaultValue(pipeline, defaultValue.EMPTY_OBJECT);
-    var inputDirectory = pipeline.input;
-    var outputDirectory = pipeline.output;
-    var stages = pipeline.stages;
-    if (!defined(inputDirectory)) {
-        throw new DeveloperError('pipeline.input is required');
-    }
+    Check.typeOf.string('pipeline.input', pipeline.input);
 
-    inputDirectory = path.normalize(inputDirectory);
-    outputDirectory = path.normalize(defaultValue(outputDirectory,
-        path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-processed')));
+    var inputDirectory = pipeline.input;
+    var outputDirectory = defaultValue(pipeline.output, path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-upgraded'));
+    var stages = pipeline.stages;
 
     if (!defined(stages)) {
         return fsExtra.copy(inputDirectory, outputDirectory);
     }
 
-    options = defaultValue(options, defaultValue.EMPTY_OBJECT);
-
-    var writeCallback = options.writeCallback;
-    var logCallback = options.logCallback;
+    var writer = defaultValue(options.writer, getDefaultWriter(outputDirectory));
+    var logger = defaultValue(options.logger, getDefaultLogger());
 
     var workingDirectory1 = getWorkingDirectory();
     var workingDirectory2 = getWorkingDirectory();
@@ -74,12 +72,11 @@ function runPipeline(pipeline, options) {
 
         stageOptions.inputDirectory = stageInputDirectory;
         stageOptions.outputDirectory = stageOutputDirectory;
-        stageOptions.logCallback = logCallback;
+        stageOptions.logger = logger;
 
         if (i === stagesLength - 1) {
-            // TODO : Not sure if this is the right approach. Should the writeCallback also have control over the temp directories? How would that work?
             // Only allow the write callback to act on the last stage. The intermediary stages always write to temp directories.
-            stageOptions.writeCallback = writeCallback;
+            stageOptions.writer = writer;
         }
 
         var stageFunction = getStageFunction(stageName, stageOptions);
@@ -88,9 +85,9 @@ function runPipeline(pipeline, options) {
         }
 
         stageObjects.push({
-            options : stageOptions,
-            stageFunction : stageFunction,
-            name : stageName
+            options: stageOptions,
+            stageFunction: stageFunction,
+            name: stageName
         });
     }
 
@@ -98,9 +95,7 @@ function runPipeline(pipeline, options) {
     return Promise.each(stageObjects, function(stage) {
         return fsExtra.emptyDir(stage.options.outputDirectory)
             .then(function() {
-                if (defined(logCallback)) {
-                    logCallback('Running ' + stage.name);
-                }
+                logger('Running ' + stage.name);
                 return stage.stageFunction(stage.options);
             });
     }).finally(function() {
@@ -123,23 +118,22 @@ function getStageFunction(stageName, stageOptions) {
             return combineTileset;
         case 'upgrade':
             return upgradeTileset;
-        default:
-            return undefined;
     }
 }
 
 /**
  * A callback function that writes files after they have been processed.
- * @callback WriteCallback
+ * @callback Writer
  *
  * @param {String} file Relative path of the file.
- * @param {Buffer} buffer A buffer storing the processed file's data.
+ * @param {Buffer} contents The contents of the file.
+ *
  * @returns {Promise} A promise that resolves when the callback is complete.
  */
 
 /**
  * A callback function that logs messages.
- * @callback LogCallback
+ * @callback Logger
  *
- * @param {String} message A log message.
+ * @param {String} message The message to log.
  */

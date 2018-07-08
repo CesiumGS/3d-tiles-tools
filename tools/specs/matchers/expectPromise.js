@@ -16,7 +16,7 @@ module.exports = function expectPromise(promise, done) {
         },
         toResolveWith: function toResolveWith(expectedValue) {
             return promise
-                .then(function (result) {
+                .then(function(result) {
                     expect(result).toEqual(expectedValue);
                     done();
                 })
@@ -28,10 +28,10 @@ module.exports = function expectPromise(promise, done) {
             var typeName = defaultValue(ErrorType.displayName, ErrorType.name);
 
             promise
-                .then(function () {
+                .then(function() {
                     done.fail('expected promise to reject with ' + typeName);
                 })
-                .catch(function (error) {
+                .catch(function(error) {
                     if (!(error instanceof ErrorType)) {
                         done.fail(defaultValue(defaultValue(error.displayName, error.name), ErrorType) + ' to be instance of ' + typeName);
                         console.log(error);

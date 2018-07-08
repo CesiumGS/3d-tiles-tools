@@ -22,20 +22,20 @@ process.env.PATH += environmentSeparator + nodeBinaries;
 
 var specFiles = ['**/*.js', '!node_modules/**', '!coverage/**'];
 
-gulp.task('test', function (done) {
+gulp.task('test', function(done) {
     var jasmine = new Jasmine();
     jasmine.loadConfigFile('specs/jasmine.json');
     jasmine.addReporter(new jasmineSpecReporter.SpecReporter({
         displaySuccessfulSpec: !defined(argv.suppressPassed) || !argv.suppressPassed
     }));
     jasmine.execute();
-    jasmine.onComplete(function (passed) {
+    jasmine.onComplete(function(passed) {
         done(argv.failTaskOnError && !passed ? 1 : 0);
     });
 });
 
-gulp.task('test-watch', function () {
-    gulp.watch(specFiles).on('change', function () {
+gulp.task('test-watch', function() {
+    gulp.watch(specFiles).on('change', function() {
         // We can't simply depend on the test task because Jasmine
         // does not like being run multiple times in the same process.
         try {
@@ -48,7 +48,7 @@ gulp.task('test-watch', function () {
     });
 });
 
-gulp.task('coverage', function () {
+gulp.task('coverage', function() {
     fsExtra.removeSync('coverage/server');
     child_process.execSync('nyc' +
         ' --all' +

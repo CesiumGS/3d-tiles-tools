@@ -5,18 +5,24 @@ var Promise = require('bluebird');
 module.exports = getFilesInDirectory;
 
 /**
+ * Returns the files in a directory, recursively.
+ *
+ * @param {String} directory The directory.
+ *
+ * @returns {Promise} A promise that resolves to an array of files.
+ *
  * @private
  */
 function getFilesInDirectory(directory) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
         var files = [];
         klaw(directory)
-            .on('data', function (item) {
+            .on('data', function(item) {
                 if (!item.stats.isDirectory()) {
                     files.push(item.path);
                 }
             })
-            .on('end', function () {
+            .on('end', function() {
                 resolve(files);
             })
             .on('error', reject);

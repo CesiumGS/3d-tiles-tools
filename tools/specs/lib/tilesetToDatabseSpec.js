@@ -4,7 +4,6 @@ var fsExtra = require('fs-extra');
 var Promise = require('bluebird');
 var sqlite3 = require('sqlite3');
 var zlib = require('zlib');
-var fileExists = require('../../lib/fileExists');
 var isGzipped = require('../../lib/isGzipped');
 var tilesetToDatabase = require('../../lib/tilesetToDatabase');
 
@@ -16,7 +15,7 @@ var tilesetJsonFile = './specs/data/TilesetOfTilesets/tileset.json';
 var outputFile = './specs/data/TilesetOfTilesets.3dtiles';
 
 describe('tilesetToDatabase', function() {
-    afterEach(function (done) {
+    afterEach(function(done) {
         fsExtra.remove(outputFile)
             .then(done)
             .catch(done.fail);
@@ -26,12 +25,12 @@ describe('tilesetToDatabase', function() {
         expect(tilesetToDatabase(inputDirectory, outputFile)
             .then(function() {
                 var db;
-                return Promise.resolve(fileExists(outputFile))
+                return fsExtra.pathExists(outputFile)
                     .then(function(exists) {
                         expect(exists).toEqual(true);
                     }).then(function() {
                         db = new sqlite3.Database(outputFile);
-                        var dbAll = Promise.promisify(db.all, {context : db});
+                        var dbAll = Promise.promisify(db.all, {context: db});
                         return dbAll("SELECT * FROM media WHERE key='tileset.json'");
                     }).then(function(rows) {
                         expect(rows.length).toEqual(1);
@@ -63,7 +62,7 @@ describe('tilesetToDatabase', function() {
     it('works when no output file is provided', function(done) {
         expect(tilesetToDatabase(inputDirectory)
             .then(function() {
-                return fileExists(outputFile)
+                return fsExtra.pathExists(outputFile)
                     .then(function(exists) {
                         expect(exists).toBe(true);
                     });

@@ -2,6 +2,12 @@
 module.exports = isGzipped;
 
 /**
+ * Determines whether the buffer is gzipped.
+ *
+ * @param {Buffer} buffer The buffer.
+ *
+ * @returns {Boolean} Whether the buffer is gzipped.
+ *
  * @private
  */
 function isGzipped(buffer) {

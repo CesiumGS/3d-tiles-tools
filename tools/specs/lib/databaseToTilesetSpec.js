@@ -1,7 +1,6 @@
 'use strict';
 var fsExtra = require('fs-extra');
 var databaseToTileset = require('../../lib/databaseToTileset');
-var fileExists = require('../../lib/fileExists');
 var isGzipped = require('../../lib/isGzipped');
 
 var inputFile = './specs/data/tileset.3dtiles';
@@ -9,7 +8,7 @@ var outputDirectory = './specs/data/Tileset/';
 var tilesetJsonFile = './specs/data/TilesetOfTilesets/tileset.json';
 
 describe('databaseToTileset', function() {
-    afterEach(function (done) {
+    afterEach(function(done) {
         fsExtra.remove(outputDirectory)
             .then(function() {
                 done();
@@ -19,7 +18,7 @@ describe('databaseToTileset', function() {
     it('creates a tileset from an sqlite database', function(done) {
         expect(databaseToTileset(inputFile, outputDirectory)
             .then(function() {
-                return fileExists(tilesetJsonFile)
+                return fsExtra.pathExists(tilesetJsonFile)
                     .then(function(exists) {
                         expect(exists).toEqual(true);
                         return fsExtra.readJson(tilesetJsonFile);
@@ -38,7 +37,7 @@ describe('databaseToTileset', function() {
     it('works when no output directory is provided', function(done) {
         expect(databaseToTileset(inputFile)
             .then(function() {
-                return fileExists(tilesetJsonFile)
+                return fsExtra.pathExists(tilesetJsonFile)
                     .then(function(exists) {
                         expect(exists).toBe(true);
                     });

@@ -3,12 +3,12 @@
 define([
     './addDefaultMatchers',
     './equalsMethodEqualityTester'
-], function (addDefaultMatchers,
+], function(addDefaultMatchers,
              equalsMethodEqualityTester) {
     'use strict';
 
-    return function (env) {
-        env.beforeEach(function () {
+    return function(env) {
+        env.beforeEach(function() {
             addDefaultMatchers(true).call(env);
             env.addCustomEqualityTester(equalsMethodEqualityTester);
         });

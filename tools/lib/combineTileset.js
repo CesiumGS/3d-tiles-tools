@@ -1,15 +1,15 @@
 'use strict';
 var Cesium = require('cesium');
-var fsExtra = require('fs-extra');
 var path = require('path');
 var Promise = require('bluebird');
-var zlib = require('zlib');
-var getDefaultWriteCallback = require('./getDefaultWriteCallback');
-var getJsonBufferPadded =require('./getJsonBufferPadded');
-var isGzippedFile = require('./isGzippedFile');
+var getContentUri = require('./getContentUri');
+var getDefaultLogger = require('./getDefaultLogger');
+var getDefaultWriter = require('./getDefaultWriter');
+var getJsonBufferPadded = require('./getJsonBufferPadded');
+var getFilesCategorized = require('./getFilesCategorized');
+var getFilesInDirectory = require('./getFilesInDirectory');
 var isJson = require('./isJson');
 var readFile = require('./readFile');
-var walkDirectory = require('./walkDirectory');
 
 var Check = Cesium.Check;
 var defaultValue = Cesium.defaultValue;
@@ -20,56 +20,49 @@ module.exports = combineTileset;
 /**
  * Combines all external tilesets into a single tileset.json file.
  *
- * @param {Object} options Object with the following properties:
+ * @param {Object} options An object with the following properties:
  * @param {String} options.inputDirectory Path to the input directory.
  * @param {Object} [options.outputDirectory] Path to the output directory.
- * @param {String} [options.rootJson='tileset.json'] Relative path to the root json.
- * @param {WriteCallback} [options.writeCallback] A callback function that writes files after they have been processed.
- * @param {LogCallback} [options.logCallback] A callback function that logs messages.
+ * @param {Boolean} [options.tilesetJsonOnly=false] Only save the combined tileset.json file.
+ * @param {Writer} [options.writer] A callback function that writes files after they have been processed.
+ * @param {Logger} [options.logger] A callback function that logs messages. Defaults to console.log.
  *
  * @returns {Promise} A promise that resolves with the operation completes.
  */
 function combineTileset(options) {
     options = defaultValue(options, defaultValue.EMPTY_OBJECT);
+    Check.typeOf.string('options.inputDirectory', options.inputDirectory);
+
     var inputDirectory = options.inputDirectory;
-    var outputDirectory = options.outputDirectory;
-    var rootJsonFile = defaultValue(options.rootJson, 'tileset.json');
+    var outputDirectory = defaultValue(options.outputDirectory, path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-combined'));
+    var tilesetJsonOnly = defaultValue(options.tilesetJsonOnly, true);
+    var writer = defaultValue(options.writer, getDefaultWriter(outputDirectory));
+    var logger = defaultValue(options.logger, getDefaultLogger());
 
-    Check.typeOf.string('options.inputDirectory', inputDirectory);
+    return getFilesCategorized(inputDirectory)
+        .then(function(files) {
+            var rootTileset = files.tileset.root;
+            var externalTilesets = files.tileset.external;
+            logger('Combining ' + externalTilesets.length + ' external tilesets.');
 
-    inputDirectory = path.normalize(inputDirectory);
-    outputDirectory = path.normalize(defaultValue(outputDirectory,
-        path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-combined')));
-    rootJsonFile = path.join(inputDirectory, rootJsonFile);
-
-    var writeCallback = defaultValue(options.writeCallback, getDefaultWriteCallback(outputDirectory));
-    var logCallback = options.logCallback;
-
-    var tilesets = [rootJsonFile];
-    return combine(rootJsonFile, inputDirectory, undefined, tilesets)
-        .then(function (json) {
-            if (defined(logCallback)) {
-                logCallback('Combined ' + (tilesets.length - 1) + ' external tilesets.');
-            }
-            // If the root json is originally gzipped, save the output json as gzipped
-            var writeRootJsonPromise = isGzippedFile(rootJsonFile)
-                .then(function (gzipped) {
-                    var data = getJsonBufferPadded(json, gzipped);
-                    if (gzipped) {
-                        data = zlib.gzipSync(data);
+            return combine(inputDirectory, rootTileset, undefined)
+                .then(function(json) {
+                    var relativePath = path.relative(inputDirectory, rootTileset);
+                    var writePromise = writer(relativePath, getJsonBufferPadded(json));
+                    var promises = [writePromise];
+                    if (!tilesetJsonOnly) {
+                        var filesNotToCopy = externalTilesets.concat(rootTileset);
+                        promises.push(copyFiles(inputDirectory, filesNotToCopy, writer));
                     }
-                    var relativePath = path.relative(inputDirectory, rootJsonFile);
-                    return writeCallback(relativePath, data);
+                    return Promise.all(promises);
                 });
-            var copyFilesPromise = copyFiles(inputDirectory, tilesets, writeCallback);
-            return Promise.all([writeRootJsonPromise, copyFilesPromise]);
         });
 }
 
-function combine(jsonFile, inputDirectory, parentTile, tilesets) {
-    return readFile(jsonFile, 'json')
-        .then(function (json) {
-            var tilesetDirectory = path.dirname(jsonFile);
+function combine(inputDirectory, tileset, parentTile) {
+    return readFile(tileset, 'json')
+        .then(function(json) {
+            var tilesetDirectory = path.dirname(tileset);
             var promises = [];
             var root = json.root;
 
@@ -84,18 +77,16 @@ function combine(jsonFile, inputDirectory, parentTile, tilesets) {
                 stack.push(root);
                 while (stack.length > 0) {
                     var tile = stack.pop();
-                    // Look for external tilesets
-                    if (defined(tile.content)) {
-                        var url = tile.content.url;
-                        if (isJson(url)) {
+                    var contentUri = getContentUri(tile);
+                    if (defined(contentUri)) {
+                        if (isJson(contentUri)) {
                             // Load the external tileset
-                            url = path.join(tilesetDirectory, url);
-                            tilesets.push(url);
-                            var promise = combine(url, inputDirectory, tile, tilesets);
+                            var externalTileset = path.join(tilesetDirectory, contentUri);
+                            var promise = combine(inputDirectory, externalTileset, tile);
                             promises.push(promise);
                         } else {
-                            var contentUrl = path.join(tilesetDirectory, url);
-                            tile.content.url = getRelativePath(inputDirectory, contentUrl);
+                            contentUri = path.join(tilesetDirectory, contentUri);
+                            tile.content.uri = getRelativePath(inputDirectory, contentUri);
                         }
                     }
                     // Push children to the stack
@@ -110,7 +101,7 @@ function combine(jsonFile, inputDirectory, parentTile, tilesets) {
             }
             // Waits for all the external tilesets to finish loading before the promise resolves
             return Promise.all(promises)
-                .then(function () {
+                .then(function() {
                     return json;
                 });
         });
@@ -121,23 +112,21 @@ function getRelativePath(inputDirectory, file) {
     return relative.replace(/\\/g, '/'); // Use forward slashes in the JSON
 }
 
-function isTileset(inputDirectory, file, tilesets) {
-    var relativePath = getRelativePath(inputDirectory, file);
-    return tilesets.indexOf(relativePath) >= 0;
-}
-
-function copyFiles(inputDirectory, tilesets, writeCallback) {
-    tilesets = tilesets.map(function(tileset) {
-        return getRelativePath(inputDirectory, tileset);
-    });
-    // Copy all files except tilesets
-    return walkDirectory(inputDirectory, function(file) {
-        if (!isTileset(inputDirectory, file, tilesets)) {
-            return fsExtra.readFile(file)
-                .then(function (data) {
-                    var relativePath = getRelativePath(inputDirectory, file);
-                    return writeCallback(relativePath, data);
-                });
-        }
-    });
+function copyFiles(inputDirectory, filesNotToCopy, writer) {
+    return getFilesInDirectory(inputDirectory)
+        .then(function(files) {
+            files = files.filter(function(file) {
+                return filesNotToCopy.indexOf(file) === -1;
+            });
+            return files;
+        })
+        .then(function(files) {
+            return Promise.map(files, function(file) {
+                return readFile(file)
+                    .then(function(contents) {
+                        var relativePath = path.relative(inputDirectory, file);
+                        return writer(relativePath, contents);
+                    });
+            }, {concurrency: 100});
+        });
 }

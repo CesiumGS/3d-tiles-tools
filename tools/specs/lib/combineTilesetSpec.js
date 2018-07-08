@@ -29,7 +29,7 @@ function getContentUrls(string) {
 
 function getNumberOfTilesets(directory) {
     return getFilesInDirectory(directory)
-        .then(function (files) {
+        .then(function(files) {
             var length = files.length;
             var numberOfJsonFiles = 0;
             for (var i = 0; i < length; ++i) {
@@ -51,10 +51,10 @@ describe('combineTileset', function() {
         });
     });
 
-    it('combines external tilesets into a single tileset', function (done) {
+    it('combines external tilesets into a single tileset', function(done) {
         var combineOptions = {
-            inputDirectory : tilesetDirectory,
-            outputDirectory : combinedDirectory
+            inputDirectory: tilesetDirectory,
+            outputDirectory: combinedDirectory
         };
         expect(combineTileset(combineOptions)
             .then(function() {
@@ -70,9 +70,9 @@ describe('combineTileset', function() {
             }), done).toResolve();
     });
 
-    it('works when no output directory is supplied', function (done) {
+    it('works when no output directory is supplied', function(done) {
         var combineOptions = {
-            inputDirectory : tilesetDirectory
+            inputDirectory: tilesetDirectory
         };
         expect(combineTileset(combineOptions)
             .then(function() {
@@ -81,15 +81,15 @@ describe('combineTileset', function() {
             }), done).toResolve();
     });
 
-    it('gzips if the original tileset.json is gzipped', function (done) {
+    it('gzips if the original tileset.json is gzipped', function(done) {
         var gzipOptions = {
-            inputDirectory : tilesetDirectory,
-            outputDirectory : gzippedDirectory,
-            gzip : true
+            inputDirectory: tilesetDirectory,
+            outputDirectory: gzippedDirectory,
+            gzip: true
         };
         var combineOptions = {
-            inputDirectory : gzippedDirectory,
-            outputDirectory : combinedDirectory
+            inputDirectory: gzippedDirectory,
+            outputDirectory: combinedDirectory
         };
         expect(gzipTileset(gzipOptions)
             .then(function() {
@@ -103,11 +103,11 @@ describe('combineTileset', function() {
             }), done).toResolve();
     });
 
-    it('uses a different rootJson', function (done) {
+    it('uses a different rootJson', function(done) {
         var combineOptions = {
-            inputDirectory : tilesetDirectory,
-            outputDirectory : combinedDirectory,
-            rootJson : 'tileset2.json'
+            inputDirectory: tilesetDirectory,
+            outputDirectory: combinedDirectory,
+            rootJson: 'tileset2.json'
         };
         expect(combineTileset(combineOptions)
             .then(function() {
@@ -119,27 +119,27 @@ describe('combineTileset', function() {
             }), done).toResolve();
     });
 
-    it('throws when no input tileset is given ', function () {
+    it('throws when no input tileset is given ', function() {
         expect(function() {
             combineTileset();
         }).toThrowDeveloperError();
     });
 
-    it('throws when input tileset does not exist', function (done) {
+    it('throws when input tileset does not exist', function(done) {
         var combineOptions = {
-            inputDirectory : 'non-existent-tileset',
-            outputDirectory : combinedDirectory
+            inputDirectory: 'non-existent-tileset',
+            outputDirectory: combinedDirectory
         };
         expect(combineTileset(combineOptions), done).toRejectWith(Error);
     });
 
-    it('accepts custom writeCallback that does not return a promise', function (done) {
-        var writeCallback = function(file, data) {
+    it('accepts custom writer that does not return a promise', function(done) {
+        var writer = function(file, data) {
             console.log('Save file ' + file + ' with data ' + data);
         };
         var combineOptions = {
-            inputDirectory : tilesetDirectory,
-            writeCallback : writeCallback
+            inputDirectory: tilesetDirectory,
+            writer: writer
         };
 
         var spy = spyOn(console, 'log').and.callFake(function(){});
@@ -149,15 +149,15 @@ describe('combineTileset', function() {
             }), done).toResolve();
     });
 
-    it('accepts custom writeCallback that returns a promise', function (done) {
+    it('accepts custom writer that returns a promise', function(done) {
         var outputDirectory = combinedDirectory;
-        var writeCallback = function(file, data) {
+        var writer = function(file, data) {
             var outputFile = path.join(outputDirectory, file);
             return fsExtra.outputFile(outputFile, data);
         };
         var combineOptions = {
-            inputDirectory : tilesetDirectory,
-            writeCallback : writeCallback
+            inputDirectory: tilesetDirectory,
+            writer: writer
         };
         expect(combineTileset(combineOptions)
             .then(function() {
@@ -166,15 +166,15 @@ describe('combineTileset', function() {
             }), done).toResolve();
     });
 
-    it('logs debug messages', function (done) {
-        var logCallback = function(message) {
+    it('logs debug messages', function(done) {
+        var logger = function(message) {
             console.log(message);
         };
 
         var combineOptions = {
-            inputDirectory : tilesetDirectory,
-            outputDirectory : combinedDirectory,
-            logCallback : logCallback
+            inputDirectory: tilesetDirectory,
+            outputDirectory: combinedDirectory,
+            logger: logger
         };
 
         var spy = spyOn(console, 'log').and.callFake(function(){});

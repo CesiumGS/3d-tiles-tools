@@ -14,17 +14,17 @@ describe('runPipeline', function() {
             .then(done);
     });
 
-    it('throws if input is undefined', function () {
+    it('throws if input is undefined', function() {
         expect(function() {
             runPipeline();
         }).toThrowDeveloperError();
     });
 
-    it('runs one stage', function (done) {
+    it('runs one stage', function(done) {
         var pipeline = {
-            input : inputDirectory,
-            output : outputDirectory,
-            stages : ['gzip']
+            input: inputDirectory,
+            output: outputDirectory,
+            stages: ['gzip']
         };
         expect(runPipeline(pipeline)
             .then(function() {
@@ -35,11 +35,11 @@ describe('runPipeline', function() {
             }), done).toResolve();
     });
 
-    it('runs two stages', function (done) {
+    it('runs two stages', function(done) {
         var pipeline = {
-            input : inputDirectory,
-            output : outputDirectory,
-            stages : ['combine', 'gzip']
+            input: inputDirectory,
+            output: outputDirectory,
+            stages: ['combine', 'gzip']
         };
         expect(runPipeline(pipeline)
             .then(function() {
@@ -50,11 +50,11 @@ describe('runPipeline', function() {
             }), done).toResolve();
     });
 
-    it('runs three stages', function (done) {
+    it('runs three stages', function(done) {
         var pipeline = {
-            input : inputDirectory,
-            output : outputDirectory,
-            stages : ['combine', 'gzip', 'ungzip']
+            input: inputDirectory,
+            output: outputDirectory,
+            stages: ['combine', 'gzip', 'ungzip']
         };
         expect(runPipeline(pipeline)
             .then(function() {
@@ -65,11 +65,11 @@ describe('runPipeline', function() {
             }), done).toResolve();
     });
 
-    it('runs four stages', function (done) {
+    it('runs four stages', function(done) {
         var pipeline = {
-            input : inputDirectory,
-            output : outputDirectory,
-            stages : ['combine', 'gzip', 'ungzip', 'gzip']
+            input: inputDirectory,
+            output: outputDirectory,
+            stages: ['combine', 'gzip', 'ungzip', 'gzip']
         };
         expect(runPipeline(pipeline)
             .then(function() {
@@ -80,13 +80,13 @@ describe('runPipeline', function() {
             }), done).toResolve();
     });
 
-    it('runs stage with options', function (done) {
+    it('runs stage with options', function(done) {
         var pipeline = {
-            input : inputDirectory,
-            output : outputDirectory,
-            stages : [{
-                name : 'gzip',
-                tilesOnly : true
+            input: inputDirectory,
+            output: outputDirectory,
+            stages: [{
+                name: 'gzip',
+                tilesOnly: true
             }]
         };
         expect(runPipeline(pipeline)
@@ -98,16 +98,16 @@ describe('runPipeline', function() {
             }), done).toResolve();
     });
 
-    it('runs a mix of stage names and stage objects', function (done) {
+    it('runs a mix of stage names and stage objects', function(done) {
         var pipeline = {
-            input : inputDirectory,
-            output : outputDirectory,
-            stages : [
+            input: inputDirectory,
+            output: outputDirectory,
+            stages: [
                 'gzip',
                 'ungzip',
                 {
-                    name : 'gzip',
-                    tilesOnly : true
+                    name: 'gzip',
+                    tilesOnly: true
                 }
             ]
         };
@@ -120,32 +120,32 @@ describe('runPipeline', function() {
             }), done).toResolve();
     });
 
-    it('throws if stage does not have a name', function () {
+    it('throws if stage does not have a name', function() {
         var pipeline = {
-            input : inputDirectory,
-            output : outputDirectory,
-            stages : [{}]
+            input: inputDirectory,
+            output: outputDirectory,
+            stages: [{}]
         };
         expect(function() {
             runPipeline(pipeline);
         }).toThrowDeveloperError();
     });
 
-    it('throws if stage does not exist', function () {
+    it('throws if stage does not exist', function() {
         var pipeline = {
-            input : inputDirectory,
-            output : outputDirectory,
-            stages : ['invalid-stage-name']
+            input: inputDirectory,
+            output: outputDirectory,
+            stages: ['invalid-stage-name']
         };
         expect(function() {
             runPipeline(pipeline);
         }).toThrowDeveloperError();
     });
 
-    it('works when no output is supplied', function (done) {
+    it('works when no output is supplied', function(done) {
         var pipeline = {
-            input : inputDirectory,
-            stages : ['gzip']
+            input: inputDirectory,
+            stages: ['gzip']
         };
         expect(runPipeline(pipeline)
             .then(function() {
@@ -156,10 +156,10 @@ describe('runPipeline', function() {
             }), done).toResolve();
     });
 
-    it('works when no stages are supplied', function (done) {
+    it('works when no stages are supplied', function(done) {
         var pipeline = {
-            input : inputDirectory,
-            output : outputDirectory
+            input: inputDirectory,
+            output: outputDirectory
         };
         // Doesn't do any processing, just copies files to the output directory
         expect(runPipeline(pipeline)
@@ -171,19 +171,19 @@ describe('runPipeline', function() {
             }), done).toResolve();
     });
 
-    it('accepts custom writeCallback', function (done) {
-        var writeCallback = function(file, data) {
+    it('accepts custom writer', function(done) {
+        var writer = function(file, data) {
             var outputFile = path.join(outputDirectory, file);
             return fsExtra.outputFile(outputFile, data);
         };
 
         var pipeline = {
-            input : inputDirectory,
-            stages : ['gzip']
+            input: inputDirectory,
+            stages: ['gzip']
         };
 
         var options = {
-            writeCallback : writeCallback
+            writer: writer
         };
 
         expect(runPipeline(pipeline, options)
@@ -195,19 +195,19 @@ describe('runPipeline', function() {
             }), done).toResolve();
     });
 
-    it('logs debug messages', function (done) {
-        var logCallback = function(message) {
+    it('logs debug messages', function(done) {
+        var logger = function(message) {
             console.log(message);
         };
 
         var pipeline = {
-            input : inputDirectory,
-            output : outputDirectory,
-            stages : ['gzip']
+            input: inputDirectory,
+            output: outputDirectory,
+            stages: ['gzip']
         };
 
         var options = {
-            logCallback : logCallback
+            logger: logger
         };
 
         var spy = spyOn(console, 'log').and.callFake(function(){});
