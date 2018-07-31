@@ -166,7 +166,7 @@ function changeUpAxis(gltf, gltfUpAxis) {
     var rootNodes = [];
 
     for (i = 0; i < nodesLength; ++i) {
-        if (!isChild(i)) {
+        if (!isChild[i]) {
             rootNodes.push(i);
         }
     }
@@ -284,7 +284,10 @@ function upgradeGltf(file, contents, options) {
         resourceDirectory: path.dirname(file),
         logger: options.logger
     };
-    return processGltf(contents, gltfOptions).gltf;
+    return processGltf(contents, gltfOptions)
+        .then(function(results) {
+            return results.gltf;
+        });
 }
 
 function upgradeGlb(file, contents, options) {
@@ -292,7 +295,10 @@ function upgradeGlb(file, contents, options) {
         resourceDirectory: path.dirname(file),
         logger: options.logger
     };
-    return processGlb(contents, gltfOptions).glb;
+    return processGlb(contents, gltfOptions)
+        .then(function(results) {
+            return results.glb;
+        })
 }
 
 function upgradeOther(file, contents, options) { // eslint-disable-line no-unused-vars
