@@ -207,25 +207,34 @@ function transferBatchTableHierarchy(tile, options) {
     }
 }
 
+function getTransferRtcCenterFunction(b3dm) {
+    return function(gltf) {
+        transferRtcCenter(b3dm, gltf);
+        return gltf;
+    }
+}
+
+function getChangeUpAxisFunction(gltfUpAxis) {
+    return function(gltf) {
+        changeUpAxis(gltf, gltfUpAxis);
+        return gltf;
+    }
+}
+
 function upgradeB3dm(file, contents, options) {
     var b3dm = extractB3dm(contents);
     transferBatchTableHierarchy(b3dm, options);
     var gltfOptions = {
         resourceDirectory: path.dirname(file),
-        logger: options.logger
+        logger: options.logger,
+        customStages: [
+            getTransferRtcCenterFunction(b3dm),
+            getChangeUpAxisFunction(options.gltfUpAxis)
+        ]
     };
-    return glbToGltf(b3dm.glb, gltfOptions)
+    return processGlb(b3dm.glb, gltfOptions)
         .then(function(results) {
-            var gltf = results.gltf;
-            transferRtcCenter(b3dm, gltf);
-            changeUpAxis(gltf, options.gltfUpAxis);
-            return gltfToGlb(gltf);
-        })
-        .then(function(results) {
-            return results.glb;
-        })
-        .then(function(glb) {
-            b3dm.glb = glb;
+            b3dm.glb = results.glb;
             return createB3dm(b3dm);
         });
 }
@@ -293,7 +302,10 @@ function upgradeGltf(file, contents, options) {
 function upgradeGlb(file, contents, options) {
     var gltfOptions = {
         resourceDirectory: path.dirname(file),
-        logger: options.logger
+        logger: options.logger,
+        customStages: [
+            getChangeUpAxisFunction(options.gltfUpAxis)
+        ]
     };
     return processGlb(contents, gltfOptions)
         .then(function(results) {
