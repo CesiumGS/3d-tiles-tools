@@ -125,6 +125,7 @@ function upgradeTilesetJson(file, json, options) { // eslint-disable-line no-unu
 
 function upgradeI3dm(file, contents, options) {
     var i3dm = extractI3dm(contents);
+    transferBatchTableHierarchy(i3dm, options);
     if (defined(i3dm.gltfUri)) {
         return Promise.resolve(createI3dm(i3dm));
     }
@@ -195,8 +196,8 @@ function changeUpAxis(gltf, gltfUpAxis) {
     }
 }
 
-function transferBatchTableHierarchy(b3dm, options) {
-    var batchTableJson = b3dm.batchTableJson;
+function transferBatchTableHierarchy(tile, options) {
+    var batchTableJson = tile.batchTableJson;
     var batchTableHierarchy = batchTableJson.HIERARCHY;
     if (defined(batchTableHierarchy)) {
         batchTableJson.extensions = defaultValue(batchTableJson.extensions, {});
@@ -230,8 +231,9 @@ function upgradeB3dm(file, contents, options) {
 }
 
 function upgradePnts(file, contents, options) { // eslint-disable-line no-unused-vars
-    // Pass through and correct padding
-    return Promise.resolve(createPnts(extractPnts(contents)));
+    var pnts = extractPnts(contents);
+    transferBatchTableHierarchy(pnts, options);
+    return Promise.resolve(createPnts(pnts));
 }
 
 function upgradeVctr(file, contents, options) { // eslint-disable-line no-unused-vars
