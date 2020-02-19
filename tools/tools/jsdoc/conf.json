@@ -12,7 +12,7 @@
         "default": {
             "outputSourceFiles": false
         },
-        "sourceUrl": "https://github.com/AnalyticalGraphicsInc/3d-tiles-tools/blob/{version}/lib/{filename}"
+        "sourceUrl": "https://github.com/CesiumGS/3d-tiles-validator/blob/{version}/lib/{filename}"
     },
     "opts": {
         "destination": "doc",

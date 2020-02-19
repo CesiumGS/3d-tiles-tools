@@ -4,18 +4,18 @@
   "license": "Apache-2.0",
   "description": "Tools for debugging, analyzing, and validating 3D Tiles tilesets.",
   "author": {
-    "name": "Analytical Graphics, Inc. and Contributors"
+    "name": "Cesium GS, Inc. and Contributors"
   },
   "keywords": [
     "3D Tiles"
   ],
-  "homepage": "https://github.com/AnalyticalGraphicsInc/3d-tiles-tools",
+  "homepage": "https://github.com/CesiumGS/3d-tiles-validator",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AnalyticalGraphicsInc/3d-tiles-tools.git"
+    "url": "https://github.com/CesiumGS/3d-tiles-validator.git"
   },
   "bugs": {
-    "url": "https://github.com/AnalyticalGraphicsInc/3d-tiles-tools/issues"
+    "url": "https://github.com/CesiumGS/3d-tiles-validator/issues"
   },
   "main": "index.js",
   "engines": {

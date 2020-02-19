@@ -1,4 +1,4 @@
-//This file is a copy of https://github.com/AnalyticalGraphicsInc/cesium/blob/master/Specs/addDefaultMatchers.js
+//This file is a copy of https://github.com/CesiumGS/cesium/blob/master/Specs/addDefaultMatchers.js
 /*eslint strict: ["error", "function"]*/
 /*eslint-env amd*/
 /*eslint-disable no-unused-vars*/
