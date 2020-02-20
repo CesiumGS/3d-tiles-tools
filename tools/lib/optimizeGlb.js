@@ -24,9 +24,7 @@ module.exports = optimizeGlb;
  * @private
  */
 function optimizeGlb(glbBuffer, options) {
-    if (!defined(options)) {
-        options = GltfPipeline.parseArguments(['-i', 'null']);
-    }
+    options = defaultValue(options, defaultValue.EMPTY_OBJECT);
     if (!defined(glbBuffer)) {
         throw new DeveloperError('glbBuffer is not defined.');
     }
@@ -40,7 +38,8 @@ function optimizeGlb(glbBuffer, options) {
             rtcPosition = Cartesian3.unpack(cesiumRTC.center);
         }
     }
-    return loadGltfUris(gltf)
+    fixBatchIdSemantic(gltf);
+    return loadGltfUris(gltf, options)
         .then(function() {
             return Pipeline.processJSONWithExtras(gltf, options)
                 .then(function(gltf) {
@@ -54,4 +53,36 @@ function optimizeGlb(glbBuffer, options) {
                     return getBinaryGltf(gltf, embed, embedImage).glb;
                 });
         });
+}
+
+function fixBatchIdSemantic(gltf) {
+    var meshes = gltf.meshes;
+    for (var meshId in meshes) {
+        if (meshes.hasOwnProperty(meshId)) {
+            var primitives = meshes[meshId].primitives;
+            var primitivesLength = primitives.length;
+            for (var i = 0; i < primitivesLength; ++i) {
+                var attributes = primitives[i].attributes;
+                if (defined(attributes.BATCHID)) {
+                    attributes._BATCHID = attributes.BATCHID;
+                    delete attributes.BATCHID;
+                }
+            }
+        }
+    }
+
+    var techniques = gltf.techniques;
+    for (var techniqueId in techniques) {
+        if (techniques.hasOwnProperty(techniqueId)) {
+            var parameters = techniques[techniqueId].parameters;
+            for (var parameterId in parameters) {
+                if (parameters.hasOwnProperty(parameterId)) {
+                    var parameter = parameters[parameterId];
+                    if (parameter.semantic === 'BATCHID') {
+                        parameter.semantic = '_BATCHID';
+                    }
+                }
+            }
+        }
+    }
 }

@@ -22,7 +22,7 @@ describe('optimizeGlb', function() {
             }), done).toResolve();
     });
 
-    it('compresses textures in a glb using the gltf-pipeline', function(done) {
+    xit('compresses textures in a glb using the gltf-pipeline', function(done) {
         var compressionOptions = {
             textureCompressionOptions : {
                 format: 'dxt1',
