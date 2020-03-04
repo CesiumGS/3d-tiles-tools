@@ -16,7 +16,7 @@ var argv = yargs.argv;
 
 // Add third-party node module binaries to the system path
 // since some tasks need to call them directly.
-var environmentSeparator = process.platform === 'win32' ? ';' : ':';
+var environmentSeparator = (process.platform === 'win32') ? ';' : ':';
 var nodeBinaries = path.join(__dirname, 'node_modules', '.bin');
 process.env.PATH += environmentSeparator + nodeBinaries;
 
