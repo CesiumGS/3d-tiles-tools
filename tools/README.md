@@ -1,5 +1,7 @@
 # 3D Tiles Tools
 
+ ❗️ **3D Tiles Tools is not actively maintained. For converting source data to 3D Tiles check out [Cesium ion](https://cesium.com/ion).**  ❗️
+
 Node.js library and command-line tools for processing and converting 3D Tiles tilesets.
 
 ## Instructions
