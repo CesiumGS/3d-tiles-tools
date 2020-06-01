@@ -84,9 +84,13 @@ function getChildren(tilesets, tilesetPaths) {
 
         children[i] = tilesets[i].root;
         children[i].content = {
-            url : tilesetUrl
+            uri : tilesetUrl
         };
+        children[i].boundingVolume = {
+            sphere : getBoundingSphere(tilesets[i])
+        }
         delete children[i].children;
+        delete children[i].transform;
     }
     return children;
 }
@@ -100,20 +104,28 @@ function getMergedGeometricError(tilesets) {
     return geometricError;
 }
 
+function getBoundingSphere(tileset) {
+    var root = tileset.root;
+    var transform = defaultValue(root.transform, Matrix4.IDENTITY);
+    var boundingVolume = root.boundingVolume;
+    var boundingSphere;
+    if (defined(boundingVolume.sphere)) {
+        boundingSphere = createBoundingSphereFromSphere(boundingVolume.sphere, transform);
+    } else if (defined(boundingVolume.region)) {
+        boundingSphere = createBoundingSphereFromRegion(boundingVolume.region, transform);
+    } else if (defined(boundingVolume.box)) {
+        boundingSphere = createBoundingSphereFromBox(boundingVolume.box, transform);
+    }
+    var center = boundingSphere.center;
+    var radius = boundingSphere.radius;
+    return [center.x, center.y, center.z, radius];
+}
+
 function getMergedSphere(tilesets) {
     var length = tilesets.length;
     var boundingSpheres = new Array(length);
     for (var i = 0; i < length; ++i) {
-        var root = tilesets[i].root;
-        var transform = defaultValue(root.transform, Matrix4.IDENTITY);
-        var boundingVolume = root.boundingVolume;
-        if (defined(boundingVolume.sphere)) {
-            boundingSpheres[i] = createBoundingSphereFromSphere(boundingVolume.sphere, transform);
-        } else if (defined(boundingVolume.region)) {
-            boundingSpheres[i] = createBoundingSphereFromRegion(boundingVolume.region, transform);
-        } else if (defined(boundingVolume.box)) {
-            boundingSpheres[i] = createBoundingSphereFromBox(boundingVolume.box, transform);
-        }
+        boundingSpheres[i] = BoundingSphere.unpack(getBoundingSphere(tilesets[i]));
     }
     var boundingSphere = BoundingSphere.fromBoundingSpheres(boundingSpheres);
     var center = boundingSphere.center;
@@ -127,7 +139,7 @@ function createBoundingSphereFromBox(box, transform) {
 
     // Find the transformed center and halfAxes
     center = Matrix4.multiplyByPoint(transform, center, center);
-    var rotationScale = Matrix4.getRotation(transform, new Matrix3());
+    var rotationScale = Matrix4.getMatrix3(transform, new Matrix3());
     halfAxes = Matrix3.multiply(rotationScale, halfAxes, halfAxes);
 
     var orientedBoundingBox = new OrientedBoundingBox(center, halfAxes);
