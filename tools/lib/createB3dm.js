@@ -36,7 +36,7 @@ function createB3dm(options) {
     var featureTableBinaryBuffer = getBufferPadded(featureTableBinary);
     var batchTableJsonBuffer = getJsonBufferPadded(batchTableJson);
     var batchTableBinaryBuffer = getBufferPadded(batchTableBinary);
-    var glbBuffer = getGlbPadded(glb);
+    var glbBuffer = glb;
 
     var byteLength = headerByteLength + featureTableJsonBuffer.length + featureTableBinaryBuffer.length + batchTableJsonBuffer.length + batchTableBinaryBuffer.length + glbBuffer.length;
     var header = Buffer.alloc(headerByteLength);

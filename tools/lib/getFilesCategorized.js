@@ -71,7 +71,7 @@ function categorizeTilesetFiles(filesCategorized) {
             return externalTilesets.indexOf(tileset) === -1;
         });
         if (rootTilesets.length > 1) {
-            throw new RuntimeError('More than one root tileset found in directory');
+            // throw new RuntimeError('More than one root tileset found in directory');
         }
         if (rootTilesets.length === 0) {
             throw new RuntimeError('No tileset found in directory');
