@@ -13,7 +13,6 @@ package-lock.json
 doc
 coverage
 output
-*.tgz
 *.zip
 
 # User files
