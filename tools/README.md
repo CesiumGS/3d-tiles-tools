@@ -166,7 +166,7 @@ node ./bin/3d-tiles-tools.js cmptToGlb -i ./specs/data/composite.cmpt -o ./outpu
 
 ### optimizeB3dm
 
-Optimize a b3dm using [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline/blob/master/README.md). Since this tool does not
+Optimize a b3dm using [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md). Since this tool does not
 process an entire tileset, it cannot be used with the Pipeline tool.
 
 ```
@@ -185,7 +185,7 @@ node ./bin/3d-tiles-tools.js optimizeB3dm -i ./specs/data/batchedWithBatchTableB
 |`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
 |`--options`|All arguments past this flag are consumed by gltf-pipeline.| No |
 
-To use tileset texture compression, pass the [`texcomp` flags](https://github.com/CesiumGS/gltf-pipeline/blob/master/README.md#command-line-flags)
+To use tileset texture compression, pass the [`texcomp` flags](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md#command-line-flags)
 ```
 node ./bin/3d-tiles-tools.js optimizeB3dm -i ./specs/data/Textured/batchedTextured.b3dm -o ./output/optimized.b3dm --options --texcomp.dxt1.enable --texcomp.dxt1.quality=5 --texcomp.etc1.enable
 ```
@@ -193,7 +193,7 @@ This example optimizes the b3dm and compresses the textures into `dxt1` and `etc
 
 ### optimizeI3dm
 
-Optimize a i3dm using [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline/blob/master/README.md).
+Optimize a i3dm using [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md).
 Since this tool does not process an entire tileset, it cannot be used with the Pipeline tool.
 
 ```
@@ -212,7 +212,7 @@ node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/instancedWithBatchTabl
 |`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
 |`--options`|All arguments past this flag are consumed by gltf-pipeline.| No |
 
-To use tileset texture compression, pass the [`texcomp` flags](https://github.com/CesiumGS/gltf-pipeline/blob/master/README.md#command-line-flags).
+To use tileset texture compression, pass the [`texcomp` flags](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md#command-line-flags).
 ```
 node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/Textured/instancedTextured.i3dm -o ./output/optimized.i3dm --options --texcomp.dxt1.enable --texcomp.dxt1.quality=5 --texcomp.etc1.enable
 ```
