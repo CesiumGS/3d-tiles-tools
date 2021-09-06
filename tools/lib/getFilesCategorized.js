@@ -76,6 +76,7 @@ function categorizeTilesetFiles(filesCategorized) {
         if (rootTilesets.length === 0) {
             throw new RuntimeError('No tileset found in directory');
         }
+
         var rootTileset = rootTilesets[0];
         var tree = {};
         tree[rootTileset] = {};
