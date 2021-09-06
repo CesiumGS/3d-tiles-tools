@@ -3,6 +3,7 @@ var Cesium = require('cesium');
 var fsExtra = require('fs-extra');
 var zlib = require('zlib');
 var isGzipped = require('./isGzipped');
+var Promise = require('bluebird');
 
 var defaultValue = Cesium.defaultValue;
 
@@ -20,16 +21,17 @@ module.exports = readFile;
  */
 function readFile(file, type) {
     type = defaultValue(type, 'binary');
-    return fsExtra.readFile(file)
-        .then(function(contents) {
-            if (isGzipped(contents)) {
-                contents = zlib.gunzipSync(contents);
-            }
-            if (type === 'text') {
-                return contents.toString();
-            } else if (type === 'json') {
-                return JSON.parse(contents.toString());
-            }
-            return contents;
-        });
+    let contents = fsExtra.readFileSync(file);
+    return new Promise(function(resolve, reject){
+        if (isGzipped(contents)) {
+            contents = zlib.gunzipSync(contents);
+        }
+        if (type === 'text') {
+            resolve(contents.toString());
+        } else if (type === 'json') {
+            resolve(JSON.parse(contents.toString()));
+        }
+
+        resolve(contents);
+    });
 }
