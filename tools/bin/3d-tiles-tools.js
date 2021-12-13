@@ -109,12 +109,12 @@ var argv = yargs
     })
     .command('ungzip', 'Ungzips the input tileset directory.')
     .command('combine', 'Combines all external tilesets into a single tileset.json file.', {
-        'r': {
-            alias: 'rootJson',
-            default: 'tileset.json',
+        'i': {
+            alias: 'input',
             description: 'Relative path to the root tileset.json file.',
             normalize: true,
-            type: 'string'
+            type: 'string',
+            demandOption: true
         }
     })
     .command('merge', 'Merge any number of tilesets together into a single tileset.', {
