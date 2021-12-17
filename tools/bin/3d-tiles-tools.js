@@ -111,7 +111,7 @@ var argv = yargs
     .command('combine', 'Combines all external tilesets into a single tileset.json file.', {
         'i': {
             alias: 'input',
-            description: 'Relative path to the root tileset.json file.',
+            description: 'Relative path to the folder containing the root tileset.json file.',
             normalize: true,
             type: 'string',
             demandOption: true
