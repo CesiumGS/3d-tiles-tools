@@ -39,7 +39,7 @@ function optimizeGlb(glbBuffer, options) {
         }
     }
     fixBatchIdSemantic(gltf);
-    return loadGltfUris(gltf)
+    return loadGltfUris(gltf, options)
         .then(function() {
             return Pipeline.processJSONWithExtras(gltf, options)
                 .then(function(gltf) {

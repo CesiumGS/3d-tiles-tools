@@ -1,5 +1,7 @@
 # 3D Tiles Tools
 
+ ❗️ **3D Tiles Tools is not actively maintained. For converting source data to 3D Tiles check out [Cesium ion](https://cesium.com/ion).**  ❗️
+
 Node.js library and command-line tools for processing and converting 3D Tiles tilesets.
 
 ## Instructions
@@ -160,7 +162,7 @@ node ./bin/3d-tiles-tools.js cmptToGlb -i ./specs/data/composite.cmpt -o ./outpu
 
 ### optimizeB3dm
 
-Optimize a b3dm using [gltf-pipeline](https://github.com/AnalyticalGraphicsInc/gltf-pipeline/blob/master/README.md). Since this tool does not
+Optimize a b3dm using [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md). Since this tool does not
 process an entire tileset, it cannot be used with the Pipeline tool.
 
 ```
@@ -179,7 +181,7 @@ node ./bin/3d-tiles-tools.js optimizeB3dm -i ./specs/data/batchedWithBatchTableB
 |`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
 |`--options`|All arguments past this flag are consumed by gltf-pipeline.| No |
 
-To use tileset texture compression, pass the [`texcomp` flags](https://github.com/AnalyticalGraphicsInc/gltf-pipeline/blob/master/README.md#command-line-flags)
+To use tileset texture compression, pass the [`texcomp` flags](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md#command-line-flags)
 ```
 node ./bin/3d-tiles-tools.js optimizeB3dm -i ./specs/data/Textured/batchedTextured.b3dm -o ./output/optimized.b3dm --options --texcomp.dxt1.enable --texcomp.dxt1.quality=5 --texcomp.etc1.enable
 ```
@@ -187,7 +189,7 @@ This example optimizes the b3dm and compresses the textures into `dxt1` and `etc
 
 ### optimizeI3dm
 
-Optimize a i3dm using [gltf-pipeline](https://github.com/AnalyticalGraphicsInc/gltf-pipeline/blob/master/README.md).
+Optimize a i3dm using [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md).
 Since this tool does not process an entire tileset, it cannot be used with the Pipeline tool.
 
 ```
@@ -206,7 +208,7 @@ node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/instancedWithBatchTabl
 |`-f`, `--force`|Overwrite output file if it exists.| No, default `false` |
 |`--options`|All arguments past this flag are consumed by gltf-pipeline.| No |
 
-To use tileset texture compression, pass the [`texcomp` flags](https://github.com/AnalyticalGraphicsInc/gltf-pipeline/blob/master/README.md#command-line-flags).
+To use tileset texture compression, pass the [`texcomp` flags](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md#command-line-flags).
 ```
 node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/Textured/instancedTextured.i3dm -o ./output/optimized.i3dm --options --texcomp.dxt1.enable --texcomp.dxt1.quality=5 --texcomp.etc1.enable
 ```
@@ -218,7 +220,7 @@ Generates a sqlite database for a tileset.
 
 This tool cannot be used with the Pipeline tool.
 
-Each tile is stored gzipped in the database.  The specification for the tables in the database is not final, see [3d-tiles/#89](https://github.com/AnalyticalGraphicsInc/3d-tiles/issues/89).
+Each tile is stored gzipped in the database.  The specification for the tables in the database is not final, see [3d-tiles/#89](https://github.com/CesiumGS/3d-tiles/issues/89).
 
 ```
 node ./bin/3d-tiles-tools.js tilesetToDatabase -i ./specs/data/TilesetOfTilesets/ -o ./output/tileset.3dtiles
@@ -236,7 +238,7 @@ Unpack a tileset database to a tileset folder.
 
 This tool cannot be used with the Pipeline tool.
 
-Each tile is stored gzipped in the database, and unzipped when unpacked.  The specification for the tables in the database is not final, see [3d-tiles/#89](https://github.com/AnalyticalGraphicsInc/3d-tiles/issues/89).
+Each tile is stored gzipped in the database, and unzipped when unpacked.  The specification for the tables in the database is not final, see [3d-tiles/#89](https://github.com/CesiumGS/3d-tiles/issues/89).
 
 ```
 node ./bin/3d-tiles-tools.js databaseToTileset -i ./specs/data/tileset.3dtiles -o ./output/Tileset

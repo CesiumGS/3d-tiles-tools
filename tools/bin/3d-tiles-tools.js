@@ -398,7 +398,7 @@ function readCmptWriteGlb(inputPath, outputPath, force) {
             if (glbsLength === 0) {
                 throw new DeveloperError('No glbs found in ' + inputPath + '.');
             } else if (glbsLength === 1) {
-                glbPaths[0] = [outputPath + '.glb'];
+                glbPaths[0] = outputPath + '.glb';
             } else {
                 for (var i = 0; i < glbsLength; ++i) {
                     glbPaths[i] = outputPath + '_' + i + '.glb';

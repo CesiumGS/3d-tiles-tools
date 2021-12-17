@@ -86,16 +86,16 @@ function combine(jsonFile, inputDirectory, parentTile, tilesets) {
                     var tile = stack.pop();
                     // Look for external tilesets
                     if (defined(tile.content)) {
-                        var url = tile.content.url;
-                        if (isJson(url)) {
+                        var uri = tile.content.uri;
+                        if (isJson(uri)) {
                             // Load the external tileset
-                            url = path.join(tilesetDirectory, url);
-                            tilesets.push(url);
-                            var promise = combine(url, inputDirectory, tile, tilesets);
+                            uri = path.join(tilesetDirectory, uri);
+                            tilesets.push(uri);
+                            var promise = combine(uri, inputDirectory, tile, tilesets);
                             promises.push(promise);
                         } else {
-                            var contentUrl = path.join(tilesetDirectory, url);
-                            tile.content.url = getRelativePath(inputDirectory, contentUrl);
+                            var contentUri = path.join(tilesetDirectory, uri);
+                            tile.content.uri = getRelativePath(inputDirectory, contentUri);
                         }
                     }
                     // Push children to the stack
