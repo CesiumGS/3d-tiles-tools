@@ -47,7 +47,7 @@ function gzipTileset(options) {
         logCallback((gzip ? 'Compressing' : 'Uncompressing') + ' files...');
     }
 
-    var operation = gzip ? zlib.gzipSync : zlib.gunzipSync;
+    var operation = (gzip) ? zlib.gzipSync : zlib.gunzipSync;
     return walkDirectory(inputDirectory, function(file) {
         return fsExtra.readFile(file)
             .then(function(data) {

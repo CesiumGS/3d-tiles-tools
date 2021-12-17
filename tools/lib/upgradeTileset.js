@@ -92,22 +92,22 @@ var optimizeOptions = {
 function upgradeTile(file) {
     return readFile(file)
         .then(function(buffer) {
-            return upgradeTileContent(buffer);
+            return upgradeTileContent(buffer, path.dirname(file));
         });
 }
 
-function upgradeTileContent(buffer) {
+function upgradeTileContent(buffer, basePath) {
     var magic = getMagic(buffer);
     if (magic === 'b3dm') {
         var b3dm = extractB3dm(buffer);
-        return optimizeGlb(b3dm.glb, optimizeOptions)
+        return optimizeGlb(b3dm.glb, Object.assign({}, optimizeOptions, {basePath: basePath}))
             .then(function(glb) {
                 return glbToB3dm(glb, b3dm.featureTable.json, b3dm.featureTable.binary, b3dm.batchTable.json, b3dm.batchTable.binary);
             });
     } else if (magic === 'cmpt') {
         var tiles = extractCmpt(buffer);
         return Promise.map(tiles, function(tile) {
-            return upgradeTileContent(tile);
+            return upgradeTileContent(tile, basePath);
         }).then(function(upgradedTiles) {
             return makeCompositeTile(upgradedTiles);
         });

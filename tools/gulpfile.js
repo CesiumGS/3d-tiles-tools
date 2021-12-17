@@ -16,7 +16,7 @@ var argv = yargs.argv;
 
 // Add third-party node module binaries to the system path
 // since some tasks need to call them directly.
-var environmentSeparator = process.platform === 'win32' ? ';' : ':';
+var environmentSeparator = (process.platform === 'win32') ? ';' : ':';
 var nodeBinaries = path.join(__dirname, 'node_modules', '.bin');
 process.env.PATH += environmentSeparator + nodeBinaries;
 
@@ -79,3 +79,42 @@ gulp.task('jsDoc', function() {
         });
     });
 });
+
+gulp.task('cloc', function() {
+    var cmdLine;
+    var clocPath = path.join('node_modules', 'cloc', 'lib', 'cloc');
+
+    //Run cloc on primary Source files only
+    var source = new Promise(function(resolve, reject) {
+        cmdLine = 'perl ' + clocPath + ' --quiet --progress-rate=0' +
+            ' lib/ bin/';
+
+        child_process.exec(cmdLine, function(error, stdout, stderr) {
+            if (error) {
+                console.log(stderr);
+                return reject(error);
+            }
+            console.log('Source:');
+            console.log(stdout);
+            resolve();
+        });
+    });
+
+    //If running cloc on source succeeded, also run it on the tests.
+    return source.then(function() {
+        return new Promise(function(resolve, reject) {
+            cmdLine = 'perl ' + clocPath + ' --quiet --progress-rate=0' +
+                ' specs/lib/';
+            child_process.exec(cmdLine, function(error, stdout, stderr) {
+                if (error) {
+                    console.log(stderr);
+                    return reject(error);
+                }
+                console.log('Specs:');
+                console.log(stdout);
+                resolve();
+            });
+        });
+    });
+});
+

@@ -111,7 +111,7 @@ var argv = yargs
     .command('combine', 'Combines all external tilesets into a single tileset.json file.', {
         'i': {
             alias: 'input',
-            description: 'Relative path to the root tileset.json file.',
+            description: 'Relative path to the folder containing the root tileset.json file.',
             normalize: true,
             type: 'string',
             demandOption: true
@@ -398,7 +398,7 @@ function readCmptWriteGlb(inputPath, outputPath, force) {
             if (glbsLength === 0) {
                 throw new DeveloperError('No glbs found in ' + inputPath + '.');
             } else if (glbsLength === 1) {
-                glbPaths[0] = [outputPath + '.glb'];
+                glbPaths[0] = outputPath + '.glb';
             } else {
                 for (var i = 0; i < glbsLength; ++i) {
                     glbPaths[i] = outputPath + '_' + i + '.glb';
