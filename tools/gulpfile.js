@@ -11,6 +11,7 @@ var path = require('path');
 var Promise = require('bluebird');
 var yargs = require('yargs');
 
+var defaultValue = Cesium.defaultValue;
 var defined = Cesium.defined;
 var argv = yargs.argv;
 
@@ -118,3 +119,88 @@ gulp.task('cloc', function() {
     });
 });
 
+function getLicenseDataFromPackage(packageName, override) {
+    override = defaultValue(override, defaultValue.EMPTY_OBJECT);
+    var packagePath = path.join('node_modules', packageName, 'package.json');
+
+    if (!fsExtra.existsSync(packagePath)) {
+        throw new Error(`Unable to find ${packageName} license information`);
+    }
+
+    var contents = fsExtra.readFileSync(packagePath);
+    var packageJson = JSON.parse(contents);
+
+    var licenseField = override.license;
+
+    if (!licenseField) {
+        licenseField = [packageJson.license];
+    }
+
+    if (!licenseField && packageJson.licenses) {
+        licenseField = packageJson.licenses;
+    }
+
+    if (!licenseField) {
+        console.log(`No license found for ${packageName}`);
+        licenseField = ['NONE'];
+    }
+
+    var version = packageJson.version;
+    if (!packageJson.version) {
+        console.log(`No version information found for ${packageName}`);
+        version = 'NONE';
+    }
+
+    return {
+        name: packageName,
+        license: licenseField,
+        version: version,
+        url: `https://www.npmjs.com/package/${packageName}`,
+        notes: override.notes
+    };
+}
+
+function readThirdPartyExtraJson() {
+    var path = 'ThirdParty.extra.json';
+    if (fsExtra.existsSync(path)) {
+        var contents = fsExtra.readFileSync(path);
+        return JSON.parse(contents);
+    }
+    return [];
+}
+
+gulp.task('generate-third-party', async function() {
+    var packageJson = JSON.parse(fsExtra.readFileSync('package.json'));
+    var thirdPartyExtraJson = readThirdPartyExtraJson();
+
+    var thirdPartyJson = [];
+
+    var dependencies = packageJson.dependencies;
+    for (var packageName in dependencies) {
+        if (dependencies.hasOwnProperty(packageName)) {
+            var override = thirdPartyExtraJson.find(
+                (entry) => entry.name === packageName
+            );
+            thirdPartyJson.push(
+                getLicenseDataFromPackage(packageName, override)
+            );
+        }
+    }
+
+    thirdPartyJson.sort(function (a, b) {
+        var nameA = a.name.toLowerCase();
+        var nameB = b.name.toLowerCase();
+        if (nameA < nameB) {
+            return -1;
+        }
+        if (nameA > nameB) {
+            return 1;
+        }
+        return 0;
+    });
+
+    fsExtra.writeFileSync(
+        'ThirdParty.json',
+        JSON.stringify(thirdPartyJson, null, 2)
+    );
+});

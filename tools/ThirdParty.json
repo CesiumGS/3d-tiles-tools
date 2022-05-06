@@ -1,0 +1,66 @@
+[
+  {
+    "name": "bluebird",
+    "license": [
+      "MIT"
+    ],
+    "version": "3.7.2",
+    "url": "https://www.npmjs.com/package/bluebird"
+  },
+  {
+    "name": "cesium",
+    "license": [
+      "Apache-2.0"
+    ],
+    "version": "1.93.0",
+    "url": "https://www.npmjs.com/package/cesium"
+  },
+  {
+    "name": "fs-extra",
+    "license": [
+      "MIT"
+    ],
+    "version": "7.0.1",
+    "url": "https://www.npmjs.com/package/fs-extra"
+  },
+  {
+    "name": "gltf-pipeline",
+    "license": [
+      "Apache-2.0"
+    ],
+    "version": "1.0.7",
+    "url": "https://www.npmjs.com/package/gltf-pipeline"
+  },
+  {
+    "name": "klaw",
+    "license": [
+      "MIT"
+    ],
+    "version": "3.0.0",
+    "url": "https://www.npmjs.com/package/klaw"
+  },
+  {
+    "name": "sqlite3",
+    "license": [
+      "BSD-3-Clause"
+    ],
+    "version": "4.2.0",
+    "url": "https://www.npmjs.com/package/sqlite3"
+  },
+  {
+    "name": "uuid",
+    "license": [
+      "MIT"
+    ],
+    "version": "3.4.0",
+    "url": "https://www.npmjs.com/package/uuid"
+  },
+  {
+    "name": "yargs",
+    "license": [
+      "MIT"
+    ],
+    "version": "13.3.2",
+    "url": "https://www.npmjs.com/package/yargs"
+  }
+]

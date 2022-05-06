@@ -50,7 +50,8 @@
     "test-watch": "gulp test-watch",
     "coverage": "gulp coverage",
     "jsDoc": "gulp jsDoc",
-    "cloc": "gulp cloc"
+    "cloc": "gulp cloc",
+    "generate-third-party": "gulp generate-third-party"
   },
   "bin": {
     "3d-tiles-tools": "./bin/3d-tiles-tools.js"
