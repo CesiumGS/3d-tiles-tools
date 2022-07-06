@@ -1,5 +1,5 @@
 'use strict';
-var getBufferPadded = require('./getBufferPadded');
+const getBufferPadded = require('./getBufferPadded');
 
 module.exports = makeCompositeTile;
 
@@ -10,18 +10,18 @@ module.exports = makeCompositeTile;
  * @returns {Buffer} A single buffer holding the composite tile.
  */
 function makeCompositeTile(tileBuffers) {
-    var headerByteLength = 16;
-    var buffers = [];
-    var byteLength = headerByteLength;
-    var tilesLength = tileBuffers.length;
-    for (var i = 0; i < tilesLength; i++) {
-        var tile = tileBuffers[i];
+    const headerByteLength = 16;
+    const buffers = [];
+    let byteLength = headerByteLength;
+    const tilesLength = tileBuffers.length;
+    for (let i = 0; i < tilesLength; i++) {
+        let tile = tileBuffers[i];
         tile = getBufferPadded(tile, byteLength);
         tile.writeUInt32LE(tile.length, 8); // Rewrite byte length
         buffers.push(tile);
         byteLength += tile.length;
     }
-    var header = Buffer.alloc(16);
+    const header = Buffer.alloc(16);
     header.write('cmpt', 0);               // magic
     header.writeUInt32LE(1, 4);            // version
     header.writeUInt32LE(byteLength, 8);   // byteLength

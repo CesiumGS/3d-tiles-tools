@@ -1,23 +1,23 @@
 'use strict';
-var fsExtra = require('fs-extra');
-var GltfPipeline = require('gltf-pipeline');
-var path = require('path');
-var Promise = require('bluebird');
-var bufferToJson = require('../../lib/bufferToJson');
-var gzipTileset = require('../../lib/gzipTileset');
-var isGzippedFile = require('../../lib/isGzippedFile');
-var readFile = require('../../lib/readFile');
-var upgradeTileset = require('../../lib/upgradeTileset');
+const fsExtra = require('fs-extra');
+const GltfPipeline = require('gltf-pipeline');
+const path = require('path');
+const Promise = require('bluebird');
+const bufferToJson = require('../../lib/bufferToJson');
+const gzipTileset = require('../../lib/gzipTileset');
+const isGzippedFile = require('../../lib/isGzippedFile');
+const readFile = require('../../lib/readFile');
+const upgradeTileset = require('../../lib/upgradeTileset');
 
-var parseBinaryGltf = GltfPipeline.parseBinaryGltf;
+const parseBinaryGltf = GltfPipeline.parseBinaryGltf;
 
-var batchedDeprecated1Directory = './specs/data/BatchedDeprecated1/';
-var batchedDeprecated2Directory = './specs/data/BatchedDeprecated2/';
-var gzippedDirectory = './specs/data/BatchedDeprecated-gzipped/';
-var upgradedDirectory = './specs/data/BatchedDeprecated-upgraded/';
-var upgradedJson = './specs/data/BatchedDeprecated-upgraded/tileset.json';
-var upgradedB3dm1 = './specs/data/BatchedDeprecated-upgraded/batchedDeprecated1.b3dm';
-var upgradedB3dm2 = './specs/data/BatchedDeprecated-upgraded/batchedDeprecated2.b3dm';
+const batchedDeprecated1Directory = './specs/data/BatchedDeprecated1/';
+const batchedDeprecated2Directory = './specs/data/BatchedDeprecated2/';
+const gzippedDirectory = './specs/data/BatchedDeprecated-gzipped/';
+const upgradedDirectory = './specs/data/BatchedDeprecated-upgraded/';
+const upgradedJson = './specs/data/BatchedDeprecated-upgraded/tileset.json';
+const upgradedB3dm1 = './specs/data/BatchedDeprecated-upgraded/batchedDeprecated1.b3dm';
+const upgradedB3dm2 = './specs/data/BatchedDeprecated-upgraded/batchedDeprecated2.b3dm';
 
 describe('upgradeTileset', function() {
     afterEach(function (done) {
@@ -30,7 +30,7 @@ describe('upgradeTileset', function() {
     });
 
     it('upgrades tileset', function (done) {
-        var upgradeOptions = {
+        const upgradeOptions = {
             inputDirectory : batchedDeprecated1Directory,
             outputDirectory : upgradedDirectory
         };
@@ -45,7 +45,7 @@ describe('upgradeTileset', function() {
     });
 
     function checkUpgradedB3dm(tilesetUrl, tileUrl, done) {
-        var upgradeOptions = {
+        const upgradeOptions = {
             inputDirectory : tilesetUrl,
             outputDirectory : upgradedDirectory
         };
@@ -53,26 +53,26 @@ describe('upgradeTileset', function() {
             .then(function() {
                 return readFile(tileUrl)
                     .then(function(b3dm) {
-                        var headerByteLength = 28;
-                        var byteLength = b3dm.readUInt32LE(8);
-                        var featureTableJsonByteLength = b3dm.readUInt32LE(12);
-                        var featureTableBinaryByteLength = b3dm.readUInt32LE(16);
-                        var batchTableJsonByteLength = b3dm.readUInt32LE(20);
-                        var batchTableBinaryByteLength = b3dm.readUInt32LE(24);
+                        const headerByteLength = 28;
+                        const byteLength = b3dm.readUInt32LE(8);
+                        const featureTableJsonByteLength = b3dm.readUInt32LE(12);
+                        const featureTableBinaryByteLength = b3dm.readUInt32LE(16);
+                        const batchTableJsonByteLength = b3dm.readUInt32LE(20);
+                        const batchTableBinaryByteLength = b3dm.readUInt32LE(24);
 
-                        var featureTableJsonByteOffset = headerByteLength;
-                        var featureTableBinaryByteOffset = featureTableJsonByteOffset + featureTableJsonByteLength;
-                        var batchTableJsonByteOffset = featureTableBinaryByteOffset + featureTableBinaryByteLength;
-                        var batchTableBinaryByteOffset = batchTableJsonByteOffset + batchTableJsonByteLength;
-                        var glbByteOffset = batchTableBinaryByteOffset + batchTableBinaryByteLength;
+                        const featureTableJsonByteOffset = headerByteLength;
+                        const featureTableBinaryByteOffset = featureTableJsonByteOffset + featureTableJsonByteLength;
+                        const batchTableJsonByteOffset = featureTableBinaryByteOffset + featureTableBinaryByteLength;
+                        const batchTableBinaryByteOffset = batchTableJsonByteOffset + batchTableJsonByteLength;
+                        const glbByteOffset = batchTableBinaryByteOffset + batchTableBinaryByteLength;
 
-                        var featureTableJsonBuffer = b3dm.slice(featureTableJsonByteOffset, featureTableBinaryByteOffset);
-                        var batchTableJsonBuffer = b3dm.slice(batchTableJsonByteOffset, batchTableBinaryByteOffset);
-                        var glbBuffer = b3dm.slice(glbByteOffset, byteLength);
+                        const featureTableJsonBuffer = b3dm.slice(featureTableJsonByteOffset, featureTableBinaryByteOffset);
+                        const batchTableJsonBuffer = b3dm.slice(batchTableJsonByteOffset, batchTableBinaryByteOffset);
+                        const glbBuffer = b3dm.slice(glbByteOffset, byteLength);
 
-                        var featureTableJson = bufferToJson(featureTableJsonBuffer);
-                        var batchTableJson = bufferToJson(batchTableJsonBuffer);
-                        var gltf = parseBinaryGltf(glbBuffer);
+                        const featureTableJson = bufferToJson(featureTableJsonBuffer);
+                        const batchTableJson = bufferToJson(batchTableJsonBuffer);
+                        const gltf = parseBinaryGltf(glbBuffer);
 
                         expect(featureTableJson.BATCH_LENGTH).toBe(10);
                         expect(batchTableJson.Height.length).toBe(10);
@@ -90,7 +90,7 @@ describe('upgradeTileset', function() {
     });
 
     it('works when no output directory is supplied', function (done) {
-        var upgradeOptions = {
+        const upgradeOptions = {
             inputDirectory : batchedDeprecated1Directory,
             outputDirectory : upgradedDirectory
         };
@@ -102,12 +102,12 @@ describe('upgradeTileset', function() {
     });
 
     it('gzips if the original files are gzipped', function (done) {
-        var gzipOptions = {
+        const gzipOptions = {
             inputDirectory : batchedDeprecated1Directory,
             outputDirectory : gzippedDirectory,
             gzip : true
         };
-        var upgradeOptions = {
+        const upgradeOptions = {
             inputDirectory : gzippedDirectory,
             outputDirectory : upgradedDirectory
         };
@@ -130,7 +130,7 @@ describe('upgradeTileset', function() {
     });
 
     it('throws error when input tileset does not exist', function (done) {
-        var upgradeOptions = {
+        const upgradeOptions = {
             inputDirectory : 'non-existent-tileset',
             outputDirectory : upgradedDirectory
         };
@@ -138,16 +138,16 @@ describe('upgradeTileset', function() {
     });
 
     it('accepts custom writeCallback that does not return a promise', function (done) {
-        var writeCallback = function(file, data) {
+        const writeCallback = function(file, data) {
             console.log('Save file ' + file + ' with data ' + data);
         };
-        var upgradeOptions = {
+        const upgradeOptions = {
             inputDirectory : batchedDeprecated1Directory,
             outputDirectory : upgradedDirectory,
             writeCallback : writeCallback
         };
 
-        var spy = spyOn(console, 'log').and.callFake(function(){});
+        const spy = spyOn(console, 'log').and.callFake(function(){});
         expect(upgradeTileset(upgradeOptions)
             .then(function() {
                 expect(spy).toHaveBeenCalled();
@@ -155,12 +155,12 @@ describe('upgradeTileset', function() {
     });
 
     it('accepts custom writeCallback that returns a promise', function (done) {
-        var outputDirectory = upgradedDirectory;
-        var writeCallback = function(file, data) {
-            var outputFile = path.join(outputDirectory, file);
+        const outputDirectory = upgradedDirectory;
+        const writeCallback = function(file, data) {
+            const outputFile = path.join(outputDirectory, file);
             return fsExtra.outputFile(outputFile, data);
         };
-        var upgradeOptions = {
+        const upgradeOptions = {
             inputDirectory : batchedDeprecated1Directory,
             outputDirectory : upgradedDirectory,
             writeCallback : writeCallback
@@ -173,17 +173,17 @@ describe('upgradeTileset', function() {
     });
 
     it('logs debug messages', function (done) {
-        var logCallback = function(message) {
+        const logCallback = function(message) {
             console.log(message);
         };
 
-        var upgradeOptions = {
+        const upgradeOptions = {
             inputDirectory : batchedDeprecated1Directory,
             outputDirectory : upgradedDirectory,
             logCallback : logCallback
         };
 
-        var spy = spyOn(console, 'log').and.callFake(function(){});
+        const spy = spyOn(console, 'log').and.callFake(function(){});
         expect(upgradeTileset(upgradeOptions)
             .then(function() {
                 expect(spy).toHaveBeenCalled();

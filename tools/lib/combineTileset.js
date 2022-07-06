@@ -1,19 +1,19 @@
 'use strict';
-var Cesium = require('cesium');
-var fsExtra = require('fs-extra');
-var path = require('path');
-var Promise = require('bluebird');
-var zlib = require('zlib');
-var getDefaultWriteCallback = require('./getDefaultWriteCallback');
-var getJsonBufferPadded =require('./getJsonBufferPadded');
-var isGzippedFile = require('./isGzippedFile');
-var isJson = require('./isJson');
-var readFile = require('./readFile');
-var walkDirectory = require('./walkDirectory');
+const Cesium = require('cesium');
+const fsExtra = require('fs-extra');
+const path = require('path');
+const Promise = require('bluebird');
+const zlib = require('zlib');
+const getDefaultWriteCallback = require('./getDefaultWriteCallback');
+const getJsonBufferPadded =require('./getJsonBufferPadded');
+const isGzippedFile = require('./isGzippedFile');
+const isJson = require('./isJson');
+const readFile = require('./readFile');
+const walkDirectory = require('./walkDirectory');
 
-var Check = Cesium.Check;
-var defaultValue = Cesium.defaultValue;
-var defined = Cesium.defined;
+const Check = Cesium.Check;
+const defaultValue = Cesium.defaultValue;
+const defined = Cesium.defined;
 
 module.exports = combineTileset;
 
@@ -31,9 +31,9 @@ module.exports = combineTileset;
  */
 function combineTileset(options) {
     options = defaultValue(options, defaultValue.EMPTY_OBJECT);
-    var inputDirectory = options.inputDirectory;
-    var outputDirectory = options.outputDirectory;
-    var rootJsonFile = defaultValue(options.rootJson, 'tileset.json');
+    let inputDirectory = options.inputDirectory;
+    let outputDirectory = options.outputDirectory;
+    let rootJsonFile = defaultValue(options.rootJson, 'tileset.json');
 
     Check.typeOf.string('options.inputDirectory', inputDirectory);
 
@@ -42,26 +42,26 @@ function combineTileset(options) {
         path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-combined')));
     rootJsonFile = path.join(inputDirectory, rootJsonFile);
 
-    var writeCallback = defaultValue(options.writeCallback, getDefaultWriteCallback(outputDirectory));
-    var logCallback = options.logCallback;
+    const writeCallback = defaultValue(options.writeCallback, getDefaultWriteCallback(outputDirectory));
+    const logCallback = options.logCallback;
 
-    var tilesets = [rootJsonFile];
+    const tilesets = [rootJsonFile];
     return combine(rootJsonFile, inputDirectory, undefined, tilesets)
         .then(function (json) {
             if (defined(logCallback)) {
                 logCallback('Combined ' + (tilesets.length - 1) + ' external tilesets.');
             }
             // If the root json is originally gzipped, save the output json as gzipped
-            var writeRootJsonPromise = isGzippedFile(rootJsonFile)
+            const writeRootJsonPromise = isGzippedFile(rootJsonFile)
                 .then(function (gzipped) {
-                    var data = getJsonBufferPadded(json, gzipped);
+                    let data = getJsonBufferPadded(json, gzipped);
                     if (gzipped) {
                         data = zlib.gzipSync(data);
                     }
-                    var relativePath = path.relative(inputDirectory, rootJsonFile);
+                    const relativePath = path.relative(inputDirectory, rootJsonFile);
                     return writeCallback(relativePath, data);
                 });
-            var copyFilesPromise = copyFiles(inputDirectory, tilesets, writeCallback);
+            const copyFilesPromise = copyFiles(inputDirectory, tilesets, writeCallback);
             return Promise.all([writeRootJsonPromise, copyFilesPromise]);
         });
 }
@@ -69,9 +69,9 @@ function combineTileset(options) {
 function combine(jsonFile, inputDirectory, parentTile, tilesets) {
     return readFile(jsonFile, 'json')
         .then(function (json) {
-            var tilesetDirectory = path.dirname(jsonFile);
-            var promises = [];
-            var root = json.root;
+            const tilesetDirectory = path.dirname(jsonFile);
+            const promises = [];
+            const root = json.root;
 
             if (defined(root)) {
                 // Append the external tileset to the parent tile
@@ -80,29 +80,29 @@ function combine(jsonFile, inputDirectory, parentTile, tilesets) {
                     parentTile.children = root.children;
                 }
                 // Loop over all the tiles
-                var stack = [];
+                const stack = [];
                 stack.push(root);
                 while (stack.length > 0) {
-                    var tile = stack.pop();
+                    const tile = stack.pop();
                     // Look for external tilesets
                     if (defined(tile.content)) {
-                        var uri = tile.content.uri;
+                        let uri = tile.content.uri;
                         if (isJson(uri)) {
                             // Load the external tileset
                             uri = path.join(tilesetDirectory, uri);
                             tilesets.push(uri);
-                            var promise = combine(uri, inputDirectory, tile, tilesets);
+                            const promise = combine(uri, inputDirectory, tile, tilesets);
                             promises.push(promise);
                         } else {
-                            var contentUri = path.join(tilesetDirectory, uri);
+                            const contentUri = path.join(tilesetDirectory, uri);
                             tile.content.uri = getRelativePath(inputDirectory, contentUri);
                         }
                     }
                     // Push children to the stack
-                    var children = tile.children;
+                    const children = tile.children;
                     if (defined(children)) {
-                        var length = children.length;
-                        for (var i = 0; i < length; ++i) {
+                        const length = children.length;
+                        for (let i = 0; i < length; ++i) {
                             stack.push(children[i]);
                         }
                     }
@@ -117,12 +117,12 @@ function combine(jsonFile, inputDirectory, parentTile, tilesets) {
 }
 
 function getRelativePath(inputDirectory, file) {
-    var relative = path.relative(inputDirectory, file);
+    const relative = path.relative(inputDirectory, file);
     return relative.replace(/\\/g, '/'); // Use forward slashes in the JSON
 }
 
 function isTileset(inputDirectory, file, tilesets) {
-    var relativePath = getRelativePath(inputDirectory, file);
+    const relativePath = getRelativePath(inputDirectory, file);
     return tilesets.indexOf(relativePath) >= 0;
 }
 
@@ -135,7 +135,7 @@ function copyFiles(inputDirectory, tilesets, writeCallback) {
         if (!isTileset(inputDirectory, file, tilesets)) {
             return fsExtra.readFile(file)
                 .then(function (data) {
-                    var relativePath = getRelativePath(inputDirectory, file);
+                    const relativePath = getRelativePath(inputDirectory, file);
                     return writeCallback(relativePath, data);
                 });
         }

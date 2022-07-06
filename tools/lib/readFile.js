@@ -1,10 +1,10 @@
 'use strict';
-var Cesium = require('cesium');
-var fsExtra = require('fs-extra');
-var zlib = require('zlib');
-var isGzipped = require('./isGzipped');
+const Cesium = require('cesium');
+const fsExtra = require('fs-extra');
+const zlib = require('zlib');
+const isGzipped = require('./isGzipped');
 
-var defaultValue = Cesium.defaultValue;
+const defaultValue = Cesium.defaultValue;
 
 module.exports = readFile;
 

@@ -1,18 +1,18 @@
 'use strict';
-var fs = require('fs');
-var extractI3dm = require('../../lib/extractI3dm');
+const fs = require('fs');
+const extractI3dm = require('../../lib/extractI3dm');
 
-var i3dmPath = './specs/data/instancedWithBatchTableBinary.i3dm';
+const i3dmPath = './specs/data/instancedWithBatchTableBinary.i3dm';
 
 describe('extractI3dm', function() {
-    var i3dmBuffer;
+    let i3dmBuffer;
 
     beforeAll(function() {
         i3dmBuffer = fs.readFileSync(i3dmPath);
     });
 
     it('extracts a i3dm from buffer', function() {
-        var i3dm = extractI3dm(i3dmBuffer);
+        const i3dm = extractI3dm(i3dmBuffer);
         expect(i3dm.header.magic).toBe('i3dm');
         expect(i3dm.header.version).toBe(1);
         expect(i3dm.featureTable.json).toBeDefined();

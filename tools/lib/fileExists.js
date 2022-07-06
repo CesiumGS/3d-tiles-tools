@@ -1,5 +1,5 @@
 'use strict';
-var fsExtra = require('fs-extra');
+const fsExtra = require('fs-extra');
 
 module.exports = fileExists;
 

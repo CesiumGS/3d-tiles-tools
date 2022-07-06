@@ -1,9 +1,9 @@
 'use strict';
-var Cesium = require('cesium');
-var klaw = require('klaw');
-var Promise = require('bluebird');
+const Cesium = require('cesium');
+const klaw = require('klaw');
+const Promise = require('bluebird');
 
-var defined = Cesium.defined;
+const defined = Cesium.defined;
 
 module.exports = walkDirectory;
 
@@ -14,7 +14,7 @@ function walkDirectory(directory, processFileCallback) {
     return new Promise(function(resolve, reject) {
         getNumberOfFilesInDirectory(directory)
             .then(function(numberOfFiles) {
-                var numberComplete = 0;
+                let numberComplete = 0;
                 function complete() {
                     ++numberComplete;
                     if (numberComplete === numberOfFiles) {
@@ -29,7 +29,7 @@ function walkDirectory(directory, processFileCallback) {
 
 function getNumberOfFilesInDirectory(directory) {
     return new Promise(function(resolve, reject) {
-        var numberOfFiles = 0;
+        let numberOfFiles = 0;
         klaw(directory)
             .on('data', function (item) {
                 if (!item.stats.isDirectory()) {
@@ -47,7 +47,7 @@ function walk(directory, processFileCallback, resolve, reject) {
     klaw(directory)
         .on('data', function (item) {
             if (!item.stats.isDirectory()) {
-                var promise = processFileCallback(item.path);
+                const promise = processFileCallback(item.path);
                 if (defined(promise) && defined(promise.then)) {
                     promise
                         .then(resolve)

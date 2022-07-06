@@ -1,8 +1,8 @@
 'use strict';
-var Cesium = require('cesium');
+const Cesium = require('cesium');
 
-var defaultValue = Cesium.defaultValue;
-var defined = Cesium.defined;
+const defaultValue = Cesium.defaultValue;
+const defined = Cesium.defined;
 
 module.exports = getBufferPadded;
 
@@ -23,10 +23,10 @@ function getBufferPadded(buffer, byteOffset) {
 
     byteOffset = defaultValue(byteOffset, 0);
 
-    var boundary = 8;
-    var byteLength = buffer.length;
-    var remainder = (byteOffset + byteLength) % boundary;
-    var padding = (remainder === 0) ? 0 : boundary - remainder;
-    var emptyBuffer = Buffer.alloc(padding);
+    const boundary = 8;
+    const byteLength = buffer.length;
+    const remainder = (byteOffset + byteLength) % boundary;
+    const padding = (remainder === 0) ? 0 : boundary - remainder;
+    const emptyBuffer = Buffer.alloc(padding);
     return Buffer.concat([buffer, emptyBuffer]);
 }

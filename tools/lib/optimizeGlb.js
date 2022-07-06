@@ -1,17 +1,17 @@
 'use strict';
-var Cesium = require('cesium');
-var GltfPipeline = require('gltf-pipeline');
+const Cesium = require('cesium');
+const GltfPipeline = require('gltf-pipeline');
 
-var Cartesian3 = Cesium.Cartesian3;
-var DeveloperError = Cesium.DeveloperError;
-var defaultValue = Cesium.defaultValue;
-var defined = Cesium.defined;
+const Cartesian3 = Cesium.Cartesian3;
+const DeveloperError = Cesium.DeveloperError;
+const defaultValue = Cesium.defaultValue;
+const defined = Cesium.defined;
 
-var addCesiumRTC = GltfPipeline.addCesiumRTC;
-var getBinaryGltf = GltfPipeline.getBinaryGltf;
-var loadGltfUris = GltfPipeline.loadGltfUris;
-var parseBinaryGltf = GltfPipeline.parseBinaryGltf;
-var Pipeline = GltfPipeline.Pipeline;
+const addCesiumRTC = GltfPipeline.addCesiumRTC;
+const getBinaryGltf = GltfPipeline.getBinaryGltf;
+const loadGltfUris = GltfPipeline.loadGltfUris;
+const parseBinaryGltf = GltfPipeline.parseBinaryGltf;
+const Pipeline = GltfPipeline.Pipeline;
 
 module.exports = optimizeGlb;
 
@@ -28,12 +28,12 @@ function optimizeGlb(glbBuffer, options) {
     if (!defined(glbBuffer)) {
         throw new DeveloperError('glbBuffer is not defined.');
     }
-    var rtcPosition;
-    var gltf = parseBinaryGltf(glbBuffer);
-    var extensions = gltf.extensions;
+    let rtcPosition;
+    const gltf = parseBinaryGltf(glbBuffer);
+    const extensions = gltf.extensions;
     if (defined(extensions)) {
         // If it is used, extract the CesiumRTC extension and add it back after processing
-        var cesiumRTC = extensions.CESIUM_RTC;
+        const cesiumRTC = extensions.CESIUM_RTC;
         if (defined(cesiumRTC)) {
             rtcPosition = Cartesian3.unpack(cesiumRTC.center);
         }
@@ -48,21 +48,21 @@ function optimizeGlb(glbBuffer, options) {
                             position: rtcPosition
                         });
                     }
-                    var embed = defaultValue(options.embed, true);
-                    var embedImage = defaultValue(options.embedImage, true);
+                    const embed = defaultValue(options.embed, true);
+                    const embedImage = defaultValue(options.embedImage, true);
                     return getBinaryGltf(gltf, embed, embedImage).glb;
                 });
         });
 }
 
 function fixBatchIdSemantic(gltf) {
-    var meshes = gltf.meshes;
-    for (var meshId in meshes) {
+    const meshes = gltf.meshes;
+    for (const meshId in meshes) {
         if (meshes.hasOwnProperty(meshId)) {
-            var primitives = meshes[meshId].primitives;
-            var primitivesLength = primitives.length;
-            for (var i = 0; i < primitivesLength; ++i) {
-                var attributes = primitives[i].attributes;
+            const primitives = meshes[meshId].primitives;
+            const primitivesLength = primitives.length;
+            for (let i = 0; i < primitivesLength; ++i) {
+                const attributes = primitives[i].attributes;
                 if (defined(attributes.BATCHID)) {
                     attributes._BATCHID = attributes.BATCHID;
                     delete attributes.BATCHID;
@@ -71,13 +71,13 @@ function fixBatchIdSemantic(gltf) {
         }
     }
 
-    var techniques = gltf.techniques;
-    for (var techniqueId in techniques) {
+    const techniques = gltf.techniques;
+    for (const techniqueId in techniques) {
         if (techniques.hasOwnProperty(techniqueId)) {
-            var parameters = techniques[techniqueId].parameters;
-            for (var parameterId in parameters) {
+            const parameters = techniques[techniqueId].parameters;
+            for (const parameterId in parameters) {
                 if (parameters.hasOwnProperty(parameterId)) {
-                    var parameter = parameters[parameterId];
+                    const parameter = parameters[parameterId];
                     if (parameter.semantic === 'BATCHID') {
                         parameter.semantic = '_BATCHID';
                     }

@@ -1,16 +1,16 @@
 'use strict';
-var Cesium = require('cesium');
-var fsExtra = require('fs-extra');
-var path = require('path');
-var zlib = require('zlib');
-var getDefaultWriteCallback = require('./getDefaultWriteCallback');
-var isGzipped = require('./isGzipped');
-var isTile = require('./isTile');
-var walkDirectory = require('./walkDirectory');
+const Cesium = require('cesium');
+const fsExtra = require('fs-extra');
+const path = require('path');
+const zlib = require('zlib');
+const getDefaultWriteCallback = require('./getDefaultWriteCallback');
+const isGzipped = require('./isGzipped');
+const isTile = require('./isTile');
+const walkDirectory = require('./walkDirectory');
 
-var Check = Cesium.Check;
-var defaultValue = Cesium.defaultValue;
-var defined = Cesium.defined;
+const Check = Cesium.Check;
+const defaultValue = Cesium.defaultValue;
+const defined = Cesium.defined;
 
 module.exports = gzipTileset;
 
@@ -29,10 +29,10 @@ module.exports = gzipTileset;
  */
 function gzipTileset(options) {
     options = defaultValue(options, defaultValue.EMPTY_OBJECT);
-    var inputDirectory = options.inputDirectory;
-    var outputDirectory = options.outputDirectory;
-    var gzip = defaultValue(options.gzip, true);
-    var tilesOnly = defaultValue(options.tilesOnly, false);
+    let inputDirectory = options.inputDirectory;
+    let outputDirectory = options.outputDirectory;
+    const gzip = defaultValue(options.gzip, true);
+    const tilesOnly = defaultValue(options.tilesOnly, false);
 
     Check.typeOf.string('options.inputDirectory', inputDirectory);
 
@@ -40,21 +40,21 @@ function gzipTileset(options) {
     outputDirectory = path.normalize(defaultValue(outputDirectory,
         path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-' + (gzip ? 'gzipped' : 'ungzipped'))));
 
-    var writeCallback = defaultValue(options.writeCallback, getDefaultWriteCallback(outputDirectory));
-    var logCallback = options.logCallback;
+    const writeCallback = defaultValue(options.writeCallback, getDefaultWriteCallback(outputDirectory));
+    const logCallback = options.logCallback;
 
     if (defined(logCallback)) {
         logCallback((gzip ? 'Compressing' : 'Uncompressing') + ' files...');
     }
 
-    var operation = (gzip) ? zlib.gzipSync : zlib.gunzipSync;
+    const operation = (gzip) ? zlib.gzipSync : zlib.gunzipSync;
     return walkDirectory(inputDirectory, function(file) {
         return fsExtra.readFile(file)
             .then(function(data) {
                 if (!(gzip && tilesOnly && !isTile(file)) && (isGzipped(data) !== gzip)) {
                     data = operation(data);
                 }
-                var relativePath = path.relative(inputDirectory, file);
+                const relativePath = path.relative(inputDirectory, file);
                 return writeCallback(relativePath, data);
             });
     });

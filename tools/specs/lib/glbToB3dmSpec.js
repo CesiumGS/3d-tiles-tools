@@ -1,25 +1,25 @@
 'use strict';
-var fs = require('fs');
-var extractB3dm = require('../../lib/extractB3dm');
-var getBufferPadded = require('../../lib/getBufferPadded');
-var getJsonBufferPadded = require('../../lib/getJsonBufferPadded');
-var glbToB3dm = require('../../lib/glbToB3dm');
+const fs = require('fs');
+const extractB3dm = require('../../lib/extractB3dm');
+const getBufferPadded = require('../../lib/getBufferPadded');
+const getJsonBufferPadded = require('../../lib/getJsonBufferPadded');
+const glbToB3dm = require('../../lib/glbToB3dm');
 
-var glbPath = './specs/data/CesiumTexturedBox/CesiumTexturedBox.glb';
-var b3dmPath = './specs/data/batchedWithBatchTableBinary.b3dm';
+const glbPath = './specs/data/CesiumTexturedBox/CesiumTexturedBox.glb';
+const b3dmPath = './specs/data/batchedWithBatchTableBinary.b3dm';
 
 describe('glbToB3dm', function() {
-    var glbBuffer;
+    let glbBuffer;
 
     beforeAll(function() {
         glbBuffer = fs.readFileSync(glbPath);
     });
 
     it('generates a basic b3dm header for a glb', function() {
-        var headerByteLength = 28;
-        var byteLength = headerByteLength + glbBuffer.length;
-        var b3dmBuffer = glbToB3dm(glbBuffer);
-        var header = b3dmBuffer.slice(0, headerByteLength);
+        const headerByteLength = 28;
+        const byteLength = headerByteLength + glbBuffer.length;
+        const b3dmBuffer = glbToB3dm(glbBuffer);
+        const header = b3dmBuffer.slice(0, headerByteLength);
         expect(header.toString('utf8', 0, 4)).toEqual('b3dm');  // magic
         expect(header.readUInt32LE(4)).toEqual(1);              // version
         expect(header.readUInt32LE(8)).toEqual(byteLength);     // byteLength
@@ -31,10 +31,10 @@ describe('glbToB3dm', function() {
     });
 
     it('generates a b3dm with feature table and batch table', function() {
-        var featureTableJson = {
+        const featureTableJson = {
             BATCH_LENGTH : 10
         };
-        var batchTableJson = {
+        const batchTableJson = {
             height : {
                 componentType : 'FLOAT',
                 type : 'SCALAR',
@@ -42,16 +42,16 @@ describe('glbToB3dm', function() {
             }
         };
 
-        var headerByteLength = 28;
-        var featureTableJsonBuffer = getJsonBufferPadded(featureTableJson, headerByteLength);
-        var featureTableBinaryBuffer = getBufferPadded(Buffer.alloc(16)); // Contents don't matter
-        var batchTableJsonBuffer = getJsonBufferPadded(batchTableJson);
-        var batchTableBinaryBuffer = getBufferPadded(Buffer.alloc(32)); // Contents don't matter
+        const headerByteLength = 28;
+        const featureTableJsonBuffer = getJsonBufferPadded(featureTableJson, headerByteLength);
+        const featureTableBinaryBuffer = getBufferPadded(Buffer.alloc(16)); // Contents don't matter
+        const batchTableJsonBuffer = getJsonBufferPadded(batchTableJson);
+        const batchTableBinaryBuffer = getBufferPadded(Buffer.alloc(32)); // Contents don't matter
 
-        var byteLength = headerByteLength + featureTableJsonBuffer.length + featureTableBinaryBuffer.length + batchTableJsonBuffer.length + batchTableBinaryBuffer.length + glbBuffer.length;
+        const byteLength = headerByteLength + featureTableJsonBuffer.length + featureTableBinaryBuffer.length + batchTableJsonBuffer.length + batchTableBinaryBuffer.length + glbBuffer.length;
 
-        var b3dmBuffer = glbToB3dm(glbBuffer, featureTableJson, featureTableBinaryBuffer, batchTableJson, batchTableBinaryBuffer);
-        var header = b3dmBuffer.slice(0, headerByteLength);
+        const b3dmBuffer = glbToB3dm(glbBuffer, featureTableJson, featureTableBinaryBuffer, batchTableJson, batchTableBinaryBuffer);
+        const header = b3dmBuffer.slice(0, headerByteLength);
         expect(header.toString('utf8', 0, 4)).toEqual('b3dm');                     // magic
         expect(header.readUInt32LE(4)).toEqual(1);                                 // version
         expect(header.readUInt32LE(8)).toEqual(byteLength);                        // byteLength
@@ -63,9 +63,9 @@ describe('glbToB3dm', function() {
     });
 
     it('convert b3dm to glb and back to b3dm', function() {
-        var b3dmBuffer = fs.readFileSync(b3dmPath);
-        var b3dm = extractB3dm(b3dmBuffer);
-        var b3dmOut = glbToB3dm(b3dm.glb, b3dm.featureTable.json, b3dm.featureTable.binary, b3dm.batchTable.json, b3dm.batchTable.binary);
+        const b3dmBuffer = fs.readFileSync(b3dmPath);
+        const b3dm = extractB3dm(b3dmBuffer);
+        const b3dmOut = glbToB3dm(b3dm.glb, b3dm.featureTable.json, b3dm.featureTable.binary, b3dm.batchTable.json, b3dm.batchTable.binary);
         expect(b3dm).toEqual(extractB3dm(b3dmOut));
         expect(b3dmOut).toEqual(b3dmBuffer);
     });

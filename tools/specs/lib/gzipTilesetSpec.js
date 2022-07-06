@@ -1,16 +1,16 @@
 'use strict';
-var fsExtra = require('fs-extra');
-var path = require('path');
-var Promise = require('bluebird');
-var isGzippedFile = require('../../lib/isGzippedFile');
-var gzipTileset = require('../../lib/gzipTileset');
+const fsExtra = require('fs-extra');
+const path = require('path');
+const Promise = require('bluebird');
+const isGzippedFile = require('../../lib/isGzippedFile');
+const gzipTileset = require('../../lib/gzipTileset');
 
-var tilesetDirectory = './specs/data/TilesetOfTilesets/';
-var tilesetJson = './specs/data/TilesetOfTilesets/tileset.json';
-var gzippedDirectory = './specs/data/TilesetOfTilesets-gzipped';
-var gzippedJson = './specs/data/TilesetOfTilesets-gzipped/tileset.json';
-var ungzippedDirectory = './specs/data/TilesetOfTilesets-ungzipped';
-var ungzippedJson = './specs/data/TilesetOfTilesets-ungzipped/tileset.json';
+const tilesetDirectory = './specs/data/TilesetOfTilesets/';
+const tilesetJson = './specs/data/TilesetOfTilesets/tileset.json';
+const gzippedDirectory = './specs/data/TilesetOfTilesets-gzipped';
+const gzippedJson = './specs/data/TilesetOfTilesets-gzipped/tileset.json';
+const ungzippedDirectory = './specs/data/TilesetOfTilesets-ungzipped';
+const ungzippedJson = './specs/data/TilesetOfTilesets-ungzipped/tileset.json';
 
 describe('gzipTileset', function() {
     afterEach(function (done) {
@@ -23,7 +23,7 @@ describe('gzipTileset', function() {
     });
 
     it('gzips uncompressed tileset', function (done) {
-        var gzipOptions = {
+        const gzipOptions = {
             inputDirectory : tilesetDirectory,
             outputDirectory : gzippedDirectory,
             gzip : true
@@ -38,12 +38,12 @@ describe('gzipTileset', function() {
     });
 
     it('ungzips compressed tileset', function (done) {
-        var gzipOptions = {
+        const gzipOptions = {
             inputDirectory : tilesetDirectory,
             outputDirectory : gzippedDirectory,
             gzip : true
         };
-        var ungzipOptions = {
+        const ungzipOptions = {
             inputDirectory : gzippedDirectory,
             outputDirectory : ungzippedDirectory,
             gzip : false
@@ -61,7 +61,7 @@ describe('gzipTileset', function() {
     });
 
     it('works when no output directory is supplied', function (done) {
-        var gzipOptions = {
+        const gzipOptions = {
             inputDirectory : tilesetDirectory,
             gzip : true
         };
@@ -75,12 +75,12 @@ describe('gzipTileset', function() {
     });
 
     it('does not gzip already gzipped tileset', function (done) {
-        var gzipOptions = {
+        const gzipOptions = {
             inputDirectory : tilesetDirectory,
             outputDirectory : gzippedDirectory,
             gzip : true
         };
-        var gzipAgainOptions = {
+        const gzipAgainOptions = {
             inputDirectory : gzippedDirectory,
             outputDirectory : ungzippedDirectory,
             gzip : true
@@ -89,7 +89,7 @@ describe('gzipTileset', function() {
             .then(function() {
                 return gzipTileset(gzipAgainOptions)
                     .then(function() {
-                        var promises = [
+                        const promises = [
                             fsExtra.readFile(gzippedJson),
                             fsExtra.readFile(ungzippedJson)
                         ];
@@ -102,14 +102,14 @@ describe('gzipTileset', function() {
     });
 
     it('does not ungzip already ungzipped tileset', function (done) {
-        var ungzipOptions = {
+        const ungzipOptions = {
             inputDirectory : tilesetDirectory,
             outputDirectory : ungzippedDirectory,
             gzip : false
         };
         expect(gzipTileset(ungzipOptions)
             .then(function() {
-                var promises = [
+                const promises = [
                     fsExtra.readFile(tilesetJson),
                     fsExtra.readFile(ungzippedJson)
                 ];
@@ -121,7 +121,7 @@ describe('gzipTileset', function() {
     });
 
     it('only gzips tiles when tilesOnly is true', function (done) {
-        var gzipOptions = {
+        const gzipOptions = {
             inputDirectory : tilesetDirectory,
             outputDirectory : gzippedDirectory,
             gzip : true,
@@ -143,7 +143,7 @@ describe('gzipTileset', function() {
     });
 
     it('throws error when input tileset does not exist', function (done) {
-        var gzipOptions = {
+        const gzipOptions = {
             inputDirectory : 'non-existent-tileset',
             outputDirectory : gzippedDirectory,
             gzip : true
@@ -152,16 +152,16 @@ describe('gzipTileset', function() {
     });
 
     it('accepts custom writeCallback that does not return a promise', function (done) {
-        var writeCallback = function(file, data) {
+        const writeCallback = function(file, data) {
             console.log('Save file ' + file + ' with data ' + data);
         };
-        var gzipOptions = {
+        const gzipOptions = {
             inputDirectory : tilesetDirectory,
             gzip : true,
             writeCallback : writeCallback
         };
 
-        var spy = spyOn(console, 'log').and.callFake(function(){});
+        const spy = spyOn(console, 'log').and.callFake(function(){});
         expect(gzipTileset(gzipOptions)
             .then(function() {
                 expect(spy).toHaveBeenCalled();
@@ -169,12 +169,12 @@ describe('gzipTileset', function() {
     });
 
     it('accepts custom writeCallback that returns a promise', function (done) {
-        var outputDirectory = gzippedDirectory;
-        var writeCallback = function(file, data) {
-            var outputFile = path.join(outputDirectory, file);
+        const outputDirectory = gzippedDirectory;
+        const writeCallback = function(file, data) {
+            const outputFile = path.join(outputDirectory, file);
             return fsExtra.outputFile(outputFile, data);
         };
-        var gzipOptions = {
+        const gzipOptions = {
             inputDirectory : tilesetDirectory,
             gzip : true,
             writeCallback : writeCallback
@@ -189,18 +189,18 @@ describe('gzipTileset', function() {
     });
 
     it('logs debug messages', function (done) {
-        var logCallback = function(message) {
+        const logCallback = function(message) {
             console.log(message);
         };
 
-        var gzipOptions = {
+        const gzipOptions = {
             inputDirectory : tilesetDirectory,
             outputDirectory : gzippedDirectory,
             gzip : true,
             logCallback : logCallback
         };
 
-        var spy = spyOn(console, 'log').and.callFake(function(){});
+        const spy = spyOn(console, 'log').and.callFake(function(){});
         expect(gzipTileset(gzipOptions)
             .then(function() {
                 expect(spy).toHaveBeenCalled();

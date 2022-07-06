@@ -1,15 +1,15 @@
 'use strict';
-var Cesium = require('cesium');
-var fsExtra = require('fs-extra');
-var path = require('path');
-var Promise = require('bluebird');
-var sqlite3 = require('sqlite3');
-var zlib = require('zlib');
-var isGzipped = require('../lib/isGzipped');
+const Cesium = require('cesium');
+const fsExtra = require('fs-extra');
+const path = require('path');
+const Promise = require('bluebird');
+const sqlite3 = require('sqlite3');
+const zlib = require('zlib');
+const isGzipped = require('../lib/isGzipped');
 
-var defaultValue = Cesium.defaultValue;
-var defined = Cesium.defined;
-var DeveloperError = Cesium.DeveloperError;
+const defaultValue = Cesium.defaultValue;
+const defined = Cesium.defined;
+const DeveloperError = Cesium.DeveloperError;
 
 module.exports = databaseToTileset;
 
@@ -28,13 +28,13 @@ function databaseToTileset(inputFile, outputDirectory) {
     outputDirectory = defaultValue(outputDirectory, path.join(path.dirname(inputFile), path.basename(inputFile, path.extname(inputFile))));
 
     // Open the database.
-    var db = new sqlite3.Database(inputFile, sqlite3.OPEN_READWRITE);
-    var dbAll = Promise.promisify(db.all, {context : db});
+    const db = new sqlite3.Database(inputFile, sqlite3.OPEN_READWRITE);
+    const dbAll = Promise.promisify(db.all, {context : db});
 
     // Read a chunk of rows from the database at a time. Since the row contents contain tile blobs the limit should not be too high.
-    var offset = 0;
-    var limit = 100;
-    var processChunk = function() {
+    let offset = 0;
+    const limit = 100;
+    const processChunk = function() {
         return dbAll('SELECT * FROM media LIMIT ? OFFSET ?', limit, offset)
             .then(function(rows) {
                 if (rows.length === 0) {
@@ -57,7 +57,7 @@ function databaseToTileset(inputFile, outputDirectory) {
 }
 
 function writeFile(outputDirectory, file, data) {
-    var filePath = path.normalize(path.join(outputDirectory, file));
+    const filePath = path.normalize(path.join(outputDirectory, file));
     if (isGzipped(data)) {
         data = zlib.gunzipSync(data);
     }

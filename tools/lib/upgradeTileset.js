@@ -1,24 +1,24 @@
 'use strict';
-var Cesium = require('cesium');
-var path = require('path');
-var Promise = require('bluebird');
-var zlib = require('zlib');
-var extractB3dm = require('./extractB3dm');
-var extractCmpt = require('./extractCmpt');
-var getDefaultWriteCallback = require('./getDefaultWriteCallback');
-var getMagic = require('./getMagic');
-var glbToB3dm = require('./glbToB3dm');
-var isGzippedFile = require('./isGzippedFile');
-var isJson = require('./isJson');
-var isTile = require('./isTile');
-var makeCompositeTile = require('./makeCompositeTile');
-var optimizeGlb = require('./optimizeGlb');
-var readFile = require('./readFile');
-var walkDirectory = require('./walkDirectory');
+const Cesium = require('cesium');
+const path = require('path');
+const Promise = require('bluebird');
+const zlib = require('zlib');
+const extractB3dm = require('./extractB3dm');
+const extractCmpt = require('./extractCmpt');
+const getDefaultWriteCallback = require('./getDefaultWriteCallback');
+const getMagic = require('./getMagic');
+const glbToB3dm = require('./glbToB3dm');
+const isGzippedFile = require('./isGzippedFile');
+const isJson = require('./isJson');
+const isTile = require('./isTile');
+const makeCompositeTile = require('./makeCompositeTile');
+const optimizeGlb = require('./optimizeGlb');
+const readFile = require('./readFile');
+const walkDirectory = require('./walkDirectory');
 
-var Check = Cesium.Check;
-var defaultValue = Cesium.defaultValue;
-var defined = Cesium.defined;
+const Check = Cesium.Check;
+const defaultValue = Cesium.defaultValue;
+const defined = Cesium.defined;
 
 module.exports = upgradeTileset;
 
@@ -35,8 +35,8 @@ module.exports = upgradeTileset;
  */
 function upgradeTileset(options) {
     options = defaultValue(options, defaultValue.EMPTY_OBJECT);
-    var inputDirectory = options.inputDirectory;
-    var outputDirectory = options.outputDirectory;
+    let inputDirectory = options.inputDirectory;
+    let outputDirectory = options.outputDirectory;
 
     Check.typeOf.string('options.inputDirectory', inputDirectory);
 
@@ -44,8 +44,8 @@ function upgradeTileset(options) {
     outputDirectory = path.normalize(defaultValue(outputDirectory,
         path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-upgrades')));
 
-    var writeCallback = defaultValue(options.writeCallback, getDefaultWriteCallback(outputDirectory));
-    var logCallback = options.logCallback;
+    const writeCallback = defaultValue(options.writeCallback, getDefaultWriteCallback(outputDirectory));
+    const logCallback = options.logCallback;
 
     if (defined(logCallback)) {
         logCallback('Upgrading to 3D Tiles version 1.0');
@@ -59,7 +59,7 @@ function upgradeTileset(options) {
                         if (gzipped) {
                             data = zlib.gzipSync(data);
                         }
-                        var relativePath = path.relative(inputDirectory, file);
+                        const relativePath = path.relative(inputDirectory, file);
                         return writeCallback(relativePath, data);
                     });
             });
@@ -85,7 +85,7 @@ function upgradeTilesetJson(file) {
         });
 }
 
-var optimizeOptions = {
+const optimizeOptions = {
     preserve : true
 };
 
@@ -97,15 +97,15 @@ function upgradeTile(file) {
 }
 
 function upgradeTileContent(buffer, basePath) {
-    var magic = getMagic(buffer);
+    const magic = getMagic(buffer);
     if (magic === 'b3dm') {
-        var b3dm = extractB3dm(buffer);
+        const b3dm = extractB3dm(buffer);
         return optimizeGlb(b3dm.glb, Object.assign({}, optimizeOptions, {basePath: basePath}))
             .then(function(glb) {
                 return glbToB3dm(glb, b3dm.featureTable.json, b3dm.featureTable.binary, b3dm.batchTable.json, b3dm.batchTable.binary);
             });
     } else if (magic === 'cmpt') {
-        var tiles = extractCmpt(buffer);
+        const tiles = extractCmpt(buffer);
         return Promise.map(tiles, function(tile) {
             return upgradeTileContent(tile, basePath);
         }).then(function(upgradedTiles) {

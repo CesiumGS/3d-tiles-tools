@@ -1,10 +1,10 @@
 'use strict';
-var Cesium = require('cesium');
-var getBufferPadded = require('./getBufferPadded');
-var getJsonBufferPadded = require('./getJsonBufferPadded');
+const Cesium = require('cesium');
+const getBufferPadded = require('./getBufferPadded');
+const getJsonBufferPadded = require('./getJsonBufferPadded');
 
-var defined = Cesium.defined;
-var DeveloperError = Cesium.DeveloperError;
+const defined = Cesium.defined;
+const DeveloperError = Cesium.DeveloperError;
 
 module.exports = glbToB3dm;
 
@@ -23,14 +23,14 @@ function glbToB3dm(glbBuffer, featureTableJson, featureTableBinary, batchTableJs
         throw new DeveloperError('glbBuffer is not defined.');
     }
 
-    var headerByteLength = 28;
-    var featureTableJsonBuffer = getJsonBufferPadded(featureTableJson, headerByteLength);
-    var featureTableBinaryBuffer = getBufferPadded(featureTableBinary);
-    var batchTableJsonBuffer = getJsonBufferPadded(batchTableJson);
-    var batchTableBinaryBuffer = getBufferPadded(batchTableBinary);
+    const headerByteLength = 28;
+    const featureTableJsonBuffer = getJsonBufferPadded(featureTableJson, headerByteLength);
+    const featureTableBinaryBuffer = getBufferPadded(featureTableBinary);
+    const batchTableJsonBuffer = getJsonBufferPadded(batchTableJson);
+    const batchTableBinaryBuffer = getBufferPadded(batchTableBinary);
 
-    var byteLength = headerByteLength + featureTableJsonBuffer.length + featureTableBinaryBuffer.length + batchTableJsonBuffer.length + batchTableBinaryBuffer.length + glbBuffer.length;
-    var header = Buffer.alloc(headerByteLength);
+    const byteLength = headerByteLength + featureTableJsonBuffer.length + featureTableBinaryBuffer.length + batchTableJsonBuffer.length + batchTableBinaryBuffer.length + glbBuffer.length;
+    const header = Buffer.alloc(headerByteLength);
     header.write('b3dm', 0);                                    // magic
     header.writeUInt32LE(1, 4);                                 // version
     header.writeUInt32LE(byteLength, 8);                        // byteLength - length of entire tile, including header, in bytes

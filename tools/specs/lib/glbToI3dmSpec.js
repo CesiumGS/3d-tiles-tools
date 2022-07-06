@@ -1,25 +1,25 @@
 'use strict';
-var fs = require('fs');
-var extractI3dm = require('../../lib/extractI3dm');
-var getBufferPadded = require('../../lib/getBufferPadded');
-var getJsonBufferPadded = require('../../lib/getJsonBufferPadded');
-var glbToI3dm = require('../../lib/glbToI3dm');
+const fs = require('fs');
+const extractI3dm = require('../../lib/extractI3dm');
+const getBufferPadded = require('../../lib/getBufferPadded');
+const getJsonBufferPadded = require('../../lib/getJsonBufferPadded');
+const glbToI3dm = require('../../lib/glbToI3dm');
 
-var glbPath = './specs/data/CesiumTexturedBox/CesiumTexturedBox.glb';
-var i3dmPath = './specs/data/instancedWithBatchTableBinary.i3dm';
+const glbPath = './specs/data/CesiumTexturedBox/CesiumTexturedBox.glb';
+const i3dmPath = './specs/data/instancedWithBatchTableBinary.i3dm';
 
 describe('glbToI3dm', function() {
-    var glbBuffer;
+    let glbBuffer;
 
     beforeAll(function() {
         glbBuffer = fs.readFileSync(glbPath);
     });
 
     it('generates a basic i3dm header for a glb', function() {
-        var headerByteLength = 32;
-        var byteLength = headerByteLength + glbBuffer.length;
-        var i3dmBuffer = glbToI3dm(glbBuffer);
-        var header = i3dmBuffer.slice(0, headerByteLength);
+        const headerByteLength = 32;
+        const byteLength = headerByteLength + glbBuffer.length;
+        const i3dmBuffer = glbToI3dm(glbBuffer);
+        const header = i3dmBuffer.slice(0, headerByteLength);
         expect(header.toString('utf8', 0, 4)).toEqual('i3dm');  // magic
         expect(header.readUInt32LE(4)).toEqual(1);              // version
         expect(header.readUInt32LE(8)).toEqual(byteLength);     // byteLength
@@ -32,13 +32,13 @@ describe('glbToI3dm', function() {
     });
 
     it('generates an i3dm with feature table and batch table', function() {
-        var featureTableJson = {
+        const featureTableJson = {
             INSTANCES_LENGTH : 1,
             POSITION : {
                 byteOffset : 0
             }
         };
-        var batchTableJson = {
+        const batchTableJson = {
             height : {
                 componentType : 'FLOAT',
                 type : 'SCALAR',
@@ -46,16 +46,16 @@ describe('glbToI3dm', function() {
             }
         };
 
-        var featureTableJsonBuffer = getJsonBufferPadded(featureTableJson);
-        var featureTableBinaryBuffer = getBufferPadded(Buffer.alloc(16)); // Contents don't matter
-        var batchTableJsonBuffer = getJsonBufferPadded(batchTableJson);
-        var batchTableBinaryBuffer = getBufferPadded(Buffer.alloc(32)); // Contents don't matter
+        const featureTableJsonBuffer = getJsonBufferPadded(featureTableJson);
+        const featureTableBinaryBuffer = getBufferPadded(Buffer.alloc(16)); // Contents don't matter
+        const batchTableJsonBuffer = getJsonBufferPadded(batchTableJson);
+        const batchTableBinaryBuffer = getBufferPadded(Buffer.alloc(32)); // Contents don't matter
 
-        var headerByteLength = 32;
-        var byteLength = headerByteLength + featureTableJsonBuffer.length + featureTableBinaryBuffer.length + batchTableJsonBuffer.length + batchTableBinaryBuffer.length + glbBuffer.length;
+        const headerByteLength = 32;
+        const byteLength = headerByteLength + featureTableJsonBuffer.length + featureTableBinaryBuffer.length + batchTableJsonBuffer.length + batchTableBinaryBuffer.length + glbBuffer.length;
 
-        var i3dmBuffer = glbToI3dm(glbBuffer, featureTableJson, featureTableBinaryBuffer, batchTableJson, batchTableBinaryBuffer);
-        var header = i3dmBuffer.slice(0, headerByteLength);
+        const i3dmBuffer = glbToI3dm(glbBuffer, featureTableJson, featureTableBinaryBuffer, batchTableJson, batchTableBinaryBuffer);
+        const header = i3dmBuffer.slice(0, headerByteLength);
         expect(header.toString('utf8', 0, 4)).toEqual('i3dm');                      // magic
         expect(header.readUInt32LE(4)).toEqual(1);                                  // version
         expect(header.readUInt32LE(8)).toEqual(byteLength);                         // byteLength
@@ -68,9 +68,9 @@ describe('glbToI3dm', function() {
     });
 
     it('convert i3dm to glb and back to i3dm', function() {
-        var i3dmBuffer = fs.readFileSync(i3dmPath);
-        var i3dm = extractI3dm(i3dmBuffer);
-        var i3dmOut = glbToI3dm(i3dm.glb, i3dm.featureTable.json, i3dm.featureTable.binary, i3dm.batchTable.json, i3dm.batchTable.binary);
+        const i3dmBuffer = fs.readFileSync(i3dmPath);
+        const i3dm = extractI3dm(i3dmBuffer);
+        const i3dmOut = glbToI3dm(i3dm.glb, i3dm.featureTable.json, i3dm.featureTable.binary, i3dm.batchTable.json, i3dm.batchTable.binary);
         expect(i3dm).toEqual(extractI3dm(i3dmOut));
         expect(i3dmOut).toEqual(i3dmBuffer);
     });

@@ -1,45 +1,45 @@
 #!/usr/bin/env node
 'use strict';
-var Cesium = require('cesium');
-var fsExtra = require('fs-extra');
-var GltfPipeline = require('gltf-pipeline');
-var path = require('path');
-var Promise = require('bluebird');
-var yargs = require('yargs');
-var zlib = require('zlib');
-var databaseToTileset = require('../lib/databaseToTileset');
-var directoryExists = require('../lib/directoryExists');
-var extractB3dm = require('../lib/extractB3dm');
-var extractCmpt = require('../lib/extractCmpt');
-var extractI3dm = require('../lib/extractI3dm');
-var fileExists = require('../lib/fileExists');
-var getBufferPadded = require('../lib/getBufferPadded');
-var getMagic = require('../lib/getMagic');
-var getJsonBufferPadded = require('../lib/getJsonBufferPadded');
-var glbToB3dm = require('../lib/glbToB3dm');
-var glbToI3dm = require('../lib/glbToI3dm');
-var isGzipped = require('../lib/isGzipped');
-var optimizeGlb = require('../lib/optimizeGlb');
-var runPipeline = require('../lib/runPipeline');
-var tilesetToDatabase = require('../lib/tilesetToDatabase');
+const Cesium = require('cesium');
+const fsExtra = require('fs-extra');
+const GltfPipeline = require('gltf-pipeline');
+const path = require('path');
+const Promise = require('bluebird');
+const yargs = require('yargs');
+const zlib = require('zlib');
+const databaseToTileset = require('../lib/databaseToTileset');
+const directoryExists = require('../lib/directoryExists');
+const extractB3dm = require('../lib/extractB3dm');
+const extractCmpt = require('../lib/extractCmpt');
+const extractI3dm = require('../lib/extractI3dm');
+const fileExists = require('../lib/fileExists');
+const getBufferPadded = require('../lib/getBufferPadded');
+const getMagic = require('../lib/getMagic');
+const getJsonBufferPadded = require('../lib/getJsonBufferPadded');
+const glbToB3dm = require('../lib/glbToB3dm');
+const glbToI3dm = require('../lib/glbToI3dm');
+const isGzipped = require('../lib/isGzipped');
+const optimizeGlb = require('../lib/optimizeGlb');
+const runPipeline = require('../lib/runPipeline');
+const tilesetToDatabase = require('../lib/tilesetToDatabase');
 
-var zlibGunzip = Promise.promisify(zlib.gunzip);
-var zlibGzip = Promise.promisify(zlib.gzip);
+const zlibGunzip = Promise.promisify(zlib.gunzip);
+const zlibGzip = Promise.promisify(zlib.gzip);
 
-var defaultValue = Cesium.defaultValue;
-var defined = Cesium.defined;
-var DeveloperError = Cesium.DeveloperError;
+const defaultValue = Cesium.defaultValue;
+const defined = Cesium.defined;
+const DeveloperError = Cesium.DeveloperError;
 
-var index = -1;
-for (var i = 0; i < process.argv.length; i++) {
+let index = -1;
+for (let i = 0; i < process.argv.length; i++) {
     if (process.argv[i] === '--options') {
         index = i;
         break;
     }
 }
 
-var args;
-var optionArgs;
+let args;
+let optionArgs;
 if (index < 0) {
     args = process.argv.slice(2);
     optionArgs = [];
@@ -52,7 +52,7 @@ if (index < 0) {
 optionArgs.push('-i');
 optionArgs.push('null');
 
-var argv = yargs
+const argv = yargs
     .usage('Usage: $0 <command> [options]')
     .help('h')
     .alias('h', 'help')
@@ -121,10 +121,10 @@ var argv = yargs
     .strict()
     .parse(args);
 
-var command = argv._[0];
-var input = defaultValue(argv.i, argv._[1]);
-var output = defaultValue(argv.o, argv._[2]);
-var force = argv.f;
+const command = argv._[0];
+const input = defaultValue(argv.i, argv._[1]);
+const output = defaultValue(argv.o, argv._[2]);
+const force = argv.f;
 
 if (!defined(input)) {
     console.log('-i or --input argument is required. See --help for details.');
@@ -214,8 +214,8 @@ function logCallback(message) {
 function processPipeline(inputFile) {
     return fsExtra.readJson(inputFile)
         .then(function(pipeline) {
-            var inputDirectory = pipeline.input;
-            var outputDirectory = pipeline.output;
+            let inputDirectory = pipeline.input;
+            let outputDirectory = pipeline.output;
 
             if (!defined(inputDirectory)) {
                 throw new DeveloperError('pipeline.input is required.');
@@ -232,7 +232,7 @@ function processPipeline(inputFile) {
                     pipeline.input = inputDirectory;
                     pipeline.output = outputDirectory;
 
-                    var options = {
+                    const options = {
                         logCallback : logCallback
                     };
 
@@ -245,15 +245,15 @@ function processStage(inputDirectory, outputDirectory, force, command, argv) {
     outputDirectory = defaultValue(outputDirectory, path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-processed'));
     return checkDirectoryOverwritable(outputDirectory, force)
         .then(function() {
-            var stage = getStage(command, argv);
+            const stage = getStage(command, argv);
 
-            var pipeline = {
+            const pipeline = {
                 input : inputDirectory,
                 output : outputDirectory,
                 stages : [stage]
             };
 
-            var options = {
+            const options = {
                 logCallback : logCallback
             };
 
@@ -262,7 +262,7 @@ function processStage(inputDirectory, outputDirectory, force, command, argv) {
 }
 
 function getStage(stageName, argv) {
-    var stage = {
+    const stage = {
         name : stageName
     };
     switch (stageName) {
@@ -298,7 +298,7 @@ function readGlbWriteB3dm(inputPath, outputPath, force) {
             return readFile(inputPath)
                 .then(function(glb) {
                     // Set b3dm spec requirements
-                    var featureTableJson = {
+                    const featureTableJson = {
                         BATCH_LENGTH : 0
                     };
                     return fsExtra.outputFile(outputPath, glbToB3dm(glb, featureTableJson));
@@ -313,14 +313,14 @@ function readGlbWriteI3dm(inputPath, outputPath, force) {
             return readFile(inputPath)
                 .then(function(glb) {
                     // Set i3dm spec requirements
-                    var featureTable = {
+                    const featureTable = {
                         INSTANCES_LENGTH : 1,
                         POSITION : {
                             byteOffset : 0
                         }
                     };
-                    var featureTableJsonBuffer = getJsonBufferPadded(featureTable);
-                    var featureTableBinaryBuffer = getBufferPadded(Buffer.alloc(12, 0)); // [0, 0, 0]
+                    const featureTableJsonBuffer = getJsonBufferPadded(featureTable);
+                    const featureTableBinaryBuffer = getBufferPadded(Buffer.alloc(12, 0)); // [0, 0, 0]
 
                     return fsExtra.outputFile(outputPath, glbToI3dm(glb, featureTableJsonBuffer, featureTableBinaryBuffer));
                 });
@@ -350,11 +350,11 @@ function readI3dmWriteGlb(inputPath, outputPath, force) {
 }
 
 function extractGlbs(tiles) {
-    var glbs = [];
-    var tilesLength = tiles.length;
-    for (var i = 0; i < tilesLength; ++i) {
-        var tile = tiles[i];
-        var magic = getMagic(tile);
+    const glbs = [];
+    const tilesLength = tiles.length;
+    for (let i = 0; i < tilesLength; ++i) {
+        const tile = tiles[i];
+        const magic = getMagic(tile);
         if (magic === 'i3dm') {
             glbs.push(extractI3dm(tile).glb);
         } else if (magic === 'b3dm') {
@@ -368,16 +368,16 @@ function readCmptWriteGlb(inputPath, outputPath, force) {
     outputPath = defaultValue(outputPath, inputPath).slice(0, inputPath.length - 5);
     return readFile(inputPath)
         .then(function(cmpt) {
-            var tiles = extractCmpt(cmpt);
-            var glbs = extractGlbs(tiles);
-            var glbsLength = glbs.length;
-            var glbPaths = new Array(glbsLength);
+            const tiles = extractCmpt(cmpt);
+            const glbs = extractGlbs(tiles);
+            const glbsLength = glbs.length;
+            const glbPaths = new Array(glbsLength);
             if (glbsLength === 0) {
                 throw new DeveloperError('No glbs found in ' + inputPath + '.');
             } else if (glbsLength === 1) {
                 glbPaths[0] = outputPath + '.glb';
             } else {
-                for (var i = 0; i < glbsLength; ++i) {
+                for (let i = 0; i < glbsLength; ++i) {
                     glbPaths[i] = outputPath + '_' + i + '.glb';
                 }
             }
@@ -392,10 +392,10 @@ function readCmptWriteGlb(inputPath, outputPath, force) {
 }
 
 function readAndOptimizeB3dm(inputPath, outputPath, force, optionArgs) {
-    var options = GltfPipeline.parseArguments(optionArgs);
+    const options = GltfPipeline.parseArguments(optionArgs);
     outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 5) + '-optimized.b3dm');
-    var gzipped;
-    var b3dm;
+    let gzipped;
+    let b3dm;
     return checkFileOverwritable(outputPath, force)
         .then(function() {
             return fsExtra.readFile(inputPath);
@@ -412,7 +412,7 @@ function readAndOptimizeB3dm(inputPath, outputPath, force, optionArgs) {
             return optimizeGlb(b3dm.glb, options);
         })
         .then(function(glbBuffer) {
-            var b3dmBuffer = glbToB3dm(glbBuffer, b3dm.featureTable.json, b3dm.featureTable.binary, b3dm.batchTable.json, b3dm.batchTable.binary);
+            const b3dmBuffer = glbToB3dm(glbBuffer, b3dm.featureTable.json, b3dm.featureTable.binary, b3dm.batchTable.json, b3dm.batchTable.binary);
             if (gzipped) {
                 return zlibGzip(b3dmBuffer);
             }
@@ -424,10 +424,10 @@ function readAndOptimizeB3dm(inputPath, outputPath, force, optionArgs) {
 }
 
 function readAndOptimizeI3dm(inputPath, outputPath, force, optionArgs) {
-    var options = GltfPipeline.parseArguments(optionArgs);
+    const options = GltfPipeline.parseArguments(optionArgs);
     outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 5) + '-optimized.i3dm');
-    var gzipped;
-    var i3dm;
+    let gzipped;
+    let i3dm;
     return checkFileOverwritable(outputPath, force)
         .then(function() {
             return fsExtra.readFile(inputPath);
@@ -444,7 +444,7 @@ function readAndOptimizeI3dm(inputPath, outputPath, force, optionArgs) {
             return optimizeGlb(i3dm.glb, options);
         })
         .then(function(glbBuffer) {
-            var i3dmBuffer = glbToI3dm(glbBuffer, i3dm.featureTable.json, i3dm.featureTable.binary, i3dm.batchTable.json, i3dm.batchTable.binary);
+            const i3dmBuffer = glbToI3dm(glbBuffer, i3dm.featureTable.json, i3dm.featureTable.binary, i3dm.batchTable.json, i3dm.batchTable.binary);
             if (gzipped) {
                 return zlibGzip(i3dmBuffer);
             }
