@@ -48,7 +48,7 @@ function getFilesCategorized(directory) {
             return categorizeFiles(files, filesCategorized);
         })
         .then(function() {
-            return categorizeTilesetFiles(filesCategorized);
+            // return categorizeTilesetFiles(filesCategorized);
         })
         .then(function() {
             return filesCategorized;

@@ -58,11 +58,11 @@ function upgradeTileset(options) {
 
     return getFilesCategorized(inputDirectory)
         .then(function(files) {
-            return getGltfUpAxis(files.tileset.root)
-                .then(function(gltfUpAxis) {
-                    options.gltfUpAxis = gltfUpAxis;
-                    return upgradeFiles(files, options);
-                });
+            return upgradeFiles(files, options);
+            // return getGltfUpAxis(files.tileset.root)
+            //     .then(function(gltfUpAxis) {
+            //         options.gltfUpAxis = gltfUpAxis;
+            //     });
         });
 }
 
@@ -319,6 +319,7 @@ function upgradeOther(file, contents, options) { // eslint-disable-line no-unuse
 }
 
 function upgradeHelper(files, type, upgradeCallback, options) {
+    console.log(files);
     return Promise.map(files, function(file) {
         return readFile(file, type)
             .then(function(contents) {
@@ -347,7 +348,7 @@ function upgradeFiles(files, options) {
         upgradeHelper(files.other.gltf, 'json', upgradeGltf, options),
         upgradeHelper(files.other.glb, 'binary', upgradeGlb, options),
         upgradeHelper(files.other.other, 'binary', upgradeOther, options),
-        upgradeHelper([files.tileset.root], 'json', upgradeTilesetJson, options),
-        upgradeHelper(files.tileset.external, 'json', upgradeTilesetJson, options)
+        // upgradeHelper([files.tileset.root], 'json', upgradeTilesetJson, options),
+        // upgradeHelper(files.tileset.external, 'json', upgradeTilesetJson, options)
     ]);
 }
