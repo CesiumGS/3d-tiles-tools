@@ -28,7 +28,7 @@ function tilesetToDatabase(inputDirectory, outputFile) {
     }
 
     outputFile = defaultValue(outputFile,
-        path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '.3dtiles'));
+        path.join(path.dirname(inputDirectory), `${path.basename(inputDirectory)  }.3dtiles`));
 
     let db;
     let dbRun;

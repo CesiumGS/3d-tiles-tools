@@ -42,7 +42,7 @@ function upgradeTileset(options) {
 
     inputDirectory = path.normalize(inputDirectory);
     outputDirectory = path.normalize(defaultValue(outputDirectory,
-        path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-upgrades')));
+        path.join(path.dirname(inputDirectory), `${path.basename(inputDirectory)  }-upgrades`)));
 
     const writeCallback = defaultValue(options.writeCallback, getDefaultWriteCallback(outputDirectory));
     const logCallback = options.logCallback;

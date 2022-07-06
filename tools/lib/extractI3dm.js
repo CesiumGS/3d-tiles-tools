@@ -21,11 +21,11 @@ function extractI3dm(buffer) {
     }
     const magic = getMagic(buffer);
     if (magic !== 'i3dm') {
-        throw new DeveloperError('Invalid magic, expected "i3dm", got: "' + magic + '".');
+        throw new DeveloperError(`Invalid magic, expected "i3dm", got: "${  magic  }".`);
     }
     const version = buffer.readUInt32LE(4);
     if (version !== 1) {
-        throw new DeveloperError('Invalid version, only "1" is valid, got: "' + version + '".');
+        throw new DeveloperError(`Invalid version, only "1" is valid, got: "${  version  }".`);
     }
 
     const byteLength = buffer.readUInt32LE(8);

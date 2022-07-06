@@ -87,8 +87,8 @@ gulp.task('cloc', function() {
 
     //Run cloc on primary Source files only
     const source = new Promise(function(resolve, reject) {
-        cmdLine = 'perl ' + clocPath + ' --quiet --progress-rate=0' +
-            ' lib/ bin/';
+        cmdLine = `perl ${  clocPath  } --quiet --progress-rate=0` +
+            ` lib/ bin/`;
 
         child_process.exec(cmdLine, function(error, stdout, stderr) {
             if (error) {
@@ -104,8 +104,8 @@ gulp.task('cloc', function() {
     //If running cloc on source succeeded, also run it on the tests.
     return source.then(function() {
         return new Promise(function(resolve, reject) {
-            cmdLine = 'perl ' + clocPath + ' --quiet --progress-rate=0' +
-                ' specs/lib/';
+            cmdLine = `perl ${  clocPath  } --quiet --progress-rate=0` +
+                ` specs/lib/`;
             child_process.exec(cmdLine, function(error, stdout, stderr) {
                 if (error) {
                     console.log(stderr);
@@ -177,7 +177,7 @@ gulp.task('generate-third-party', async function() {
 
     const dependencies = packageJson.dependencies;
     for (const packageName in dependencies) {
-        if (dependencies.hasOwnProperty(packageName)) {
+        if (Object.prototype.hasOwnProperty.call(dependencies, packageName)) {
             const override = thirdPartyExtraJson.find(
                 (entry) => entry.name === packageName
             );

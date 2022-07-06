@@ -58,7 +58,7 @@ function optimizeGlb(glbBuffer, options) {
 function fixBatchIdSemantic(gltf) {
     const meshes = gltf.meshes;
     for (const meshId in meshes) {
-        if (meshes.hasOwnProperty(meshId)) {
+        if (Object.prototype.hasOwnProperty.call(meshes, meshId)) {
             const primitives = meshes[meshId].primitives;
             const primitivesLength = primitives.length;
             for (let i = 0; i < primitivesLength; ++i) {
@@ -73,10 +73,10 @@ function fixBatchIdSemantic(gltf) {
 
     const techniques = gltf.techniques;
     for (const techniqueId in techniques) {
-        if (techniques.hasOwnProperty(techniqueId)) {
+        if (Object.prototype.hasOwnProperty.call(techniques, techniqueId)) {
             const parameters = techniques[techniqueId].parameters;
             for (const parameterId in parameters) {
-                if (parameters.hasOwnProperty(parameterId)) {
+                if (Object.prototype.hasOwnProperty.call(parameters, parameterId)) {
                     const parameter = parameters[parameterId];
                     if (parameter.semantic === 'BATCHID') {
                         parameter.semantic = '_BATCHID';

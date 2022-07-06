@@ -38,13 +38,13 @@ function gzipTileset(options) {
 
     inputDirectory = path.normalize(inputDirectory);
     outputDirectory = path.normalize(defaultValue(outputDirectory,
-        path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-' + (gzip ? 'gzipped' : 'ungzipped'))));
+        path.join(path.dirname(inputDirectory), `${path.basename(inputDirectory)  }-${  gzip ? 'gzipped' : 'ungzipped'}`)));
 
     const writeCallback = defaultValue(options.writeCallback, getDefaultWriteCallback(outputDirectory));
     const logCallback = options.logCallback;
 
     if (defined(logCallback)) {
-        logCallback((gzip ? 'Compressing' : 'Uncompressing') + ' files...');
+        logCallback(`${gzip ? 'Compressing' : 'Uncompressing'  } files...`);
     }
 
     const operation = (gzip) ? zlib.gzipSync : zlib.gunzipSync;

@@ -27,12 +27,12 @@ function extractCmptInner(buffer, results) {
 
     const magic = getMagic(buffer);
     if (magic !== 'cmpt') {
-        throw new DeveloperError('Invalid magic, expected "cmpt", got: "' + magic + '".');
+        throw new DeveloperError(`Invalid magic, expected "cmpt", got: "${  magic  }".`);
     }
 
     const version = buffer.readUInt32LE(4);
     if (version !== 1) {
-        throw new DeveloperError('Invalid version, only "1" is valid, got: "' + version + '".');
+        throw new DeveloperError(`Invalid version, only "1" is valid, got: "${  version  }".`);
     }
 
     const tilesLength = buffer.readUInt32LE(12);

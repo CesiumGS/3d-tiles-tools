@@ -20,11 +20,11 @@ function extractB3dm(b3dmBuffer) {
     }
     const magic = getMagic(b3dmBuffer);
     if (magic !== 'b3dm') {
-        throw new DeveloperError('Invalid magic, expected "b3dm", got: "' + magic + '".');
+        throw new DeveloperError(`Invalid magic, expected "b3dm", got: "${  magic  }".`);
     }
     const version = b3dmBuffer.readUInt32LE(4);
     if (version !== 1) {
-        throw new DeveloperError('Invalid version, only "1" is valid, got: "' + version + '".');
+        throw new DeveloperError(`Invalid version, only "1" is valid, got: "${  version  }".`);
     }
     let headerByteLength = 28;
     const byteLength = b3dmBuffer.readUInt32LE(8);

@@ -36,7 +36,7 @@ function runPipeline(pipeline, options) {
 
     inputDirectory = path.normalize(inputDirectory);
     outputDirectory = path.normalize(defaultValue(outputDirectory,
-        path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-processed')));
+        path.join(path.dirname(inputDirectory), `${path.basename(inputDirectory)  }-processed`)));
 
     if (!defined(stages)) {
         return fsExtra.copy(inputDirectory, outputDirectory);
@@ -84,7 +84,7 @@ function runPipeline(pipeline, options) {
 
         const stageFunction = getStageFunction(stageName, stageOptions);
         if (!defined(stageFunction)) {
-            throw new DeveloperError('Stage "' + stageName + '" does not exist');
+            throw new DeveloperError(`Stage "${  stageName  }" does not exist`);
         }
 
         stageObjects.push({
@@ -99,7 +99,7 @@ function runPipeline(pipeline, options) {
         return fsExtra.emptyDir(stage.options.outputDirectory)
             .then(function() {
                 if (defined(logCallback)) {
-                    logCallback('Running ' + stage.name);
+                    logCallback(`Running ${  stage.name}`);
                 }
                 return stage.stageFunction(stage.options);
             });

@@ -39,7 +39,7 @@ function combineTileset(options) {
 
     inputDirectory = path.normalize(inputDirectory);
     outputDirectory = path.normalize(defaultValue(outputDirectory,
-        path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '-combined')));
+        path.join(path.dirname(inputDirectory), `${path.basename(inputDirectory)  }-combined`)));
     rootJsonFile = path.join(inputDirectory, rootJsonFile);
 
     const writeCallback = defaultValue(options.writeCallback, getDefaultWriteCallback(outputDirectory));
@@ -49,7 +49,7 @@ function combineTileset(options) {
     return combine(rootJsonFile, inputDirectory, undefined, tilesets)
         .then(function (json) {
             if (defined(logCallback)) {
-                logCallback('Combined ' + (tilesets.length - 1) + ' external tilesets.');
+                logCallback(`Combined ${  tilesets.length - 1  } external tilesets.`);
             }
             // If the root json is originally gzipped, save the output json as gzipped
             const writeRootJsonPromise = isGzippedFile(rootJsonFile)

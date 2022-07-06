@@ -135,7 +135,7 @@ describe('combineTileset', function() {
 
     it('accepts custom writeCallback that does not return a promise', function (done) {
         const writeCallback = function(file, data) {
-            console.log('Save file ' + file + ' with data ' + data);
+            console.log(`Save file ${  file  } with data ${  data}`);
         };
         const combineOptions = {
             inputDirectory : tilesetDirectory,
