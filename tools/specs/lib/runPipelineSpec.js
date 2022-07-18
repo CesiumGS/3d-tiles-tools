@@ -1,12 +1,12 @@
 'use strict';
-var fsExtra = require('fs-extra');
-var path = require('path');
-var isGzippedFile = require('../../lib/isGzippedFile');
-var runPipeline = require('../../lib/runPipeline');
+const fsExtra = require('fs-extra');
+const path = require('path');
+const isGzippedFile = require('../../lib/isGzippedFile');
+const runPipeline = require('../../lib/runPipeline');
 
-var inputDirectory = './specs/data/TilesetOfTilesets/';
-var outputDirectory = './specs/data/TilesetOfTilesets-processed';
-var outputJson = './specs/data/TilesetOfTilesets-processed/tileset.json';
+const inputDirectory = './specs/data/TilesetOfTilesets/';
+const outputDirectory = './specs/data/TilesetOfTilesets-processed';
+const outputJson = './specs/data/TilesetOfTilesets-processed/tileset.json';
 
 describe('runPipeline', function() {
     afterEach(function(done) {
@@ -21,7 +21,7 @@ describe('runPipeline', function() {
     });
 
     it('runs one stage', function (done) {
-        var pipeline = {
+        const pipeline = {
             input : inputDirectory,
             output : outputDirectory,
             stages : ['gzip']
@@ -36,7 +36,7 @@ describe('runPipeline', function() {
     });
 
     it('runs two stages', function (done) {
-        var pipeline = {
+        const pipeline = {
             input : inputDirectory,
             output : outputDirectory,
             stages : ['combine', 'gzip']
@@ -51,7 +51,7 @@ describe('runPipeline', function() {
     });
 
     it('runs three stages', function (done) {
-        var pipeline = {
+        const pipeline = {
             input : inputDirectory,
             output : outputDirectory,
             stages : ['combine', 'gzip', 'ungzip']
@@ -66,7 +66,7 @@ describe('runPipeline', function() {
     });
 
     it('runs four stages', function (done) {
-        var pipeline = {
+        const pipeline = {
             input : inputDirectory,
             output : outputDirectory,
             stages : ['combine', 'gzip', 'ungzip', 'gzip']
@@ -81,7 +81,7 @@ describe('runPipeline', function() {
     });
 
     it('runs stage with options', function (done) {
-        var pipeline = {
+        const pipeline = {
             input : inputDirectory,
             output : outputDirectory,
             stages : [{
@@ -99,7 +99,7 @@ describe('runPipeline', function() {
     });
 
     it('runs a mix of stage names and stage objects', function (done) {
-        var pipeline = {
+        const pipeline = {
             input : inputDirectory,
             output : outputDirectory,
             stages : [
@@ -121,7 +121,7 @@ describe('runPipeline', function() {
     });
 
     it('throws if stage does not have a name', function () {
-        var pipeline = {
+        const pipeline = {
             input : inputDirectory,
             output : outputDirectory,
             stages : [{}]
@@ -132,7 +132,7 @@ describe('runPipeline', function() {
     });
 
     it('throws if stage does not exist', function () {
-        var pipeline = {
+        const pipeline = {
             input : inputDirectory,
             output : outputDirectory,
             stages : ['invalid-stage-name']
@@ -143,7 +143,7 @@ describe('runPipeline', function() {
     });
 
     it('works when no output is supplied', function (done) {
-        var pipeline = {
+        const pipeline = {
             input : inputDirectory,
             stages : ['gzip']
         };
@@ -157,7 +157,7 @@ describe('runPipeline', function() {
     });
 
     it('works when no stages are supplied', function (done) {
-        var pipeline = {
+        const pipeline = {
             input : inputDirectory,
             output : outputDirectory
         };
@@ -172,17 +172,17 @@ describe('runPipeline', function() {
     });
 
     it('accepts custom writeCallback', function (done) {
-        var writeCallback = function(file, data) {
-            var outputFile = path.join(outputDirectory, file);
+        const writeCallback = function(file, data) {
+            const outputFile = path.join(outputDirectory, file);
             return fsExtra.outputFile(outputFile, data);
         };
 
-        var pipeline = {
+        const pipeline = {
             input : inputDirectory,
             stages : ['gzip']
         };
 
-        var options = {
+        const options = {
             writeCallback : writeCallback
         };
 
@@ -196,21 +196,21 @@ describe('runPipeline', function() {
     });
 
     it('logs debug messages', function (done) {
-        var logCallback = function(message) {
+        const logCallback = function(message) {
             console.log(message);
         };
 
-        var pipeline = {
+        const pipeline = {
             input : inputDirectory,
             output : outputDirectory,
             stages : ['gzip']
         };
 
-        var options = {
+        const options = {
             logCallback : logCallback
         };
 
-        var spy = spyOn(console, 'log').and.callFake(function(){});
+        const spy = spyOn(console, 'log').and.callFake(function(){});
         expect(runPipeline(pipeline, options)
             .then(function() {
                 expect(spy).toHaveBeenCalled();

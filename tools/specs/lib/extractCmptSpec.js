@@ -1,14 +1,14 @@
 'use strict';
-var fsExtra = require('fs-extra');
-var Promise = require('bluebird');
-var extractCmpt = require('../../lib/extractCmpt');
+const fsExtra = require('fs-extra');
+const Promise = require('bluebird');
+const extractCmpt = require('../../lib/extractCmpt');
 
-var compositePath = './specs/data/composite.cmpt';
-var compositeOfCompositePath = './specs/data/compositeOfComposite.cmpt';
+const compositePath = './specs/data/composite.cmpt';
+const compositeOfCompositePath = './specs/data/compositeOfComposite.cmpt';
 
 describe('extractCmpt', function() {
-    var compositeBuffer;
-    var compositeOfCompositeBuffer; //eslint-disable-line no-unused-vars
+    let compositeBuffer;
+    let compositeOfCompositeBuffer; //eslint-disable-line no-unused-vars
     beforeAll(function(done) {
         Promise.all([
             fsExtra.readFile(compositePath)
@@ -23,18 +23,18 @@ describe('extractCmpt', function() {
     });
 
     it('extracts a b3dm and i3dm from composite buffer', function() {
-        var innerTiles = extractCmpt(compositeBuffer);
-        var b3dmMagic = innerTiles[0].toString('utf8', 0, 4);
-        var i3dmMagic = innerTiles[1].toString('utf8', 0, 4);
+        const innerTiles = extractCmpt(compositeBuffer);
+        const b3dmMagic = innerTiles[0].toString('utf8', 0, 4);
+        const i3dmMagic = innerTiles[1].toString('utf8', 0, 4);
         expect(innerTiles.length).toBe(2);
         expect(b3dmMagic).toBe('b3dm');
         expect(i3dmMagic).toBe('i3dm');
     });
 
     it('extracts a b3dm and i3dm from composite-of-composite buffer', function() {
-        var innerTiles = extractCmpt(compositeBuffer);
-        var b3dmMagic = innerTiles[0].toString('utf8', 0, 4);
-        var i3dmMagic = innerTiles[1].toString('utf8', 0, 4);
+        const innerTiles = extractCmpt(compositeBuffer);
+        const b3dmMagic = innerTiles[0].toString('utf8', 0, 4);
+        const i3dmMagic = innerTiles[1].toString('utf8', 0, 4);
         expect(innerTiles.length).toBe(2);
         expect(b3dmMagic).toBe('b3dm');
         expect(i3dmMagic).toBe('i3dm');

@@ -1,12 +1,12 @@
 'use strict';
-var fsExtra = require('fs-extra');
-var databaseToTileset = require('../../lib/databaseToTileset');
-var fileExists = require('../../lib/fileExists');
-var isGzipped = require('../../lib/isGzipped');
+const fsExtra = require('fs-extra');
+const databaseToTileset = require('../../lib/databaseToTileset');
+const fileExists = require('../../lib/fileExists');
+const isGzipped = require('../../lib/isGzipped');
 
-var inputFile = './specs/data/tileset.3dtiles';
-var outputDirectory = './specs/data/Tileset/';
-var tilesetJsonFile = './specs/data/TilesetOfTilesets/tileset.json';
+const inputFile = './specs/data/tileset.3dtiles';
+const outputDirectory = './specs/data/Tileset/';
+const tilesetJsonFile = './specs/data/TilesetOfTilesets/tileset.json';
 
 describe('databaseToTileset', function() {
     afterEach(function (done) {

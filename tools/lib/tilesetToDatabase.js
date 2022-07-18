@@ -1,17 +1,17 @@
 'use strict';
-var Cesium = require('cesium');
-var fsExtra = require('fs-extra');
-var klaw = require('klaw');
-var path = require('path');
-var Promise = require('bluebird');
-var sqlite3 = require('sqlite3');
-var zlib = require('zlib');
-var isGzipped = require('../lib/isGzipped');
-var isTile = require('../lib/isTile');
+const Cesium = require('cesium');
+const fsExtra = require('fs-extra');
+const klaw = require('klaw');
+const path = require('path');
+const Promise = require('bluebird');
+const sqlite3 = require('sqlite3');
+const zlib = require('zlib');
+const isGzipped = require('../lib/isGzipped');
+const isTile = require('../lib/isTile');
 
-var defaultValue = Cesium.defaultValue;
-var defined = Cesium.defined;
-var DeveloperError = Cesium.DeveloperError;
+const defaultValue = Cesium.defaultValue;
+const defined = Cesium.defined;
+const DeveloperError = Cesium.DeveloperError;
 
 module.exports = tilesetToDatabase;
 
@@ -28,10 +28,10 @@ function tilesetToDatabase(inputDirectory, outputFile) {
     }
 
     outputFile = defaultValue(outputFile,
-        path.join(path.dirname(inputDirectory), path.basename(inputDirectory) + '.3dtiles'));
+        path.join(path.dirname(inputDirectory), `${path.basename(inputDirectory)  }.3dtiles`));
 
-    var db;
-    var dbRun;
+    let db;
+    let dbRun;
     // Delete the .3dtiles file if it already exists
     return Promise.resolve(fsExtra.remove(outputFile))
         .then(function () {
@@ -50,10 +50,10 @@ function tilesetToDatabase(inputDirectory, outputFile) {
         })
         .then(function () {
             //Build the collection of file paths to be inserted.
-            var filePaths = [];
-            var stream = klaw(inputDirectory);
+            const filePaths = [];
+            const stream = klaw(inputDirectory);
             stream.on('readable', function () {
-                var filePath = stream.read();
+                let filePath = stream.read();
                 while (defined(filePath)) {
                     if (filePath.stats.isFile()) {
                         filePaths.push(filePath.path);
@@ -75,7 +75,7 @@ function tilesetToDatabase(inputDirectory, outputFile) {
                     .then(function (data) {
                         filePath = path.normalize(path.relative(inputDirectory, filePath)).replace(/\\/g, '/');
                         // Only gzip tiles and json files. Other files like external textures should not be gzipped.
-                        var shouldGzip = isTile(filePath) || path.extname(filePath) === '.json';
+                        const shouldGzip = isTile(filePath) || path.extname(filePath) === '.json';
                         if (shouldGzip && !isGzipped(data)) {
                             data = zlib.gzipSync(data);
                         }

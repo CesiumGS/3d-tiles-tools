@@ -1,7 +1,7 @@
 'use strict';
-var Cesium = require('cesium');
+const Cesium = require('cesium');
 
-var defaultValue = Cesium.defaultValue;
+const defaultValue = Cesium.defaultValue;
 
 module.exports = getMagic;
 

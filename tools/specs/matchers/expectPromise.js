@@ -1,9 +1,9 @@
 'use strict';
 
-var Cesium = require('cesium');
+const Cesium = require('cesium');
 
-var defined = Cesium.defined;
-var defaultValue = Cesium.defaultValue;
+const defined = Cesium.defined;
+const defaultValue = Cesium.defaultValue;
 
 module.exports = function expectPromise(promise, done) {
     return {
@@ -11,7 +11,7 @@ module.exports = function expectPromise(promise, done) {
             return promise
                 .then(done)
                 .catch(function(err){
-                    done.fail('Expected promise to resolve' + err);
+                    done.fail(`Expected promise to resolve${  err}`);
                 });
         },
         toResolveWith: function toResolveWith(expectedValue) {
@@ -21,19 +21,19 @@ module.exports = function expectPromise(promise, done) {
                     done();
                 })
                 .catch(function(err){
-                    done.fail('Expected promise to resolve' + err);
+                    done.fail(`Expected promise to resolve${  err}`);
                 });
         },
         toRejectWith: function toRejectWith(ErrorType, errorMessage) {
-            var typeName = defaultValue(ErrorType.displayName, ErrorType.name);
+            const typeName = defaultValue(ErrorType.displayName, ErrorType.name);
 
             promise
                 .then(function () {
-                    done.fail('expected promise to reject with ' + typeName);
+                    done.fail(`expected promise to reject with ${  typeName}`);
                 })
                 .catch(function (error) {
                     if (!(error instanceof ErrorType)) {
-                        done.fail(defaultValue(defaultValue(error.displayName, error.name), ErrorType) + ' to be instance of ' + typeName);
+                        done.fail(`${defaultValue(defaultValue(error.displayName, error.name), ErrorType)  } to be instance of ${  typeName}`);
                         console.log(error);
                     }
 

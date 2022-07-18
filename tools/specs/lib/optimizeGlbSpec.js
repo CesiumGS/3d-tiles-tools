@@ -1,12 +1,12 @@
 'use strict';
-var fsExtra = require('fs-extra');
-var Promise = require('bluebird');
-var optimizeGlb = require('../../lib/optimizeGlb');
+const fsExtra = require('fs-extra');
+const Promise = require('bluebird');
+const optimizeGlb = require('../../lib/optimizeGlb');
 
-var glbPath = './specs/data/CesiumTexturedBox/CesiumTexturedBox.glb';
+const glbPath = './specs/data/CesiumTexturedBox/CesiumTexturedBox.glb';
 
 describe('optimizeGlb', function() {
-    var buffer;
+    let buffer;
     beforeAll(function(done) {
         fsExtra.readFile(glbPath)
             .then(function(data) {
@@ -23,14 +23,14 @@ describe('optimizeGlb', function() {
     });
 
     xit('compresses textures in a glb using the gltf-pipeline', function(done) {
-        var compressionOptions = {
+        const compressionOptions = {
             textureCompressionOptions : {
                 format: 'dxt1',
                 quality: 10
             }
         };
 
-        var promises = [];
+        const promises = [];
         promises.push(optimizeGlb(buffer));
         promises.push(optimizeGlb(buffer, compressionOptions));
 

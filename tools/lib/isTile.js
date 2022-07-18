@@ -1,5 +1,5 @@
 'use strict';
-var path = require('path');
+const path = require('path');
 
 module.exports = isTile;
 
@@ -7,7 +7,7 @@ module.exports = isTile;
  * @private
  */
 function isTile(file) {
-    var extension = path.extname(file);
+    const extension = path.extname(file);
     return extension === '.b3dm' ||
         extension === '.i3dm' ||
         extension === '.pnts' ||

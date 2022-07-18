@@ -1,11 +1,11 @@
 'use strict';
 
-var Cesium = require('cesium');
-var bufferToJson = require('./bufferToJson');
-var getMagic = require('./getMagic');
+const Cesium = require('cesium');
+const bufferToJson = require('./bufferToJson');
+const getMagic = require('./getMagic');
 
-var defined = Cesium.defined;
-var DeveloperError = Cesium.DeveloperError;
+const defined = Cesium.defined;
+const DeveloperError = Cesium.DeveloperError;
 
 module.exports = extractI3dm;
 
@@ -19,47 +19,47 @@ function extractI3dm(buffer) {
     if (!defined(buffer)) {
         throw new DeveloperError('buffer is not defined.');
     }
-    var magic = getMagic(buffer);
+    const magic = getMagic(buffer);
     if (magic !== 'i3dm') {
-        throw new DeveloperError('Invalid magic, expected "i3dm", got: "' + magic + '".');
+        throw new DeveloperError(`Invalid magic, expected "i3dm", got: "${  magic  }".`);
     }
-    var version = buffer.readUInt32LE(4);
+    const version = buffer.readUInt32LE(4);
     if (version !== 1) {
-        throw new DeveloperError('Invalid version, only "1" is valid, got: "' + version + '".');
+        throw new DeveloperError(`Invalid version, only "1" is valid, got: "${  version  }".`);
     }
 
-    var byteLength = buffer.readUInt32LE(8);
-    var featureTableJsonByteLength = buffer.readUInt32LE(12);
-    var featureTableBinaryByteLength = buffer.readUInt32LE(16);
-    var batchTableJsonByteLength = buffer.readUInt32LE(20);
-    var batchTableBinaryByteLength = buffer.readUInt32LE(24);
-    var gltfFormat = buffer.readUInt32LE(28);
+    const byteLength = buffer.readUInt32LE(8);
+    const featureTableJsonByteLength = buffer.readUInt32LE(12);
+    const featureTableBinaryByteLength = buffer.readUInt32LE(16);
+    const batchTableJsonByteLength = buffer.readUInt32LE(20);
+    const batchTableBinaryByteLength = buffer.readUInt32LE(24);
+    const gltfFormat = buffer.readUInt32LE(28);
 
     if (gltfFormat !== 1) {
         throw new DeveloperError('Only embedded binary glTF is supported.');
     }
 
-    var headerByteLength = 32;
-    var featureTableJsonByteOffset = headerByteLength;
-    var featureTableBinaryByteOffset = featureTableJsonByteOffset + featureTableJsonByteLength;
-    var batchTableJsonByteOffset = featureTableBinaryByteOffset + featureTableBinaryByteLength;
-    var batchTableBinaryByteOffset = batchTableJsonByteOffset + batchTableJsonByteLength;
-    var gltfByteOffset = batchTableBinaryByteOffset + batchTableBinaryByteLength;
+    const headerByteLength = 32;
+    const featureTableJsonByteOffset = headerByteLength;
+    const featureTableBinaryByteOffset = featureTableJsonByteOffset + featureTableJsonByteLength;
+    const batchTableJsonByteOffset = featureTableBinaryByteOffset + featureTableBinaryByteLength;
+    const batchTableBinaryByteOffset = batchTableJsonByteOffset + batchTableJsonByteLength;
+    const gltfByteOffset = batchTableBinaryByteOffset + batchTableBinaryByteLength;
 
-    var gltfByteLength = byteLength - gltfByteOffset;
+    const gltfByteLength = byteLength - gltfByteOffset;
     if (gltfByteLength === 0) {
         throw new DeveloperError('glTF byte length is zero, i3dm must have a glTF to instance.');
     }
 
-    var featureTableJsonBuffer = buffer.slice(featureTableJsonByteOffset, featureTableBinaryByteOffset);
-    var featureTableBinaryBuffer = buffer.slice(featureTableBinaryByteOffset, batchTableJsonByteOffset);
-    var batchTableJsonBuffer = buffer.slice(batchTableJsonByteOffset, batchTableBinaryByteOffset);
-    var batchTableBinaryBuffer = buffer.slice(batchTableBinaryByteOffset, gltfByteOffset);
-    var glbBuffer = buffer.slice(gltfByteOffset, byteLength);
+    const featureTableJsonBuffer = buffer.slice(featureTableJsonByteOffset, featureTableBinaryByteOffset);
+    const featureTableBinaryBuffer = buffer.slice(featureTableBinaryByteOffset, batchTableJsonByteOffset);
+    const batchTableJsonBuffer = buffer.slice(batchTableJsonByteOffset, batchTableBinaryByteOffset);
+    const batchTableBinaryBuffer = buffer.slice(batchTableBinaryByteOffset, gltfByteOffset);
+    let glbBuffer = buffer.slice(gltfByteOffset, byteLength);
     glbBuffer = alignGlb(glbBuffer, gltfByteOffset);
 
-    var featureTableJson = bufferToJson(featureTableJsonBuffer);
-    var batchTableJson = bufferToJson(batchTableJsonBuffer);
+    const featureTableJson = bufferToJson(featureTableJsonBuffer);
+    const batchTableJson = bufferToJson(batchTableJsonBuffer);
 
     return {
         header : {

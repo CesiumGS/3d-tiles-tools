@@ -1,8 +1,8 @@
 'use strict';
-var Cesium = require('cesium');
+const Cesium = require('cesium');
 
-var defaultValue = Cesium.defaultValue;
-var defined = Cesium.defined;
+const defaultValue = Cesium.defaultValue;
+const defined = Cesium.defined;
 
 module.exports = getJsonBufferPadded;
 
@@ -26,14 +26,14 @@ function getJsonBufferPadded(json, byteOffset) {
     }
 
     byteOffset = defaultValue(byteOffset, 0);
-    var string = JSON.stringify(json);
+    let string = JSON.stringify(json);
 
-    var boundary = 8;
-    var byteLength = Buffer.byteLength(string);
-    var remainder = (byteOffset + byteLength) % boundary;
-    var padding = (remainder === 0) ? 0 : boundary - remainder;
-    var whitespace = '';
-    for (var i = 0; i < padding; ++i) {
+    const boundary = 8;
+    const byteLength = Buffer.byteLength(string);
+    const remainder = (byteOffset + byteLength) % boundary;
+    const padding = (remainder === 0) ? 0 : boundary - remainder;
+    let whitespace = '';
+    for (let i = 0; i < padding; ++i) {
         whitespace += ' ';
     }
     string += whitespace;

@@ -1,10 +1,10 @@
 'use strict';
-var Cesium = require('cesium');
-var bufferToJson = require('./bufferToJson');
-var getMagic = require('./getMagic');
+const Cesium = require('cesium');
+const bufferToJson = require('./bufferToJson');
+const getMagic = require('./getMagic');
 
-var defined = Cesium.defined;
-var DeveloperError = Cesium.DeveloperError;
+const defined = Cesium.defined;
+const DeveloperError = Cesium.DeveloperError;
 
 module.exports = extractB3dm;
 
@@ -18,21 +18,21 @@ function extractB3dm(b3dmBuffer) {
     if (!defined(b3dmBuffer)) {
         throw new DeveloperError('b3dmBuffer is not defined.');
     }
-    var magic = getMagic(b3dmBuffer);
+    const magic = getMagic(b3dmBuffer);
     if (magic !== 'b3dm') {
-        throw new DeveloperError('Invalid magic, expected "b3dm", got: "' + magic + '".');
+        throw new DeveloperError(`Invalid magic, expected "b3dm", got: "${  magic  }".`);
     }
-    var version = b3dmBuffer.readUInt32LE(4);
+    const version = b3dmBuffer.readUInt32LE(4);
     if (version !== 1) {
-        throw new DeveloperError('Invalid version, only "1" is valid, got: "' + version + '".');
+        throw new DeveloperError(`Invalid version, only "1" is valid, got: "${  version  }".`);
     }
-    var headerByteLength = 28;
-    var byteLength = b3dmBuffer.readUInt32LE(8);
-    var featureTableJsonByteLength = b3dmBuffer.readUInt32LE(12);
-    var featureTableBinaryByteLength = b3dmBuffer.readUInt32LE(16);
-    var batchTableJsonByteLength = b3dmBuffer.readUInt32LE(20);
-    var batchTableBinaryByteLength = b3dmBuffer.readUInt32LE(24);
-    var batchLength = 0;
+    let headerByteLength = 28;
+    const byteLength = b3dmBuffer.readUInt32LE(8);
+    let featureTableJsonByteLength = b3dmBuffer.readUInt32LE(12);
+    let featureTableBinaryByteLength = b3dmBuffer.readUInt32LE(16);
+    let batchTableJsonByteLength = b3dmBuffer.readUInt32LE(20);
+    let batchTableBinaryByteLength = b3dmBuffer.readUInt32LE(24);
+    let batchLength = 0;
 
     // Keep this legacy check in for now since a lot of tilesets are still using the old header.
     // Legacy header #1: [batchLength] [batchTableByteLength]
@@ -59,21 +59,21 @@ function extractB3dm(b3dmBuffer) {
         featureTableBinaryByteLength = 0;
     }
 
-    var featureTableJsonByteOffset = headerByteLength;
-    var featureTableBinaryByteOffset = featureTableJsonByteOffset + featureTableJsonByteLength;
-    var batchTableJsonByteOffset = featureTableBinaryByteOffset + featureTableBinaryByteLength;
-    var batchTableBinaryByteOffset = batchTableJsonByteOffset + batchTableJsonByteLength;
-    var glbByteOffset = batchTableBinaryByteOffset + batchTableBinaryByteLength;
+    const featureTableJsonByteOffset = headerByteLength;
+    const featureTableBinaryByteOffset = featureTableJsonByteOffset + featureTableJsonByteLength;
+    const batchTableJsonByteOffset = featureTableBinaryByteOffset + featureTableBinaryByteLength;
+    const batchTableBinaryByteOffset = batchTableJsonByteOffset + batchTableJsonByteLength;
+    const glbByteOffset = batchTableBinaryByteOffset + batchTableBinaryByteLength;
 
-    var featureTableJsonBuffer = b3dmBuffer.slice(featureTableJsonByteOffset, featureTableBinaryByteOffset);
-    var featureTableBinary = b3dmBuffer.slice(featureTableBinaryByteOffset, batchTableJsonByteOffset);
-    var batchTableJsonBuffer = b3dmBuffer.slice(batchTableJsonByteOffset, batchTableBinaryByteOffset);
-    var batchTableBinary = b3dmBuffer.slice(batchTableBinaryByteOffset, glbByteOffset);
-    var glbBuffer = b3dmBuffer.slice(glbByteOffset, byteLength);
+    const featureTableJsonBuffer = b3dmBuffer.slice(featureTableJsonByteOffset, featureTableBinaryByteOffset);
+    const featureTableBinary = b3dmBuffer.slice(featureTableBinaryByteOffset, batchTableJsonByteOffset);
+    const batchTableJsonBuffer = b3dmBuffer.slice(batchTableJsonByteOffset, batchTableBinaryByteOffset);
+    const batchTableBinary = b3dmBuffer.slice(batchTableBinaryByteOffset, glbByteOffset);
+    let glbBuffer = b3dmBuffer.slice(glbByteOffset, byteLength);
     glbBuffer = alignGlb(glbBuffer, glbByteOffset);
 
-    var featureTableJson = bufferToJson(featureTableJsonBuffer);
-    var batchTableJson = bufferToJson(batchTableJsonBuffer);
+    let featureTableJson = bufferToJson(featureTableJsonBuffer);
+    const batchTableJson = bufferToJson(batchTableJsonBuffer);
 
     if (Object.keys(featureTableJson).length === 0) {
         featureTableJson = {

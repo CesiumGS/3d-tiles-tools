@@ -1,6 +1,6 @@
 'use strict';
-var fsExtra = require('fs-extra');
-var path = require('path');
+const fsExtra = require('fs-extra');
+const path = require('path');
 
 module.exports = getDefaultWriteCallback;
 
@@ -9,7 +9,7 @@ module.exports = getDefaultWriteCallback;
  */
 function getDefaultWriteCallback(outputDirectory) {
     return function(file, data) {
-        var outputFile = path.join(outputDirectory, file);
+        const outputFile = path.join(outputDirectory, file);
         return fsExtra.outputFile(outputFile, data);
     };
 }

@@ -1,6 +1,6 @@
 'use strict';
-var klaw = require('klaw');
-var Promise = require('bluebird');
+const klaw = require('klaw');
+const Promise = require('bluebird');
 
 module.exports = getFilesInDirectory;
 
@@ -9,7 +9,7 @@ module.exports = getFilesInDirectory;
  */
 function getFilesInDirectory(directory) {
     return new Promise(function (resolve, reject) {
-        var files = [];
+        const files = [];
         klaw(directory)
             .on('data', function (item) {
                 if (!item.stats.isDirectory()) {
