@@ -2,6 +2,14 @@
 
  ❗️ **3D Tiles Tools is not actively maintained. For converting source data to 3D Tiles check out [Cesium ion](https://cesium.com/ion).**  ❗️
 
+> **A note about the repository structure**
+> 
+> This repository was originally part of the `3d-tiles-validator` repository, which contained multiple projects. Now, these project are maintained in separate repositories:
+> 
+> - The `3d-tiles-validator` can be found in [the `3d-tiles-validator` repository](https://github.com/CesiumGS/3d-tiles-validator)
+> - The `3d-tiles-samples-generator` can be found in [the `3d-tiles-samples-generator` repository](https://github.com/CesiumGS/3d-tiles-samples-generator)
+> 
+
 Node.js library and command-line tools for processing and converting 3D Tiles tilesets.
 
 ## Instructions
