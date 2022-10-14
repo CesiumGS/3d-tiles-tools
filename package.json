@@ -9,13 +9,13 @@
   "keywords": [
     "3D Tiles"
   ],
-  "homepage": "https://github.com/CesiumGS/3d-tiles-validator",
+  "homepage": "https://github.com/CesiumGS/3d-tiles-tools",
   "repository": {
     "type": "git",
-    "url": "https://github.com/CesiumGS/3d-tiles-validator.git"
+    "url": "https://github.com/CesiumGS/3d-tiles-tools.git"
   },
   "bugs": {
-    "url": "https://github.com/CesiumGS/3d-tiles-validator/issues"
+    "url": "https://github.com/CesiumGS/3d-tiles-tools/issues"
   },
   "main": "index.js",
   "engines": {
@@ -25,9 +25,9 @@
     "bluebird": "^3.5.3",
     "cesium": "^1.55",
     "fs-extra": "^7.0.1",
-    "gltf-pipeline": "^1.0.6",
+    "gltf-pipeline": "^3.0.5",
     "klaw": "^3.0.0",
-    "sqlite3": "^4.0.6",
+    "sqlite3": "^5.1.2",
     "uuid": "^3.3.2",
     "yargs": "^13.2.2"
   },
@@ -37,12 +37,12 @@
     "eslint-config-cesium": "^9.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-node": "^11.1.0",
-    "gulp": "^4.0.0",
+    "gulp": "^4.0.2",
     "jasmine": "^3.3.1",
     "jasmine-spec-reporter": "^4.2.1",
     "jsdoc": "^3.5.5",
-    "nyc": "^13.3.0",
-    "open": "^0.0.5",
+    "nyc": "^15.1.0",
+    "open": "^8.4.0",
     "request": "^2.88.0",
     "requirejs": "^2.3.6"
   },
