@@ -25,7 +25,7 @@
     "bluebird": "^3.5.3",
     "cesium": "^1.55",
     "fs-extra": "^7.0.1",
-    "gltf-pipeline": "^3.0.5",
+    "gltf-pipeline": "^1.0.6",
     "klaw": "^3.0.0",
     "sqlite3": "^5.1.2",
     "uuid": "^3.3.2",
