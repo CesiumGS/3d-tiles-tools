@@ -365,7 +365,7 @@ function extractGlbs(tiles) {
 }
 
 function readCmptWriteGlb(inputPath, outputPath, force) {
-    outputPath = defaultValue(outputPath, inputPath).slice(0, inputPath.length - 5);
+    outputPath = defaultValue(outputPath, inputPath.slice(0, inputPath.length - 5));
     return readFile(inputPath)
         .then(function(cmpt) {
             const tiles = extractCmpt(cmpt);
