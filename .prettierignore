@@ -1,0 +1,9 @@
+*
+!src/**/
+!demos/**/
+!**/*.js
+!**/*.ts
+!**/*.json
+tsconfig.json
+.prettierrc.json
+ThirdParty.json

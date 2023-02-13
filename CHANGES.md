@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+### 0.?.? - 2023-??-??
+
+* Rewrite
+
 ### 0.1.3 - 2017-04-14
 
 * Cleaned up project files and upgraded dependencies. [#70](https://github.com/CesiumGS/3d-tiles-validator/pull/70)

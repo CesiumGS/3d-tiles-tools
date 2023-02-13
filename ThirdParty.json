@@ -1,66 +1,42 @@
 [
   {
-    "name": "bluebird",
+    "name": "@types/better-sqlite3",
     "license": [
       "MIT"
     ],
-    "version": "3.7.2",
-    "url": "https://www.npmjs.com/package/bluebird"
+    "version": "7.6.2",
+    "url": "https://www.npmjs.com/package/@types/better-sqlite3"
   },
   {
-    "name": "cesium",
-    "license": [
-      "Apache-2.0"
-    ],
-    "version": "1.98.1",
-    "url": "https://www.npmjs.com/package/cesium"
-  },
-  {
-    "name": "fs-extra",
+    "name": "better-sqlite3",
     "license": [
       "MIT"
     ],
-    "version": "7.0.1",
-    "url": "https://www.npmjs.com/package/fs-extra"
+    "version": "7.6.0",
+    "url": "https://www.npmjs.com/package/better-sqlite3"
   },
   {
-    "name": "gltf-pipeline",
+    "name": "jszip",
     "license": [
-      "Apache-2.0"
+      "(MIT OR GPL-3.0-or-later)"
     ],
-    "version": "1.0.7",
-    "url": "https://www.npmjs.com/package/gltf-pipeline"
+    "version": "3.10.0",
+    "url": "https://www.npmjs.com/package/jszip"
   },
   {
-    "name": "klaw",
-    "license": [
-      "MIT"
-    ],
-    "version": "3.0.0",
-    "url": "https://www.npmjs.com/package/klaw"
-  },
-  {
-    "name": "sqlite3",
-    "license": [
-      "BSD-3-Clause"
-    ],
-    "version": "5.1.2",
-    "url": "https://www.npmjs.com/package/sqlite3"
-  },
-  {
-    "name": "uuid",
+    "name": "minimist",
     "license": [
       "MIT"
     ],
-    "version": "3.4.0",
-    "url": "https://www.npmjs.com/package/uuid"
+    "version": "1.2.6",
+    "url": "https://www.npmjs.com/package/minimist"
   },
   {
-    "name": "yargs",
+    "name": "seedrandom",
     "license": [
       "MIT"
     ],
-    "version": "13.3.2",
-    "url": "https://www.npmjs.com/package/yargs"
+    "version": "3.0.5",
+    "url": "https://www.npmjs.com/package/seedrandom"
   }
 ]

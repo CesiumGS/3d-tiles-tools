@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2021",
+    "outDir": "build",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "strictNullChecks": true,
+    "noImplicitOverride": true,
+    "declaration": true,
+    "declarationMap": true,
+    "lib": [
+      "es2021"
+    ],
+    "paths": {
+      "*": [ "./src/*.d.ts"]
+    }    
+  },
+  "include": ["src" ],
+  "exclude": ["node_modules"]
+}
