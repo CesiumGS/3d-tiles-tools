@@ -5,7 +5,7 @@ const yargs = require("yargs/yargs");
 // and the `--options` arguments
 const optionsIndex = process.argv.indexOf("--options");
 let toolArgs;
-let optionArgs : string[];
+let optionArgs: string[];
 if (optionsIndex < 0) {
   toolArgs = process.argv.slice(2);
   optionArgs = [];

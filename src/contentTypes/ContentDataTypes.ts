@@ -104,7 +104,10 @@ export class ContentDataTypes {
     if (!parsedObject.asset) {
       return false;
     }
-    return defined(parsedObject.geometricError) || parsedObject.root;
+    if (defined(parsedObject.geometricError) || parsedObject.root) {
+      return true;
+    }
+    return false;
   }
 
   /**

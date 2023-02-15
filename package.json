@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@types/archiver": "^5.3.1",
+    "@types/jasmine": "^4.0.3",
     "@types/minimist": "^1.2.2",
     "@types/seedrandom": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "^5.38.0",
@@ -30,6 +31,7 @@
     "eslint-config-cesium": "^9.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-node": "^11.1.0",
+    "jasmine": "^4.3.0",
     "prettier": "2.7.1",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.3"
@@ -38,6 +40,7 @@
     "eslint": "eslint \"./**/*.*s\" --cache",
     "build": "npx tsc",
     "start": "npx ts-node src/main.ts",
+    "test": "ts-node node_modules/jasmine/bin/jasmine --config=specs/jasmine.json",
     "prettier-check": "prettier --check \"**/*\"",
     "prettier": "prettier --write \"**/*\"",
     "generate-third-party": "node generateThirdParty.js"

@@ -5,7 +5,7 @@ import util from "util";
 import { performance } from "perf_hooks";
 
 import { TilesetTarget } from "../src/tilesetData/TilesetTarget";
-import { TilesetEntry } from "../src/tilesetData/TilesetEntry"
+import { TilesetEntry } from "../src/tilesetData/TilesetEntry";
 
 import { TilesetTarget3dtiles } from "../src/packages/TilesetTarget3dtiles";
 import { TilesetTarget3tz } from "../src/packages/TilesetTarget3tz";

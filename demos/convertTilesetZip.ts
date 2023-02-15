@@ -4,7 +4,7 @@ import StreamZip from "node-stream-zip";
 import { TilesetTargets } from "../src/tilesetData/TilesetTargets";
 
 /**
- * Writes the data from the given input file (which is assumed to be a plain 
+ * Writes the data from the given input file (which is assumed to be a plain
  * ZIP file) into a tileset target.
  *
  * The type of the output depends on the extension of the output file name:

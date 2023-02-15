@@ -36,8 +36,12 @@ export class ContentDataTypeRegistry {
     }
 
     // The predicates will be checked in the order in which they are
-    // registered. In the future, there might be a mechanism for
-    // 'overriding' a previously registered types.
+    // registered. This allows to quickly detect the types that can
+    // be determined by the file extension alone, or by the magic
+    // bytes (without loading the whole data and trying to parse it
+    // into JSON).
+    // In the future, there might be a mechanism for 'overriding' a
+    // previously registered type.
     ContentDataTypeRegistry.register(
       ContentDataTypes.CONTENT_TYPE_GLB,
       "CONTENT_TYPE_GLB"
