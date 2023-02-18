@@ -16,8 +16,9 @@ export type ContentDataTypeEntry = {
   /**
    * The type of the content data when it matches the predicate.
    *
-   * This is usually a string like `CONTENT_TYPE_GLB`, but the
-   * details are not yet specified.
+   * This is supposed to be a string that uniquely identifies
+   * the content type. For the known content types, this will
+   * be one of the constant strings in ContentDataTypes.
    */
   type: string;
 };

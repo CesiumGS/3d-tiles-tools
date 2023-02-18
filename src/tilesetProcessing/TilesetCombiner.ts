@@ -14,9 +14,8 @@ import { TilesetTargets } from "../tilesetData/TilesetTargets";
 
 import { Tiles } from "../tilesets/Tiles";
 import { Tilesets } from "../tilesets/Tilesets";
-
-// TODO Content type detection to be extracted from validator
-import { ContentTypes_Dummy } from "../contentTypes/ContentTypes_Dummy";
+import { ContentData } from "../contentTypes/ContentData";
+import { BufferedContentData } from "../contentTypes/BufferedContentData";
 
 /**
  * A class for combining external tileset of a given tileset, to
@@ -24,6 +23,13 @@ import { ContentTypes_Dummy } from "../contentTypes/ContentTypes_Dummy";
  *
  */
 export class TilesetCombiner {
+
+  /**
+   * A predicate that is used to detect whether a given 
+   * content data refers to an external tileset.
+   */
+  private readonly externalTilesetDetector: (contentData: ContentData) => Promise<boolean>;
+
   /**
    * The file names of external tilesets, relative to the
    * root directory of the input tileset
@@ -43,7 +49,8 @@ export class TilesetCombiner {
   /**
    * Creates a new instance
    */
-  constructor() {
+  constructor(externalTilesetDetector: (contentData: ContentData) => Promise<boolean>) {
+    this.externalTilesetDetector = externalTilesetDetector;
     this.externalTilesetFileNames = [];
   }
 
@@ -155,7 +162,7 @@ export class TilesetCombiner {
     }
     await Tiles.traverseExplicit(root, async (tilePath: Tile[]) => {
       const tile = tilePath[tilePath.length - 1];
-      this.combineTileInternal(currentDirectory, tile);
+      await this.combineTileInternal(currentDirectory, tile);
       return true;
     });
   }
@@ -170,12 +177,12 @@ export class TilesetCombiner {
    * @param currentDirectory - The current directory (see `combineTilesetsInternal`)
    * @param tile - The current tile
    */
-  private combineTileInternal(currentDirectory: string, tile: Tile): void {
+  private async combineTileInternal(currentDirectory: string, tile: Tile): Promise<void> {
     if (tile.content) {
-      this.combineContentInternal(currentDirectory, tile, tile.content);
+      await this.combineContentInternal(currentDirectory, tile, tile.content);
     } else if (tile.contents) {
       for (const content of tile.contents) {
-        this.combineContentInternal(currentDirectory, tile, content);
+        await this.combineContentInternal(currentDirectory, tile, content);
       }
     }
   }
@@ -195,18 +202,24 @@ export class TilesetCombiner {
    * @param tile - The current tile
    * @param content - The current tile content
    */
-  private combineContentInternal(
+  private async combineContentInternal(
     currentDirectory: string,
     tile: Tile,
     content: Content
-  ): void {
+  ): Promise<void> {
+
+    // TODO Replace non-null assertions with error checks here!!!
     const contentUri = content.uri;
-    const isTileset = ContentTypes_Dummy.isProbablyTileset(contentUri);
+    const externalFileName = Paths.join(currentDirectory, contentUri);
+    console.log("externalFileName is " + externalFileName);
+    const externalFileBuffer =
+      this.tilesetSource!.getValue(externalFileName);
+    const contentData = new BufferedContentData(contentUri, externalFileBuffer!);
+    const isTileset = await this.externalTilesetDetector(contentData);
     console.log(
-      "Content uri is " + contentUri + ", assuming tileset? " + isTileset
+      "Content uri is " + contentUri + ", external file name is "+externalFileName+", assuming tileset? " + isTileset
     );
     if (isTileset) {
-      const externalFileName = Paths.join(currentDirectory, contentUri);
       this.externalTilesetFileNames.push(externalFileName);
       const externalTilesetDirectory = path.dirname(externalFileName);
       console.log("externalFileName is " + externalFileName);

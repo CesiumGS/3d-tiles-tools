@@ -1,7 +1,13 @@
 import { BufferedContentData } from "../src/contentTypes/BufferedContentData";
-import { ContentDataTypeRegistry } from "../src/contentTypes/ContentDataTypeRegistry";
+import { ContentDataTypeChecks } from "../src/contentTypes/ContentDataTypeChecks";
+import { ContentDataTypes } from "../src/contentTypes/ContentDataTypes";
 
-async function testContentDataTypeRegistry() {
+async function testContentDataTypeChecks() {
+  const check = ContentDataTypeChecks.createCheck(
+    ContentDataTypes.CONTENT_TYPE_TILESET,
+    ContentDataTypes.CONTENT_TYPE_GLB
+  );
+
   const contentUris = [
     "./specs/data/contentTypes/content.3tz",
     "./specs/data/contentTypes/content.b3dm",
@@ -19,13 +25,9 @@ async function testContentDataTypeRegistry() {
 
   for (const contentUri of contentUris) {
     const contentData = BufferedContentData.create(contentUri);
-    const contentDataType = await ContentDataTypeRegistry.findContentDataType(
-      contentData
-    );
-    console.log(
-      "Content data type is " + contentDataType + " for " + contentUri
-    );
+    const result = await check(contentData);
+    console.log("Result is " + result + " for " + contentUri);
   }
 }
 
-testContentDataTypeRegistry();
+testContentDataTypeChecks();

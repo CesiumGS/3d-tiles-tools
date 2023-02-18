@@ -5,3 +5,4 @@ build
 /data
 output
 /.eslintcache
+/specs/data/TilesetOfTilesets/tileset-upgraded.json

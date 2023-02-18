@@ -1,4 +1,6 @@
 import path from "path";
+import { ContentDataTypeChecks } from "../contentTypes/ContentDataTypeChecks";
+import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 
 import { TilesetCombiner } from "../tilesetProcessing/TilesetCombiner";
 import { TilesetMerger } from "../tilesetProcessing/TilesetMerger";
@@ -13,7 +15,10 @@ export class Tilesets {
     tilesetTargetName: string,
     overwrite: boolean
   ): Promise<void> {
-    const tilesetCombiner = new TilesetCombiner();
+
+    const externalTilesetDetector = ContentDataTypeChecks.createCheck(
+      ContentDataTypes.CONTENT_TYPE_TILESET);
+    const tilesetCombiner = new TilesetCombiner(externalTilesetDetector);
     await tilesetCombiner.combine(
       tilesetSourceName,
       tilesetTargetName,

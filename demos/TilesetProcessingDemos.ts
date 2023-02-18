@@ -1,4 +1,6 @@
 import fs from "fs";
+import { ContentDataTypeChecks } from "../src/contentTypes/ContentDataTypeChecks";
+import { ContentDataTypes } from "../src/contentTypes/ContentDataTypes";
 
 import { Tileset } from "../src/structure/Tileset";
 
@@ -31,7 +33,8 @@ async function combineTilesets(
   outputDirectoryName: string
 ) {
   const overwrite = true;
-  const tilesetCombiner = new TilesetCombiner();
+  const externalTilesetDetector = ContentDataTypeChecks.createCheck(ContentDataTypes.CONTENT_TYPE_TILESET);
+  const tilesetCombiner = new TilesetCombiner(externalTilesetDetector);
   await tilesetCombiner.combine(inputFileName, outputDirectoryName, overwrite);
 }
 
