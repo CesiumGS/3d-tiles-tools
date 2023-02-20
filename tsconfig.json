@@ -20,6 +20,6 @@
       "*": [ "./src/*.d.ts"]
     }    
   },
-  "include": ["src" ],
+  "include": ["src", "demos" ],
   "exclude": ["node_modules"]
 }

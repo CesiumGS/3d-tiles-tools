@@ -15,9 +15,9 @@ export class Tilesets {
     tilesetTargetName: string,
     overwrite: boolean
   ): Promise<void> {
-
     const externalTilesetDetector = ContentDataTypeChecks.createCheck(
-      ContentDataTypes.CONTENT_TYPE_TILESET);
+      ContentDataTypes.CONTENT_TYPE_TILESET
+    );
     const tilesetCombiner = new TilesetCombiner(externalTilesetDetector);
     await tilesetCombiner.combine(
       tilesetSourceName,

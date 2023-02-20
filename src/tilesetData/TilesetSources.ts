@@ -36,7 +36,7 @@ export class TilesetSources {
     const tilesetSource = TilesetSources.create(extension);
     if (!tilesetSource) {
       throw new TilesetError(
-        `Could not create tileset for name ${name} with extension "${extension}"`
+        `Could not create tileset source for name ${name} with extension "${extension}"`
       );
     }
     tilesetSource.open(name);

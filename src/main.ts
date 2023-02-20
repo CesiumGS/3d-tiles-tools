@@ -1,5 +1,6 @@
-//eslint-disable-next-line
-const yargs = require("yargs/yargs");
+import yargs from "yargs/yargs";
+
+import { ToolsMain } from "./ToolsMain";
 
 // Split the arguments that are intended for the tools
 // and the `--options` arguments
@@ -14,19 +15,39 @@ if (optionsIndex < 0) {
   optionArgs = process.argv.slice(optionsIndex + 1);
 }
 
+// The definition of the 'input' option that is used for
+// all commands that only accept a single input, to be
+// passed to the yargs 'command' definitions.
+const inputStringDefinition: any = {
+  alias: "input",
+  description: "Input path for the command.",
+  global: true,
+  normalize: true,
+  // Yes, this should be "string". But yargs crashes when the
+  // the program is started with "npx ts-node" and an option
+  // is defined to be "string" but given multiple times.
+  type: "array",
+  demandOption: true,
+};
+
+// The definition of the 'input' option that is used for
+// all commands that only multiple inputs, to be
+// passed to the yargs 'command' definitions.
+const inputArrayDefinition: any = {
+  alias: "input",
+  description:
+    "Input paths for the command. The option can be repeated to define multiple input paths.",
+  global: true,
+  normalize: true,
+  type: "array",
+  demandOption: true,
+};
+
 const args = yargs(toolArgs)
   .usage("Usage: $0 <command> [options]")
   .help("h")
   .alias("h", "help")
   .options({
-    i: {
-      alias: "input",
-      description: "Input path for the command.",
-      global: true,
-      normalize: true,
-      type: "string",
-      demandOptions: true,
-    },
     o: {
       alias: "output",
       description: "Output path for the command.",
@@ -42,22 +63,33 @@ const args = yargs(toolArgs)
       type: "boolean",
     },
   })
-  .command("tilesetToDatabase", "Create a sqlite database for a tileset.")
+  .command("tilesetToDatabase", "Create a sqlite database for a tileset.", {
+    i: inputStringDefinition,
+  })
   .command(
     "databaseToTileset",
-    "Unpack a tileset database to a tileset folder."
+    "Unpack a tileset database to a tileset folder.",
+    { i: inputStringDefinition }
   )
   .command(
     "glbToB3dm",
-    "Repackage the input glb as a b3dm with a basic header."
+    "Repackage the input glb as a b3dm with a basic header.",
+    { i: inputStringDefinition }
   )
   .command(
     "glbToI3dm",
-    "Repackage the input glb as a i3dm with a basic header."
+    "Repackage the input glb as a i3dm with a basic header.",
+    { i: inputStringDefinition }
   )
-  .command("b3dmToGlb", "Extract the binary glTF asset from the input b3dm.")
-  .command("i3dmToGlb", "Extract the binary glTF asset from the input i3dm.")
-  .command("cmptToGlb", "Extract the binary glTF assets from the input cmpt.")
+  .command("b3dmToGlb", "Extract the binary glTF asset from the input b3dm.", {
+    i: inputStringDefinition,
+  })
+  .command("i3dmToGlb", "Extract the binary glTF asset from the input i3dm.", {
+    i: inputStringDefinition,
+  })
+  .command("cmptToGlb", "Extract the binary glTF assets from the input cmpt.", {
+    i: inputStringDefinition,
+  })
   .command(
     "optimizeB3dm",
     "Pass the input b3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)",
@@ -72,6 +104,7 @@ const args = yargs(toolArgs)
     "optimizeI3dm",
     "Pass the input i3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)",
     {
+      i: inputStringDefinition,
       options: {
         description:
           "All arguments after this flag will be passed to gltf-pipeline as command line options.",
@@ -79,6 +112,7 @@ const args = yargs(toolArgs)
     }
   )
   .command("gzip", "Gzips the input tileset directory.", {
+    i: inputStringDefinition,
     t: {
       alias: "tilesOnly",
       default: false,
@@ -87,44 +121,33 @@ const args = yargs(toolArgs)
       type: "boolean",
     },
   })
-  .command("ungzip", "Ungzips the input tileset directory.")
+  .command("ungzip", "Ungzips the input tileset directory.", {
+    i: inputStringDefinition,
+  })
   .command(
     "combine",
     "Combines all external tilesets into a single tileset.json file.",
-    {
-      i: {
-        alias: "input",
-        description:
-          "Relative path to the folder containing the root tileset.json file.",
-        normalize: true,
-        type: "string",
-        demandOption: true,
-      },
-    }
+    { i: inputStringDefinition }
   )
   .command(
     "merge",
     "Merge any number of tilesets together into a single tileset.",
-    {
-      i: {
-        alias: "input",
-        description:
-          "Input tileset directories. Multiple directories may be supplied by repeating the -i flag.",
-        normalize: true,
-        type: "array",
-        demandOption: true,
-      },
-    }
+    { i: inputArrayDefinition }
   )
   .command(
     "upgrade",
-    "Upgrades the input tileset to the latest version of the 3D Tiles spec. Embedded glTF models will be upgraded to glTF 2.0."
+    "Upgrades the input tileset to the latest version of the 3D Tiles spec. Embedded glTF models will be upgraded to glTF 2.0.",
+    { i: inputStringDefinition }
   )
-  .demand(1)
+  .demandCommand(1)
   .strict();
 
-const argv = args.argv;
+const argv = args.argv as any;
+
+// TODO Debug output for "Why? Args!"
+console.log("Parsed command line arguments:");
 console.log(argv);
+
 const command = argv._[0];
 
 async function run() {
@@ -132,18 +155,53 @@ async function run() {
   await runCommand(command, argv.input, argv.output, argv.force, optionArgs);
   console.timeEnd("Total");
 }
+
 async function runCommand(
   command: string,
-  input: string,
+  inputs: string[],
   output: string,
   force: boolean,
   optionArgs: any
 ) {
   console.log("command " + command);
-  console.log("input " + input);
+  console.log("inputs " + inputs);
   console.log("output " + output);
   console.log("force " + force);
   console.log("optionArgs ", optionArgs);
+
+  const input = inputs[inputs.length - 1];
+
+  if (command === "b3dmToGlb") {
+    await ToolsMain.b3dmToGlb(input, output, force);
+  } else if (command === "i3dmToGlb") {
+    await ToolsMain.i3dmToGlb(input, output, force);
+  } else if (command === "cmptToGlb") {
+    await ToolsMain.cmptToGlb(input, output, force);
+  } else if (command === "glbToB3dm") {
+    await ToolsMain.glbToB3dm(input, output, force);
+  } else if (command === "glbToI3dm") {
+    await ToolsMain.glbToI3dm(input, output, force);
+  } else if (command === "optimizeB3dm") {
+    await ToolsMain.optimizeB3dm(input, output, force, optionArgs);
+  } else if (command === "optimizeI3dm") {
+    await ToolsMain.optimizeI3dm(input, output, force, optionArgs);
+  } else {
+    // TODO Throw up here:
+    console.log("Unhandled command: " + command);
+    //throw new DeveloperError(`Invalid command: ${command}`);
+  }
+  // TODO:
+  // pipeline
+  // gzip
+  //    TODO: The 'tilesOnly' will be extended based on content type detection
+  // ungzip (or gunzip...)
+  // combine (already exists in `Tilesets`)
+  // upgrade (already exists in `Tilesets`)
+  // merge (already exists in `Tilesets`, but no full "upgrade" done yet)
+  // optimizeB3dm (update for gltf-pipeline)
+  // optimizeI3dm (update for gltf-pipeline)
+  // tilesetToDatabase (trivial pipeline)
+  // databaseToTileset (trivial pipeline)
 }
 
 run();

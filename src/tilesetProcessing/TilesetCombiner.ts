@@ -23,12 +23,13 @@ import { BufferedContentData } from "../contentTypes/BufferedContentData";
  *
  */
 export class TilesetCombiner {
-
   /**
-   * A predicate that is used to detect whether a given 
+   * A predicate that is used to detect whether a given
    * content data refers to an external tileset.
    */
-  private readonly externalTilesetDetector: (contentData: ContentData) => Promise<boolean>;
+  private readonly externalTilesetDetector: (
+    contentData: ContentData
+  ) => Promise<boolean>;
 
   /**
    * The file names of external tilesets, relative to the
@@ -49,7 +50,9 @@ export class TilesetCombiner {
   /**
    * Creates a new instance
    */
-  constructor(externalTilesetDetector: (contentData: ContentData) => Promise<boolean>) {
+  constructor(
+    externalTilesetDetector: (contentData: ContentData) => Promise<boolean>
+  ) {
     this.externalTilesetDetector = externalTilesetDetector;
     this.externalTilesetFileNames = [];
   }
@@ -177,7 +180,10 @@ export class TilesetCombiner {
    * @param currentDirectory - The current directory (see `combineTilesetsInternal`)
    * @param tile - The current tile
    */
-  private async combineTileInternal(currentDirectory: string, tile: Tile): Promise<void> {
+  private async combineTileInternal(
+    currentDirectory: string,
+    tile: Tile
+  ): Promise<void> {
     if (tile.content) {
       await this.combineContentInternal(currentDirectory, tile, tile.content);
     } else if (tile.contents) {
@@ -207,22 +213,37 @@ export class TilesetCombiner {
     tile: Tile,
     content: Content
   ): Promise<void> {
-
     // TODO Replace non-null assertions with error checks here!!!
     const contentUri = content.uri;
+    if (!contentUri) {
+      // This is the case for legacy data (including some of the
+      // original spec data), so handle this case explicitly here.
+      throw new TilesetError('Content does not have a URI');
+    }
     const externalFileName = Paths.join(currentDirectory, contentUri);
+
+    // TODO Debug message
     console.log("externalFileName is " + externalFileName);
-    const externalFileBuffer =
-      this.tilesetSource!.getValue(externalFileName);
-    const contentData = new BufferedContentData(contentUri, externalFileBuffer!);
+
+    const externalFileBuffer = this.tilesetSource!.getValue(externalFileName);
+    const contentData = new BufferedContentData(
+      contentUri,
+      externalFileBuffer!
+    );
     const isTileset = await this.externalTilesetDetector(contentData);
+
+    // TODO Debug message
     console.log(
-      "Content uri is " + contentUri + ", external file name is "+externalFileName+", assuming tileset? " + isTileset
+      "Content uri is " +
+        contentUri +
+        ", external file name is " +
+        externalFileName +
+        ", assuming tileset? " +
+        isTileset
     );
     if (isTileset) {
       this.externalTilesetFileNames.push(externalFileName);
       const externalTilesetDirectory = path.dirname(externalFileName);
-      console.log("externalFileName is " + externalFileName);
       const externalTilesetBuffer =
         this.tilesetSource!.getValue(externalFileName);
       const externalTileset = JSON.parse(
@@ -236,6 +257,8 @@ export class TilesetCombiner {
     } else {
       const externalFileName = Paths.resolve(currentDirectory, contentUri);
       const newUri = Paths.relativize(".", externalFileName);
+      
+      // TODO Debug message
       console.log(
         "Current directory is " +
           currentDirectory +

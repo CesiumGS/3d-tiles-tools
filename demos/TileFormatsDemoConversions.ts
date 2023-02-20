@@ -2,14 +2,15 @@ import fs from "fs";
 
 import { Paths } from "../src/base/Paths";
 
-import { GltfUtilities } from "../src/tileFormats/GtlfUtilities";
+import { GltfUtilities } from "../src/contentOperations/GtlfUtilities";
 import { TileFormats } from "../src/tileFormats/TileFormats";
 
 function glbToB3dm(inputFileName: string, outputFileName: string) {
   console.log("Converting " + inputFileName);
   console.log("to         " + outputFileName);
   const inputBuffer = fs.readFileSync(inputFileName);
-  const outputTileData = TileFormats.createB3dmTileDataFromGlb(inputBuffer);
+  const outputTileData =
+    TileFormats.createDefaultB3dmTileDataFromGlb(inputBuffer);
   const outputBuffer = TileFormats.createTileDataBuffer(outputTileData);
   fs.writeFileSync(outputFileName, outputBuffer);
 }
@@ -17,7 +18,8 @@ function glbToI3dm(inputFileName: string, outputFileName: string) {
   console.log("Converting " + inputFileName);
   console.log("to         " + outputFileName);
   const inputBuffer = fs.readFileSync(inputFileName);
-  const outputTileData = TileFormats.createI3dmTileDataFromGlb(inputBuffer);
+  const outputTileData =
+    TileFormats.createDefaultI3dmTileDataFromGlb(inputBuffer);
   const outputBuffer = TileFormats.createTileDataBuffer(outputTileData);
   fs.writeFileSync(outputFileName, outputBuffer);
 }

@@ -1,7 +1,7 @@
-import zlib from "zlib";
 import { Buffers } from "../base/Buffers";
 
 import { Paths } from "../base/Paths";
+import { ContentOps } from "../contentOperations/ContentOps";
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
 
 export class TilesetEntries {
@@ -18,23 +18,18 @@ export class TilesetEntries {
     const inputKey = inputEntry.key;
     const inputValue = inputEntry.value;
     const outputKey = inputKey;
-    const outputValue = zlib.gzipSync(inputValue);
+    const outputValue = ContentOps.gzipBuffer(inputValue);
     return {
       key: outputKey,
       value: outputValue,
     };
   }
 
-  static ungzip(inputEntry: TilesetEntry): TilesetEntry {
+  static gunzip(inputEntry: TilesetEntry): TilesetEntry {
     const inputKey = inputEntry.key;
     const inputValue = inputEntry.value;
     const outputKey = inputKey;
-    let outputValue: Buffer;
-    if (Buffers.isGzipped(inputValue)) {
-      outputValue = zlib.gunzipSync(inputValue);
-    } else {
-      outputValue = inputValue;
-    }
+    const outputValue = ContentOps.gunzipBuffer(inputValue);
     return {
       key: outputKey,
       value: outputValue,

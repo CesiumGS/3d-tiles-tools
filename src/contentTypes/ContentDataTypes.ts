@@ -1,13 +1,12 @@
 /**
  * A class defining constants for known content data types.
- * 
+ *
  * The constants here are the strings that are returned by
  * `ContentDataTypeRegistry.findContentDataType`
  *
  * @internal
  */
 export class ContentDataTypes {
-
   // The constants for the known content data types
   static readonly CONTENT_TYPE_GLB = "CONTENT_TYPE_GLB";
   static readonly CONTENT_TYPE_B3DM = "CONTENT_TYPE_B3DM";

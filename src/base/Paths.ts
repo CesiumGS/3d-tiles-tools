@@ -50,6 +50,23 @@ export class Paths {
   }
 
   /**
+   * Replace the extension in the given file name with the new one.
+   *
+   * If the given file name does not have an extension, then the
+   * given extension is appended.
+   *
+   * @param fileName - The file name
+   * @param newExtension - The new extension (including the `.` dot)
+   * @returns The new name
+   */
+  static replaceExtension(fileName: string, newExtension: string): string {
+    const extension = path.extname(fileName);
+    const baseName = fileName.substring(0, fileName.length - extension.length);
+    const newName = baseName + newExtension;
+    return Paths.normalize(newName);
+  }
+
+  /**
    * Does whatever `path.join` does, but makes sure that
    * the result uses `/` forward slashes as the directory
    * separator.

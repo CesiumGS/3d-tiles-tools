@@ -10,28 +10,30 @@ import { ContentData } from "./ContentData";
  * Implementation of the `ContentData` interface that stores
  * the full content data in a buffer.
  *
+ * This could be completely synchronous. But every possibility
+ * of anything being "async" causes the promises to be smeared
+ * over all interfaces, through all call chains.
+ *
  * @internal
  */
 export class BufferedContentData implements ContentData {
-
   /**
    * Create content data from the given URI, assuming that it
-   * is a file in the local file system. 
-   * 
+   * is a file in the local file system.
+   *
    * This will try to read the data from the given file, and
-   * create a ContentData from that. If the data cannot be 
+   * create a ContentData from that. If the data cannot be
    * read, a warning will be printed, and the method will
    * return a ContentData where `exists` returns `false`.
-   * 
+   *
    * @param uri - The URI
    * @returns The ContentData
    */
-  static create(uri : string) : ContentData {
+  static create(uri: string): ContentData {
     let data = null;
     try {
       data = fs.readFileSync(uri);
-    }
-    catch (error) {
+    } catch (error) {
       console.warn(`Could not read content data from ${uri}`);
     }
     return new BufferedContentData(uri, data);

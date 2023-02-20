@@ -242,6 +242,52 @@ export class TileFormats {
   }
 
   /**
+   * Convenience method to collect all GLB (binary glTF) buffers from
+   * the given tile data.
+   *
+   * This can be applied to B3DM and I3DM tile data, as well as CMPT
+   * tile data. (For PNTS, it will return an empty array). When the
+   * given tile data is a composite (CMPT) tile data, and recursively
+   * collect the buffer from its inner tiles.
+   *
+   * @param tileDataBuffer - The tile data buffer
+   * @returns The array of GLB buffers
+   */
+  static extractGlbBuffers(tileDataBuffer: Buffer): Buffer[] {
+    const glbBuffers: Buffer[] = [];
+    TileFormats.extractGlbBuffersInternal(tileDataBuffer, glbBuffers);
+    return glbBuffers;
+  }
+
+  /**
+   * Implementation for `realGlbBuffers`, called recursively.
+   *
+   * @param tileDataBuffer - The tile data buffer
+   * @param glbBuffers The array of GLB buffers
+   */
+  private static extractGlbBuffersInternal(
+    tileDataBuffer: Buffer,
+    glbBuffers: Buffer[]
+  ): void {
+    const isComposite = TileFormats.isComposite(tileDataBuffer);
+    if (isComposite) {
+      const compositeTileData =
+        TileFormats.readCompositeTileData(tileDataBuffer);
+      for (const innerTileDataBuffer of compositeTileData.innerTileBuffers) {
+        TileFormats.extractGlbBuffersInternal(innerTileDataBuffer, glbBuffers);
+      }
+    } else {
+      const tileData = TileFormats.readTileData(tileDataBuffer);
+      if (
+        tileData.header.magic === "b3dm" ||
+        tileData.header.magic === "i3dm"
+      ) {
+        glbBuffers.push(tileData.payload);
+      }
+    }
+  }
+
+  /**
    * Creates a Batched 3D Model (B3DM) `TileData` instance from
    * a buffer that is assumed to contain valid binary glTF (GLB)
    * data.
@@ -249,7 +295,35 @@ export class TileFormats {
    * @param glbData - The GLB data
    * @returns The `TileData`
    */
-  static createB3dmTileDataFromGlb(glbData: Buffer): TileData {
+  static createDefaultB3dmTileDataFromGlb(glbData: Buffer): TileData {
+    return TileFormats.createB3dmTileDataFromGlb(
+      glbData,
+      undefined,
+      undefined,
+      undefined,
+      undefined
+    );
+  }
+
+  /**
+   * Creates a Batched 3D Model (B3DM) `TileData` instance from
+   * a buffer that is assumed to contain valid binary glTF (GLB)
+   * data.
+   *
+   * @param glbData - The GLB data
+   * @param featureTableJson - The feature table JSON
+   * @param featureTableBinary - The feature table binary
+   * @param batchTableJson - The batch table JSON
+   * @param batchTableBinary - The batch table binary
+   * @returns The `TileData`
+   */
+  static createB3dmTileDataFromGlb(
+    glbData: Buffer,
+    featureTableJson: any,
+    featureTableBinary: Buffer | undefined,
+    batchTableJson: any,
+    batchTableBinary: Buffer | undefined
+  ): TileData {
     const defaultFeatureTableJson = {
       BATCH_LENGTH: 0,
     };
@@ -260,12 +334,12 @@ export class TileFormats {
       gltfFormat: undefined,
     };
     const featureTable = {
-      json: defaultFeatureTableJson,
-      binary: Buffer.alloc(0),
+      json: featureTableJson ?? defaultFeatureTableJson,
+      binary: featureTableBinary ?? Buffer.alloc(0),
     };
     const batchTable = {
-      json: {},
-      binary: Buffer.alloc(0),
+      json: batchTableJson ?? {},
+      binary: batchTableBinary ?? Buffer.alloc(0),
     };
     const tileData = {
       header: header,
@@ -283,10 +357,46 @@ export class TileFormats {
    * namely exactly the given GLB object.
    *
    * @param glbData - The GLB data
+   * @param featureTableJson - The feature table JSON
+   * @param featureTableBinary - The feature table binary
+   * @param batchTableJson - The batch table JSON
+   * @param batchTableBinary - The batch table binary
    * @returns The `TileData`
    */
-  static createI3dmTileDataFromGlb(glbData: Buffer): TileData {
-    const defaultFetureTableJson = {
+  static createDefaultI3dmTileDataFromGlb(glbData: Buffer): TileData {
+    return TileFormats.createI3dmTileDataFromGlb(
+      glbData,
+      undefined,
+      undefined,
+      undefined,
+      undefined
+    );
+  }
+
+  /**
+   * Creates an Instanced 3D Model (I3DM) `TileData` instance from
+   * a buffer that is assumed to contain valid binary glTF (GLB)
+   * data.
+   *
+   * If no feature table information is given, then the resulting tile
+   * data will represent a single instance, namely exactly the given
+   * GLB object.
+   *
+   * @param glbData - The GLB data
+   * @param featureTableJson - The feature table JSON
+   * @param featureTableBinary - The feature table binary
+   * @param batchTableJson - The batch table JSON
+   * @param batchTableBinary - The batch table binary
+   * @returns The `TileData`
+   */
+  static createI3dmTileDataFromGlb(
+    glbData: Buffer,
+    featureTableJson: any,
+    featureTableBinary: Buffer | undefined,
+    batchTableJson: any,
+    batchTableBinary: Buffer | undefined
+  ): TileData {
+    const defaultFeatureTableJson = {
       INSTANCES_LENGTH: 1,
       POSITION: {
         byteOffset: 0,
@@ -300,12 +410,12 @@ export class TileFormats {
       gltfFormat: 1,
     };
     const featureTable = {
-      json: defaultFetureTableJson,
-      binary: defaultFeatureTableBinary,
+      json: featureTableJson ?? defaultFeatureTableJson,
+      binary: featureTableBinary ?? defaultFeatureTableBinary,
     };
     const batchTable = {
-      json: {},
-      binary: Buffer.alloc(0),
+      json: batchTableJson ?? {},
+      binary: batchTableBinary ?? Buffer.alloc(0),
     };
     const tileData = {
       header: header,

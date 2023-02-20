@@ -9,11 +9,11 @@ import { ContentData } from "./ContentData";
 
 /**
  * Lazy implementation of the `ContentData` interface.
- * 
- * This implementation tries to obtain the least amount of data
- * that is required for the implementation of the interface 
- * methods from a `ResourceResolver`, caching the data internally
- * for later calls.
+ *
+ * This implementation tries to obtain the least amount of data that
+ * is required for the implementation of the interface methods:
+ * It reads the data on demand, from a `ResourceResolver`,
+ * caching the data internally for later calls.
  *
  * @internal
  */

@@ -103,7 +103,7 @@ export class ContentDataTypeRegistry {
    * Tries to find the string that describes the given content data
    * type. If the type of the content data cannot be determined,
    * then `undefined` is returned.
-   * 
+   *
    * The exact criteria for determining the data type are not specified.
    * It may, for example, be determined solely by a file extension of
    * the URI of the given content data, or by magic bytes in the data,
@@ -246,7 +246,9 @@ export class ContentDataTypeRegistry {
   ) {
     for (const entry of ContentDataTypeRegistry.entries) {
       if (entry.type === type) {
-        throw new DeveloperError(`Content data type ${type} was already registered`);
+        throw new DeveloperError(
+          `Content data type ${type} was already registered`
+        );
       }
     }
     const entry: ContentDataTypeEntry = {
@@ -255,5 +257,4 @@ export class ContentDataTypeRegistry {
     };
     ContentDataTypeRegistry.entries.push(entry);
   }
-
 }
