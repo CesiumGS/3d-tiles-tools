@@ -33,7 +33,7 @@ async function combineTilesets(
   outputDirectoryName: string
 ) {
   const overwrite = true;
-  const externalTilesetDetector = ContentDataTypeChecks.createCheck(
+  const externalTilesetDetector = ContentDataTypeChecks.createIncludedCheck(
     ContentDataTypes.CONTENT_TYPE_TILESET
   );
   const tilesetCombiner = new TilesetCombiner(externalTilesetDetector);

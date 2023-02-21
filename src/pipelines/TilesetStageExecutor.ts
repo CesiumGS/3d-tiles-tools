@@ -1,11 +1,7 @@
-import path from "path";
-
 import { TilesetSource } from "../tilesetData/TilesetSource";
 import { TilesetSources } from "../tilesetData/TilesetSources";
 import { TilesetTarget } from "../tilesetData/TilesetTarget";
 import { TilesetTargets } from "../tilesetData/TilesetTargets";
-
-import { TilesetOps } from "../tilesetOperations/TilesetOps";
 
 import { TilesetStage } from "./TilesetStage";
 import { ContentStageExecutor } from "./ContentStageExecutor";
@@ -19,27 +15,25 @@ export class TilesetStageExecutor {
     const contentStages = tilesetStage.contentStages;
 
     if (contentStages.length === 0) {
-      // TODO Handle this...
-      console.log("    No contentStages - performing no-op");
-      TilesetOps.transformSync(
-        tilesetSource,
-        tilesetTarget,
-        undefined,
-        undefined
-      );
+      // TODO This should probably not cause a message.
+      // A TilesetStage might be something like `databaseToTileset`
+      // that is self-contained and "atomic", and does not have
+      // any content stages.
+      const message = `    No contentStages - performing no-op`;
+      console.log(message);
+      const inputEntries = TilesetSources.getEntries(tilesetSource);
+      TilesetTargets.putEntries(tilesetTarget, inputEntries);
       return;
     }
 
     for (let c = 0; c < contentStages.length; c++) {
       const contentStage = contentStages[c];
-      console.log(
-        "    Executing contentStage " +
-          c +
-          " of " +
-          contentStages.length +
-          ": " +
-          contentStage.name
-      );
+
+      const message =
+        `    Executing contentStage ${c} of ` +
+        `${contentStages.length}: ${contentStage.name}`;
+      console.log(message);
+
       await ContentStageExecutor.executeContentStage(
         tilesetSource,
         tilesetTarget,
@@ -51,30 +45,35 @@ export class TilesetStageExecutor {
   static async executeTilesetStage(
     tilesetStage: TilesetStage,
     currentInput: string,
-    currentOutput: string
+    currentOutput: string,
+    overwrite: boolean
   ) {
-    console.log("  Executing tilesetStage : " + tilesetStage.name);
-    console.log("    currentInput:  " + currentInput);
-    console.log("    currentOutput: " + currentOutput);
+    console.log(`  Executing tilesetStage : ${tilesetStage.name}`);
+    console.log(`    currentInput:  ${currentInput}`);
+    console.log(`    currentOutput: ${currentOutput}`);
 
-    // TODO Handle overwrite.
-    // TODO Handle errors.
-    // TODO Ensure "close/end" calls.
-    const inputExtension = path.extname(currentInput);
-    const tilesetSource = TilesetSources.create(inputExtension)!; // XXX Asserting existance!
-    tilesetSource.open(currentInput);
-    const outputExtension = path.extname(currentOutput);
-    const tilesetTarget = TilesetTargets.create(outputExtension)!; // XXX Asserting existance!
-    const forceOverwrite = true;
-    tilesetTarget.begin(currentOutput, forceOverwrite);
+    let tilesetSource;
+    let tilesetTarget;
+    try {
+      tilesetSource = TilesetSources.createAndOpen(currentInput);
+      tilesetTarget = TilesetTargets.createAndBegin(currentOutput, overwrite);
 
-    await TilesetStageExecutor.executeTilesetStageInternal(
-      tilesetSource,
-      tilesetTarget,
-      tilesetStage
-    );
+      await TilesetStageExecutor.executeTilesetStageInternal(
+        tilesetSource,
+        tilesetTarget,
+        tilesetStage
+      );
 
-    tilesetSource.close();
-    await tilesetTarget.end();
+      tilesetSource.close();
+      await tilesetTarget.end();
+    } catch (error) {
+      if (tilesetSource) {
+        tilesetSource.close();
+      }
+      if (tilesetTarget) {
+        await tilesetTarget.end();
+      }
+      throw error;
+    }
   }
 }

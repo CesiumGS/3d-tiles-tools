@@ -3,7 +3,7 @@ import { ContentDataTypeChecks } from "../src/contentTypes/ContentDataTypeChecks
 import { ContentDataTypes } from "../src/contentTypes/ContentDataTypes";
 
 async function testContentDataTypeChecks() {
-  const check = ContentDataTypeChecks.createCheck(
+  const check = ContentDataTypeChecks.createIncludedCheck(
     ContentDataTypes.CONTENT_TYPE_TILESET,
     ContentDataTypes.CONTENT_TYPE_GLB
   );

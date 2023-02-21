@@ -6,7 +6,7 @@ const glbPath = "./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb";
 // Notes: The same as in the notes of "glbToB3dmSpec" applies here.
 
 describe("glbToI3dm", function () {
-  let glbBuffer : Buffer;
+  let glbBuffer: Buffer;
 
   beforeAll(function () {
     glbBuffer = fs.readFileSync(glbPath);

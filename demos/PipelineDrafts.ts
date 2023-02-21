@@ -27,7 +27,8 @@ function createPipelineDraftJson() {
 async function runPipelineDrafts() {
   const pipelineJson = createPipelineDraftJson();
   const pipeline = Pipelines.createPipeline(pipelineJson);
-  await PipelineExecutor.executePipeline(pipeline);
+  const overwrite = true;
+  await PipelineExecutor.executePipeline(pipeline, overwrite);
 }
 
 runPipelineDrafts();

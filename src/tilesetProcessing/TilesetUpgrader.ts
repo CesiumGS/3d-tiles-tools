@@ -10,12 +10,28 @@ import { TilesetSources } from "../tilesetData/TilesetSources";
 import { Contents } from "../tilesets/Contents";
 import { Tiles } from "../tilesets/Tiles";
 import { Tilesets } from "../tilesets/Tilesets";
+import { DeveloperError } from "../base/DeveloperError";
 
+/**
+ * A class for "upgrading" a tileset from a previous version to
+ * a more recent version. The details of what that means exactly
+ * are not (yet) specified.
+ */
 export class TilesetUpgrader {
   /**
    * A function that will receive log messages during the upgrade process
    */
   private readonly logCallback: (message: any) => void;
+
+  /**
+   * The tileset source for the input
+   */
+  private tilesetSource: TilesetSource | undefined;
+
+  /**
+   * The tileset target for the output.
+   */
+  private tilesetTarget: TilesetTarget | undefined;
 
   /**
    * Creates a new instance
@@ -24,18 +40,31 @@ export class TilesetUpgrader {
     this.logCallback = (message: any) => console.log(message);
   }
 
+  /**
+   * Upgrade the specified source tileset, and write it to the given
+   * target.
+   *
+   * @param tilesetSourceName - The tileset source name
+   * @param tilesetTargetName - The tileset target name
+   * @param overwrite Whether the target should be overwritten if
+   * it already exists
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError When the input could not be processed,
+   * or when the output already exists and `overwrite` was `false`.
+   */
   async upgrade(
     tilesetSourceName: string,
-    tilesetTargetName: string
+    tilesetTargetName: string,
+    overwrite: boolean
   ): Promise<void> {
-    // TODO This does not copy resources yet - should it do that?
-
-    const overwrite = true;
     const tilesetSource = TilesetSources.createAndOpen(tilesetSourceName);
     const tilesetTarget = TilesetTargets.createAndBegin(
       tilesetTargetName,
       overwrite
     );
+
+    this.tilesetSource = tilesetSource;
+    this.tilesetTarget = tilesetTarget;
 
     const tilesetSourceJsonFileName =
       Tilesets.determineTilesetJsonFileName(tilesetSourceName);
@@ -44,23 +73,55 @@ export class TilesetUpgrader {
       Tilesets.determineTilesetJsonFileName(tilesetTargetName);
 
     await this.upgradeInternal(
-      tilesetSource,
       tilesetSourceJsonFileName,
-      tilesetTarget,
       tilesetTargetJsonFileName
     );
 
+    // Copy the resources only when the source and target are
+    // in fact different packages (directories)
+    const equalPackages = Tilesets.areEqualPackages(
+      tilesetSourceName,
+      tilesetTargetName
+    );
+    if (equalPackages) {
+      console.log(
+        `Not copying resources - ${tilesetSourceName} and ` +
+          `${tilesetTargetName} refer to the same package`
+      );
+    } else {
+      this.copyResources(tilesetSourceJsonFileName);
+    }
+
     tilesetSource.close();
     await tilesetTarget.end();
+
+    this.tilesetSource = undefined;
+    this.tilesetTarget = undefined;
   }
 
+  /**
+   * Internal method for the actual upgrade.
+   *
+   * It justo obtains the tileset JSON data from the source, passes
+   * it to `upgradeTileset`, and writes the result under the given
+   * name into the target.
+   *
+   * @param tilesetSourceJsonFileName - The name of the tileset JSON in the source
+   * @param tilesetTargetJsonFileName - The name of the tileset JSON in the target
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError When the input could not be processed
+   */
   private async upgradeInternal(
-    tilesetSource: TilesetSource,
     tilesetSourceJsonFileName: string,
-    tilesetTarget: TilesetTarget,
     tilesetTargetJsonFileName: string
   ): Promise<void> {
-    const tilesetJsonBuffer = tilesetSource.getValue(tilesetSourceJsonFileName);
+    if (!this.tilesetSource || !this.tilesetTarget) {
+      throw new DeveloperError("The source and target must be defined");
+    }
+
+    const tilesetJsonBuffer = this.tilesetSource.getValue(
+      tilesetSourceJsonFileName
+    );
     if (!tilesetJsonBuffer) {
       const message = `No ${tilesetSourceJsonFileName} found in input`;
       throw new TilesetError(message);
@@ -71,10 +132,20 @@ export class TilesetUpgrader {
 
     const resultTilesetJsonString = JSON.stringify(tileset, null, 2);
     const resultTilesetJsonBuffer = Buffer.from(resultTilesetJsonString);
-    tilesetTarget.addEntry(tilesetTargetJsonFileName, resultTilesetJsonBuffer);
+    this.tilesetTarget.addEntry(
+      tilesetTargetJsonFileName,
+      resultTilesetJsonBuffer
+    );
   }
 
+  /**
+   * Upgrades the given tileset, in place.
+   *
+   * @param tileset - The parsed tileset
+   */
   async upgradeTileset(tileset: Tileset): Promise<void> {
+    // TODO: There only is one operation right now, on the
+    // level of JSON. Further upgrade steps may be added here.
     TilesetUpgrader.upgradeContentUrlToUri(tileset, this.logCallback);
   }
 
@@ -106,5 +177,23 @@ export class TilesetUpgrader {
       }
       return true;
     });
+  }
+
+  /**
+   * Copy all elements from the tileset source to the tileset target,
+   * except for the one that has the given name.
+   *
+   * @param tilesetSourceJsonFileName - The name of the tileset JSON
+   * file in the source.
+   */
+  private copyResources(tilesetSourceJsonFileName: string): void {
+    const entries = TilesetSources.getEntries(this.tilesetSource!);
+    for (const entry of entries) {
+      const key = entry.key;
+      if (key === tilesetSourceJsonFileName) {
+        continue;
+      }
+      this.tilesetTarget!.addEntry(key, entry.value);
+    }
   }
 }

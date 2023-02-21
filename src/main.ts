@@ -116,8 +116,7 @@ const args = yargs(toolArgs)
     t: {
       alias: "tilesOnly",
       default: false,
-      description:
-        "Only tile files (.b3dm, .i3dm, .pnts, .vctr) should be gzipped.",
+      description: "Only tile content files should be gzipped.",
       type: "boolean",
     },
   })
@@ -152,17 +151,16 @@ const command = argv._[0];
 
 async function run() {
   console.time("Total");
-  await runCommand(command, argv.input, argv.output, argv.force, optionArgs);
+  await runCommand(command, argv, optionArgs);
   console.timeEnd("Total");
 }
 
-async function runCommand(
-  command: string,
-  inputs: string[],
-  output: string,
-  force: boolean,
-  optionArgs: any
-) {
+async function runCommand(command: string, toolArgs: any, optionArgs: any) {
+  const inputs: string[] = toolArgs.input;
+  const output = toolArgs.output;
+  const force = toolArgs.force;
+  const tilesOnly = toolArgs.tilesOnly;
+
   console.log("command " + command);
   console.log("inputs " + inputs);
   console.log("output " + output);
@@ -185,23 +183,30 @@ async function runCommand(
     await ToolsMain.optimizeB3dm(input, output, force, optionArgs);
   } else if (command === "optimizeI3dm") {
     await ToolsMain.optimizeI3dm(input, output, force, optionArgs);
+  } else if (command === "gzip") {
+    await ToolsMain.gzip(input, output, force, tilesOnly);
+  } else if (command === "ungzip") {
+    await ToolsMain.ungzip(input, output, force);
+  } else if (command === "tilesetToDatabase") {
+    await ToolsMain.tilesetToDatabase(input, output, force);
+  } else if (command === "databaseToTileset") {
+    await ToolsMain.databaseToTileset(input, output, force);
+  } else if (command === "combine") {
+    await ToolsMain.combine(input, output, force);
+  } else if (command === "upgrade") {
+    await ToolsMain.upgrade(input, output, force);
+  } else if (command === "merge") {
+    await ToolsMain.merge(inputs, output, force);
   } else {
     // TODO Throw up here:
     console.log("Unhandled command: " + command);
     //throw new DeveloperError(`Invalid command: ${command}`);
   }
+
   // TODO:
   // pipeline
-  // gzip
-  //    TODO: The 'tilesOnly' will be extended based on content type detection
-  // ungzip (or gunzip...)
-  // combine (already exists in `Tilesets`)
-  // upgrade (already exists in `Tilesets`)
-  // merge (already exists in `Tilesets`, but no full "upgrade" done yet)
   // optimizeB3dm (update for gltf-pipeline)
   // optimizeI3dm (update for gltf-pipeline)
-  // tilesetToDatabase (trivial pipeline)
-  // databaseToTileset (trivial pipeline)
 }
 
 run();

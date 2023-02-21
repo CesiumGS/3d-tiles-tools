@@ -38,7 +38,7 @@
     "typescript": "^4.8.3"
   },
   "scripts": {
-    "eslint": "eslint \"./**/*.*s\" --cache",
+    "eslint": "eslint \"./**/*.ts\" --cache",
     "build": "npx tsc",
     "start": "npx ts-node src/main.ts",
     "test": "ts-node node_modules/jasmine/bin/jasmine --config=specs/jasmine.json",

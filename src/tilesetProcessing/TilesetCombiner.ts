@@ -1,6 +1,7 @@
 import path from "path";
 
 import { Paths } from "../base/Paths";
+import { DeveloperError } from "../base/DeveloperError";
 
 import { Tileset } from "../structure/Tileset";
 import { Tile } from "../structure/Tile";
@@ -14,13 +15,13 @@ import { TilesetTargets } from "../tilesetData/TilesetTargets";
 
 import { Tiles } from "../tilesets/Tiles";
 import { Tilesets } from "../tilesets/Tilesets";
+
 import { ContentData } from "../contentTypes/ContentData";
 import { BufferedContentData } from "../contentTypes/BufferedContentData";
 
 /**
  * A class for combining external tileset of a given tileset, to
  * create a new, combined tileset.
- *
  */
 export class TilesetCombiner {
   /**
@@ -49,6 +50,9 @@ export class TilesetCombiner {
 
   /**
    * Creates a new instance
+   *
+   * @param externalTilesetDetector - The predicate that is used to
+   * detect whether something is an external tileset
    */
   constructor(
     externalTilesetDetector: (contentData: ContentData) => Promise<boolean>
@@ -66,9 +70,8 @@ export class TilesetCombiner {
    * @param overwrite Whether the target should be overwritten if
    * it already exists
    * @returns A promise that resolves when the process is finished
-   * @throws TilesetError When the input could not be processed
-   * @throws TilesetError When the output already exists
-   * and `overwrite` was `false`.
+   * @throws TilesetError When the input could not be processed,
+   * or when the output already exists and `overwrite` was `false`.
    */
   async combine(
     tilesetSourceName: string,
@@ -81,6 +84,9 @@ export class TilesetCombiner {
       overwrite
     );
 
+    this.tilesetSource = tilesetSource;
+    this.tilesetTarget = tilesetTarget;
+
     const tilesetJsonFileName =
       Tilesets.determineTilesetJsonFileName(tilesetSourceName);
 
@@ -92,6 +98,9 @@ export class TilesetCombiner {
 
     tilesetSource.close();
     await tilesetTarget.end();
+
+    this.tilesetSource = undefined;
+    this.tilesetTarget = undefined;
   }
 
   /**
@@ -116,9 +125,6 @@ export class TilesetCombiner {
     tilesetJsonFileName: string,
     tilesetTarget: TilesetTarget
   ): Promise<void> {
-    this.tilesetSource = tilesetSource;
-    this.tilesetTarget = tilesetTarget;
-
     const tilesetJsonBuffer = tilesetSource.getValue(tilesetJsonFileName);
     if (!tilesetJsonBuffer) {
       const message = `No ${tilesetJsonFileName} found in input`;
@@ -128,14 +134,12 @@ export class TilesetCombiner {
 
     this.externalTilesetFileNames.length = 0;
     await this.combineTilesetsInternal(".", tileset, undefined);
+
     this.copyResources();
 
     const combinedTilesetJsonString = JSON.stringify(tileset, null, 2);
     const combinedTilesetJsonBuffer = Buffer.from(combinedTilesetJsonString);
     tilesetTarget.addEntry("tileset.json", combinedTilesetJsonBuffer);
-
-    this.tilesetSource = undefined;
-    this.tilesetTarget = undefined;
   }
 
   /**
@@ -213,61 +217,53 @@ export class TilesetCombiner {
     tile: Tile,
     content: Content
   ): Promise<void> {
-    // TODO Replace non-null assertions with error checks here!!!
+    if (!this.tilesetSource || !this.tilesetTarget) {
+      throw new DeveloperError("The source and target must be defined");
+    }
+
     const contentUri = content.uri;
     if (!contentUri) {
       // This is the case for legacy data (including some of the
       // original spec data), so handle this case explicitly here.
-      throw new TilesetError('Content does not have a URI');
+      throw new TilesetError("Content does not have a URI");
     }
     const externalFileName = Paths.join(currentDirectory, contentUri);
 
-    // TODO Debug message
-    console.log("externalFileName is " + externalFileName);
-
-    const externalFileBuffer = this.tilesetSource!.getValue(externalFileName);
+    const externalFileBuffer = this.tilesetSource.getValue(externalFileName);
     const contentData = new BufferedContentData(
       contentUri,
       externalFileBuffer!
     );
     const isTileset = await this.externalTilesetDetector(contentData);
-
-    // TODO Debug message
-    console.log(
-      "Content uri is " +
-        contentUri +
-        ", external file name is " +
-        externalFileName +
-        ", assuming tileset? " +
-        isTileset
-    );
-    if (isTileset) {
+    if (!isTileset) {
+      // When the data is not an external tileset, then just update
+      // the content URI to point to the path that the content data
+      // will end up in
+      const externalFileName = Paths.resolve(currentDirectory, contentUri);
+      const newUri = Paths.relativize(".", externalFileName);
+      content.uri = newUri;
+    } else {
+      // When the data is an external tileset, recursively combine
+      // ("inline") that tileset, and insert its content, contents
+      // and children into the current tile
       this.externalTilesetFileNames.push(externalFileName);
       const externalTilesetDirectory = path.dirname(externalFileName);
       const externalTilesetBuffer =
-        this.tilesetSource!.getValue(externalFileName);
+        this.tilesetSource.getValue(externalFileName);
+      if (!externalTilesetBuffer) {
+        throw new TilesetError(
+          `Could not obtain data for external ` +
+            `tileset file ${externalFileName}`
+        );
+      }
       const externalTileset = JSON.parse(
-        externalTilesetBuffer!.toString()
+        externalTilesetBuffer.toString()
       ) as Tileset;
       this.combineTilesetsInternal(
         externalTilesetDirectory,
         externalTileset,
         tile
       );
-    } else {
-      const externalFileName = Paths.resolve(currentDirectory, contentUri);
-      const newUri = Paths.relativize(".", externalFileName);
-      
-      // TODO Debug message
-      console.log(
-        "Current directory is " +
-          currentDirectory +
-          ", URI is " +
-          contentUri +
-          ", newUri is " +
-          newUri
-      );
-      content.uri = newUri;
     }
   }
 
@@ -275,16 +271,23 @@ export class TilesetCombiner {
    * Copy all elements from the tileset source to the tileset target,
    * except for the ones that have been determined to be external
    * tilesets.
+   *
+   * This is supposed to be called when the `tilesetSource` and
+   * `tilesetTarget` are defined, and BEFORE the entry for the
+   * combined tileset JSON is added to the target, because that
+   * entry might overwrite an existing one.
    */
   private copyResources(): void {
-    const keys = this.tilesetSource!.getKeys();
-    for (const key of keys) {
-      //console.log("About to copy "+key+" except for "+this.externalTilesetFileNames);
+    if (!this.tilesetSource || !this.tilesetTarget) {
+      throw new DeveloperError("The source and target must be defined");
+    }
+    const entries = TilesetSources.getEntries(this.tilesetSource);
+    for (const entry of entries) {
+      const key = entry.key;
       if (this.externalTilesetFileNames.includes(key)) {
         continue;
       }
-      const value = this.tilesetSource!.getValue(key);
-      this.tilesetTarget!.addEntry(key, value!);
+      this.tilesetTarget.addEntry(key, entry.value);
     }
   }
 }

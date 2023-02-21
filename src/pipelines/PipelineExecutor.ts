@@ -2,38 +2,37 @@ import { Pipeline } from "./Pipeline";
 import { TilesetStageExecutor } from "./TilesetStageExecutor";
 
 export class PipelineExecutor {
-  static async executePipeline(pipeline: Pipeline) {
+  static async executePipeline(pipeline: Pipeline, overwrite: boolean) {
     console.log("Executing pipeline");
-
-    //console.log(pipeline.stages[0].name);
-    //console.log(pipeline.stages[1].name);
-    //console.log(pipeline.stages[1].tilesOnly);
 
     let currentInput = pipeline.input;
     let currentOutput = undefined;
+    let currentOverwrite = true;
 
     const tilesetStages = pipeline.tilesetStages;
     for (let t = 0; t < tilesetStages.length; t++) {
       const tilesetStage = tilesetStages[t];
-      console.log(
-        "  Executing tilesetStage " +
-          t +
-          " of " +
-          tilesetStages.length +
-          ": " +
-          tilesetStage.name
-      );
+
+      const message =
+        `  Executing tilesetStage ${t} of ` +
+        `${tilesetStages.length}: ${tilesetStage.name}`;
+      console.log(message);
 
       if (t == tilesetStages.length - 1) {
         currentOutput = pipeline.output;
+        currentOverwrite = overwrite;
       } else {
+        // TODO Use proper OS-specific temp directory here.
+        // (And maybe even clean up afterwards...)
         currentOutput = "./data/TEMP/tilesetStage-" + t;
+        currentOverwrite = true;
       }
 
       await TilesetStageExecutor.executeTilesetStage(
         tilesetStage,
         currentInput,
-        currentOutput
+        currentOutput,
+        currentOverwrite
       );
       currentInput = currentOutput;
     }

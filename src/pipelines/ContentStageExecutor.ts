@@ -1,11 +1,11 @@
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
 import { TilesetSource } from "../tilesetData/TilesetSource";
+import { TilesetSources } from "../tilesetData/TilesetSources";
 import { TilesetTarget } from "../tilesetData/TilesetTarget";
-
-import { TilesetEntries } from "../tilesetOperations/TilesetEntries";
-import { TilesetOps } from "../tilesetOperations/TilesetOps";
+import { TilesetTargets } from "../tilesetData/TilesetTargets";
 
 import { ContentStage } from "./ContentStage";
+import { TilesetEntries } from "./TilesetEntries";
 
 export class ContentStageExecutor {
   static async executeContentStage(
@@ -14,36 +14,58 @@ export class ContentStageExecutor {
     contentStage: ContentStage
   ) {
     if (contentStage.name === "gzip") {
-      await TilesetOps.transformAsync(
+      await ContentStageExecutor.executeGzip(
         tilesetSource,
         tilesetTarget,
-        contentStage.condition,
-        async (e: TilesetEntry) => {
-          return TilesetEntries.gzip(e);
-        }
+        contentStage.condition
       );
     } else if (contentStage.name === "ungzip") {
-      await TilesetOps.transformAsync(
-        tilesetSource,
-        tilesetTarget,
-        contentStage.condition,
-        async (e: TilesetEntry) => {
-          return TilesetEntries.gunzip(e);
-        }
-      );
+      await ContentStageExecutor.executeGunzip(tilesetSource, tilesetTarget);
     } else {
-      // TODO Handle this...
-      console.log(
-        "    Unknown contentStage name: " +
-          contentStage.name +
-          " performing no-op"
-      );
-      TilesetOps.transformSync(
-        tilesetSource,
-        tilesetTarget,
-        undefined,
-        undefined
-      );
+      // TODO Review and document this
+      const message =
+        `    Unknown contentStage name: ${contentStage.name} ` +
+        `- performing no-op`;
+      console.log(message);
+      await ContentStageExecutor.executeNoOp(tilesetSource, tilesetTarget);
     }
+  }
+
+  private static async executeGzip(
+    tilesetSource: TilesetSource,
+    tilesetTarget: TilesetTarget,
+    condition: ((e: TilesetEntry) => Promise<boolean>) | undefined
+  ): Promise<void> {
+    const inputEntries = TilesetSources.getEntries(tilesetSource);
+    for (const inputEntry of inputEntries) {
+      let included = true;
+      if (condition) {
+        included = await condition(inputEntry);
+      }
+      let outputEntry = inputEntry;
+      if (included) {
+        outputEntry = TilesetEntries.gzip(inputEntry);
+      }
+      tilesetTarget.addEntry(outputEntry.key, outputEntry.value);
+    }
+  }
+
+  private static async executeGunzip(
+    tilesetSource: TilesetSource,
+    tilesetTarget: TilesetTarget
+  ): Promise<void> {
+    const inputEntries = TilesetSources.getEntries(tilesetSource);
+    for (const inputEntry of inputEntries) {
+      const outputEntry = TilesetEntries.gunzip(inputEntry);
+      tilesetTarget.addEntry(outputEntry.key, outputEntry.value);
+    }
+  }
+
+  private static async executeNoOp(
+    tilesetSource: TilesetSource,
+    tilesetTarget: TilesetTarget
+  ): Promise<void> {
+    const inputEntries = TilesetSources.getEntries(tilesetSource);
+    TilesetTargets.putEntries(tilesetTarget, inputEntries);
   }
 }

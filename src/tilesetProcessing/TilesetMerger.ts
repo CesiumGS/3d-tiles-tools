@@ -10,6 +10,7 @@ import {
 } from "cesium";
 
 import { Paths } from "../base/Paths";
+import { DeveloperError } from "../base/DeveloperError";
 
 import { Tileset } from "../structure/Tileset";
 
@@ -27,15 +28,16 @@ import { Tilesets } from "../tilesets/Tilesets";
  */
 export class TilesetMerger {
   /**
-   * The tileset sources that have been created from the inputs
+   * The tileset sources that have been created from the source names
    */
   private tilesetSources: TilesetSource[];
 
   /**
-   * The file names for the tileset JSON files. If the inputs are tileset
-   * JSON files, then these are the file names. If the inputs are
-   * directories or files that do not end with ".json", then
-   * these names will default to "tileset.json"
+   * The file names for the tileset JSON files.
+   *
+   * If the inputs are tileset JSON files, then these are the file names.
+   * If the inputs are directories or files that do not end with ".json",
+   * then these names will default to "tileset.json"
    */
   private tilesetJsonFileNames: string[];
 
@@ -129,6 +131,10 @@ export class TilesetMerger {
    * Internal method for `merge`
    */
   private mergeInternal() {
+    if (this.tilesetSources.length == 0 || !this.tilesetTarget) {
+      throw new DeveloperError("The sources and target must be defined");
+    }
+
     // Parse the Tileset objects from all sources
     const tilesets = [];
     const length = this.tilesetSources.length;
@@ -170,7 +176,7 @@ export class TilesetMerger {
     // Write the merged tileset into the target
     const mergedTilesetJson = JSON.stringify(mergedTileset, null, 2);
     const mergedTilesetBuffer = Buffer.from(mergedTilesetJson);
-    this.tilesetTarget!.addEntry("tileset.json", mergedTilesetBuffer);
+    this.tilesetTarget.addEntry("tileset.json", mergedTilesetBuffer);
 
     // Copy the resources from the sources to the target
     this.copyResources();
@@ -184,6 +190,10 @@ export class TilesetMerger {
    * path for disambiguation.
    */
   private copyResources(): void {
+    if (this.tilesetSources.length == 0 || !this.tilesetTarget) {
+      throw new DeveloperError("The sources and target must be defined");
+    }
+
     const length = this.tilesetSources.length;
     for (let i = 0; i < length; ++i) {
       const tilesetSource = this.tilesetSources[i];
@@ -192,7 +202,7 @@ export class TilesetMerger {
       for (const sourceKey of sourceKeys) {
         const value = tilesetSource.getValue(sourceKey);
         const targetKey = tilesetSourceIdentifier + "/" + sourceKey;
-        this.tilesetTarget!.addEntry(targetKey, value!);
+        this.tilesetTarget.addEntry(targetKey, value!);
       }
     }
   }

@@ -7,15 +7,31 @@ import { TilesetMerger } from "../tilesetProcessing/TilesetMerger";
 import { TilesetUpgrader } from "../tilesetProcessing/TilesetUpgrader";
 
 /**
- * Methods related to tilesets
+ * Methods related to tilesets.
+ *
+ * Most of the methods in this class are either utility methods, or
+ * wrappers around the classes that implement parts of the command
+ * line functionality (and that may become `TilesetStage`s in a
+ * pipeline at some point).
  */
 export class Tilesets {
+  /**
+   * Performs the `combine` command line operation.
+   *
+   * @param tilesetSourceName - The tileset source name
+   * @param tilesetTargetName - The tileset target name
+   * @param overwrite Whether the target should be overwritten if
+   * it already exists
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError When the input could not be processed,
+   * or when the output already exists and `overwrite` was `false`.
+   */
   static async combine(
     tilesetSourceName: string,
     tilesetTargetName: string,
     overwrite: boolean
   ): Promise<void> {
-    const externalTilesetDetector = ContentDataTypeChecks.createCheck(
+    const externalTilesetDetector = ContentDataTypeChecks.createIncludedCheck(
       ContentDataTypes.CONTENT_TYPE_TILESET
     );
     const tilesetCombiner = new TilesetCombiner(externalTilesetDetector);
@@ -26,6 +42,17 @@ export class Tilesets {
     );
   }
 
+  /**
+   * Performs the `merge` command line operation.
+   *
+   * @param tilesetSourceName - The tileset source name
+   * @param tilesetTargetName - The tileset target name
+   * @param overwrite Whether the target should be overwritten if
+   * it already exists
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError When the input could not be processed,
+   * or when the output already exists and `overwrite` was `false`.
+   */
   static async merge(
     tilesetSourceNames: string[],
     tilesetTargetName: string,
@@ -35,9 +62,24 @@ export class Tilesets {
     await tilesetMerger.merge(tilesetSourceNames, tilesetTargetName, overwrite);
   }
 
-  static async upgrade(tilesetSourceName: string, tilesetTargetName: string) {
+  /**
+   * Performs the `upgrade` command line operation.
+   *
+   * @param tilesetSourceName - The tileset source name
+   * @param tilesetTargetName - The tileset target name
+   * @param overwrite Whether the target should be overwritten if
+   * it already exists
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError When the input could not be processed,
+   * or when the output already exists and `overwrite` was `false`.
+   */
+  static async upgrade(
+    tilesetSourceName: string,
+    tilesetTargetName: string,
+    overwrite: boolean
+  ) {
     const tilesetUpgrader = new TilesetUpgrader();
-    tilesetUpgrader.upgrade(tilesetSourceName, tilesetTargetName);
+    tilesetUpgrader.upgrade(tilesetSourceName, tilesetTargetName, overwrite);
   }
 
   /**
@@ -58,5 +100,32 @@ export class Tilesets {
       return path.basename(tilesetSourceName);
     }
     return "tileset.json";
+  }
+
+  /**
+   * Returns whether the given names likely refer to the same package.
+   *
+   * This will interpret the given strings as paths and normalize them.
+   * When the names end with `.json` (case insensitively), then the
+   * method returns whether the names refer to the same directory.
+   * Otherwise, it returns whether the paths are equal.
+   *
+   * @param tilesetPackageName0 - The first package name
+   * @param tilesetPackageName1 - The second package name
+   * @returns Whether the names refer to the same package
+   */
+  static areEqualPackages(
+    tilesetPackageName0: string,
+    tilesetPackageName1: string
+  ): boolean {
+    let name0 = path.normalize(tilesetPackageName0);
+    if (name0.toLowerCase().endsWith(".json")) {
+      name0 = path.dirname(tilesetPackageName0);
+    }
+    let name1 = path.normalize(tilesetPackageName1);
+    if (name1.toLowerCase().endsWith(".json")) {
+      name1 = path.dirname(tilesetPackageName1);
+    }
+    return name0 === name1;
   }
 }

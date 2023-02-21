@@ -2,7 +2,6 @@ import { defined } from "../base/defined";
 import { DeveloperError } from "../base/DeveloperError";
 
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
-import { PredicateAsync } from "../tilesetOperations/PredicateAsync";
 
 import { ContentDataTypeChecks } from "../contentTypes/ContentDataTypeChecks";
 import { BufferedContentData } from "../contentTypes/BufferedContentData";
@@ -30,10 +29,13 @@ export class ContentStages {
 
   static createContentStageCondition(
     contentStageJson: any
-  ): PredicateAsync<TilesetEntry> | undefined {
-    if (contentStageJson.includedContentTypes) {
+  ): ((e: TilesetEntry) => Promise<boolean>) | undefined {
+    const included = contentStageJson.includedContentTypes;
+    const excluded = contentStageJson.excludedContentTypes;
+    if (included || excluded) {
       const contentDataCheck = ContentDataTypeChecks.createCheck(
-        ...contentStageJson.includedContentTypes
+        included,
+        excluded
       );
       const condition = async (entry: TilesetEntry) => {
         const contentData = new BufferedContentData(entry.key, entry.value);

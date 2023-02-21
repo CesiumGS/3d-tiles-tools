@@ -1,11 +1,32 @@
 import { ContentData } from "./ContentData";
 import { ContentDataTypeRegistry } from "./ContentDataTypeRegistry";
 
+/**
+ * Methods to create predicates that check whether a given
+ * `ContentData` has a certain type.
+ */
 export class ContentDataTypeChecks {
+  /**
+   * Creates a predicate that checks whether a given `ContentData`
+   * has a type that is contained in the given included types,
+   * and NOT contained in the given excluded types.
+   *
+   * @param includedContentDataTypes - The included types
+   * @param excludedContentDataTypes - The excluded types
+   * @returns The predicate
+   */
   static createCheck(
-    ...contentDataTypes: string[]
+    includedContentDataTypes: string[] | undefined,
+    excludedContentDataTypes: string[] | undefined
   ): (contentData: ContentData) => Promise<boolean> {
-    const localContentDataTypes = [...contentDataTypes];
+    const localIncluded: string[] = [];
+    if (includedContentDataTypes) {
+      localIncluded.push(...includedContentDataTypes);
+    }
+    const localExcluded: string[] = [];
+    if (excludedContentDataTypes) {
+      localExcluded.push(...excludedContentDataTypes);
+    }
     return async (contentData: ContentData) => {
       const contentDataType = await ContentDataTypeRegistry.findContentDataType(
         contentData
@@ -14,11 +35,24 @@ export class ContentDataTypeChecks {
         return false;
       }
       return ContentDataTypeChecks.matches(
-        localContentDataTypes,
-        undefined,
+        localIncluded,
+        localExcluded,
         contentDataType
       );
     };
+  }
+
+  /**
+   * Creates a predicate that checks whether a given `ContentData`
+   * has a type that is contained in the given included types
+   *
+   * @param contentDataTypes - The included types
+   * @returns The predicate
+   */
+  static createIncludedCheck(
+    ...contentDataTypes: string[]
+  ): (contentData: ContentData) => Promise<boolean> {
+    return ContentDataTypeChecks.createCheck(contentDataTypes, undefined);
   }
 
   /**
