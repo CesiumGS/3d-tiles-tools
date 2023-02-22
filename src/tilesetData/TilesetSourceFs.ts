@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 
-import { defined } from "../base/defined";
 import { Paths } from "../base/Paths";
 import { Iterables } from "../base/Iterables";
 
@@ -26,27 +25,29 @@ export class TilesetSourceFs implements TilesetSource {
   }
 
   open(fullInputName: string) {
-    if (defined(this.fullInputName)) {
+    if (this.fullInputName) {
       throw new TilesetError("Source already opened");
     }
     this.fullInputName = fullInputName;
   }
 
   getKeys() {
-    if (!defined(this.fullInputName)) {
+    if (!this.fullInputName) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
-    const files = Iterables.overFiles(this.fullInputName!, true);
+    const files = Iterables.overFiles(this.fullInputName, true);
+
+    const fullInputName = this.fullInputName;
     return Iterables.map(files, (file) =>
-      Paths.relativize(this.fullInputName!, file)
+      Paths.relativize(fullInputName, file)
     );
   }
 
   getValue(key: string) {
-    if (!defined(this.fullInputName)) {
+    if (!this.fullInputName) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
-    const fullFileName = path.join(this.fullInputName!, key);
+    const fullFileName = path.join(this.fullInputName, key);
     if (!fs.existsSync(fullFileName)) {
       return undefined;
     }
@@ -55,7 +56,7 @@ export class TilesetSourceFs implements TilesetSource {
   }
 
   close() {
-    if (!defined(this.fullInputName)) {
+    if (!this.fullInputName) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
     this.fullInputName = undefined;

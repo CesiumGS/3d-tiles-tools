@@ -41,11 +41,11 @@ export class TilesetSourceResourceResolver implements ResourceResolver {
       return null;
     }
     const localUri = Paths.join(this._basePath, uri);
-    const entry = this._tilesetSource.getValue(localUri);
-    if (!entry) {
+    const value = this._tilesetSource.getValue(localUri);
+    if (!value) {
       return null;
     }
-    return entry!;
+    return value;
   }
 
   async resolveDataPartial(

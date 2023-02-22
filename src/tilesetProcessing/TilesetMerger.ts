@@ -202,7 +202,9 @@ export class TilesetMerger {
       for (const sourceKey of sourceKeys) {
         const value = tilesetSource.getValue(sourceKey);
         const targetKey = tilesetSourceIdentifier + "/" + sourceKey;
-        this.tilesetTarget.addEntry(targetKey, value!);
+        if (value) {
+          this.tilesetTarget.addEntry(targetKey, value);
+        }
       }
     }
   }

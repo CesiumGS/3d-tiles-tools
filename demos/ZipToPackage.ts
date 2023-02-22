@@ -1,4 +1,3 @@
-import path from "path";
 import StreamZip from "node-stream-zip";
 
 import { TilesetTargets } from "../src/tilesetData/TilesetTargets";
@@ -28,8 +27,10 @@ export class ZipToPackage {
   ) {
     const zip = new StreamZip.async({ file: inputFileName });
 
-    const outputExtension = path.extname(outputFileName).toLowerCase();
-    const tilesetTarget = TilesetTargets.create(outputExtension)!;
+    const tilesetTarget = TilesetTargets.createAndBegin(
+      outputFileName,
+      overwrite
+    );
     tilesetTarget.begin(outputFileName, overwrite);
 
     const entries = await zip.entries();
@@ -38,7 +39,9 @@ export class ZipToPackage {
       if (!e.isDirectory) {
         const key = e.name;
         const content = await zip.entryData(e.name);
-        tilesetTarget.addEntry(key, content!);
+        if (content) {
+          tilesetTarget.addEntry(key, content);
+        }
       }
     }
     await zip.close();

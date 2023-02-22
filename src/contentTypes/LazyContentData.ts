@@ -106,7 +106,7 @@ export class LazyContentData implements ContentData {
   /** {@inheritDoc ContentData.exists} */
   async exists(): Promise<boolean> {
     if (defined(this._exists)) {
-      return this._exists!;
+      return this._exists;
     }
     const partialData = await this._resourceResolver.resolveDataPartial(
       this._uri,
@@ -119,14 +119,14 @@ export class LazyContentData implements ContentData {
   /** {@inheritDoc ContentData.getMagic} */
   async getMagic(): Promise<string> {
     if (defined(this._magic)) {
-      return this._magic!;
+      return this._magic;
     }
     const partialData = await this._resourceResolver.resolveDataPartial(
       this._uri,
       4
     );
-    if (defined(partialData)) {
-      this._magic = Buffers.getMagic(partialData!);
+    if (partialData) {
+      this._magic = Buffers.getMagic(partialData);
       this._exists = true;
     } else {
       this._magic = "";
@@ -152,20 +152,20 @@ export class LazyContentData implements ContentData {
       return this._parsedObject;
     }
     const data = await this.getData();
-    if (!defined(data)) {
+    if (!data) {
       this._parsedObject = undefined;
       this._parsedObjectWasRequested = true;
       this._exists = false;
       return this._parsedObject;
     }
     this._exists = true;
-    if (!Buffers.isProbablyJson(data!)) {
+    if (!Buffers.isProbablyJson(data)) {
       this._parsedObject = undefined;
       this._parsedObjectWasRequested = true;
       return this._parsedObject;
     }
     try {
-      this._parsedObject = JSON.parse(data!.toString());
+      this._parsedObject = JSON.parse(data.toString());
       return this._parsedObject;
     } catch (error) {
       this._parsedObject = undefined;

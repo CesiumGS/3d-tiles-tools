@@ -76,19 +76,16 @@ async function tilesetPackageConversion(options: any) {
   if (inputExtension === ".zip") {
     ZipToPackage.convert(input, output, overwrite);
   } else {
-    const tilesetSource = TilesetSources.create(inputExtension)!;
-
-    const outputExtension = path.extname(output).toLowerCase();
-    const tilesetTarget = TilesetTargets.create(outputExtension)!;
-
-    tilesetSource.open(input);
-    tilesetTarget.begin(output, overwrite);
+    const tilesetSource = TilesetSources.createAndOpen(input);
+    const tilesetTarget = TilesetTargets.createAndBegin(output, overwrite);
 
     const keys = tilesetSource.getKeys();
     for (const key of keys) {
       const content = tilesetSource.getValue(key);
       // TODO Compression or decompression could happen here...
-      tilesetTarget.addEntry(key, content!);
+      if (content) {
+        tilesetTarget.addEntry(key, content);
+      }
     }
 
     tilesetSource.close();

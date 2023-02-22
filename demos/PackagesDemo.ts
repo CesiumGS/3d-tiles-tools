@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import fs from "fs";
-import path from "path";
 
 import { TilesetSources } from "../src/tilesetData/TilesetSources";
 import { TilesetTargets } from "../src/tilesetData/TilesetTargets";
@@ -15,9 +14,7 @@ async function createPackageExample(fileName: string) {
   console.log("Creating package " + fileName);
 
   const overwrite = true;
-  const extension = path.extname(fileName);
-  const tilesetTarget = TilesetTargets.create(extension)!;
-  tilesetTarget.begin(fileName, overwrite);
+  const tilesetTarget = TilesetTargets.createAndBegin(fileName, overwrite);
 
   tilesetTarget.addEntry("example.json", Buffer.alloc(100));
   tilesetTarget.addEntry("example.glb", Buffer.alloc(1000));
@@ -35,9 +32,7 @@ async function createPackageExample(fileName: string) {
 async function readPackageExample(fileName: string) {
   console.log("Reading package " + fileName);
 
-  const extension = path.extname(fileName);
-  const tilesetSource = TilesetSources.create(extension)!;
-  tilesetSource.open(fileName);
+  const tilesetSource = TilesetSources.createAndOpen(fileName);
 
   console.log("Package contents:");
   for (const key of tilesetSource.getKeys()) {

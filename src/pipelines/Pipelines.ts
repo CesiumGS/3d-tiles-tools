@@ -1,4 +1,3 @@
-import { defined } from "../base/defined";
 import { DeveloperError } from "../base/DeveloperError";
 
 import { Pipeline } from "./Pipeline";
@@ -8,7 +7,7 @@ import { TilesetStages } from "./TilesetStages";
 export class Pipelines {
   static createPipeline(pipelineJson: any): Pipeline {
     const tilesetStages: TilesetStage[] = [];
-    if (!defined(pipelineJson.tilesetStages)) {
+    if (!pipelineJson.tilesetStages) {
       throw new DeveloperError(
         "The pipeline JSON does not define tilesetStages"
       );

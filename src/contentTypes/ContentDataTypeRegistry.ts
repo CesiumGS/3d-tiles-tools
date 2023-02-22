@@ -224,10 +224,10 @@ export class ContentDataTypeRegistry {
       return false;
     }
     const parsedObject = await contentData.getParsedObject();
-    if (!defined(parsedObject)) {
+    if (!parsedObject) {
       return false;
     }
-    if (!defined(parsedObject.asset)) {
+    if (!parsedObject.asset) {
       return false;
     }
     return true;

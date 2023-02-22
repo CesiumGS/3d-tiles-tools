@@ -40,7 +40,9 @@ function readTilesetSource(
     }
     for (const key of keys) {
       const content = tilesetSource.getValue(key);
-      totalBytes += content!.length;
+      if (content) {
+        totalBytes += content.length;
+      }
     }
     Arrays.shuffle(keys, "0");
   }

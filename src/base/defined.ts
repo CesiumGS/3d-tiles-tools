@@ -27,6 +27,6 @@
  * @param value - The value to check.
  * @returns `true` if the value is not `undefined` and not `null`
  */
-export function defined(value: any): boolean {
+export function defined<T>(value: any): value is NonNullable<T> {
   return value !== undefined && value !== null;
 }

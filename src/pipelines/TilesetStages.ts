@@ -18,7 +18,7 @@ export class TilesetStages {
     if (!defined(tilesetStageJson.name)) {
       throw new DeveloperError("The tilesetStage JSON does not define a name");
     }
-    if (defined(tilesetStageJson.contentStages)) {
+    if (tilesetStageJson.contentStages) {
       for (const contentStageJson of tilesetStageJson.contentStages) {
         const contentStage = ContentStages.createContentStage(contentStageJson);
         contentStages.push(contentStage);

@@ -1,8 +1,6 @@
 import fs from "fs";
 import path from "path";
 
-import { defined } from "../base/defined";
-
 import { TilesetTarget } from "./TilesetTarget";
 import { TilesetError } from "./TilesetError";
 
@@ -31,7 +29,7 @@ export class TilesetTargetFs implements TilesetTarget {
   }
 
   begin(fullOutputName: string, overwrite: boolean) {
-    if (defined(this.fullOutputName)) {
+    if (this.fullOutputName) {
       throw new TilesetError("Target already opened");
     }
     this.fullOutputName = fullOutputName;
@@ -42,10 +40,10 @@ export class TilesetTargetFs implements TilesetTarget {
   }
 
   addEntry(key: string, content: Buffer) {
-    if (!defined(this.fullOutputName)) {
+    if (!this.fullOutputName) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");
     }
-    const fullOutputFileName = path.join(this.fullOutputName!, key);
+    const fullOutputFileName = path.join(this.fullOutputName, key);
     if (fs.existsSync(fullOutputFileName)) {
       if (!this.overwrite) {
         throw new TilesetError("File already exists: " + fullOutputFileName);
@@ -57,7 +55,7 @@ export class TilesetTargetFs implements TilesetTarget {
   }
 
   async end() {
-    if (!defined(this.fullOutputName)) {
+    if (!this.fullOutputName) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");
     }
     this.fullOutputName = undefined;

@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 
-import { defined } from "../base/defined";
 import { Buffers } from "../base/Buffers";
 
 import { ContentData } from "./ContentData";
@@ -87,8 +86,8 @@ export class BufferedContentData implements ContentData {
   constructor(uri: string, data: Buffer | null) {
     this._uri = uri;
     this._extension = path.extname(uri).toLowerCase();
-    if (defined(data)) {
-      this._magic = Buffers.getMagic(data!);
+    if (data) {
+      this._magic = Buffers.getMagic(data);
     } else {
       this._magic = "";
     }
@@ -127,18 +126,18 @@ export class BufferedContentData implements ContentData {
     if (this._parsedObjectWasRequested) {
       return this._parsedObject;
     }
-    if (!defined(this._data)) {
+    if (!this._data) {
       this._parsedObject = undefined;
       this._parsedObjectWasRequested = true;
       return this._parsedObject;
     }
-    if (!Buffers.isProbablyJson(this._data!)) {
+    if (!Buffers.isProbablyJson(this._data)) {
       this._parsedObject = undefined;
       this._parsedObjectWasRequested = true;
       return this._parsedObject;
     }
     try {
-      this._parsedObject = JSON.parse(this._data!.toString());
+      this._parsedObject = JSON.parse(this._data.toString());
       return this._parsedObject;
     } catch (error) {
       this._parsedObject = undefined;

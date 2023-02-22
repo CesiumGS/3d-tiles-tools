@@ -1,8 +1,6 @@
 import fs from "fs";
 import crypto from "crypto";
 
-import { defined } from "../base/defined";
-
 import { TilesetError } from "../tilesetData/TilesetError";
 
 import { IndexEntry } from "./IndexEntry";
@@ -305,13 +303,13 @@ export class ArchiveFunctions3tz {
     const stat = fs.fstatSync(fd);
     const centralDirectoryEntryData =
       ArchiveFunctions3tz.getLastCentralDirectoryEntry(fd, stat);
-    if (!defined(centralDirectoryEntryData)) {
+    if (!centralDirectoryEntryData) {
       throw new TilesetError("Could not read last central directory entry");
     }
     const indexFileName = "@3dtilesIndex1@";
     const indexFileContents = ArchiveFunctions3tz.getFileContents(
       fd,
-      centralDirectoryEntryData!,
+      centralDirectoryEntryData,
       indexFileName
     );
     const zipIndex = ArchiveFunctions3tz.parseIndexData(indexFileContents);
@@ -335,14 +333,14 @@ export class ArchiveFunctions3tz {
   static readEntryData(fd: number, zipIndex: IndexEntry[], path: string) {
     const normalizedPath = ArchiveFunctions3tz.normalizePath(path);
     const match = ArchiveFunctions3tz.searchIndex(zipIndex, normalizedPath);
-    if (defined(match)) {
+    if (match) {
       const header = ArchiveFunctions3tz.readZipLocalFileHeader(
         fd,
-        match!.offset,
+        match.offset,
         path
       );
       const fileDataOffset =
-        Number(match!.offset) +
+        Number(match.offset) +
         ArchiveFunctions3tz.ZIP_LOCAL_FILE_HEADER_STATIC_SIZE +
         header.filename_size +
         header.extra_size;

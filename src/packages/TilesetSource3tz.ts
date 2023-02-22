@@ -49,23 +49,25 @@ export class TilesetSource3tz implements TilesetSource {
   }
 
   getKeys(): IterableIterator<string> {
-    if (!defined(this.fd)) {
+    if (!defined(this.fd) || !this.zipIndex) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
+    return TilesetSource3tz.createKeysIterator(this.fd, this.zipIndex);
+  }
+
+  private static createKeysIterator(fd: number, zipIndex: IndexEntry[]) {
     let index = 0;
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const that = this;
-    return {
+    const iterator = {
       [Symbol.iterator]() {
         return this;
       },
       next(): IteratorResult<string, any> {
-        if (index >= that.zipIndex!.length) {
+        if (index >= zipIndex.length) {
           return { value: undefined, done: true };
         }
-        const entry = that.zipIndex![index];
+        const entry = zipIndex[index];
         const offset = entry.offset;
-        const fileName = ArchiveFunctions3tz.readFileName(that.fd!, offset);
+        const fileName = ArchiveFunctions3tz.readFileName(fd, offset);
         const result = {
           value: fileName,
           done: false,
@@ -74,25 +76,26 @@ export class TilesetSource3tz implements TilesetSource {
         return result;
       },
     };
+    return iterator;
   }
 
   getValue(key: string) {
-    if (!defined(this.fd)) {
+    if (!defined(this.fd) || !this.zipIndex) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
     const entryData = ArchiveFunctions3tz.readEntryData(
-      this.fd!,
-      this.zipIndex!,
+      this.fd,
+      this.zipIndex,
       key
     );
     return entryData;
   }
 
   close() {
-    if (!defined(this.fd)) {
+    if (!defined(this.fd) || !this.zipIndex) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
-    fs.closeSync(this.fd!);
+    fs.closeSync(this.fd);
 
     this.fd = undefined;
     this.zipIndex = undefined;

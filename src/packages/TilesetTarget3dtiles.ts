@@ -4,8 +4,6 @@ import path from "path";
 import { Database } from "better-sqlite3";
 import DatabaseConstructor from "better-sqlite3";
 
-import { defined } from "../base/defined";
-
 import { TilesetTarget } from "../tilesetData/TilesetTarget";
 import { TilesetError } from "../tilesetData/TilesetError";
 
@@ -40,7 +38,7 @@ export class TilesetTarget3dtiles implements TilesetTarget {
       }
     }
 
-    if (defined(this.db)) {
+    if (this.db) {
       throw new TilesetError("Target already opened");
     }
     this.db = new DatabaseConstructor(fullOutputName);
@@ -52,19 +50,19 @@ export class TilesetTarget3dtiles implements TilesetTarget {
   }
 
   addEntry(key: string, content: Buffer): void {
-    if (!defined(this.db)) {
+    if (!this.db) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");
     }
-    const insertion = this.db!.prepare("INSERT INTO media VALUES (?, ?)");
+    const insertion = this.db.prepare("INSERT INTO media VALUES (?, ?)");
     insertion.run(key, content);
   }
 
   async end(): Promise<void> {
-    if (!defined(this.db)) {
+    if (!this.db) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");
     }
-    this.db!.prepare("COMMIT").run();
-    this.db!.close();
+    this.db.prepare("COMMIT").run();
+    this.db.close();
     this.db = undefined;
   }
 }

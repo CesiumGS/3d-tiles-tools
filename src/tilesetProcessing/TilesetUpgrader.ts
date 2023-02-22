@@ -187,13 +187,16 @@ export class TilesetUpgrader {
    * file in the source.
    */
   private copyResources(tilesetSourceJsonFileName: string): void {
-    const entries = TilesetSources.getEntries(this.tilesetSource!);
+    if (!this.tilesetSource || !this.tilesetTarget) {
+      throw new DeveloperError("The source and target must be defined");
+    }
+    const entries = TilesetSources.getEntries(this.tilesetSource);
     for (const entry of entries) {
       const key = entry.key;
       if (key === tilesetSourceJsonFileName) {
         continue;
       }
-      this.tilesetTarget!.addEntry(key, entry.value);
+      this.tilesetTarget.addEntry(key, entry.value);
     }
   }
 }

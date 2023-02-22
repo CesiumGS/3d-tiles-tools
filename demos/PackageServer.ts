@@ -126,7 +126,7 @@ function handleRequest(
   }
 
   // TODO Proper query parameter handling...
-  let path = url.startsWith("/") ? url.substring(1) : url!;
+  let path = url.startsWith("/") ? url.substring(1) : url;
   const nameEnd = path.indexOf("?");
   if (nameEnd != -1) {
     path = path.substring(0, nameEnd);

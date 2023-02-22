@@ -82,7 +82,7 @@ export class TileFormats {
 
     // Assemble the resulting CompositeTileData
     const header = {
-      magic: magic!,
+      magic: magic,
       version: version,
       gltfFormat: undefined,
     };
@@ -220,7 +220,7 @@ export class TileFormats {
 
     // Assemble the final `TileData`
     const header = {
-      magic: magic!,
+      magic: magic,
       version: version,
       gltfFormat: gltfFormat,
     };

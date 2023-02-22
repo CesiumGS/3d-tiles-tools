@@ -179,9 +179,6 @@ export class Buffers {
    * @internal
    */
   private static startsWith(buffer: Buffer, bytes: number[]): boolean {
-    if (!defined(buffer) || !defined(bytes)) {
-      return false;
-    }
     if (buffer.length < bytes.length) {
       return false;
     }

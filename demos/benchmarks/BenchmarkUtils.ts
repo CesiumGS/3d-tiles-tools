@@ -106,7 +106,6 @@ export class BenchmarkUtils {
     );
   }
 
-
   /**
    * Creates a generator that allows iterating over "dummy" entries
    * for a 3D tiles data set, in the form of TilesetEntry objects.
@@ -142,5 +141,4 @@ export class BenchmarkUtils {
       yield entry;
     }
   }
-
 }

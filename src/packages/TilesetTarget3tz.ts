@@ -2,8 +2,6 @@ import fs from "fs";
 import path from "path";
 import archiver from "archiver";
 
-import { defined } from "../base/defined";
-
 import { TilesetTarget } from "../tilesetData/TilesetTarget";
 import { TilesetError } from "../tilesetData/TilesetError";
 
@@ -60,7 +58,7 @@ export class TilesetTarget3tz implements TilesetTarget {
       }
     }
 
-    if (defined(this.archive)) {
+    if (this.archive) {
       throw new TilesetError("Target already opened");
     }
 
@@ -70,11 +68,10 @@ export class TilesetTarget3tz implements TilesetTarget {
     });
     this.archive.pipe(this.outputStream);
 
-    this.finishedPromise = new Promise((resolve, reject) => {
-      this.archive!.on("error", reject);
-      this.outputStream!.on("error", reject);
-      this.outputStream!.on("close", resolve);
-    });
+    this.finishedPromise = TilesetTarget3tz.createFinishedPromise(
+      this.archive,
+      this.outputStream
+    );
 
     // Logging and error handling for archiver:
     this.archive.on("warning", (error) => {
@@ -85,23 +82,35 @@ export class TilesetTarget3tz implements TilesetTarget {
     });
   }
 
+  private static createFinishedPromise(
+    archive: archiver.Archiver,
+    outputStream: fs.WriteStream
+  ): Promise<void> {
+    const finishedPromise = new Promise<void>((resolve, reject) => {
+      archive.on("error", reject);
+      outputStream.on("error", reject);
+      outputStream.on("close", resolve);
+    });
+    return finishedPromise;
+  }
+
   addEntry(key: string, content: Buffer) {
-    if (!defined(this.archive)) {
+    if (!this.archive) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");
     }
-    this.archive!.append(content, { name: key });
+    this.archive.append(content, { name: key });
     this.indexBuilder.addEntry(key, content.length);
   }
 
   async end() {
-    if (!defined(this.archive)) {
+    if (!this.archive) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");
     }
 
     // Create the index data, and add it as the LAST entry of the ZIP
     const indexData = this.indexBuilder.createBuffer();
-    this.archive!.append(indexData, { name: "@3dtilesIndex1@" });
-    this.archive!.finalize();
+    this.archive.append(indexData, { name: "@3dtilesIndex1@" });
+    this.archive.finalize();
 
     await this.finishedPromise;
     this.finishedPromise = undefined;

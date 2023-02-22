@@ -230,10 +230,10 @@ export class TilesetCombiner {
     const externalFileName = Paths.join(currentDirectory, contentUri);
 
     const externalFileBuffer = this.tilesetSource.getValue(externalFileName);
-    const contentData = new BufferedContentData(
-      contentUri,
-      externalFileBuffer!
-    );
+    if (!externalFileBuffer) {
+      throw new TilesetError(`No data found for ${externalFileName}`);
+    }
+    const contentData = new BufferedContentData(contentUri, externalFileBuffer);
     const isTileset = await this.externalTilesetDetector(contentData);
     if (!isTileset) {
       // When the data is not an external tileset, then just update
