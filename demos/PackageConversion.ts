@@ -8,14 +8,14 @@ import minimist from "minimist";
 import { TilesetTargets } from "../src/tilesetData/TilesetTargets";
 import { TilesetSources } from "../src/tilesetData/TilesetSources";
 
-import { convertTilesetZip } from "./convertTilesetZip";
+import { ZipToPackage } from "./ZipToPackage";
 
 /**
  * Print the help message showing the command line options
  */
 function printHelp() {
   const help =
-    "Usage: tileset-package-conversion [OPTIONS]\n" +
+    "Usage: PackageConversion [OPTIONS]\n" +
     "  -i,  --input <name>    Input directory or file name.\n" +
     "  -o,  --output <name>   Output directory or file name.\n" +
     "  -f   --force           Pay respects and overwrite output files if they exist.\n" +
@@ -74,7 +74,7 @@ async function tilesetPackageConversion(options: any) {
   const inputExtension = path.extname(input).toLowerCase();
 
   if (inputExtension === ".zip") {
-    convertTilesetZip(input, output, overwrite);
+    ZipToPackage.convert(input, output, overwrite);
   } else {
     const tilesetSource = TilesetSources.create(inputExtension)!;
 

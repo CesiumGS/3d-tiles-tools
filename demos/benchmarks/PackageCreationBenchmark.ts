@@ -4,14 +4,13 @@ import fs from "fs";
 import util from "util";
 import { performance } from "perf_hooks";
 
-import { TilesetTarget } from "../src/tilesetData/TilesetTarget";
-import { TilesetEntry } from "../src/tilesetData/TilesetEntry";
+import { TilesetTarget } from "../../src/tilesetData/TilesetTarget";
+import { TilesetEntry } from "../../src/tilesetData/TilesetEntry";
 
-import { TilesetTarget3dtiles } from "../src/packages/TilesetTarget3dtiles";
-import { TilesetTarget3tz } from "../src/packages/TilesetTarget3tz";
+import { TilesetTarget3dtiles } from "../../src/packages/TilesetTarget3dtiles";
+import { TilesetTarget3tz } from "../../src/packages/TilesetTarget3tz";
 
 import { BenchmarkUtils } from "./BenchmarkUtils";
-import { createDummyEntriesIterable } from "./createDummyEntriesIterable";
 
 /**
  * Adds the given entries to the given tileset target,
@@ -65,15 +64,11 @@ async function run() {
     const configString = BenchmarkUtils.createConfigString(config);
     const outputFilePrefix = outputDirectory + configString;
 
-    const numEntries = config.numEntries;
-    const minSize = config.minSize;
-    const maxSize = config.maxSize;
-
     const tilesetTarget3tz = new TilesetTarget3tz();
     await fillTilesetTarget(
       tilesetTarget3tz,
       outputFilePrefix + ".3tz",
-      createDummyEntriesIterable(numEntries, minSize, maxSize, "0"),
+      BenchmarkUtils.createDummyEntriesIterable(config),
       "3TZ            " + configString
     );
 
@@ -81,7 +76,7 @@ async function run() {
     await fillTilesetTarget(
       tilesetTarget3dtiles,
       outputFilePrefix + ".3dtiles",
-      createDummyEntriesIterable(numEntries, minSize, maxSize, "0"),
+      BenchmarkUtils.createDummyEntriesIterable(config),
       "3DTILES        " + configString
     );
   }

@@ -1,9 +1,12 @@
 import util from "util";
+import seedrandom from "seedrandom";
 
 import { BenchmarkConfig } from "./BenchmarkConfig";
 
+import { TilesetEntry } from "../../src/tilesetData/TilesetEntry";
+
 /**
- * Methods to create benchmark configurations
+ * Methods related to the 3D Tiles Package benchmarks.
  */
 export class BenchmarkUtils {
   /**
@@ -78,4 +81,66 @@ export class BenchmarkUtils {
     );
     return configString;
   }
+
+  /**
+   * Creates a generator that allows iterating over "dummy" entries
+   * for a 3D tiles data set, in the form of TilesetEntry objects.
+   *
+   * The sizes of the TilesetEntry#value buffers will be randomized
+   * in the specified range, with the given random seed.
+   *
+   * @param numEntries The number of entries to generate
+   * @param minSize The minimum size of an entry, inclusive
+   * @param maxSize The maximum size of an entry, exclusive
+   * @param seed The random seed. An arbitrary string.
+   * @return The generator for entry objects
+   */
+  static createDummyEntriesIterable(
+    config: BenchmarkConfig
+  ): IterableIterator<TilesetEntry> {
+    return BenchmarkUtils.createDummyEntriesIterableInternal(
+      config.numEntries,
+      config.minSize,
+      config.maxSize,
+      "0"
+    );
+  }
+
+
+  /**
+   * Creates a generator that allows iterating over "dummy" entries
+   * for a 3D tiles data set, in the form of TilesetEntry objects.
+   *
+   * The sizes of the TilesetEntry#value buffers will be randomized
+   * in the specified range, with the given random seed.
+   *
+   * @param numEntries The number of entries to generate
+   * @param minSize The minimum size of an entry, inclusive
+   * @param maxSize The maximum size of an entry, exclusive
+   * @param seed The random seed. An arbitrary string.
+   * @return The generator for entry objects
+   */
+  static *createDummyEntriesIterableInternal(
+    numEntries: number,
+    minSize: number,
+    maxSize: number,
+    seed: string
+  ): IterableIterator<TilesetEntry> {
+    const random = seedrandom(seed);
+    const templateBuffer = Buffer.alloc(maxSize);
+    let index = 0;
+    while (index < numEntries) {
+      const key = "example" + index + ".glb";
+      const r = random();
+      const size = Math.floor(minSize + r * (maxSize - minSize));
+      const buffer = templateBuffer.subarray(0, size);
+      const entry = {
+        key: key,
+        value: buffer,
+      };
+      index++;
+      yield entry;
+    }
+  }
+
 }

@@ -4,12 +4,12 @@ import fs from "fs";
 import util from "util";
 import { performance } from "perf_hooks";
 
-import { TilesetSource } from "../src/tilesetData/TilesetSource";
-import { TilesetSource3tz } from "../src/packages/TilesetSource3tz";
-import { TilesetSource3dtiles } from "../src/packages/TilesetSource3dtiles";
+import { TilesetSource } from "../../src/tilesetData/TilesetSource";
+import { TilesetSource3tz } from "../../src/packages/TilesetSource3tz";
+import { TilesetSource3dtiles } from "../../src/packages/TilesetSource3dtiles";
 
 import { BenchmarkUtils } from "./BenchmarkUtils";
-import { shuffleArray } from "./shuffleArray";
+import { Arrays } from "./Arrays";
 
 /**
  * Reads all entries from the given source, repeatedly and in random
@@ -42,7 +42,7 @@ function readTilesetSource(
       const content = tilesetSource.getValue(key);
       totalBytes += content!.length;
     }
-    shuffleArray(keys, "0");
+    Arrays.shuffle(keys, "0");
   }
   tilesetSource.close();
   const afterMs = performance.now();

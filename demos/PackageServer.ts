@@ -15,7 +15,7 @@ import { TilesetSources } from "../src/tilesetData/TilesetSources";
  */
 function printHelp() {
   const help =
-    "Usage: tileset-source-server [OPTIONS]\n" +
+    "Usage: PackageServer [OPTIONS]\n" +
     "  -n,  --hostName <name>     Host name. Default: '127.0.0.1' (localhost).\n" +
     "  -p,  --port <number>       Port number. Default: '8003'.\n" +
     "  -s,  --sourceName <name>   Package file or directory name.\n" +
