@@ -54,6 +54,7 @@ const args = yargs(toolArgs)
       global: true,
       normalize: true,
       type: "string",
+      demandOption: true,
     },
     f: {
       alias: "force",
