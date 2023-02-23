@@ -1,6 +1,7 @@
 import path from "path";
 import { ContentDataTypeChecks } from "../contentTypes/ContentDataTypeChecks";
 import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
+import { Tileset } from "../structure/Tileset";
 
 import { TilesetCombiner } from "../tilesetProcessing/TilesetCombiner";
 import { TilesetMerger } from "../tilesetProcessing/TilesetMerger";
@@ -80,6 +81,17 @@ export class Tilesets {
   ) {
     const tilesetUpgrader = new TilesetUpgrader();
     tilesetUpgrader.upgrade(tilesetSourceName, tilesetTargetName, overwrite);
+  }
+
+  /**
+   * Performs the `upgrade` operation directly on a tileset
+   *
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError When the input could not be processed
+   */
+  static async upgradeTileset(tileset: Tileset) {
+    const tilesetUpgrader = new TilesetUpgrader();
+    tilesetUpgrader.upgradeTileset(tileset);
   }
 
   /**
