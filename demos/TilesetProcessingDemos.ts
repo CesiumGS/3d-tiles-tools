@@ -1,12 +1,8 @@
 import fs from "fs";
-import { ContentDataTypeChecks } from "../src/contentTypes/ContentDataTypeChecks";
-import { ContentDataTypes } from "../src/contentTypes/ContentDataTypes";
 
 import { Tileset } from "../src/structure/Tileset";
 
-import { TilesetCombiner } from "../src/tilesetProcessing/TilesetCombiner";
-import { TilesetMerger } from "../src/tilesetProcessing/TilesetMerger";
-import { TilesetUpgrader } from "../src/tilesetProcessing/TilesetUpgrader";
+import { Tilesets } from "../src/tilesets/Tilesets";
 
 async function upgradeTilesetJson(
   inputFileName: string,
@@ -14,17 +10,19 @@ async function upgradeTilesetJson(
 ) {
   const inputBuffer = fs.readFileSync(inputFileName);
   const tileset = JSON.parse(inputBuffer.toString()) as Tileset;
+  const inputJsonString = JSON.stringify(tileset, null, 2);
 
   console.log("Initial:");
-  console.log(JSON.stringify(tileset, null, 2));
+  console.log(inputJsonString);
 
-  const tilesetUpgrader = new TilesetUpgrader();
-  await tilesetUpgrader.upgradeTileset(tileset);
+  await Tilesets.upgradeTileset(tileset);
+
+  const resultJsonString = JSON.stringify(tileset, null, 2);
 
   console.log("After upgrading (only content URL to URI)");
-  console.log(JSON.stringify(tileset, null, 2));
+  console.log(resultJsonString);
 
-  const outputBuffer = Buffer.from(JSON.stringify(tileset, null, 2));
+  const outputBuffer = Buffer.from(resultJsonString);
   fs.writeFileSync(outputFileName, outputBuffer);
 }
 
@@ -33,11 +31,7 @@ async function combineTilesets(
   outputDirectoryName: string
 ) {
   const overwrite = true;
-  const externalTilesetDetector = ContentDataTypeChecks.createIncludedCheck(
-    ContentDataTypes.CONTENT_TYPE_TILESET
-  );
-  const tilesetCombiner = new TilesetCombiner(externalTilesetDetector);
-  await tilesetCombiner.combine(inputFileName, outputDirectoryName, overwrite);
+  await Tilesets.combine(inputFileName, outputDirectoryName, overwrite);
 }
 
 async function mergeTilesets(
@@ -45,8 +39,7 @@ async function mergeTilesets(
   outputDirectoryName: string
 ) {
   const overwrite = true;
-  const tilesetMerger = new TilesetMerger();
-  await tilesetMerger.merge(inputFileNames, outputDirectoryName, overwrite);
+  await Tilesets.merge(inputFileNames, outputDirectoryName, overwrite);
 }
 
 async function tilesetProcessingDemos() {
