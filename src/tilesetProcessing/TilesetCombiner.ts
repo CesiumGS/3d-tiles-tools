@@ -228,7 +228,6 @@ export class TilesetCombiner {
       throw new TilesetError("Content does not have a URI");
     }
     const externalFileName = Paths.join(currentDirectory, contentUri);
-
     const externalFileBuffer = this.tilesetSource.getValue(externalFileName);
     if (!externalFileBuffer) {
       throw new TilesetError(`No data found for ${externalFileName}`);
@@ -239,7 +238,6 @@ export class TilesetCombiner {
       // When the data is not an external tileset, then just update
       // the content URI to point to the path that the content data
       // will end up in
-      const externalFileName = Paths.resolve(currentDirectory, contentUri);
       const newUri = Paths.relativize(".", externalFileName);
       content.uri = newUri;
     } else {
@@ -259,7 +257,7 @@ export class TilesetCombiner {
       const externalTileset = JSON.parse(
         externalTilesetBuffer.toString()
       ) as Tileset;
-      this.combineTilesetsInternal(
+      await this.combineTilesetsInternal(
         externalTilesetDirectory,
         externalTileset,
         tile
