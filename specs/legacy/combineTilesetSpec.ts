@@ -4,13 +4,13 @@ import { Tilesets } from "../../src/tilesets/Tilesets";
 import { SpecHelpers } from "./SpecHelpers";
 
 const tilesetDirectory = "./specs/data/TilesetOfTilesetsWithUris/";
-const combinedDirectory = "./specs/data/TilesetOfTilesetsWithUris-combined";
+const combinedDirectory = "./specs/data/output/TilesetOfTilesetsWithUris-combined";
 const combinedJson =
-  "./specs/data/TilesetOfTilesetsWithUris-combined/tileset.json";
+  "./specs/data/output/TilesetOfTilesetsWithUris-combined/tileset.json";
 
 describe("combineTileset", function () {
   afterEach(async function () {
-    SpecHelpers.forceDeleteDirectory(combinedDirectory);
+    //SpecHelpers.forceDeleteDirectory(combinedDirectory);
   });
 
   it("combines external tilesets into a single tileset", async function () {

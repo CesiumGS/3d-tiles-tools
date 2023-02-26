@@ -91,7 +91,7 @@ export class Buffers {
   /**
    * Creates a buffer that contains the JSON representation
    * of the given object, padding the end of the data with
-   * spaced if necessary to make sure that the data ends
+   * spaces if necessary to make sure that the data ends
    * at an 8-byte boundary.
    *
    * @param json - The object

@@ -1,8 +1,9 @@
 
 package-lock.json
-node_modules
-build
+.eslintcache
+
+/node_modules
+/build
 /data
-output
-/.eslintcache
-/specs/data/TilesetOfTilesets/tileset-upgraded.json
+/output
+/specs/data/output

@@ -11,6 +11,10 @@ import { Contents } from "../tilesets/Contents";
 import { Tiles } from "../tilesets/Tiles";
 import { Tilesets } from "../tilesets/Tilesets";
 import { DeveloperError } from "../base/DeveloperError";
+import { TileFormats } from "../tileFormats/TileFormats";
+import { GltfUtilities } from "../contentOperations/GtlfUtilities";
+import { BufferedContentData } from "../contentTypes/BufferedContentData";
+import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
 
 /**
  * A class for "upgrading" a tileset from a previous version to
@@ -33,11 +37,19 @@ export class TilesetUpgrader {
    */
   private tilesetTarget: TilesetTarget | undefined;
 
+  private readonly upgradeOptions: any;
+
   /**
    * Creates a new instance
    */
   constructor() {
     this.logCallback = (message: any) => console.log(message);
+
+    this.upgradeOptions = {
+      upgradeContentUrlToUri: true,
+      upgradeB3dmGltf1ToGltf2: true,
+      upgradeI3dmGltf1ToGltf2: true,
+    };
   }
 
   /**
@@ -146,7 +158,9 @@ export class TilesetUpgrader {
   async upgradeTileset(tileset: Tileset): Promise<void> {
     // TODO: There only is one operation right now, on the
     // level of JSON. Further upgrade steps may be added here.
-    TilesetUpgrader.upgradeContentUrlToUri(tileset, this.logCallback);
+    if (this.upgradeOptions.upgradeContentUrlToUri) {
+      TilesetUpgrader.upgradeContentUrlToUri(tileset, this.logCallback);
+    }
   }
 
   /**
@@ -198,5 +212,88 @@ export class TilesetUpgrader {
       }
       this.tilesetTarget.addEntry(key, entry.value);
     }
+  }
+
+  private static async upgradeB3dmGltf1ToGltf2(
+    inputBuffer: Buffer
+  ): Promise<Buffer> {
+    const inputTileData = TileFormats.readTileData(inputBuffer);
+    const inputGlb = inputTileData.payload;
+    const outputGlb = await GltfUtilities.upgradeGlb(inputGlb);
+    const outputTileData = TileFormats.createB3dmTileDataFromGlb(
+      outputGlb,
+      inputTileData.featureTable.json,
+      inputTileData.featureTable.binary,
+      inputTileData.batchTable.json,
+      inputTileData.batchTable.binary
+    );
+    const outputBuffer = TileFormats.createTileDataBuffer(outputTileData);
+    return outputBuffer;
+  }
+
+  private static async upgradeI3dmGltf1ToGltf2(
+    inputBuffer: Buffer
+  ): Promise<Buffer> {
+    const inputTileData = TileFormats.readTileData(inputBuffer);
+    const inputGlb = inputTileData.payload;
+    const outputGlb = await GltfUtilities.upgradeGlb(inputGlb);
+    const outputTileData = TileFormats.createI3dmTileDataFromGlb(
+      outputGlb,
+      inputTileData.featureTable.json,
+      inputTileData.featureTable.binary,
+      inputTileData.batchTable.json,
+      inputTileData.batchTable.binary
+    );
+    const outputBuffer = TileFormats.createTileDataBuffer(outputTileData);
+    return outputBuffer;
+  }
+
+  private async upgradeResources(
+    tilesetSourceJsonFileName: string
+  ): Promise<void> {
+    if (!this.tilesetSource || !this.tilesetTarget) {
+      throw new DeveloperError("The source and target must be defined");
+    }
+    const entries = TilesetSources.getEntries(this.tilesetSource);
+    for (const entry of entries) {
+      const key = entry.key;
+      if (key === tilesetSourceJsonFileName) {
+        continue;
+      }
+      let value = entry.value;
+
+      const contentData = new BufferedContentData(key, value);
+      const type = await ContentDataTypeRegistry.findContentDataType(
+        contentData
+      );
+      value = await this.processValue(key, value, type);
+
+      this.tilesetTarget.addEntry(key, value);
+    }
+  }
+
+  private async processValue(
+    key: string,
+    value: Buffer,
+    type: string | undefined
+  ): Promise<Buffer> {
+    if (type === "CONTENT_TYPE_B3DM") {
+      if (this.upgradeOptions.upgradeB3dmGltf1ToGltf2) {
+        console.log("Upgrading GLB in " + key);
+        value = await TilesetUpgrader.upgradeB3dmGltf1ToGltf2(value);
+      } else {
+        console.log("Not upgrading " + key + " (disabled via option)");
+      }
+    } else if (type === "CONTENT_TYPE_I3DM") {
+      if (this.upgradeOptions.upgradeI3dmGltf1ToGltf2) {
+        console.log("Upgrading GLB in " + key);
+        value = await TilesetUpgrader.upgradeI3dmGltf1ToGltf2(value);
+      } else {
+        console.log("Not upgrading " + key + " (disabled via option)");
+      }
+    } else {
+      console.log("Not upgrading " + key + " with type " + type);
+    }
+    return value;
   }
 }

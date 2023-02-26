@@ -260,7 +260,7 @@ export class TileFormats {
   }
 
   /**
-   * Implementation for `realGlbBuffers`, called recursively.
+   * Implementation for `extractGlbBuffers`, called recursively.
    *
    * @param tileDataBuffer - The tile data buffer
    * @param glbBuffers The array of GLB buffers
@@ -433,7 +433,7 @@ export class TileFormats {
    * @param tileDatas - The `TileData` instances
    * @returns The `CompositeTileData`
    */
-  static createCmpt(tileDatas: TileData[]): CompositeTileData {
+  static createCompositeTileData(tileDatas: TileData[]): CompositeTileData {
     const innerBuffers = [];
     for (const tileData of tileDatas) {
       const innerBuffer = TileFormats.createTileDataBuffer(tileData);

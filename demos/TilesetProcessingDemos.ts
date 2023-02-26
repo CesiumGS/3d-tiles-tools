@@ -1,4 +1,7 @@
 import fs from "fs";
+import path from "path";
+
+import { Paths } from "../src/base/Paths";
 
 import { Tileset } from "../src/structure/Tileset";
 
@@ -23,6 +26,7 @@ async function upgradeTilesetJson(
   console.log(resultJsonString);
 
   const outputBuffer = Buffer.from(resultJsonString);
+  Paths.ensureDirectoryExists(path.dirname(outputFileName));
   fs.writeFileSync(outputFileName, outputBuffer);
 }
 
@@ -45,20 +49,20 @@ async function mergeTilesets(
 async function tilesetProcessingDemos() {
   await upgradeTilesetJson(
     "./specs/data/TilesetOfTilesets/tileset.json",
-    "./specs/data/TilesetOfTilesets/tileset-upgraded.json"
+    "./specs/data/output/TilesetOfTilesets/tileset-upgraded.json"
   );
 
   await combineTilesets(
-    "./specs/data/combineTilesets/input/tileset.json",
-    "./specs/data/combineTilesets/output"
+    "./specs/data/combineTilesets/tileset.json",
+    "./specs/data/output/combineTilesets"
   );
 
   await mergeTilesets(
     [
-      "./specs/data/mergeTilesets/input/TilesetA/tileset.json",
-      "./specs/data/mergeTilesets/input/sub/TilesetA/tileset.json",
+      "./specs/data/mergeTilesets/TilesetA/tileset.json",
+      "./specs/data/mergeTilesets/sub/TilesetA/tileset.json",
     ],
-    "./specs/data/mergeTilesets/output/merged.3tz"
+    "./specs/data/output/mergeTilesets/merged.3tz"
   );
 }
 
