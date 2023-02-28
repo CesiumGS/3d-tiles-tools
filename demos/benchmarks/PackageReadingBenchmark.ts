@@ -1,10 +1,9 @@
-#!/usr/bin/env node
-
 import fs from "fs";
 import util from "util";
 import { performance } from "perf_hooks";
 
 import { TilesetSource } from "../../src/tilesetData/TilesetSource";
+
 import { TilesetSource3tz } from "../../src/packages/TilesetSource3tz";
 import { TilesetSource3dtiles } from "../../src/packages/TilesetSource3dtiles";
 

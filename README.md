@@ -168,7 +168,7 @@ npx ts-node ./demos/PackageConversion.ts -i ./specs/data/Tileset -o ./output/exa
 ```
 npx ts-node ./demos/PackageServer.ts -s ./specs/data/Tileset
 ```
-to be opened with the `TilesetSourceSandcastle.js`.
+to be opened with the `PackageSandcastle.js`.
 
 ---
 

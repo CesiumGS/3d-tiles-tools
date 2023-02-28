@@ -91,7 +91,7 @@ export class Tilesets {
    */
   static async upgradeTileset(tileset: Tileset) {
     const tilesetUpgrader = new TilesetUpgrader();
-    tilesetUpgrader.upgradeTileset(tileset);
+    await tilesetUpgrader.upgradeTileset(tileset);
   }
 
   /**

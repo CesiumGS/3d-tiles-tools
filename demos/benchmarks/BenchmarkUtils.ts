@@ -40,7 +40,7 @@ export class BenchmarkUtils {
    * @returns The list
    */
   static createBenchmarkConfigs(): BenchmarkConfig[] {
-    const configs: any[] = [];
+    const configs: BenchmarkConfig[] = [];
 
     //configs.push({ numEntries: 10, minSize: 10000, maxSize: 100000 });
     //*/
@@ -112,6 +112,10 @@ export class BenchmarkUtils {
    *
    * The sizes of the TilesetEntry#value buffers will be randomized
    * in the specified range, with the given random seed.
+   *
+   * The buffers will contain all-zero data, and can therefore not
+   * sensibly be used for any test or benchmark that involves GZIP
+   * compression.
    *
    * @param numEntries The number of entries to generate
    * @param minSize The minimum size of an entry, inclusive

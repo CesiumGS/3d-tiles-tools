@@ -28,33 +28,4 @@ export class Contents {
     }
     return undefined;
   }
-
-  /**
-   * If the given `Content` does not have a `uri` but uses the
-   * legacy `url` property, then a message is logged, and the
-   * `url` property is renamed to `uri`.
-   *
-   * @param content - The `Content`
-   */
-  static upgradeUrlToUri(
-    content: Content,
-    logCallback: (message: any) => void
-  ): void {
-    if (content.uri) {
-      return;
-    }
-    const legacyContent = content as any;
-    if (legacyContent.url) {
-      logCallback(
-        "The 'url' property of tile content is deprecated. Renaming it to 'uri'."
-      );
-      content.uri = legacyContent.url;
-      delete legacyContent.url;
-      return;
-    }
-    // This should never be the case:
-    logCallback(
-      "The content does not have a 'uri' property (and no legacy 'url' property)"
-    );
-  }
 }

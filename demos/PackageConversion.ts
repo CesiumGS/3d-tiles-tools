@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { defined } from "../src/base/defined";
 import { defaultValue } from "../src/base/defaultValue";
 

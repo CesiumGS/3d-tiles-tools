@@ -1,7 +1,8 @@
 
 package-lock.json
 .eslintcache
-
+/.nyc_output
+/coverage
 /node_modules
 /build
 /data

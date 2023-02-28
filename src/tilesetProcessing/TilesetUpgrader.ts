@@ -1,5 +1,12 @@
+import { Buffers } from "../base/Buffers";
+import { DeveloperError } from "../base/DeveloperError";
+
+import { BufferedContentData } from "../contentTypes/BufferedContentData";
+import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
+
 import { Tile } from "../structure/Tile";
 import { Tileset } from "../structure/Tileset";
+import { Content } from "../structure/Content";
 
 import { TilesetError } from "../tilesetData/TilesetError";
 import { TilesetSource } from "../tilesetData/TilesetSource";
@@ -7,14 +14,29 @@ import { TilesetTarget } from "../tilesetData/TilesetTarget";
 import { TilesetTargets } from "../tilesetData/TilesetTargets";
 import { TilesetSources } from "../tilesetData/TilesetSources";
 
-import { Contents } from "../tilesets/Contents";
 import { Tiles } from "../tilesets/Tiles";
 import { Tilesets } from "../tilesets/Tilesets";
-import { DeveloperError } from "../base/DeveloperError";
+
 import { TileFormats } from "../tileFormats/TileFormats";
+
 import { GltfUtilities } from "../contentOperations/GtlfUtilities";
-import { BufferedContentData } from "../contentTypes/BufferedContentData";
-import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
+import { ContentOps } from "../contentOperations/ContentOps";
+
+/**
+ * The options for the upgrade. This is only used internally,
+ * as a collection of flags to enable/disable certain parts
+ * of the update.
+ *
+ * The exact set of options (and how they may eventually
+ * be exposed to the user) still have to be decided.
+ */
+type UpgradeOptions = {
+  upgradeAssetVersionNumber: boolean;
+  upgradeRefineCase: boolean;
+  upgradeContentUrlToUri: boolean;
+  upgradeB3dmGltf1ToGltf2: boolean;
+  upgradeI3dmGltf1ToGltf2: boolean;
+};
 
 /**
  * A class for "upgrading" a tileset from a previous version to
@@ -37,15 +59,28 @@ export class TilesetUpgrader {
    */
   private tilesetTarget: TilesetTarget | undefined;
 
-  private readonly upgradeOptions: any;
+  /**
+   * The options for the upgrade.
+   */
+  private readonly upgradeOptions: UpgradeOptions;
 
   /**
    * Creates a new instance
+   *
+   * @param quiet - Whether log messages should be omitted
    */
-  constructor() {
-    this.logCallback = (message: any) => console.log(message);
+  constructor(quiet?: boolean) {
+    if (quiet !== true) {
+      this.logCallback = (message: any) => console.log(message);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+      this.logCallback = (message: any) => {};
+    }
 
+    // By default, ALL options are enabled
     this.upgradeOptions = {
+      upgradeAssetVersionNumber: true,
+      upgradeRefineCase: true,
       upgradeContentUrlToUri: true,
       upgradeB3dmGltf1ToGltf2: true,
       upgradeI3dmGltf1ToGltf2: true,
@@ -88,21 +123,7 @@ export class TilesetUpgrader {
       tilesetSourceJsonFileName,
       tilesetTargetJsonFileName
     );
-
-    // Copy the resources only when the source and target are
-    // in fact different packages (directories)
-    const equalPackages = Tilesets.areEqualPackages(
-      tilesetSourceName,
-      tilesetTargetName
-    );
-    if (equalPackages) {
-      console.log(
-        `Not copying resources - ${tilesetSourceName} and ` +
-          `${tilesetTargetName} refer to the same package`
-      );
-    } else {
-      this.copyResources(tilesetSourceJsonFileName);
-    }
+    await this.upgradeResources(tilesetSourceJsonFileName);
 
     tilesetSource.close();
     await tilesetTarget.end();
@@ -131,19 +152,32 @@ export class TilesetUpgrader {
       throw new DeveloperError("The source and target must be defined");
     }
 
-    const tilesetJsonBuffer = this.tilesetSource.getValue(
+    // Obtain the tileset JSON buffer (unzip it if necessary)
+    // and parse the Tileset out of it
+    let tilesetJsonBuffer = this.tilesetSource.getValue(
       tilesetSourceJsonFileName
     );
     if (!tilesetJsonBuffer) {
       const message = `No ${tilesetSourceJsonFileName} found in input`;
       throw new TilesetError(message);
     }
+    let tilesetJsonBufferWasZipped = false;
+    if (Buffers.isGzipped(tilesetJsonBuffer)) {
+      tilesetJsonBufferWasZipped = true;
+      tilesetJsonBuffer = ContentOps.gunzipBuffer(tilesetJsonBuffer);
+    }
     const tileset = JSON.parse(tilesetJsonBuffer.toString()) as Tileset;
 
+    // Perform the actual upgrade
     await this.upgradeTileset(tileset);
 
+    // Put the upgraded tileset JSON buffer into the target
+    // (zipping it, if the input was zipped)
     const resultTilesetJsonString = JSON.stringify(tileset, null, 2);
-    const resultTilesetJsonBuffer = Buffer.from(resultTilesetJsonString);
+    let resultTilesetJsonBuffer = Buffer.from(resultTilesetJsonString);
+    if (tilesetJsonBufferWasZipped) {
+      resultTilesetJsonBuffer = ContentOps.gzipBuffer(resultTilesetJsonBuffer);
+    }
     this.tilesetTarget.addEntry(
       tilesetTargetJsonFileName,
       resultTilesetJsonBuffer
@@ -156,10 +190,32 @@ export class TilesetUpgrader {
    * @param tileset - The parsed tileset
    */
   async upgradeTileset(tileset: Tileset): Promise<void> {
-    // TODO: There only is one operation right now, on the
-    // level of JSON. Further upgrade steps may be added here.
+    if (this.upgradeOptions.upgradeAssetVersionNumber) {
+      this.logCallback(`Upgrading asset version number`);
+      await this.upgradeAssetVersionNumber(tileset);
+    }
     if (this.upgradeOptions.upgradeContentUrlToUri) {
-      TilesetUpgrader.upgradeContentUrlToUri(tileset, this.logCallback);
+      this.logCallback(`Upgrading refine to be in uppercase`);
+      await this.upgradeRefineValues(tileset);
+    }
+    if (this.upgradeOptions.upgradeContentUrlToUri) {
+      this.logCallback(`Upgrading content.url to content.uri`);
+      await this.upgradeEachContentUrlToUri(tileset);
+    }
+  }
+
+  /**
+   * Upgrade the `asset.version` number in the given tileset
+   * to be "1.1".
+   *
+   * @param tileset - The tileset
+   */
+  private upgradeAssetVersionNumber(tileset: Tileset) {
+    if (tileset.asset.version !== "1.1") {
+      this.logCallback(
+        `  Upgrading asset version from ${tileset.asset.version} to 1.1`
+      );
+      tileset.asset.version = "1.1";
     }
   }
 
@@ -171,22 +227,18 @@ export class TilesetUpgrader {
    * define a `uri`, but a (legacy) `url` property, then a warning is
    * printed and the `url` is renamed to `uri`.
    *
-   * @param tileset - The tiles
-   * @param logCallback - A callback for log messages
+   * @param tileset - The tileset
    */
-  private static upgradeContentUrlToUri(
-    tileset: Tileset,
-    logCallback: (message: any) => void
-  ) {
+  private async upgradeEachContentUrlToUri(tileset: Tileset) {
     const root = tileset.root;
-    Tiles.traverseExplicit(root, async (tilePath: Tile[]) => {
+    await Tiles.traverseExplicit(root, async (tilePath: Tile[]) => {
       const tile = tilePath[tilePath.length - 1];
       if (tile.content) {
-        Contents.upgradeUrlToUri(tile.content, logCallback);
+        this.upgradeContentUrlToUri(tile.content);
       }
       if (tile.contents) {
         for (const content of tile.contents) {
-          Contents.upgradeUrlToUri(content, logCallback);
+          this.upgradeContentUrlToUri(content);
         }
       }
       return true;
@@ -194,13 +246,64 @@ export class TilesetUpgrader {
   }
 
   /**
-   * Copy all elements from the tileset source to the tileset target,
-   * except for the one that has the given name.
+   * If the given `Content` does not have a `uri` but uses the
+   * legacy `url` property, then a message is logged, and the
+   * `url` property is renamed to `uri`.
    *
-   * @param tilesetSourceJsonFileName - The name of the tileset JSON
-   * file in the source.
+   * @param content - The `Content`
    */
-  private copyResources(tilesetSourceJsonFileName: string): void {
+  private upgradeContentUrlToUri(content: Content): void {
+    if (content.uri) {
+      return;
+    }
+    const legacyContent = content as any;
+    if (legacyContent.url) {
+      this.logCallback(
+        `  Renaming 'url' property for content ${legacyContent.url} to 'uri'`
+      );
+      content.uri = legacyContent.url;
+      delete legacyContent.url;
+      return;
+    }
+    // This should never be the case:
+    this.logCallback(
+      "  The content does not have a 'uri' property (and no legacy 'url' property)"
+    );
+  }
+
+  /**
+   * Upgrade the `refine` property of each tile to be written in
+   * uppercase letters.
+   *
+   * @param tileset - The tileset
+   */
+  private async upgradeRefineValues(tileset: Tileset) {
+    const root = tileset.root;
+    await Tiles.traverseExplicit(root, async (tilePath: Tile[]) => {
+      const tile = tilePath[tilePath.length - 1];
+      if (tile.refine && tile.refine !== "ADD" && tile.refine !== "REPLACE") {
+        const oldValue = tile.refine;
+        const newValue = oldValue.toUpperCase();
+        this.logCallback(
+          `  Renaming 'refine' value from ${oldValue} to ${newValue}`
+        );
+        tile.refine = newValue;
+      }
+      return true;
+    });
+  }
+
+  /**
+   * Upgrade all resources from the tileset source (except for the
+   * file with the given name) and put them into the tileset target.
+   *
+   * @param tilesetSourceJsonFileName - The name of the tileset JSON file
+   * in the source
+   * @returns A promise that resolves when the process is finished.
+   */
+  private async upgradeResources(
+    tilesetSourceJsonFileName: string
+  ): Promise<void> {
     if (!this.tilesetSource || !this.tilesetTarget) {
       throw new DeveloperError("The source and target must be defined");
     }
@@ -210,10 +313,58 @@ export class TilesetUpgrader {
       if (key === tilesetSourceJsonFileName) {
         continue;
       }
-      this.tilesetTarget.addEntry(key, entry.value);
+      const sourceValue = entry.value;
+      const contentData = new BufferedContentData(key, sourceValue);
+      const type = await ContentDataTypeRegistry.findContentDataType(
+        contentData
+      );
+      const targetValue = await this.processValue(key, sourceValue, type);
+      this.tilesetTarget.addEntry(key, targetValue);
     }
   }
 
+  /**
+   * Process the value of an entry (i.e. the data of one file), and return
+   * a possibly "upgraded" version of that value.
+   *
+   * @param key - The key (file name)
+   * @param value - The value (file contents buffer)
+   * @param type - The type of the content. See `ContentDataTypes`.
+   * @returns A promise that resolves when the value is processed.
+   */
+  private async processValue(
+    key: string,
+    value: Buffer,
+    type: string | undefined
+  ): Promise<Buffer> {
+    if (type === "CONTENT_TYPE_B3DM") {
+      if (this.upgradeOptions.upgradeB3dmGltf1ToGltf2) {
+        this.logCallback(`  Upgrading GLB in ${key}`);
+        value = await TilesetUpgrader.upgradeB3dmGltf1ToGltf2(value);
+      } else {
+        this.logCallback(`  Not upgrading GLB in ${key} (disabled via option)`);
+      }
+    } else if (type === "CONTENT_TYPE_I3DM") {
+      if (this.upgradeOptions.upgradeI3dmGltf1ToGltf2) {
+        this.logCallback(`  Upgrading GLB in ${key}`);
+        value = await TilesetUpgrader.upgradeI3dmGltf1ToGltf2(value);
+      } else {
+        this.logCallback(`  Not upgrading GLB in ${key} (disabled via option)`);
+      }
+    } else {
+      this.logCallback(`  No upgrade operation to perform for ${key}`);
+    }
+    return value;
+  }
+
+  /**
+   * For the given B3DM data buffer, extract the GLB, upgrade it
+   * with `GltfUtilities.upgradeGlb`, create a new B3DM from the
+   * result, and return it.
+   *
+   * @param inputBuffer - The input buffer
+   * @returns The upgraded buffer
+   */
   private static async upgradeB3dmGltf1ToGltf2(
     inputBuffer: Buffer
   ): Promise<Buffer> {
@@ -231,6 +382,14 @@ export class TilesetUpgrader {
     return outputBuffer;
   }
 
+  /**
+   * For the given I3DM data buffer, extract the GLB, upgrade it
+   * with `GltfUtilities.upgradeGlb`, create a new B3DM from the
+   * result, and return it.
+   *
+   * @param inputBuffer - The input buffer
+   * @returns The upgraded buffer
+   */
   private static async upgradeI3dmGltf1ToGltf2(
     inputBuffer: Buffer
   ): Promise<Buffer> {
@@ -246,54 +405,5 @@ export class TilesetUpgrader {
     );
     const outputBuffer = TileFormats.createTileDataBuffer(outputTileData);
     return outputBuffer;
-  }
-
-  private async upgradeResources(
-    tilesetSourceJsonFileName: string
-  ): Promise<void> {
-    if (!this.tilesetSource || !this.tilesetTarget) {
-      throw new DeveloperError("The source and target must be defined");
-    }
-    const entries = TilesetSources.getEntries(this.tilesetSource);
-    for (const entry of entries) {
-      const key = entry.key;
-      if (key === tilesetSourceJsonFileName) {
-        continue;
-      }
-      let value = entry.value;
-
-      const contentData = new BufferedContentData(key, value);
-      const type = await ContentDataTypeRegistry.findContentDataType(
-        contentData
-      );
-      value = await this.processValue(key, value, type);
-
-      this.tilesetTarget.addEntry(key, value);
-    }
-  }
-
-  private async processValue(
-    key: string,
-    value: Buffer,
-    type: string | undefined
-  ): Promise<Buffer> {
-    if (type === "CONTENT_TYPE_B3DM") {
-      if (this.upgradeOptions.upgradeB3dmGltf1ToGltf2) {
-        console.log("Upgrading GLB in " + key);
-        value = await TilesetUpgrader.upgradeB3dmGltf1ToGltf2(value);
-      } else {
-        console.log("Not upgrading " + key + " (disabled via option)");
-      }
-    } else if (type === "CONTENT_TYPE_I3DM") {
-      if (this.upgradeOptions.upgradeI3dmGltf1ToGltf2) {
-        console.log("Upgrading GLB in " + key);
-        value = await TilesetUpgrader.upgradeI3dmGltf1ToGltf2(value);
-      } else {
-        console.log("Not upgrading " + key + " (disabled via option)");
-      }
-    } else {
-      console.log("Not upgrading " + key + " with type " + type);
-    }
-    return value;
   }
 }

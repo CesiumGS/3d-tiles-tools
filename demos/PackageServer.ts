@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import path from "path";
 import http from "http";
 import minimist from "minimist";

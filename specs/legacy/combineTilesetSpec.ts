@@ -4,7 +4,8 @@ import { Tilesets } from "../../src/tilesets/Tilesets";
 import { SpecHelpers } from "./SpecHelpers";
 
 const tilesetDirectory = "./specs/data/TilesetOfTilesetsWithUris/";
-const combinedDirectory = "./specs/data/output/TilesetOfTilesetsWithUris-combined";
+const combinedDirectory =
+  "./specs/data/output/TilesetOfTilesetsWithUris-combined";
 const combinedJson =
   "./specs/data/output/TilesetOfTilesetsWithUris-combined/tileset.json";
 
