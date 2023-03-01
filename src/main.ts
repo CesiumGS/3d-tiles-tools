@@ -141,6 +141,15 @@ const args = yargs(toolArgs)
     "Upgrades the input tileset to the latest version of the 3D Tiles spec. Embedded glTF models will be upgraded to glTF 2.0.",
     { i: inputStringDefinition }
   )
+  .command(
+    "analyze",
+    "Analyze the input file, and write the results to the output directory. " +
+      "This will accept B3DM, I3DM, PNTS, CMPT, and GLB files (both for glTF " +
+      "1.0 and for glTF 2.0), and write files into the output directory that " +
+      "contain the feature table, batch table, layout information, the GLB, " +
+      "and the JSON of the GLB",
+    { i: inputStringDefinition }
+  )
   .demandCommand(1)
   .strict();
 
@@ -204,6 +213,8 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
     await ToolsMain.upgrade(input, output, force);
   } else if (command === "merge") {
     await ToolsMain.merge(inputs, output, force);
+  } else if (command === "analyze") {
+    await ToolsMain.analyze(input, output, force);
   } else {
     throw new DeveloperError(`Invalid command: ${command}`);
   }
