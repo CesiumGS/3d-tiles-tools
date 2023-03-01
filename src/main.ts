@@ -1,5 +1,7 @@
 import yargs from "yargs/yargs";
 
+import { DeveloperError } from "./base/DeveloperError";
+
 import { ToolsMain } from "./ToolsMain";
 
 // Split the arguments that are intended for the tools
@@ -144,9 +146,11 @@ const args = yargs(toolArgs)
 
 const argv = args.argv as any;
 
-// TODO Debug output for "Why? Args!"
+// Debug output for "Why? Args!"
+/*/
 console.log("Parsed command line arguments:");
 console.log(argv);
+//*/
 
 const command = argv._[0];
 
@@ -162,11 +166,13 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   const force = toolArgs.force;
   const tilesOnly = toolArgs.tilesOnly;
 
+  /*/
   console.log("command " + command);
   console.log("inputs " + inputs);
   console.log("output " + output);
   console.log("force " + force);
   console.log("optionArgs ", optionArgs);
+  //*/
 
   const input = inputs[inputs.length - 1];
 
@@ -199,15 +205,8 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   } else if (command === "merge") {
     await ToolsMain.merge(inputs, output, force);
   } else {
-    // TODO Throw up here:
-    console.log("Unhandled command: " + command);
-    //throw new DeveloperError(`Invalid command: ${command}`);
+    throw new DeveloperError(`Invalid command: ${command}`);
   }
-
-  // TODO:
-  // pipeline
-  // optimizeB3dm (update for gltf-pipeline)
-  // optimizeI3dm (update for gltf-pipeline)
 }
 
 run();
