@@ -194,7 +194,7 @@ export class TilesetUpgrader {
       this.logCallback(`Upgrading asset version number`);
       await this.upgradeAssetVersionNumber(tileset);
     }
-    if (this.upgradeOptions.upgradeContentUrlToUri) {
+    if (this.upgradeOptions.upgradeRefineCase) {
       this.logCallback(`Upgrading refine to be in uppercase`);
       await this.upgradeRefineValues(tileset);
     }
