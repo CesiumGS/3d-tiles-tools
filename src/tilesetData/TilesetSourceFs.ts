@@ -10,6 +10,8 @@ import { TilesetError } from "./TilesetError";
 /**
  * Implementation of a TilesetSource based on a directory
  * in a file system
+ *
+ * @internal
  */
 export class TilesetSourceFs implements TilesetSource {
   /**

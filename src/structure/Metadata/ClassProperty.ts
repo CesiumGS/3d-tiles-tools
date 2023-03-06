@@ -1,5 +1,6 @@
 import { RootProperty } from "../RootProperty";
 
+/** @internal */
 export interface ClassProperty extends RootProperty {
   name?: string;
   description?: string;

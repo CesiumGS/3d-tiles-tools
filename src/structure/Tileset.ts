@@ -7,6 +7,7 @@ import { RootProperty } from "./RootProperty";
 import { Statistics } from "./Statistics";
 import { Tile } from "./Tile";
 
+/** @internal */
 export interface Tileset extends RootProperty {
   asset: Asset;
   properties?: Properties;

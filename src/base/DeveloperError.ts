@@ -1,6 +1,8 @@
 /**
  * An error that may be thrown to indicate that an invalid
  * operation was performed, caused by a wrong API usage.
+ *
+ * @internal
  */
 export class DeveloperError extends Error {
   constructor(message: string) {

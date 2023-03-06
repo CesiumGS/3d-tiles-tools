@@ -3,6 +3,8 @@
  *
  * TODO This could probably be replaced with an NPM library
  * for URI handling. The billion dollar question: Which one?
+ *
+ * @internal
  */
 export class Uris {
   /**

@@ -8,8 +8,9 @@ import { TilesetError } from "../tilesetData/TilesetError";
 import { IndexBuilder } from "./IndexBuilder";
 
 /**
- * Implementation of a TilesetTarget that creates a
- * 3TZ file.
+ * Implementation of a TilesetTarget that creates a 3TZ file.
+ *
+ * @internal
  */
 export class TilesetTarget3tz implements TilesetTarget {
   /**

@@ -4,6 +4,8 @@ import { UnzippingResourceResolver } from "./UnzippingResourceResolver";
 
 /**
  * Methods to create `ResourceResolver` instances.
+ *
+ * @internal
  */
 export class ResourceResolvers {
   /**

@@ -11,6 +11,8 @@ import path from "path";
  * representations of paths will use the forward slash `/`
  * as the directory separator, regardless of the operating
  * system.
+ *
+ * @internal
  */
 export class Paths {
   /**
@@ -42,7 +44,7 @@ export class Paths {
    * @param fileName - The file name
    * @param extensions - The extensions to check, in lowercase,
    * and including the `.` dot.
-   * @param Whether the file name has one of the given extensions.
+   * @returns Whether the file name has one of the given extensions.
    */
   static hasExtension(fileName: string, ...extensions: string[]): boolean {
     const extension = path.extname(fileName).toLowerCase();

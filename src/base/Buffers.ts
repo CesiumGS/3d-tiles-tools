@@ -6,6 +6,8 @@ import { defined } from "./defined";
  * The methods in this class are convenience methods that
  * are mainly used for handling buffers that contain tile
  * data.
+ *
+ * @internal
  */
 export class Buffers {
   /**
@@ -17,7 +19,7 @@ export class Buffers {
    *
    * @param buffer - The buffer
    * @param byteOffset - The optional byte offset, defaulting to 0
-   * @return The magic header.
+   * @returns The magic header.
    */
   static getMagic(buffer: Buffer, byteOffset?: number): string {
     const magicLength = 4;
@@ -78,7 +80,7 @@ export class Buffers {
    * be returned.
    *
    * @param buffer - The buffer
-   * @return The parsed object
+   * @returns The parsed object
    * @throws Possible errors from `JSON:parse`
    */
   static getJson(buffer: Buffer): any {
@@ -97,7 +99,7 @@ export class Buffers {
    * @param json - The object
    * @param byteOffset - An optional offset where the buffer
    * is assumed to start, defaulting to 0
-   * @return The buffer
+   * @returns The buffer
    */
   static getJsonBufferPadded(json: any, byteOffset?: number): Buffer {
     if (!defined(json) || Object.keys(json).length === 0) {
@@ -126,7 +128,7 @@ export class Buffers {
    * @param json - The object
    * @param byteOffset - An optional offset where the buffer
    * is assumed to start, defaulting to 0
-   * @return The buffer
+   * @returns The buffer
    */
   static getBufferPadded(buffer: Buffer, byteOffset?: number): Buffer {
     byteOffset = byteOffset ?? 0;

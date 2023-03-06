@@ -10,6 +10,8 @@ import { ArchiveFunctions3tz } from "./ArchiveFunctions3tz";
 
 /**
  * Implementation of a TilesetSource based on a 3TZ file.
+ *
+ * @internal
  */
 export class TilesetSource3tz implements TilesetSource {
   /**

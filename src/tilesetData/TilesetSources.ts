@@ -12,6 +12,8 @@ import { TilesetSourceFs } from "./TilesetSourceFs";
 
 /**
  * Methods related to `TilesetSource` instances
+ *
+ * @internal
  */
 export class TilesetSources {
   /**

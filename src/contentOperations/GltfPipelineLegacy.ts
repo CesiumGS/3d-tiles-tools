@@ -57,7 +57,7 @@ export class GltfPipelineLegacy {
     extensions.CESIUM_RTC = {
       center: positionArray,
     };
-    GltfPipelineLegacy.addExtensionsRequired(gltf, "CEISUM_RTC");
+    GltfPipelineLegacy.addExtensionsRequired(gltf, "CESIUM_RTC");
     GltfPipelineLegacy.addExtensionsUsed(gltf, "CESIUM_RTC");
   }
 

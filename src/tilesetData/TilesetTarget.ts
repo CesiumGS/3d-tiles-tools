@@ -1,5 +1,7 @@
 /**
  * An interface for classes that can receive tileset data.
+ *
+ * @internal
  */
 export interface TilesetTarget {
   /**

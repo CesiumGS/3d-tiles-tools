@@ -10,6 +10,8 @@ import { TilesetError } from "../tilesetData/TilesetError";
 /**
  * Implementation of a TilesetTarget that creates a
  * 3DTILES (SQLITE3 database) file.
+ *
+ * @internal
  */
 export class TilesetTarget3dtiles implements TilesetTarget {
   /**

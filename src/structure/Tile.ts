@@ -4,6 +4,7 @@ import { MetadataEntity } from "./MetadataEntity";
 import { RootProperty } from "./RootProperty";
 import { TileImplicitTiling } from "./TileImplicitTiling";
 
+/** @internal */
 export interface Tile extends RootProperty {
   boundingVolume: BoundingVolume;
   viewerRequestVolume?: BoundingVolume;

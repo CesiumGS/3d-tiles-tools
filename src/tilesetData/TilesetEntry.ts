@@ -1,6 +1,8 @@
 /**
  * A class representing a single entry in a tileset data set, consisting
  * of the key (file name) and the data
+ *
+ * @internal
  */
 export interface TilesetEntry {
   /**

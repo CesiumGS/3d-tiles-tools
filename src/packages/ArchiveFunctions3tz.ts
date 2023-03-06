@@ -17,6 +17,9 @@ interface ZipLocalFileHeader {
   extra_size: number;
 }
 
+/**
+ * @internal
+ */
 export class ArchiveFunctions3tz {
   private static readonly ZIP_END_OF_CENTRAL_DIRECTORY_HEADER_SIG = 0x06054b50;
   private static readonly ZIP_START_OF_CENTRAL_DIRECTORY_HEADER_SIG = 0x02014b50;
