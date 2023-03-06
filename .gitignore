@@ -5,6 +5,7 @@ package-lock.json
 /coverage
 /node_modules
 /build
+/dist
 /data
 /output
 /specs/data/output
