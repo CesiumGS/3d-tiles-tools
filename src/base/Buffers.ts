@@ -1,3 +1,5 @@
+import zlib from "zlib";
+
 import { defined } from "./defined";
 
 /**
@@ -10,6 +12,36 @@ import { defined } from "./defined";
  * @internal
  */
 export class Buffers {
+  /**
+   * Applies GZIP compression to the given buffer, and returns
+   * the result.
+   *
+   * @param inputBuffer - The input buffer
+   * @returns The resulting buffer
+   */
+  static gzip(inputBuffer: Buffer): Buffer {
+    const outputBuffer = zlib.gzipSync(inputBuffer);
+    return outputBuffer;
+  }
+
+  /**
+   * If the given buffer is compressed with GZIP, then it is
+   * unzipped, and the result is returned. Otherwise, the
+   * given buffer is returned as it is.
+   *
+   * @param inputBuffer - The input buffer
+   * @returns The resulting buffer
+   */
+  static gunzip(inputBuffer: Buffer): Buffer {
+    let outputBuffer: Buffer;
+    if (Buffers.isGzipped(inputBuffer)) {
+      outputBuffer = zlib.gunzipSync(inputBuffer);
+    } else {
+      outputBuffer = inputBuffer;
+    }
+    return outputBuffer;
+  }
+
   /**
    * Obtains the magic header from the given buffer.
    *

@@ -164,7 +164,7 @@ export class TilesetUpgrader {
     let tilesetJsonBufferWasZipped = false;
     if (Buffers.isGzipped(tilesetJsonBuffer)) {
       tilesetJsonBufferWasZipped = true;
-      tilesetJsonBuffer = ContentOps.gunzipBuffer(tilesetJsonBuffer);
+      tilesetJsonBuffer = Buffers.gunzip(tilesetJsonBuffer);
     }
     const tileset = JSON.parse(tilesetJsonBuffer.toString()) as Tileset;
 

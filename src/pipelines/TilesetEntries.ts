@@ -1,4 +1,4 @@
-import { ContentOps } from "../contentOperations/ContentOps";
+import { Buffers } from "../base/Buffers";
 
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
 
@@ -7,7 +7,7 @@ export class TilesetEntries {
     const inputKey = inputEntry.key;
     const inputValue = inputEntry.value;
     const outputKey = inputKey;
-    const outputValue = ContentOps.gzipBuffer(inputValue);
+    const outputValue = Buffers.gzip(inputValue);
     return {
       key: outputKey,
       value: outputValue,
@@ -18,7 +18,7 @@ export class TilesetEntries {
     const inputKey = inputEntry.key;
     const inputValue = inputEntry.value;
     const outputKey = inputKey;
-    const outputValue = ContentOps.gunzipBuffer(inputValue);
+    const outputValue = Buffers.gunzip(inputValue);
     return {
       key: outputKey,
       value: outputValue,
