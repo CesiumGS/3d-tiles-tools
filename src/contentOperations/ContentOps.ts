@@ -3,7 +3,6 @@ import { GltfUtilities } from "./GtlfUtilities";
 import { TileFormats } from "../tileFormats/TileFormats";
 
 export class ContentOps {
-
   static b3dmToGlbBuffer(inputBuffer: Buffer): Buffer {
     const inputTileData = TileFormats.readTileData(inputBuffer);
     const outputBuffer = inputTileData.payload;

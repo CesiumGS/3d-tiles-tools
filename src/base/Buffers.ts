@@ -223,4 +223,19 @@ export class Buffers {
     }
     return true;
   }
+
+  /**
+   * Creates a string representation of the given buffer where each
+   * byte is encoded in its binary form, consisting of 8 bits.
+   *
+   * Warning: This is primarily intended for debugging. The resulting
+   * string may be very long...
+   *
+   * @param buffer - The input buffer
+   * @returns The resulting string
+   */
+  static createBinaryString(buffer: Buffer): string {
+    const s = [...buffer].map((b) => b.toString(2).padStart(8, "0")).join("");
+    return s;
+  }
 }
