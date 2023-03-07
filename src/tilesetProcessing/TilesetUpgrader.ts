@@ -176,7 +176,7 @@ export class TilesetUpgrader {
     const resultTilesetJsonString = JSON.stringify(tileset, null, 2);
     let resultTilesetJsonBuffer = Buffer.from(resultTilesetJsonString);
     if (tilesetJsonBufferWasZipped) {
-      resultTilesetJsonBuffer = ContentOps.gzipBuffer(resultTilesetJsonBuffer);
+      resultTilesetJsonBuffer = Buffers.gzip(resultTilesetJsonBuffer);
     }
     this.tilesetTarget.addEntry(
       tilesetTargetJsonFileName,
