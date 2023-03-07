@@ -1,6 +1,8 @@
 /**
  * One entry of a ZIP index, as it is found in the `"@3dtilesIndex1@"` file
  * according to the 3TZ specification.
+ *
+ * @internal
  */
 export interface IndexEntry {
   /**

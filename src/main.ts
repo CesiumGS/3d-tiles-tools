@@ -45,7 +45,15 @@ const inputArrayDefinition: any = {
   demandOption: true,
 };
 
-const args = yargs(toolArgs)
+/**
+ * Parses the arguments that are intended for the actual 3D Tiles tools
+ * (ignoring the option arguments), and returns the result.
+ *
+ * @param a - The arguments
+ * @returns The parsed arguments object
+ */
+function parseToolArgs(a: string[]) {
+  const args = yargs(a)
   .usage("Usage: $0 <command> [options]")
   .help("h")
   .alias("h", "help")
@@ -84,19 +92,32 @@ const args = yargs(toolArgs)
     "Repackage the input glb as a i3dm with a basic header.",
     { i: inputStringDefinition }
   )
-  .command("b3dmToGlb", "Extract the binary glTF asset from the input b3dm.", {
+    .command(
+      "b3dmToGlb",
+      "Extract the binary glTF asset from the input b3dm.",
+      {
     i: inputStringDefinition,
-  })
-  .command("i3dmToGlb", "Extract the binary glTF asset from the input i3dm.", {
+      }
+    )
+    .command(
+      "i3dmToGlb",
+      "Extract the binary glTF asset from the input i3dm.",
+      {
     i: inputStringDefinition,
-  })
-  .command("cmptToGlb", "Extract the binary glTF assets from the input cmpt.", {
+      }
+    )
+    .command(
+      "cmptToGlb",
+      "Extract the binary glTF assets from the input cmpt.",
+      {
     i: inputStringDefinition,
-  })
+      }
+    )
   .command(
     "optimizeB3dm",
     "Pass the input b3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)",
     {
+        i: inputStringDefinition,
       options: {
         description:
           "All arguments after this flag will be passed to gltf-pipeline as command line options.",
@@ -153,19 +174,41 @@ const args = yargs(toolArgs)
   .demandCommand(1)
   .strict();
 
-const argv = args.argv as any;
+  return args.argv as any;
+}
+
+/**
+ * Parses the arguments that have been given after the `--options`,
+ * and returns the parsed arguments.
+ *
+ * This includes special handling of `draco` options for passing
+ * them to the `gltf-pipeline`.
+ *
+ * @param a - The option arguments
+ * @returns The parsed arguments object
+ */
+function parseOptionArgs(a: string[]) {
+  const args = yargs(a);
+  const v = args.argv as any;
+  if (v.draco) {
+    v.dracoOptions = v.draco;
+  }
+  return v;
+}
+
+const parsedToolArgs = parseToolArgs(toolArgs);
 
 // Debug output for "Why? Args!"
 /*/
 console.log("Parsed command line arguments:");
-console.log(argv);
+console.log(parsedToolArgs);
 //*/
 
-const command = argv._[0];
+const command = parsedToolArgs._[0];
 
 async function run() {
   console.time("Total");
-  await runCommand(command, argv, optionArgs);
+  await runCommand(command, parsedToolArgs, optionArgs);
   console.timeEnd("Total");
 }
 
@@ -174,6 +217,7 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   const output = toolArgs.output;
   const force = toolArgs.force;
   const tilesOnly = toolArgs.tilesOnly;
+  const parsedOptionArgs = parseOptionArgs(optionArgs);
 
   /*/
   console.log("command " + command);
@@ -181,6 +225,7 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   console.log("output " + output);
   console.log("force " + force);
   console.log("optionArgs ", optionArgs);
+  console.log("parsedOptionArgs ", parsedOptionArgs);
   //*/
 
   const input = inputs[inputs.length - 1];
@@ -196,9 +241,9 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   } else if (command === "glbToI3dm") {
     await ToolsMain.glbToI3dm(input, output, force);
   } else if (command === "optimizeB3dm") {
-    await ToolsMain.optimizeB3dm(input, output, force, optionArgs);
+    await ToolsMain.optimizeB3dm(input, output, force, parsedOptionArgs);
   } else if (command === "optimizeI3dm") {
-    await ToolsMain.optimizeI3dm(input, output, force, optionArgs);
+    await ToolsMain.optimizeI3dm(input, output, force, parsedOptionArgs);
   } else if (command === "gzip") {
     await ToolsMain.gzip(input, output, force, tilesOnly);
   } else if (command === "ungzip") {
@@ -220,4 +265,12 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   }
 }
 
-run();
+async function runChecked() {
+  try {
+    await run();
+  } catch (e: any) {
+    console.log(`${e}`);
+  }
+}
+
+runChecked();

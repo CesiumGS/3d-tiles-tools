@@ -1,6 +1,8 @@
 /**
  * An interface for classes that can resolve resources that
  * are given as URI strings.
+ *
+ * @internal
  */
 export interface ResourceResolver {
   /**

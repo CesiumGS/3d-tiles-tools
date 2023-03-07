@@ -9,6 +9,8 @@ import { TilesetError } from "../tilesetData/TilesetError";
 /**
  * Implementation of a TilesetSource based on a 3DTILES (SQLITE3 database)
  * file.
+ *
+ * @internal
  */
 export class TilesetSource3dtiles implements TilesetSource {
   /**

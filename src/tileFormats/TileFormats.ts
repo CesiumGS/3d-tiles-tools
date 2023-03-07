@@ -17,7 +17,7 @@ export class TileFormats {
    * Returns whether the given buffer contains composite (CMPT) tile data.
    *
    * @param buffer - The buffer
-   * @return Whether the given buffer contains composite tile data
+   * @returns Whether the given buffer contains composite tile data
    */
   static isComposite(buffer: Buffer): boolean {
     const magic = Buffers.getMagic(buffer);
@@ -32,7 +32,7 @@ export class TileFormats {
    * format can be checked with `isComposite`.
    *
    * @param buffer - The buffer
-   * @return The `CompositeTileData`
+   * @returns The `CompositeTileData`
    * @throws TileFormatError If the given buffer did not contain
    * valid CMPT data.
    */
@@ -101,7 +101,7 @@ export class TileFormats {
    * I3DM or PNTS data.
    *
    * @param buffer - The buffer
-   * @return The `TileData`
+   * @returns The `TileData`
    * @throws TileFormatError If the given buffer did not contain
    * valid tile data.
    */

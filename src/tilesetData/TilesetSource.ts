@@ -1,5 +1,7 @@
 /**
  * An interface for a 3D Tiles tileset source
+ *
+ * @internal
  */
 export interface TilesetSource {
   /**

@@ -1,5 +1,6 @@
 import { RootProperty } from "./RootProperty";
 
+/** @internal */
 export interface StatisticsClassProperty extends RootProperty {
   min: any;
   max: any;

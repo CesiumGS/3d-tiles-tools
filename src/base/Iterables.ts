@@ -5,6 +5,8 @@ import { PathLike } from "fs";
 
 /**
  * Utility methods for iterable objects.
+ *
+ * @internal
  */
 export class Iterables {
   /**

@@ -1,0 +1,76 @@
+/**
+ * Config file for API Extractor.  For more info, please visit: https://api-extractor.com
+ */
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
+
+  /**
+   * (REQUIRED) Specifies the .d.ts file to be used as the starting point for analysis.  API Extractor
+   * analyzes the symbols exported by this module.
+   *
+   * The file extension must be ".d.ts" and not ".ts".
+   *
+   * The path is resolved relative to the folder of the config file that contains the setting; to change this,
+   * prepend a folder token such as "<projectFolder>".
+   *
+   * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
+   */
+  "mainEntryPointFilePath": "build/index.d.ts",
+
+  /**
+   * Configures how the API report file (*.api.md) will be generated.
+   */
+  "apiReport": {
+    /**
+     * (REQUIRED) Whether to generate an API report.
+     */
+    "enabled": true,
+
+    /**
+     * Specifies the folder where the temporary report file is written.  The file name portion is determined by
+     * the "reportFileName" setting.
+     *
+     * After the temporary file is written to disk, it is compared with the file in the "reportFolder".
+     * If they are different, a production build will fail.
+     *
+     * The path is resolved relative to the folder of the config file that contains the setting; to change this,
+     * prepend a folder token such as "<projectFolder>".
+     *
+     * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
+     * DEFAULT VALUE: "<projectFolder>/temp/"
+     */
+    "reportTempFolder": "<projectFolder>/build/api-extractor"
+  },
+
+  /**
+   * Configures how the doc model file (*.api.json) will be generated.
+   */
+  "docModel": {
+    /**
+     * (REQUIRED) Whether to generate a doc model file.
+     */
+    "enabled": true,
+
+    /**
+     * The output path for the doc model file.  The file extension should be ".api.json".
+     *
+     * The path is resolved relative to the folder of the config file that contains the setting; to change this,
+     * prepend a folder token such as "<projectFolder>".
+     *
+     * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
+     * DEFAULT VALUE: "<projectFolder>/temp/<unscopedPackageName>.api.json"
+     */
+     "apiJsonFilePath": "<projectFolder>/build/api-extractor/<unscopedPackageName>.api.json"
+  },
+
+  /**
+   * Configures how the .d.ts rollup file will be generated.
+   */
+  "dtsRollup": {
+    /**
+     * (REQUIRED) Whether to generate the .d.ts rollup file.
+     */
+    "enabled": true
+  },
+
+}

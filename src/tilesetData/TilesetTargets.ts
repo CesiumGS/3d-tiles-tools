@@ -10,6 +10,8 @@ import { TilesetEntry } from "./TilesetEntry";
 
 /**
  * Methods related to `TilesetTarget` instances
+ *
+ * @internal
  */
 export class TilesetTargets {
   /**

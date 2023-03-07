@@ -93,7 +93,7 @@ export class BenchmarkUtils {
    * @param minSize The minimum size of an entry, inclusive
    * @param maxSize The maximum size of an entry, exclusive
    * @param seed The random seed. An arbitrary string.
-   * @return The generator for entry objects
+   * @returns The generator for entry objects
    */
   static createDummyEntriesIterable(
     config: BenchmarkConfig

@@ -5,6 +5,8 @@ import { IndexBuilderEntry } from "./IndexBuilderEntry";
 /**
  * A class that can build an index for a 3TZ file that will be stored
  * as the `"@3dtilesIndex1@"` file.
+ *
+ * @internal
  */
 export class IndexBuilder {
   /**

@@ -5,6 +5,7 @@ import { MetadataEntity } from "./MetadataEntity";
 import { PropertyTable } from "./PropertyTable";
 import { RootProperty } from "./RootProperty";
 
+/** @internal */
 export interface Subtree extends RootProperty {
   buffers?: BufferObject[];
   bufferViews?: BufferView[];

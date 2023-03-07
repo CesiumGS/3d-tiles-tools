@@ -1,6 +1,8 @@
 /**
  * An error that may be thrown to indicate that a tileset
  * was invalid and could not be processed.
+ *
+ * @internal
  */
 export class TilesetError extends Error {
   constructor(message: string) {

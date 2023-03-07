@@ -3,6 +3,8 @@
  *
  * These entries will be converted into 'IndexEntry' objects
  * when the index buffer is built.
+ *
+ * @internal
  */
 export interface IndexBuilderEntry {
   /**

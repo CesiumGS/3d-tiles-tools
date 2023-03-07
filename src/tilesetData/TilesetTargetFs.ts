@@ -7,6 +7,8 @@ import { TilesetError } from "./TilesetError";
 /**
  * Implementation of a TilesetTarget that writes into
  * a directory of a file system
+ *
+ * @internal
  */
 export class TilesetTargetFs implements TilesetTarget {
   /**

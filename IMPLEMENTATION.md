@@ -73,3 +73,70 @@ The `./demos/` folder contains demos that show how to use various parts of the A
 - `TilesetUpgraderDemos`: More fine-grained demos for the upgrade functionality
 
 The `./demos/benchmarks` folder contains very basic benchmarks for creating/reading different 3D Tiles package formats.
+
+
+## API Definition
+
+The API definition is tracked with https://api-extractor.com
+
+After running `npm install`, the API documentation can be created with `npm run docs`. The API documentation will be written into the `build/docs` directory. The surface API information will be written into `etc/3d-tiles-tools.api.md`. This file captures the public API, and changes in the public API will cause a warning to be printed
+
+> Warning: You have changed the public API signature for this project. Updating etc/3d-tiles-tools.api.md
+
+This API definition file is tracked with Git, so changes in this file should be reviewed carefully.
+
+
+## Release Process
+
+- Prepare the actual release:
+  - Update `CHANGES.md`
+  - Update the version number in `package.json`
+
+- Generate the tarball for the release:  
+  
+  `npm run package` 
+
+  This will run the required scripts from the `package.json`:
+    - Clean the build output folder
+    - Prepare the package: 
+      - Perform linting
+      - Check formatting
+      - Build (compile TypeScript to JavaScript)
+      - Run the unit tests
+      - Generate the documentation
+      - Update the third-party information
+    - Package the build output folder into a TAR file
+
+- Verify the contents of the resulting TAR file. If there are unwanted files, add these files to `.npmignore` and re-generate the tarball
+
+- Create a git tag for the version and push it:
+ 
+  `git tag -a v1.2.3 -m "Release of version 1.2.3"`
+  
+  `git push origin v1.2.3`
+
+- Publish the package:
+  
+  `npm publish`
+
+
+### Build Scripts
+
+The build scripts that are used for the release process are documented with `about:`_`<step>`_ in the `package.json` file. Each of these comments indicates the goal and preconditions for running the respective step. The structure of these scripts is often organized hierarchically:
+
+- `docs`
+  - `build`
+  - `docs-generate`
+    - `docs-prepare-directory`
+    - `docs-extract-api`,
+    - `docs-generate-markdown`,
+
+ The intention is to make sure that each "top-level" (single-word) script can be executed without any preconditions (athough this pattern may not be applied for all steps). Intermediate steps can be executed manually or as part of other steps when it is ensured that the respective preconditions are met.
+
+The following `devDependencies` are *only* used for the implementation of the build process:
+
+- `mkdirp` - To generate the `etc` output directory for the API definition file (if it does not exist yet)
+- `del-cli` - To delete the contents of the `build` output folder
+- `copyfiles` - To copy the `bin/main` file to the build folder (see `bin/README.md` for details)
+
+

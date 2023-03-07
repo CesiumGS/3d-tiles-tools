@@ -19,13 +19,14 @@
  * else                console.log('not truthy);
  * ```
  * will be
- * ``
+ * ```
  * defined
  * not truthy
  * ```
  *
  * @param value - The value to check.
  * @returns `true` if the value is not `undefined` and not `null`
+ * @internal
  */
 export function defined<T>(value: any): value is NonNullable<T> {
   return value !== undefined && value !== null;

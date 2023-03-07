@@ -109,20 +109,29 @@ Quantize floating-point attributes and oct-encode normals:
 npx ts-node ./src/main.ts optimizeB3dm -i ./specs/data/batchedWithBatchTableBinary.b3dm -o ./output/optimized.b3dm --options -q -n
 ```
 
-To use tileset texture compression, pass the [`texcomp` flags](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md#command-line-flags)
+To use Draco compression, pass the [`draco` flags](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md#command-line-flags)
 ```
-node ./bin/3d-tiles-tools.js optimizeB3dm -i ./specs/data/Textured/batchedTextured.b3dm -o ./output/optimized.b3dm --options --texcomp.dxt1.enable --texcomp.dxt1.quality=5 --texcomp.etc1.enable
+npx ts-node ./src/main.ts optimizeB3dm -i ./specs/data/Textured/batchedTextured.b3dm -o ./output/optimized.b3dm --options --draco.compressMeshes --draco.compressionLevel=9
 ```
-This example optimizes the b3dm and compresses the textures into `dxt1` and `etc1` formats.
+This example optimizes the b3dm and compresses the meshes using Draco, with a high compression level.
 
 
 ### optimizeI3dm
 
 Optimize a i3dm using [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md).
 ```
-node ./bin/3d-tiles-tools.js optimizeI3dm -i ./specs/data/instancedWithBatchTableBinary.i3dm -o ./output/optimized.i3dm
+npx ts-node ./src/main.ts optimizeI3dm -i ./specs/data/instancedWithBatchTableBinary.i3dm -o ./output/optimized.i3dm
 ```
 See [optimizeB3dm](#optimizeb3dm) for further examples.
+
+
+### upgrade
+
+Upgrade a tileset to the latest 3D Tiles version.
+```
+npx ts-node ./src/main.ts upgrade -i ./specs/data/TilesetOfTilesets/tileset.json -o ./output/upgraded
+```
+The exact behavior of the upgrade operation is not yet specified. But when B3DM- and I3DM tile content in the input tileset uses glTF 1.0 assets, then the upgrade step will try to upgrade these assets to glTF 2.0.
 
 
 ---
