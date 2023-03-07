@@ -15,8 +15,8 @@
  * const value = 0;
  * if (defined(value)) console.log('defined');
  * else                console.log('not defined');
- * if (value)          console.log('truthy);
- * else                console.log('not truthy);
+ * if (value)          console.log('truthy');
+ * else                console.log('not truthy');
  * ```
  * will be
  * ```
