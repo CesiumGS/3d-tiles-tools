@@ -22,7 +22,10 @@ export class BoundingVolumeDerivation {
    * @param rootBoundingVolume - The root bounding volume
    * @param implicitCoordinates - The coordinates of the child tile, as an
    * array [level,x,y] for quadtrees or [level,x,y,z] for octrees.
-   * @returns An object containing the JSON for a bounding volume
+   * @returns An object containing the JSON for a bounding volume,
+   * or `undefined` if the given bounding volume was of a type from
+   * which no other bounding volume can be derived (i.e. when it
+   * was a bounding sphere)
    */
   static deriveBoundingVolume(
     rootBoundingVolume: BoundingVolume,
@@ -85,6 +88,9 @@ export class BoundingVolumeDerivation {
         box: childBox,
       };
     }
+
+    // Bounding spheres cannot be derived:
+    return undefined;
   }
 
   /**
@@ -99,31 +105,11 @@ export class BoundingVolumeDerivation {
     return json && json.extensions && json.extensions[extensionName];
   }
 
-  // See https://github.com/CesiumGS/cesium/issues/10801
-  private static Matrix3_multiplyByScale = function (
-    matrix: Matrix3,
-    scale: Cartesian3,
-    result: Matrix3
-  ) {
-    const array = new Array(9);
-    array[0] = matrix[0] * scale.x;
-    array[1] = matrix[1] * scale.x;
-    array[2] = matrix[2] * scale.x;
-    array[3] = matrix[3] * scale.y;
-    array[4] = matrix[4] * scale.y;
-    array[5] = matrix[5] * scale.y;
-    array[6] = matrix[6] * scale.z;
-    array[7] = matrix[7] * scale.z;
-    array[8] = matrix[8] * scale.z;
-    Matrix3.fromArray(array, 0, result);
+  private static readonly scratchScaleFactors = new Cartesian3();
+  private static readonly scratchRootCenter = new Cartesian3();
+  private static readonly scratchCenter = new Cartesian3();
+  private static readonly scratchHalfAxes = new Matrix3();
 
-    return result;
-  };
-
-  static scratchScaleFactors = new Cartesian3();
-  static scratchRootCenter = new Cartesian3();
-  static scratchCenter = new Cartesian3();
-  static scratchHalfAxes = new Matrix3();
   /**
    * Derive a bounding volume for a descendant tile (child, grandchild, etc.),
    * assuming a quadtree or octree implicit tiling scheme. The (level, x, y, [z])
@@ -203,7 +189,7 @@ export class BoundingVolumeDerivation {
     );
 
     let halfAxes = Matrix3.clone(rootHalfAxes);
-    halfAxes = BoundingVolumeDerivation.Matrix3_multiplyByScale(
+    halfAxes = Matrix3.multiplyByScale(
       halfAxes,
       scaleFactors,
       halfAxes
@@ -215,7 +201,7 @@ export class BoundingVolumeDerivation {
     return childBox;
   }
 
-  static scratchRectangle = new Rectangle();
+  private static readonly scratchRectangle = new Rectangle();
   /**
    * Derive a bounding volume for a descendant tile (child, grandchild, etc.),
    * assuming a quadtree or octree implicit tiling scheme. The (level, x, y, [z])
