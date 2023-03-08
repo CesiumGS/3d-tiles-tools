@@ -111,7 +111,7 @@ export class TilesetTarget3tz implements TilesetTarget {
     // Create the index data, and add it as the LAST entry of the ZIP
     const indexData = this.indexBuilder.createBuffer();
     this.archive.append(indexData, { name: "@3dtilesIndex1@" });
-    this.archive.finalize();
+    await this.archive.finalize();
 
     await this.finishedPromise;
     this.finishedPromise = undefined;
