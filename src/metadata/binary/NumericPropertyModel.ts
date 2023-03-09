@@ -1,6 +1,6 @@
-import { PropertyModel } from "./PropertyModel";
 import { NumericBuffers } from "./NumericBuffers";
 
+import { PropertyModel } from "../PropertyModel";
 import { MetadataTypes } from "../MetadataTypes";
 
 /**

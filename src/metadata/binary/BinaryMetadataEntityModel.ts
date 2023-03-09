@@ -3,8 +3,7 @@ import { defined } from "../../base/defined";
 import { MetadataEntityModel } from "../MetadataEntityModel";
 import { MetadataValues } from "../MetadataValues";
 import { MetadataError } from "../MetadataError";
-
-import { PropertyTableModel } from "./PropertyTableModel";
+import { PropertyTableModel } from "../PropertyTableModel";
 
 /**
  * Implementation of a `MetadataEntityModel` that is backed by binary

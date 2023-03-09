@@ -1,22 +1,23 @@
-import { BinaryMetadataEntityModel } from "./BinaryMetadataEntityModel";
+import { BinaryPropertyModels } from "./BinaryPropertyModels";
 import { BinaryPropertyTable } from "./BinaryPropertyTable";
-import { PropertyModel } from "./PropertyModel";
-import { PropertyModels } from "./PropertyModels";
+import { BinaryMetadataEntityModel } from "./BinaryMetadataEntityModel";
 
 import { MetadataEntityModel } from "../MetadataEntityModel";
 import { MetadataEntityModels } from "../MetadataEntityModels";
 import { MetadataError } from "../MetadataError";
+import { PropertyModel } from "../PropertyModel";
+import { PropertyTableModel } from "../PropertyTableModel";
 
 import { ClassProperty } from "../../structure/Metadata/ClassProperty";
 import { PropertyTableProperty } from "../../structure/PropertyTableProperty";
 
 /**
- * Implementation of a model for a property table that is backed
+ * Implementation of the `PropertyTableModel` interface that is backed
  * by binary data.
  *
  * @internal
  */
-export class PropertyTableModel {
+export class BinaryPropertyTableModel implements PropertyTableModel {
   /**
    * The structure containing the raw data of the binary
    * property table
@@ -46,7 +47,7 @@ export class PropertyTableModel {
     const propertyTableProperties = propertyTable.properties;
     if (propertyTableProperties) {
       for (const propertyId of Object.keys(propertyTableProperties)) {
-        const propertyModel = PropertyModels.createPropertyModel(
+        const propertyModel = BinaryPropertyModels.createPropertyModel(
           this._binaryPropertyTable,
           propertyId
         );
@@ -59,14 +60,7 @@ export class PropertyTableModel {
       MetadataEntityModels.computeSemanticToPropertyIdMapping(metadataClass);
   }
 
-  /**
-   * Returns the `MetadataEntityModel` that corresponds to the
-   * row of the table with the given index.
-   *
-   * @param index - The index (i.e. the table row)
-   * @returns The `MetdataEntityModel`
-   * @throws MetadataError If the index is out of range
-   */
+  /** {@inheritDoc PropertyTableModel.getMetadataEntityModel} */
   getMetadataEntityModel(index: number): MetadataEntityModel {
     const propertyTable = this._binaryPropertyTable.propertyTable;
     const count = propertyTable.count;
@@ -83,14 +77,12 @@ export class PropertyTableModel {
     return metadataEntityModel;
   }
 
-  /**
-   * Returns the `ClassProperty` that defines the structure of the
-   * property with the given ID, or `undefined` if this table was
-   * created for a `MetadataClass` that does not define this property.
-   *
-   * @param propertyId - The property ID
-   * @returns The `ClassProperty`
-   */
+  /** {@inheritDoc PropertyTableModel.getPropertyModel} */
+  getPropertyModel(propertyId: string): PropertyModel | undefined {
+    return this._propertyIdToModel[propertyId];
+  }
+
+  /** {@inheritDoc PropertyTableModel.getClassProperty} */
   getClassProperty(propertyId: string): ClassProperty | undefined {
     const binaryPropertyTable = this._binaryPropertyTable;
     const metadataClass = binaryPropertyTable.metadataClass;
@@ -101,14 +93,7 @@ export class PropertyTableModel {
     return classProperties[propertyId];
   }
 
-  /**
-   * Returns the `PropertyTableProperty` that defines the structure of the
-   * property with the given ID, or `undefined` if this table was
-   * created for a `PropertyTable` that does not define this property.
-   *
-   * @param propertyId - The property ID
-   * @returns The `PropertyTableProperty`
-   */
+  /** {@inheritDoc PropertyTableModel.getPropertyTableProperty} */
   getPropertyTableProperty(
     propertyId: string
   ): PropertyTableProperty | undefined {
@@ -119,18 +104,5 @@ export class PropertyTableModel {
       return undefined;
     }
     return propertyTableProperties[propertyId];
-  }
-
-  /**
-   * Returns the `PropertyModel` for the property with the given ID.
-   * This is the "column" of the table that contains the property
-   * data. Returns `undefined` if this table was created for
-   * a `MetadataClass` that does not define this property.
-   *
-   * @param propertyId - The property ID
-   * @returns The `PropertyModel`
-   */
-  getPropertyModel(propertyId: string): PropertyModel | undefined {
-    return this._propertyIdToModel[propertyId];
   }
 }

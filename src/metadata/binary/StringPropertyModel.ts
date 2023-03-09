@@ -1,5 +1,6 @@
-import { PropertyModel } from "./PropertyModel";
-import { PropertyModels } from "./PropertyModels";
+import { PropertyModel } from "../PropertyModel";
+
+import { BinaryPropertyModels } from "./BinaryPropertyModels";
 import { ArrayBuffers } from "./ArrayBuffers";
 
 /**
@@ -29,7 +30,7 @@ export class StringPropertyModel implements PropertyModel {
     const stringOffsetsBuffer = this._stringOffsetsBuffer;
     const stringOffsetType = this._stringOffsetType;
 
-    const stringSlice = PropertyModels.computeSlice(
+    const stringSlice = BinaryPropertyModels.computeSlice(
       index,
       stringOffsetsBuffer,
       stringOffsetType,

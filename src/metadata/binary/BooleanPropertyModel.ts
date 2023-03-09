@@ -1,4 +1,5 @@
-import { PropertyModel } from "./PropertyModel";
+import { PropertyModel } from "../PropertyModel";
+
 import { NumericBuffers } from "./NumericBuffers";
 
 /**

@@ -13,19 +13,49 @@ export interface TraversedTile {
   /**
    * Returns a `Tile` object that contains the "JSON"-representation
    * of the tile. This is just a plain data structure corresponding
-   * the tile.
+   * to the tile.
    *
-   * Values that may be overridden (for example, via metadata semantics)
-   * are already substituted in the returned object.
+   * The returned object reflects the "raw" state of the tile that
+   * is either contained in the tileset JSON, or derived from the
+   * subdivision rules of implicit tiles.
    *
-   * This means that the return value of this method reflects the
-   * actual tile if and only if the underlying metadata was valid.
+   * Specifically: This is the state BEFORE any semantic-based
+   * overrides have been applied. When there is metadata
+   * associated with the tile, and this metadata has semantics
+   * that override certain tile properties, then these overrides
+   * are NOT reflected in the returned tile.
+   *
+   * In order to obtain a tile where the semantic-based overrides
+   * are applied, `asFinalTile` can be used.
+   *
+   * Note that there are no guarantees about identities for the
+   * returned object. This means that callers should NOT modify
+   * the returned object or any of its properties, because they
+   * may be the actual objects that are stored in the tileset
+   * JSON.
    *
    * @returns A `Tile` with information about this traversed tile
    * @throws ImplicitTilingError If the representation of this traversed
    * tile could not be created due to invalid input structures.
    */
-  asTile(): Tile;
+  asRawTile(): Tile;
+
+  /**
+   * Returns a `Tile` object that contains the "JSON"-representation
+   * of the tile. This is just a plain data structure corresponding
+   * the tile.
+   *
+   * In contrast to `asRawTile`, this method returns a `Tile` object
+   * where semantic-based overrides have already been applied. When
+   * there is metadata associated with the tile, and this metadata
+   * has semantics that override certain tile properties, then these
+   * overrides ARE reflected in the returned tile.
+   *
+   * @returns A `Tile` with information about this traversed tile
+   * @throws ImplicitTilingError If the representation of this traversed
+   * tile could not be created due to invalid input structures.
+   */
+  asFinalTile(): Tile;
 
   /**
    * Returns the level of the tile in the traversed hierarchy, with
@@ -41,6 +71,8 @@ export interface TraversedTile {
    * This resembles a JSON path. But for cases like implicit tilesets,
    * it may contain elements that are not part of the JSONPath format.
    * It may therefore only be used as a semi-human-readable identifier.
+   * The exact format is not specified. Callers should not rely on
+   * the format.
    *
    * @returns The path
    */

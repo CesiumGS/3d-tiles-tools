@@ -1,8 +1,8 @@
-import { PropertyModel } from "./PropertyModel";
-import { NumericBuffers } from "./NumericBuffers";
-import { PropertyModels } from "./PropertyModels";
-
+import { PropertyModel } from "../PropertyModel";
 import { MetadataTypes } from "../MetadataTypes";
+
+import { NumericBuffers } from "./NumericBuffers";
+import { BinaryPropertyModels } from "./BinaryPropertyModels";
 
 /**
  * Implementation of a `PropertyModel` for numeric array types.
@@ -46,7 +46,7 @@ export class NumericArrayPropertyModel implements PropertyModel {
     const count = this._count;
     const componentCount = MetadataTypes.componentCountForType(type);
 
-    const arraySlice = PropertyModels.computeSlice(
+    const arraySlice = BinaryPropertyModels.computeSlice(
       index,
       arrayOffsetsBuffer,
       arrayOffsetType,

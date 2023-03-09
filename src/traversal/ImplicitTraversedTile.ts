@@ -3,19 +3,19 @@ import { defined } from "../base/defined";
 import { ResourceResolver } from "../io/ResourceResolver";
 
 import { TraversedTile } from "./TraversedTile";
-import { ImplicitTileTraversal } from "./ImplicitTileTraversal";
+import { SubtreeModel } from "./SubtreeModel";
+import { SubtreeModels } from "./SubtreeModels";
 
 import { Tile } from "../structure/Tile";
 import { Content } from "../structure/Content";
 import { MetadataEntity } from "../structure/MetadataEntity";
 import { TileImplicitTiling } from "../structure/TileImplicitTiling";
 
-import { BoundingVolumeDerivation } from "./cesium/BoundingVolumeDerivation";
-
 import { TreeCoordinates } from "../implicitTiling/TreeCoordinates";
-import { SubtreeInfo } from "../implicitTiling/SubtreeInfo";
 import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError";
 import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
+
+import { BoundingVolumeDerivation } from "./cesium/BoundingVolumeDerivation";
 
 /**
  * An implementation of a `TraversedTile` that represents a tile
@@ -48,11 +48,11 @@ export class ImplicitTraversedTile implements TraversedTile {
   private readonly _path: string;
 
   /**
-   * The `SubtreeInfo` object that will be used for accessing
-   * the availability information for the subtree that this
-   * tile belongs to.
+   * The `SubtreeModel` object that will be used for accessing
+   * the availability information and metadata for the subtree
+   * that this tile belongs to.
    */
-  private readonly _subtreeInfo: SubtreeInfo;
+  private readonly _subtreeModel: SubtreeModel;
 
   /**
    * The global level of this tile. This refers to the
@@ -87,7 +87,7 @@ export class ImplicitTraversedTile implements TraversedTile {
     resourceResolver: ResourceResolver,
     root: TraversedTile,
     path: string,
-    subtreeInfo: SubtreeInfo,
+    subtreeModel: SubtreeModel,
     globalLevel: number,
     globalCoordinate: TreeCoordinates,
     rootCoordinate: TreeCoordinates,
@@ -98,7 +98,7 @@ export class ImplicitTraversedTile implements TraversedTile {
     this._resourceResolver = resourceResolver;
     this._root = root;
     this._path = path;
-    this._subtreeInfo = subtreeInfo;
+    this._subtreeModel = subtreeModel;
     this._globalLevel = globalLevel;
     this._globalCoordinate = globalCoordinate;
     this._rootCoordinate = rootCoordinate;
@@ -106,18 +106,15 @@ export class ImplicitTraversedTile implements TraversedTile {
     this._parent = parent;
   }
 
-  asTile(): Tile {
-    // TODO The bounding volume and geometric error
-    // may be overridden via semantics!
-    const rootTile = this._root.asTile();
+  asRawTile(): Tile {
+    const rootTile = this._root.asFinalTile();
 
     const boundingVolume = BoundingVolumeDerivation.deriveBoundingVolume(
       rootTile.boundingVolume,
       this._globalCoordinate.toArray()
     );
     if (!boundingVolume) {
-      // The bounding volume neither contained a region nor a box.
-      // This should have been detected by previous validation.
+      // The bounding volume was not a region, box, or S2 Cell.
       throw new ImplicitTilingError("Could not subdivide bounding volume");
     }
     const level = this._globalCoordinate.level;
@@ -144,6 +141,15 @@ export class ImplicitTraversedTile implements TraversedTile {
       extensions: extensions,
       extras: extras,
     };
+  }
+
+  asFinalTile(): Tile {
+    const tile = this.asRawTile();
+
+    // TODO Apply overrides here
+    const TODO = "Apply overrides here";
+
+    return tile;
   }
 
   get path(): string {
@@ -186,6 +192,7 @@ export class ImplicitTraversedTile implements TraversedTile {
    * @throws ImplicitTilingError If the input data was invalid
    */
   private async createNextSubtreeLevelChildren(): Promise<TraversedTile[]> {
+    const subtreeInfo = this._subtreeModel.subtreeInfo;
     const traversedChildren = [];
     const localChildCoordinates = this._localCoordinate.children();
     for (const localChildCoordinate of localChildCoordinates) {
@@ -194,17 +201,20 @@ export class ImplicitTraversedTile implements TraversedTile {
         this._rootCoordinate,
         localChildCoordinate
       );
-      const childSubtreeAvailability =
-        this._subtreeInfo.getChildSubtreeAvailabilityInfo();
+      const childSubtreeAvailability = subtreeInfo.childSubtreeAvailabilityInfo;
       const childSubtreeAvailable = childSubtreeAvailability.isAvailable(
         localChildCoordinate.toIndexInLevel()
       );
       if (childSubtreeAvailable) {
-        const childSubtreeInfo = await ImplicitTileTraversal.resolveSubtreeInfo(
+        const schema = this._subtreeModel.subtreeMetadataModel?.schema;
+
+        const childSubtreeModel = await SubtreeModels.resolve(
           this._implicitTiling,
+          schema,
           this._resourceResolver,
           globalChildCoordinate
         );
+
         const childLocalCoordinate = ImplicitTilings.createRootCoordinates(
           this._implicitTiling
         );
@@ -220,7 +230,7 @@ export class ImplicitTraversedTile implements TraversedTile {
           this._resourceResolver,
           this._root,
           childPath,
-          childSubtreeInfo,
+          childSubtreeModel,
           this._globalLevel + 1,
           globalChildCoordinate,
           globalChildCoordinate,
@@ -244,7 +254,8 @@ export class ImplicitTraversedTile implements TraversedTile {
    * @throws ImplicitTilingError If the input data was invalid
    */
   private async createDirectChildren(): Promise<TraversedTile[]> {
-    const tileAvailabilityInfo = this._subtreeInfo.getTileAvailabilityInfo();
+    const subtreeInfo = this._subtreeModel.subtreeInfo;
+    const tileAvailabilityInfo = subtreeInfo.tileAvailabilityInfo;
     const localChildCoordinates = this._localCoordinate.children();
     const traversedChildren = [];
     for (const localChildCoordinate of localChildCoordinates) {
@@ -270,7 +281,7 @@ export class ImplicitTraversedTile implements TraversedTile {
           this._resourceResolver,
           this._root,
           childPath,
-          this._subtreeInfo,
+          this._subtreeModel,
           this._globalLevel + 1,
           globalChildCoordinate,
           this._rootCoordinate,
@@ -285,8 +296,8 @@ export class ImplicitTraversedTile implements TraversedTile {
 
   getContents(): Content[] {
     const contents = [];
-    const contentAvailabilityInfos =
-      this._subtreeInfo.getContentAvailabilityInfos();
+    const subtreeInfo = this._subtreeModel.subtreeInfo;
+    const contentAvailabilityInfos = subtreeInfo.contentAvailabilityInfos;
     for (const contentAvailabilityInfo of contentAvailabilityInfos) {
       const available = contentAvailabilityInfo.isAvailable(
         this._localCoordinate.toIndex()
@@ -295,7 +306,7 @@ export class ImplicitTraversedTile implements TraversedTile {
         // TODO The existence of the root content URI should
         // have been validated. So this could also throw
         // an error if the template URI is not found.
-        const templateUri = this._root.asTile().content?.uri;
+        const templateUri = this._root.asRawTile().content?.uri;
         if (defined(templateUri)) {
           const contentUri = ImplicitTilings.substituteTemplateUri(
             this._implicitTiling.subdivisionScheme,

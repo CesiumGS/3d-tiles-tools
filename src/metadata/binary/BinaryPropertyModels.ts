@@ -1,7 +1,9 @@
 import { defined } from "../../base/defined";
 
+import { PropertyModel } from "../PropertyModel";
+import { MetadataError } from "../MetadataError";
+
 import { BinaryPropertyTable } from "./BinaryPropertyTable";
-import { PropertyModel } from "./PropertyModel";
 import { StringPropertyModel } from "./StringPropertyModel";
 import { BooleanPropertyModel } from "./BooleanPropertyModel";
 import { NumericPropertyModel } from "./NumericPropertyModel";
@@ -10,13 +12,13 @@ import { StringArrayPropertyModel } from "./StringArrayPropertyModel";
 import { BooleanArrayPropertyModel } from "./BooleanArrayPropertyModel";
 import { NumericBuffers } from "./NumericBuffers";
 
-import { MetadataError } from "../MetadataError";
 /**
- * Methods related to `PropertyModel` instances
+ * Methods related to `PropertyModel` instances that are created
+ * from binary data.
  *
  * @internal
  */
-export class PropertyModels {
+export class BinaryPropertyModels {
   /**
    * Creates a `PropertyModel` for the specified property in
    * the given `BinaryPropertyTable`.

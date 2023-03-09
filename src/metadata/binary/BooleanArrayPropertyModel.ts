@@ -1,5 +1,6 @@
-import { PropertyModel } from "./PropertyModel";
-import { PropertyModels } from "./PropertyModels";
+import { PropertyModel } from "../PropertyModel";
+
+import { BinaryPropertyModels } from "./BinaryPropertyModels";
 import { BooleanPropertyModel } from "./BooleanPropertyModel";
 
 /**
@@ -31,7 +32,7 @@ export class BooleanArrayPropertyModel implements PropertyModel {
     const arrayOffsetType = this._arrayOffsetType;
     const count = this._count;
 
-    const arraySlice = PropertyModels.computeSlice(
+    const arraySlice = BinaryPropertyModels.computeSlice(
       index,
       arrayOffsetsBuffer,
       arrayOffsetType,

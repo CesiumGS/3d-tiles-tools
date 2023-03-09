@@ -1,9 +1,8 @@
-import { defined } from "../base/defined";
-
 import { ResourceResolver } from "../io/ResourceResolver";
 
 import { TraversedTile } from "./TraversedTile";
-import { ImplicitTileTraversal } from "./ImplicitTileTraversal";
+import { ExplicitTraversedTiles } from "./ExplicitTraversedTiles";
+import { MetadataSemanticOverrides } from "./MetadataSemanticOverrides";
 
 import { Tile } from "../structure/Tile";
 import { Content } from "../structure/Content";
@@ -77,97 +76,69 @@ export class ExplicitTraversedTile implements TraversedTile {
     this._resourceResolver = resourceResolver;
   }
 
-  asTile(): Tile {
+  asRawTile(): Tile {
+    return this._tile;
+  }
+
+  asFinalTile(): Tile {
     const tile = this._tile;
+
+    const finalTile = {
+      boundingVolume: tile.boundingVolume,
+      viewerRequestVolume: tile.viewerRequestVolume,
+      geometricError: tile.geometricError,
+      refine: tile.refine,
+      transform: tile.transform,
+      content: tile.content,
+      contents: tile.contents,
+      children: tile.children,
+      metadata: tile.metadata,
+      implicitTiling: tile.implicitTiling,
+      extensions: tile.extensions,
+      extras: tile.extras,
+    };
 
     const schema = this._schema;
     const metadata = tile.metadata;
-
-    const boundingVolume = tile.boundingVolume;
-    let transform = tile.transform;
-    let refine = tile.refine;
-    let geometricError = tile.geometricError;
-
     if (metadata && schema) {
-      let metadataEntityModel = undefined;
-      try {
-        metadataEntityModel = MetadataEntityModels.create(schema, metadata);
-      } catch (error) {
-        // Errors from creating the entity model should have been
-        // prevented by the metadata- and schema validation:
-        const message = `Error while traversing tileset: ${error}`;
-        throw new ImplicitTilingError(message);
-      }
-      if (metadataEntityModel) {
-        // Apply the semantic-based overrides from the metadata
-        const semanticBoundingBox =
-          metadataEntityModel.getPropertyValueBySemantic("TILE_BOUNDING_BOX");
-        if (semanticBoundingBox) {
-          boundingVolume.box = semanticBoundingBox;
-        }
+      this.applyMetadataSemanticOverrides(finalTile);
+    }
+    return finalTile;
+  }
 
-        const semanticBoundingRegion =
-          metadataEntityModel.getPropertyValueBySemantic(
-            "TILE_BOUNDING_REGION"
-          );
-        if (semanticBoundingRegion) {
-          boundingVolume.region = semanticBoundingRegion;
-        }
-
-        const semanticBoundingSphere =
-          metadataEntityModel.getPropertyValueBySemantic(
-            "TILE_BOUNDING_SPHERE"
-          );
-        if (semanticBoundingSphere) {
-          boundingVolume.sphere = semanticBoundingSphere;
-        }
-
-        const semanticGeometricError =
-          metadataEntityModel.getPropertyValueBySemantic(
-            "TILE_GEOMETRIC_ERROR"
-          );
-        if (defined(semanticGeometricError)) {
-          geometricError = semanticGeometricError as number;
-        }
-
-        const semanticRefine =
-          metadataEntityModel.getPropertyValueBySemantic("TILE_REFINE");
-        if (semanticRefine === 0) {
-          refine = "ADD";
-        } else if (semanticRefine === 1) {
-          refine = "REPLACE";
-        }
-
-        const semanticTransform =
-          metadataEntityModel.getPropertyValueBySemantic("TILE_TRANSFORM");
-        if (semanticTransform) {
-          transform = semanticTransform;
-        }
-      }
+  /**
+   * Perform the overrides of the properties of the given tile that
+   * are given by metadata semantics.
+   *
+   * If this instance contains a `Schema` and a `MetadataEntity`,
+   * then the property values of that metadata entity are examined.
+   * The property values that have a semantic will be used to
+   * override the corresponding values in the given tile.
+   *
+   * For example, when the metadata entity has a property with the
+   * semantic `TILE_GEOMETRIC_ERROR`, then the `geometricError` in
+   * the given tile will be replaced with the corresponding value
+   * from the metadata entity.
+   *
+   * @param finalTile - The tile
+   * @throws ImplicitTilingError If the input (for example, the
+   * schema and the metadata entity) are not structurally valid.
+   */
+  private applyMetadataSemanticOverrides(finalTile: Tile) {
+    const schema = this._schema;
+    const metadata = this._tile.metadata;
+    if (!metadata || !schema) {
+      return;
     }
 
-    const viewerRequestVolume = tile.viewerRequestVolume;
-    const content = tile.content;
-    const contents = tile.contents;
-    const children = tile.children;
-    const implicitTiling = tile.implicitTiling;
-    const extensions = tile.extensions;
-    const extras = tile.extras;
-
-    return {
-      boundingVolume: boundingVolume,
-      viewerRequestVolume: viewerRequestVolume,
-      geometricError: geometricError,
-      refine: refine,
-      transform: transform,
-      content: content,
-      contents: contents,
-      children: children,
-      metadata: metadata,
-      implicitTiling: implicitTiling,
-      extensions: extensions,
-      extras: extras,
-    };
+    let metadataEntityModel = undefined;
+    try {
+      metadataEntityModel = MetadataEntityModels.create(schema, metadata);
+    } catch (error) {
+      const message = `Error while traversing tileset: ${error}`;
+      throw new ImplicitTilingError(message);
+    }
+    MetadataSemanticOverrides.applyToTile(finalTile, metadataEntityModel);
   }
 
   get path(): string {
@@ -183,9 +154,11 @@ export class ExplicitTraversedTile implements TraversedTile {
 
   async getChildren(): Promise<TraversedTile[]> {
     const implicitTiling = this._tile.implicitTiling;
+    const schema = this._schema;
     if (implicitTiling) {
-      const children = await ImplicitTileTraversal.createTraversedChildren(
+      const children = await ExplicitTraversedTiles.createTraversedChildren(
         implicitTiling,
+        schema,
         this,
         this._resourceResolver
       );

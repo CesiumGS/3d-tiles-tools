@@ -1,33 +1,25 @@
 import { AvailabilityInfo } from "./AvailabilityInfo";
 
 /**
- * Summarizes the information about a subtree.
+ * Summarizes the information about the elements that are
+ * available in a subtree.
  *
  * It offers the availability information for tiles, child
  * subtrees, and contents, as `AvailabilityInfo` objects.
  */
-export class SubtreeInfo {
-  private readonly _tileAvailabilityInfo: AvailabilityInfo;
-  private readonly _contentAvailabilityInfos: AvailabilityInfo[];
-  private readonly _childSubtreeAvailabilityInfo: AvailabilityInfo;
+export interface SubtreeInfo {
+  /**
+   * The AvailabilityInfo for the tiles
+   */
+  tileAvailabilityInfo: AvailabilityInfo;
 
-  constructor(
-    tileAvailabilityInfo: AvailabilityInfo,
-    contentAvailabilityInfos: AvailabilityInfo[],
-    childSubtreeAvailabilityInfo: AvailabilityInfo
-  ) {
-    (this._tileAvailabilityInfo = tileAvailabilityInfo),
-      (this._contentAvailabilityInfos = contentAvailabilityInfos),
-      (this._childSubtreeAvailabilityInfo = childSubtreeAvailabilityInfo);
-  }
+  /**
+   * The AvailabilityInfo for the content
+   */
+  contentAvailabilityInfos: AvailabilityInfo[];
 
-  getTileAvailabilityInfo(): AvailabilityInfo {
-    return this._tileAvailabilityInfo;
-  }
-  getContentAvailabilityInfos(): AvailabilityInfo[] {
-    return this._contentAvailabilityInfos;
-  }
-  getChildSubtreeAvailabilityInfo(): AvailabilityInfo {
-    return this._childSubtreeAvailabilityInfo;
-  }
+  /**
+   * The AvailabilityInfo for the child subtrees
+   */
+  childSubtreeAvailabilityInfo: AvailabilityInfo;
 }
