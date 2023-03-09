@@ -62,8 +62,7 @@ export class OctreeCoordinates implements TreeCoordinates {
 
   descendants(
     maxLevelInclusive: number,
-    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
-    depthFirst: boolean = false
+    depthFirst: boolean
   ): IterableIterator<OctreeCoordinates> {
     const queue: OctreeCoordinates[] = [this];
     const result = {
