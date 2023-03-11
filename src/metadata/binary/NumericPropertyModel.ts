@@ -23,6 +23,7 @@ export class NumericPropertyModel implements PropertyModel {
     this._componentType = componentType;
   }
 
+  /** {@inheritDoc PropertyModel.getPropertyValue} */
   getPropertyValue(index: number): any {
     const valuesBuffer = this._valuesBuffer;
     const componentType = this._componentType;

@@ -30,6 +30,7 @@ export class DefaultMetadataEntityModel implements MetadataEntityModel {
     this._json = json;
   }
 
+  /** {@inheritDoc MetadataEntityModel.getPropertyValue} */
   getPropertyValue(propertyId: string): any {
     const properties = this._metadataClass.properties;
     if (!properties) {
@@ -45,6 +46,7 @@ export class DefaultMetadataEntityModel implements MetadataEntityModel {
     return MetadataValues.processValue(property, undefined, undefined, value);
   }
 
+  /** {@inheritDoc MetadataEntityModel.getPropertyValueBySemantic} */
   getPropertyValueBySemantic(semantic: string): any {
     const propertyId = this._semanticToPropertyId[semantic];
     if (!defined(propertyId)) {

@@ -14,6 +14,7 @@ export class BooleanPropertyModel implements PropertyModel {
     this._valuesBuffer = valuesBuffer;
   }
 
+  /** {@inheritDoc PropertyModel.getPropertyValue} */
   getPropertyValue(index: number): any {
     const valuesBuffer = this._valuesBuffer;
     const result = BooleanPropertyModel.getBooleanFromBuffer(

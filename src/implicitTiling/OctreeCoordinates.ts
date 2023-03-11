@@ -18,6 +18,7 @@ export class OctreeCoordinates implements TreeCoordinates {
     this._z = z;
   }
 
+  /** {@inheritDoc TreeCoordinates.level} */
   get level(): number {
     return this._level;
   }
@@ -34,6 +35,7 @@ export class OctreeCoordinates implements TreeCoordinates {
     return this._z;
   }
 
+  /** {@inheritDoc TreeCoordinates.parent} */
   parent(): OctreeCoordinates | null {
     if (this._level === 0) {
       return null;
@@ -45,6 +47,7 @@ export class OctreeCoordinates implements TreeCoordinates {
     return new OctreeCoordinates(pLevel, px, py, pz);
   }
 
+  /** {@inheritDoc TreeCoordinates.children} */
   *children(): IterableIterator<OctreeCoordinates> {
     const nLevel = this._level + 1;
     const nX = this._x << 1;
@@ -60,6 +63,7 @@ export class OctreeCoordinates implements TreeCoordinates {
     yield new OctreeCoordinates(nLevel, nX + 1, nY + 1, nZ + 1);
   }
 
+  /** {@inheritDoc TreeCoordinates.descendants} */
   descendants(
     maxLevelInclusive: number,
     depthFirst: boolean
@@ -85,15 +89,18 @@ export class OctreeCoordinates implements TreeCoordinates {
     return result;
   }
 
+  /** {@inheritDoc TreeCoordinates.toArray} */
   toArray(): number[] {
     return [this.level, this.x, this.y, this.z];
   }
 
+  /** {@inheritDoc TreeCoordinates.toIndex} */
   toIndex(): number {
     const offset = Octrees.computeNumberOfNodesForLevels(this._level);
     return offset + this.toIndexInLevel();
   }
 
+  /** {@inheritDoc TreeCoordinates.toIndexInLevel} */
   toIndexInLevel(): number {
     return MortonOrder.encode3D(this._x, this._y, this._z);
   }

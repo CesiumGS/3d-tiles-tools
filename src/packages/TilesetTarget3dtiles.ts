@@ -26,6 +26,7 @@ export class TilesetTarget3dtiles implements TilesetTarget {
     this.db = undefined;
   }
 
+  /** {@inheritDoc TilesetTarget.begin} */
   begin(fullOutputName: string, overwrite: boolean): void {
     if (fs.existsSync(fullOutputName)) {
       if (overwrite) {
@@ -51,6 +52,7 @@ export class TilesetTarget3dtiles implements TilesetTarget {
       .run();
   }
 
+  /** {@inheritDoc TilesetTarget.addEntry} */
   addEntry(key: string, content: Buffer): void {
     if (!this.db) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");
@@ -59,6 +61,7 @@ export class TilesetTarget3dtiles implements TilesetTarget {
     insertion.run(key, content);
   }
 
+  /** {@inheritDoc TilesetTarget.end} */
   async end(): Promise<void> {
     if (!this.db) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");

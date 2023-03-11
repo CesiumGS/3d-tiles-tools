@@ -26,6 +26,7 @@ export class TilesetSourceFs implements TilesetSource {
     this.fullInputName = undefined;
   }
 
+  /** {@inheritDoc TilesetSource.open} */
   open(fullInputName: string) {
     if (this.fullInputName) {
       throw new TilesetError("Source already opened");
@@ -33,6 +34,7 @@ export class TilesetSourceFs implements TilesetSource {
     this.fullInputName = fullInputName;
   }
 
+  /** {@inheritDoc TilesetSource.getKeys} */
   getKeys() {
     if (!this.fullInputName) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
@@ -45,7 +47,8 @@ export class TilesetSourceFs implements TilesetSource {
     );
   }
 
-  getValue(key: string) {
+  /** {@inheritDoc TilesetSource.getValue} */
+  getValue(key: string): Buffer | undefined {
     if (!this.fullInputName) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
@@ -54,9 +57,13 @@ export class TilesetSourceFs implements TilesetSource {
       return undefined;
     }
     const data = fs.readFileSync(fullFileName);
+    if (data === null) {
+      return undefined;
+    }
     return data;
   }
 
+  /** {@inheritDoc TilesetSource.close} */
   close() {
     if (!this.fullInputName) {
       throw new TilesetError("Source is not opened. Call 'open' first.");

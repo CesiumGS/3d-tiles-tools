@@ -17,12 +17,14 @@ export class FileResourceResolver implements ResourceResolver {
     this._basePath = basePath;
   }
 
+  /** {@inheritDoc ResourceResolver.resolveUri} */
   resolveUri(uri: string): string {
     let resolved = path.resolve(this._basePath, decodeURIComponent(uri));
     resolved = resolved.replace(/\\/g, "/");
     return resolved;
   }
 
+  /** {@inheritDoc ResourceResolver.resolveDataPartial} */
   async resolveDataPartial(
     uri: string,
     maxBytes: number
@@ -46,6 +48,7 @@ export class FileResourceResolver implements ResourceResolver {
     }
   }
 
+  /** {@inheritDoc ResourceResolver.resolveData} */
   async resolveData(uri: string): Promise<Buffer | null> {
     if (Uris.isDataUri(uri)) {
       const data = Buffer.from(uri.split(",")[1], "base64");
@@ -66,6 +69,8 @@ export class FileResourceResolver implements ResourceResolver {
     );
     return Buffer.from(actualData);
   }
+
+  /** {@inheritDoc ResourceResolver.derive} */
   derive(uri: string): ResourceResolver {
     const resolved = path.join(this._basePath, decodeURIComponent(uri));
     return new FileResourceResolver(resolved);

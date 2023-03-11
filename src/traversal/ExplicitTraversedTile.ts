@@ -76,10 +76,12 @@ export class ExplicitTraversedTile implements TraversedTile {
     this._resourceResolver = resourceResolver;
   }
 
+  /** {@inheritDoc TraversedTile.asRawTile} */
   asRawTile(): Tile {
     return this._tile;
   }
 
+  /** {@inheritDoc TraversedTile.asFinalTile} */
   asFinalTile(): Tile {
     const tile = this._tile;
 
@@ -141,17 +143,22 @@ export class ExplicitTraversedTile implements TraversedTile {
     MetadataSemanticOverrides.applyToTile(finalTile, metadataEntityModel);
   }
 
+  /** {@inheritDoc TraversedTile.path} */
   get path(): string {
     return this._path;
   }
+
+  /** {@inheritDoc TraversedTile.level} */
   get level(): number {
     return this._level;
   }
 
+  /** {@inheritDoc TraversedTile.getParent} */
   getParent(): TraversedTile | undefined {
     return this._parent;
   }
 
+  /** {@inheritDoc TraversedTile.getChildren} */
   async getChildren(): Promise<TraversedTile[]> {
     const implicitTiling = this._tile.implicitTiling;
     const schema = this._schema;
@@ -187,6 +194,7 @@ export class ExplicitTraversedTile implements TraversedTile {
     return traversedChildren;
   }
 
+  /** {@inheritDoc TraversedTile.getContents} */
   getContents(): Content[] {
     if (this._tile.content) {
       return [this._tile.content];
@@ -197,6 +205,7 @@ export class ExplicitTraversedTile implements TraversedTile {
     return [];
   }
 
+  /** {@inheritDoc TraversedTile.getSubtreeUri} - PRELIMINARY */
   getSubtreeUri(): string | undefined {
     const implicitTiling = this._tile.implicitTiling;
     if (implicitTiling) {
@@ -212,10 +221,12 @@ export class ExplicitTraversedTile implements TraversedTile {
     return undefined;
   }
 
+  /** {@inheritDoc TraversedTile.getImplicitTiling} - PRELIMINARY */
   getImplicitTiling(): TileImplicitTiling | undefined {
     return this._tile.implicitTiling;
   }
 
+  /** {@inheritDoc TraversedTile.getMetadata} - PRELIMINARY */
   getMetadata(): MetadataEntity | undefined {
     return this._tile.metadata;
   }

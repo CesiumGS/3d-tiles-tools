@@ -16,6 +16,7 @@ export class QuadtreeCoordinates implements TreeCoordinates {
     this._y = y;
   }
 
+  /** {@inheritDoc TreeCoordinates.level} */
   get level(): number {
     return this._level;
   }
@@ -28,6 +29,7 @@ export class QuadtreeCoordinates implements TreeCoordinates {
     return this._y;
   }
 
+  /** {@inheritDoc TreeCoordinates.parent} */
   parent(): QuadtreeCoordinates | null {
     if (this._level === 0) {
       return null;
@@ -38,6 +40,7 @@ export class QuadtreeCoordinates implements TreeCoordinates {
     return new QuadtreeCoordinates(pLevel, px, py);
   }
 
+  /** {@inheritDoc TreeCoordinates.children} */
   *children(): IterableIterator<QuadtreeCoordinates> {
     const nLevel = this._level + 1;
     const nX = this._x << 1;
@@ -48,6 +51,7 @@ export class QuadtreeCoordinates implements TreeCoordinates {
     yield new QuadtreeCoordinates(nLevel, nX + 1, nY + 1);
   }
 
+  /** {@inheritDoc TreeCoordinates.descendants} */
   descendants(
     maxLevelInclusive: number,
     depthFirst: boolean
@@ -73,15 +77,18 @@ export class QuadtreeCoordinates implements TreeCoordinates {
     return result;
   }
 
+  /** {@inheritDoc TreeCoordinates.toArray} */
   toArray(): number[] {
     return [this.level, this.x, this.y];
   }
 
+  /** {@inheritDoc TreeCoordinates.toIndex} */
   toIndex(): number {
     const offset = Quadtrees.computeNumberOfNodesForLevels(this._level);
     return offset + this.toIndexInLevel();
   }
 
+  /** {@inheritDoc TreeCoordinates.toIndexInLevel} */
   toIndexInLevel(): number {
     return MortonOrder.encode2D(this._x, this._y);
   }

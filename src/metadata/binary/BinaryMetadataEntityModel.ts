@@ -26,6 +26,7 @@ export class BinaryMetadataEntityModel implements MetadataEntityModel {
     this._semanticToPropertyId = semanticToPropertyId;
   }
 
+  /** {@inheritDoc MetadataEntityModel.getPropertyValue} */
   getPropertyValue(propertyId: string): any {
     const propertyTableModel = this._propertyTableModel;
     const classProperty = propertyTableModel.getClassProperty(propertyId);
@@ -58,6 +59,7 @@ export class BinaryMetadataEntityModel implements MetadataEntityModel {
     return processedValue;
   }
 
+  /** {@inheritDoc MetadataEntityModel.getPropertyValueBySemantic} */
   getPropertyValueBySemantic(semantic: string): any {
     const propertyId = this._semanticToPropertyId[semantic];
     if (!defined(propertyId)) {

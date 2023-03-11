@@ -13,10 +13,12 @@ export class BufferAvailabilityInfo implements AvailabilityInfo {
     this._length = length;
   }
 
+  /** {@inheritDoc AvailabilityInfo.length} */
   get length(): number {
     return this._length;
   }
 
+  /** {@inheritDoc AvailabilityInfo.isAvailable} */
   isAvailable(index: number): boolean {
     if (index < 0 || index >= this.length) {
       throw new RangeError(

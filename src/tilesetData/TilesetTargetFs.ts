@@ -30,6 +30,7 @@ export class TilesetTargetFs implements TilesetTarget {
     this.overwrite = false;
   }
 
+  /** {@inheritDoc TilesetTarget.begin} */
   begin(fullOutputName: string, overwrite: boolean) {
     if (this.fullOutputName) {
       throw new TilesetError("Target already opened");
@@ -41,6 +42,7 @@ export class TilesetTargetFs implements TilesetTarget {
     }
   }
 
+  /** {@inheritDoc TilesetTarget.addEntry} */
   addEntry(key: string, content: Buffer) {
     if (!this.fullOutputName) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");
@@ -56,6 +58,7 @@ export class TilesetTargetFs implements TilesetTarget {
     fs.writeFileSync(fullOutputFileName, content);
   }
 
+  /** {@inheritDoc TilesetTarget.end} */
   async end() {
     if (!this.fullOutputName) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");
