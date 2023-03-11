@@ -126,7 +126,7 @@ export class ImplicitTraversedTile implements TraversedTile {
     const refine = rootTile.refine;
     const transform = undefined;
     const metadata = undefined;
-    const contents = this.getContents();
+    const contents = this.getRawContents();
     const implicitTiling = undefined;
     const extensions = undefined;
     const extras = undefined;
@@ -148,20 +148,15 @@ export class ImplicitTraversedTile implements TraversedTile {
   /** {@inheritDoc TraversedTile.asFinalTile} */
   asFinalTile(): Tile {
     const tile = this.asRawTile();
-
+    tile.contents = this.getFinalContents();
     const subtreeMetadataModel = this._subtreeModel.subtreeMetadataModel;
     if (subtreeMetadataModel) {
-      if (
-        subtreeMetadataModel.tileMetadataModel &&
-        subtreeMetadataModel.tileIndexMapping
-      ) {
-        const tileIndex = this._localCoordinate.toIndex();
-        const metadataIndex = subtreeMetadataModel.tileIndexMapping[tileIndex];
-        const tileMetadataModel = subtreeMetadataModel.tileMetadataModel;
-        const metadataEntityModel =
-          tileMetadataModel.getMetadataEntityModel(metadataIndex);
-        MetadataSemanticOverrides.applyToTile(tile, metadataEntityModel);
-      }
+      const tileIndex = this._localCoordinate.toIndex();
+      MetadataSemanticOverrides.applyImplicitTileMetadataSemanticOverrides(
+        tile,
+        tileIndex,
+        subtreeMetadataModel
+      );
     }
     return tile;
   }
@@ -329,8 +324,8 @@ export class ImplicitTraversedTile implements TraversedTile {
     return traversedChildren;
   }
 
-  /** {@inheritDoc TraversedTile.getContents} */
-  getContents(): Content[] {
+  /** {@inheritDoc TraversedTile.getRawContents} */
+  getRawContents(): Content[] {
     const contents = [];
     const subtreeInfo = this._subtreeModel.subtreeInfo;
     const contentAvailabilityInfos = subtreeInfo.contentAvailabilityInfos;
@@ -349,7 +344,6 @@ export class ImplicitTraversedTile implements TraversedTile {
             templateUri,
             this._globalCoordinate
           );
-          // TODO Check semantics!
           const content: Content = {
             boundingVolume: undefined,
             uri: contentUri,
@@ -359,6 +353,26 @@ export class ImplicitTraversedTile implements TraversedTile {
           contents.push(content);
         }
       }
+    }
+    return contents;
+  }
+
+  /** {@inheritDoc TraversedTile.getFinalContents} */
+  getFinalContents(): Content[] {
+    const contents = this.getRawContents();
+    const subtreeMetadataModel = this._subtreeModel.subtreeMetadataModel;
+    if (!subtreeMetadataModel) {
+      return contents;
+    }
+    for (let i = 0; i < contents.length; i++) {
+      const content = contents[i];
+      const tileIndex = this._localCoordinate.toIndex();
+      MetadataSemanticOverrides.applyImplicitContentMetadataSemanticOverrides(
+        content,
+        i,
+        tileIndex,
+        subtreeMetadataModel
+      );
     }
     return contents;
   }
@@ -390,6 +404,11 @@ export class ImplicitTraversedTile implements TraversedTile {
   /** {@inheritDoc TraversedTile.getMetadata} PRELIMINARY */
   getMetadata(): MetadataEntity | undefined {
     return undefined;
+  }
+
+  /** {@inheritDoc TraversedTile.resolveUri} - PRELIMINARY */
+  resolveUri(uri: string): string {
+    return this._resourceResolver.resolveUri(uri);
   }
 
   // TODO For debugging

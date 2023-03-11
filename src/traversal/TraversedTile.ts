@@ -112,7 +112,11 @@ export interface TraversedTile {
    *
    * @returns The contents
    */
-  getContents(): Content[];
+  getRawContents(): Content[];
+
+  // TODO Document or improve this - the same difference as between
+  // asRawTile and asFinalTile
+  getFinalContents(): Content[];
 
   // TODO Some information has to be exposed here solely
   // for the validation. This should preferably not be
@@ -121,4 +125,5 @@ export interface TraversedTile {
   getSubtreeUri(): string | undefined;
   getImplicitTiling(): TileImplicitTiling | undefined;
   getMetadata(): MetadataEntity | undefined;
+  resolveUri(uri: string): string;
 }

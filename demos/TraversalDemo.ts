@@ -44,7 +44,7 @@ async function tilesetTraversalDemo(filePath: string) {
     schema,
     resourceResolver,
     async (traversedTile) => {
-      const contentUris = traversedTile.getContents().map((c) => c.uri);
+      const contentUris = traversedTile.getFinalContents().map((c) => c.uri);
       const geometricError = traversedTile.asFinalTile().geometricError;
       console.log(
         `  Traversed tile: ${traversedTile}, ` +
@@ -60,9 +60,9 @@ async function tilesetTraversalDemo(filePath: string) {
 }
 
 async function runDemo() {
-  const tilesetFile =
+  const tilesetFileName =
     "../3d-tiles-samples/1.1/SparseImplicitQuadtree/tileset.json";
-  await tilesetTraversalDemo(tilesetFile);
+  await tilesetTraversalDemo(tilesetFileName);
 }
 
 runDemo();

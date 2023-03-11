@@ -5,10 +5,14 @@ import { Schema } from "../structure/Metadata/Schema";
  * An interface summarizing the metadata that may be associated
  * with a subtree.
  *
- * (Note: One could consider to offer something like this in the
+ * Note: One could consider to offer something like this in the
  * `implicitTiling` package, alongside the `SubtreeInfo`. But
  * the structure of this interface is too much tailored for
- * its use in the traversal right now)
+ * its use in the traversal right now. If it was supposed to
+ * be offered as a public interface, then the 'index mappings'
+ * should probably be hidden behind some function like
+ * m = getMetadataEntityModelForTile(tileIndex);
+ * that does the index lookup internally.
  *
  * @internal
  */
@@ -50,6 +54,15 @@ export interface SubtreeMetadataModel {
    * The mappings from content indices to the rows of the
    * contentMetadataModels that contain the metadata for
    * the respective content.
+   *
+   * The order is
+   * `contentIndexMappings[contentSetIndex][contentIndex]`
+   * where
+   * - the `contentSetIndex` is `0` for single contents,
+   *   `0` or `1` for two contents, and so on
+   * - the `contentIndex` is `n` for the `n-th` available content
+   *
+   * (Yes, this should really be hidden behind an interface...)
    *
    * (See SubtreeMetadataModels.computeAvailabilityIndexingMapping
    * for details)

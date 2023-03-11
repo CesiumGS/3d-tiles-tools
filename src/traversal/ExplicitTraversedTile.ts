@@ -10,10 +10,7 @@ import { TileImplicitTiling } from "../structure/TileImplicitTiling";
 import { MetadataEntity } from "../structure/MetadataEntity";
 import { Schema } from "../structure/Metadata/Schema";
 
-import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError";
 import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
-
-import { MetadataEntityModels } from "../metadata/MetadataEntityModels";
 
 /**
  * An implementation of a `TraversedTile` that reflects a tile
@@ -85,14 +82,16 @@ export class ExplicitTraversedTile implements TraversedTile {
   asFinalTile(): Tile {
     const tile = this._tile;
 
+    const contents = this.getFinalContents();
+
     const finalTile = {
       boundingVolume: tile.boundingVolume,
       viewerRequestVolume: tile.viewerRequestVolume,
       geometricError: tile.geometricError,
       refine: tile.refine,
       transform: tile.transform,
-      content: tile.content,
-      contents: tile.contents,
+      content: undefined,
+      contents: contents,
       children: tile.children,
       metadata: tile.metadata,
       implicitTiling: tile.implicitTiling,
@@ -101,46 +100,13 @@ export class ExplicitTraversedTile implements TraversedTile {
     };
 
     const schema = this._schema;
-    const metadata = tile.metadata;
-    if (metadata && schema) {
-      this.applyMetadataSemanticOverrides(finalTile);
+    if (schema) {
+      MetadataSemanticOverrides.applyExplicitTileMetadataSemanticOverrides(
+        finalTile,
+        schema
+      );
     }
     return finalTile;
-  }
-
-  /**
-   * Perform the overrides of the properties of the given tile that
-   * are given by metadata semantics.
-   *
-   * If this instance contains a `Schema` and a `MetadataEntity`,
-   * then the property values of that metadata entity are examined.
-   * The property values that have a semantic will be used to
-   * override the corresponding values in the given tile.
-   *
-   * For example, when the metadata entity has a property with the
-   * semantic `TILE_GEOMETRIC_ERROR`, then the `geometricError` in
-   * the given tile will be replaced with the corresponding value
-   * from the metadata entity.
-   *
-   * @param finalTile - The tile
-   * @throws ImplicitTilingError If the input (for example, the
-   * schema and the metadata entity) are not structurally valid.
-   */
-  private applyMetadataSemanticOverrides(finalTile: Tile) {
-    const schema = this._schema;
-    const metadata = this._tile.metadata;
-    if (!metadata || !schema) {
-      return;
-    }
-
-    let metadataEntityModel = undefined;
-    try {
-      metadataEntityModel = MetadataEntityModels.create(schema, metadata);
-    } catch (error) {
-      const message = `Error while traversing tileset: ${error}`;
-      throw new ImplicitTilingError(message);
-    }
-    MetadataSemanticOverrides.applyToTile(finalTile, metadataEntityModel);
   }
 
   /** {@inheritDoc TraversedTile.path} */
@@ -194,8 +160,8 @@ export class ExplicitTraversedTile implements TraversedTile {
     return traversedChildren;
   }
 
-  /** {@inheritDoc TraversedTile.getContents} */
-  getContents(): Content[] {
+  /** {@inheritDoc TraversedTile.getRawContents} */
+  getRawContents(): Content[] {
     if (this._tile.content) {
       return [this._tile.content];
     }
@@ -205,20 +171,47 @@ export class ExplicitTraversedTile implements TraversedTile {
     return [];
   }
 
+  /** {@inheritDoc TraversedTile.getFinalContents} */
+  getFinalContents(): Content[] {
+    const rawContents = this.getRawContents();
+    const schema = this._schema;
+    if (!schema) {
+      return rawContents;
+    }
+    const finalContents: Content[] = [];
+    for (let i = 0; i < rawContents.length; i++) {
+      const rawContent = rawContents[i];
+      const finalContent: Content = {
+        boundingVolume: rawContent.boundingVolume,
+        uri: rawContent.uri,
+        metadata: rawContent.metadata,
+        group: rawContent.group,
+        extensions: rawContent.extensions,
+        extras: rawContent.extras,
+      };
+      MetadataSemanticOverrides.applyExplicitContentMetadataSemanticOverrides(
+        finalContent,
+        schema
+      );
+      finalContents.push(finalContent);
+    }
+    return finalContents;
+  }
+
   /** {@inheritDoc TraversedTile.getSubtreeUri} - PRELIMINARY */
   getSubtreeUri(): string | undefined {
     const implicitTiling = this._tile.implicitTiling;
-    if (implicitTiling) {
-      const rootCoordinates =
-        ImplicitTilings.createRootCoordinates(implicitTiling);
-      const subtreeUri = ImplicitTilings.substituteTemplateUri(
-        implicitTiling.subdivisionScheme,
-        implicitTiling.subtrees.uri,
-        rootCoordinates
-      );
-      return subtreeUri;
+    if (!implicitTiling) {
+      return undefined;
     }
-    return undefined;
+    const rootCoordinates =
+      ImplicitTilings.createRootCoordinates(implicitTiling);
+    const subtreeUri = ImplicitTilings.substituteTemplateUri(
+      implicitTiling.subdivisionScheme,
+      implicitTiling.subtrees.uri,
+      rootCoordinates
+    );
+    return subtreeUri;
   }
 
   /** {@inheritDoc TraversedTile.getImplicitTiling} - PRELIMINARY */
@@ -229,6 +222,11 @@ export class ExplicitTraversedTile implements TraversedTile {
   /** {@inheritDoc TraversedTile.getMetadata} - PRELIMINARY */
   getMetadata(): MetadataEntity | undefined {
     return this._tile.metadata;
+  }
+
+  /** {@inheritDoc TraversedTile.resolveUri} - PRELIMINARY */
+  resolveUri(uri: string): string {
+    return this._resourceResolver.resolveUri(uri);
   }
 
   // TODO For debugging
