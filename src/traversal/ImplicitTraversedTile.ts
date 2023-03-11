@@ -16,6 +16,7 @@ import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError";
 import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
 
 import { BoundingVolumeDerivation } from "./cesium/BoundingVolumeDerivation";
+import { MetadataSemanticOverrides } from "./MetadataSemanticOverrides";
 
 /**
  * An implementation of a `TraversedTile` that represents a tile
@@ -106,6 +107,7 @@ export class ImplicitTraversedTile implements TraversedTile {
     this._parent = parent;
   }
 
+  /** {@inheritDoc TraversedTile.asRawTile} */
   asRawTile(): Tile {
     const rootTile = this._root.asFinalTile();
 
@@ -143,33 +145,66 @@ export class ImplicitTraversedTile implements TraversedTile {
     };
   }
 
+  /** {@inheritDoc TraversedTile.asFinalTile} */
   asFinalTile(): Tile {
     const tile = this.asRawTile();
 
-    // TODO Apply overrides here
-    const TODO = "Apply overrides here";
-
+    const subtreeMetadataModel = this._subtreeModel.subtreeMetadataModel;
+    if (subtreeMetadataModel) {
+      if (
+        subtreeMetadataModel.tileMetadataModel &&
+        subtreeMetadataModel.tileIndexMapping
+      ) {
+        const tileIndex = this._localCoordinate.toIndex();
+        const metadataIndex = subtreeMetadataModel.tileIndexMapping[tileIndex];
+        const tileMetadataModel = subtreeMetadataModel.tileMetadataModel;
+        const metadataEntityModel =
+          tileMetadataModel.getMetadataEntityModel(metadataIndex);
+        MetadataSemanticOverrides.applyToTile(tile, metadataEntityModel);
+      }
+    }
     return tile;
   }
 
+  /** {@inheritDoc TraversedTile.path} */
   get path(): string {
     return this._path;
   }
+
+  /** {@inheritDoc TraversedTile.level} */
   get level(): number {
     return this._globalLevel;
   }
+
+  /**
+   * Returns the local coordinate of this implicit tile.
+   *
+   * This is the coordinate referring to the nearest subtree root.
+   *
+   * @returns The local coordinate
+   */
   getLocalCoordinate(): TreeCoordinates {
     return this._localCoordinate;
   }
 
+  /**
+   * Returns the global coordinate of this implicit tile.
+   *
+   * This is the coordinate referring to the root of the
+   * implicit tile hierarchy.
+   *
+   * @returns The global coordinate
+   */
   getGlobalCoordinate(): TreeCoordinates {
     return this._globalCoordinate;
   }
 
+  /** {@inheritDoc TraversedTile.getParent} */
   getParent(): TraversedTile | undefined {
     return this._parent;
   }
 
+  /** {@inheritDoc TraversedTile.getChildren} */
   async getChildren(): Promise<TraversedTile[]> {
     const localLevel = this._localCoordinate.level;
     if (localLevel === this._implicitTiling.subtreeLevels - 1) {
@@ -294,6 +329,7 @@ export class ImplicitTraversedTile implements TraversedTile {
     return traversedChildren;
   }
 
+  /** {@inheritDoc TraversedTile.getContents} */
   getContents(): Content[] {
     const contents = [];
     const subtreeInfo = this._subtreeModel.subtreeInfo;
@@ -327,6 +363,7 @@ export class ImplicitTraversedTile implements TraversedTile {
     return contents;
   }
 
+  /** {@inheritDoc TraversedTile.getSubtreeUri} PRELIMINARY */
   getSubtreeUri(): string | undefined {
     const localCoordinate = this._localCoordinate;
     if (localCoordinate.level === 0) {
@@ -342,6 +379,7 @@ export class ImplicitTraversedTile implements TraversedTile {
     return undefined;
   }
 
+  /** {@inheritDoc TraversedTile.getImplicitTiling} PRELIMINARY */
   getImplicitTiling(): TileImplicitTiling | undefined {
     const localCoordinate = this._localCoordinate;
     if (localCoordinate.level === 0) {
@@ -349,6 +387,7 @@ export class ImplicitTraversedTile implements TraversedTile {
     }
   }
 
+  /** {@inheritDoc TraversedTile.getMetadata} PRELIMINARY */
   getMetadata(): MetadataEntity | undefined {
     return undefined;
   }
