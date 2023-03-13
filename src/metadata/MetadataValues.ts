@@ -66,7 +66,13 @@ export class MetadataValues {
       ? offsetOverride
       : classProperty.offset;
     const scale = defined(scaleOverride) ? scaleOverride : classProperty.scale;
-    value = MetadataValues.transform(value, offset, scale);
+
+    if (defined(scale)) {
+      value = ArrayValues.deepMultiply(value, scale);
+    }
+    if (defined(offset)) {
+      value = ArrayValues.deepAdd(value, offset);
+    }
     return value;
   }
 
@@ -86,21 +92,6 @@ export class MetadataValues {
     for (let i = 0; i < value.length; i++) {
       value[i] = MetadataValues.normalize(value[i], componentType);
     }
-    return value;
-  }
-
-  /**
-   * Applies the given offset and scale to the given input value, if they
-   * are defined.
-   *
-   * @param value - The input value
-   * @param offset - The optional offset
-   * @param scale - The optional scale
-   * @returns The transformed value
-   */
-  private static transform(value: any, offset: any, scale: any): any {
-    value = ArrayValues.deepMultiply(value, scale);
-    value = ArrayValues.deepAdd(value, offset);
     return value;
   }
 }

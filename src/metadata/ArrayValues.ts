@@ -1,10 +1,31 @@
-import { defined } from "../base/defined";
-import { defaultValue } from "../base/defaultValue";
+import { MetadataError } from "./MetadataError";
+
+/**
+ * Type definition for numeric values (number or bigint)
+ */
+type NumericScalar = number | bigint;
+
+/**
+ * Type definition for numeric values or n-dimensional
+ * arrays of numeric values.
+ */
+type NumericND = NumericScalar | NumericND[];
+
+/**
+ * A type definition for numbers
+ */
+type NumberScalar = number;
+
+/**
+ * A type definition for numbers or n-dimensional
+ * arrays of numbers
+ */
+type NumberND = NumberScalar | NumberND[];
 
 /**
  * Utility functions for generic operations on values that
- * may be numbers or bigints or (potentially multi-dimensional)
- * arrays of numbers or bigints.
+ * may be numbers or (potentially multi-dimensional) arrays
+ * of numbers.
  *
  * These methods are mainly used for performing operations
  * on metadata values that have been found to be numeric
@@ -13,198 +34,248 @@ import { defaultValue } from "../base/defaultValue";
  *
  * When two values are involved, then the methods assume
  * that the values have the same structure, i.e. they are
- * both numeric, or arrays with the same length.
+ * both numeric/numbers or arrays with the same length. If this
+ * is not the case, then a `MetadataError` will be thrown.
  */
 export class ArrayValues {
   // Implementation note:
-  // The way how these functions are written is drilling a hole
-  // into the type checks that COULD be offered by TypeScript.
-  // However, defining these methods in a type-safe way is fairly
-  // non-trivial, and (more importantly) would require the proper
-  // type checks to be done by the caller.
+  // The methods here are supposed to be called in a context
+  // where no (compile-time) type information is available.
+  // Thes are offered to operate on "any" types, but usually
+  // delegate to "...Internal" methods with more specific
+  // type signatures. This does not imply any compile-time
+  // checks, but these specific signatures might be exposed
+  // as public methods at some point.
+
+  /**
+   * Returns whether the given value is a Numeric scalar
+   * (i.e. number or bigint)
+   *
+   * @param value - The value
+   * @returns Whether the value is Numeric
+   */
+  private static isNumericScalar(value: any): value is NumericScalar {
+    if (typeof value === "number") {
+      return true;
+    }
+    if (typeof value === "bigint") {
+      return true;
+    }
+    return true;
+  }
 
   /**
    * Multiplies the given input value with the given factor.
    *
-   * If the factor is undefined, then the original value
-   * is returned.
-   *
-   * This considers the case that the values are numbers or
-   * (potentially multi-dimensional) arrays of numbers.
-   *
    * @param value - The input value
-   * @param factor - The optional factor
+   * @param factor - The factor
    * @returns The resulting value
+   * @throws MetadataError If the parameters have incompatible types
    */
   static deepMultiply(value: any, factor: any): any {
-    if (!defined(factor)) {
-      return value;
+    return ArrayValues.deepMultiplyInternal(value, factor);
+  }
+
+  /**
+   * Multiplies the given input value with the given factor.
+   *
+   * @param value - The input value
+   * @param factor - The factor
+   * @returns The resulting value
+   * @throws MetadataError If the parameters have incompatible types
+   */
+  private static deepMultiplyInternal<T extends NumberND>(
+    value: T,
+    factor: T
+  ): T {
+    if (Array.isArray(value) && Array.isArray(factor)) {
+      if (value.length != factor.length) {
+        throw new MetadataError(
+          `Values ${value} and ${factor} have different lengths`
+        );
+      }
+      const result = value.slice();
+      for (let i = 0; i < result.length; i++) {
+        result[i] = ArrayValues.deepMultiplyInternal(result[i], factor[i]);
+      }
+      return result as T;
     }
-    const f = factor as any;
-    if (!Array.isArray(value)) {
-      return value * f;
+    if (typeof value === "number" && typeof factor === "number") {
+      return (value * factor) as T;
     }
-    for (let i = 0; i < value.length; i++) {
-      value[i] = ArrayValues.deepMultiply(value[i], f[i]);
-    }
-    return value;
+    throw new MetadataError(
+      `Values ${value} and ${factor} have invalid ` +
+        `types ${typeof value} and ${typeof factor}`
+    );
   }
 
   /**
    * Adds the given addend to the given input value.
    *
-   * If the addend is undefined, then the original value
-   * is returned.
-   *
-   * This considers the case that the values are numbers or
-   * (potentially multi-dimensional) arrays of numbers.
+   * @param value - The input value
+   * @param addend - The optional addend
+   * @returns The resulting value
+   * @throws MetadataError If the parameters have incompatible types
+   */
+  static deepAdd(value: any, addend: any): any {
+    return ArrayValues.deepAddInternal(value, addend);
+  }
+
+  /**
+   * Adds the given addend to the given input value.
    *
    * @param value - The input value
    * @param addend - The optional addend
    * @returns The resulting value
+   * @throws MetadataError If the parameters have incompatible types
    */
-  static deepAdd(value: any, addend: any): any {
-    if (!defined(addend)) {
-      return value;
+  private static deepAddInternal<T extends NumberND>(value: T, addend: T): T {
+    if (Array.isArray(value) && Array.isArray(addend)) {
+      if (value.length != addend.length) {
+        throw new MetadataError(
+          `Values ${value} and ${addend} have different lengths`
+        );
+      }
+      const result = value.slice();
+      for (let i = 0; i < result.length; i++) {
+        result[i] = ArrayValues.deepAddInternal(result[i], addend[i]);
+      }
+      return result as T;
     }
-    if (!Array.isArray(value)) {
-      return value + addend;
+    if (typeof value === "number" && typeof addend === "number") {
+      return (value + addend) as T;
     }
-    const a = addend as any;
-    for (let i = 0; i < value.length; i++) {
-      value[i] = ArrayValues.deepAdd(value[i], a[i]);
-    }
-    return value;
+    throw new MetadataError(
+      `Values ${value} and ${addend} have invalid ` +
+        `types ${typeof value} and ${typeof addend}`
+    );
   }
 
   /**
    * Computes the minimum of the given values.
    *
-   * This considers the case that the values are numbers or
-   * (potentially multi-dimensional) arrays of numbers,
-   * and computes the component-wise minimum.
+   * For arrays, it computes the component-wise minimum.
    *
    * @param a - The first value
-   * @param b - THe second value
+   * @param b - The second value
    * @returns The mimimum value
+   * @throws MetadataError If the parameters have incompatible types
    */
   static deepMin(a: any, b: any): any {
+    return ArrayValues.deepMinInternal(a, b);
+  }
+
+  /**
+   * Computes the minimum of the given values.
+   *
+   * For arrays, it computes the component-wise minimum.
+   *
+   * @param a - The first value
+   * @param b - The second value
+   * @returns The mimimum value
+   * @throws MetadataError If the parameters have incompatible types
+   */
+  private static deepMinInternal<T extends NumericND>(a: T, b: T): T {
     if (Array.isArray(a) && Array.isArray(b)) {
+      if (a.length != b.length) {
+        throw new MetadataError(`Values ${a} and ${b} have different lengths`);
+      }
       const result = a.slice();
       for (let i = 0; i < a.length; ++i) {
-        result[i] = ArrayValues.deepMin(a[i], b[i]);
+        result[i] = ArrayValues.deepMinInternal(a[i], b[i]);
       }
-      return result;
+      return result as T;
     }
-    return Math.min(a, b);
+    if (ArrayValues.isNumericScalar(a) && ArrayValues.isNumericScalar(b)) {
+      return a < b ? a : b;
+    }
+    throw new MetadataError(
+      `Values ${a} and ${b} have invalid ` + `types ${typeof a} and ${typeof b}`
+    );
   }
 
   /**
    * Computes the maximum of the given values.
    *
-   * This considers the case that the values are numbers or
-   * (potentially multi-dimensional) arrays of numbers,
-   * and computes the component-wise maximum.
+   * For arrays, it computes the component-wise maximum.
    *
    * @param a - The first value
-   * @param b - THe second value
+   * @param b - The second value
    * @returns The maximum value
+   * @throws MetadataError If the parameters have incompatible types
    */
   static deepMax(a: any, b: any): any {
+    return ArrayValues.deepMaxInternal(a, b);
+  }
+
+  /**
+   * Computes the maximum of the given values.
+   *
+   * For arrays, it computes the component-wise maximum.
+   *
+   * @param a - The first value
+   * @param b - The second value
+   * @returns The maximum value
+   * @throws MetadataError If the parameters have incompatible types
+   */
+  private static deepMaxInternal<T extends NumericND>(a: T, b: T): T {
     if (Array.isArray(a) && Array.isArray(b)) {
       const result = a.slice();
       for (let i = 0; i < a.length; ++i) {
-        result[i] = ArrayValues.deepMax(a[i], b[i]);
+        result[i] = ArrayValues.deepMaxInternal(a[i], b[i]);
       }
-      return result;
+      return result as T;
     }
-    return Math.max(a, b);
-  }
-
-  /**
-   * Returns whether the given values are equal up to the
-   * give relative epsilon.
-   *
-   * This considers the case that the values are numbers or
-   * (potentially multi-dimensional) arrays of numbers.
-   *
-   * @param a - The first element
-   * @param b - The second element
-   * @param epsilon - A relative epsilon
-   * @returns Whether the objects are equal
-   */
-  static deepEqualsEpsilon(a: any, b: any, epsilon: number): boolean {
-    if (Array.isArray(a) && Array.isArray(b)) {
-      if (a.length !== b.length) {
-        return false;
-      }
-      for (let i = 0; i < a.length; ++i) {
-        if (!ArrayValues.deepEqualsEpsilon(a[i], b[i], epsilon)) {
-          return false;
-        }
-      }
-      return true;
+    if (ArrayValues.isNumericScalar(a) && ArrayValues.isNumericScalar(b)) {
+      return a > b ? a : b;
     }
-    return ArrayValues.equalsEpsilon(a, b, epsilon);
-  }
-
-  /**
-   * From CesiumJS:
-   *
-   * Returns whether two numbers are equal, up to a certain epsilon
-   *
-   * @param left - The first value
-   * @param right - The second value
-   * @param relativeEpsilon - The maximum inclusive delta for the relative tolerance test.
-   * @param absoluteEpsilon - The maximum inclusive delta for the absolute tolerance test.
-   * @returns Whether the values are equal within the epsilon
-   */
-  private static equalsEpsilon(
-    left: number,
-    right: number,
-    relativeEpsilon: number,
-    absoluteEpsilon?: number
-  ) {
-    relativeEpsilon = defaultValue(relativeEpsilon, 0.0);
-    absoluteEpsilon = defaultValue(absoluteEpsilon, relativeEpsilon);
-    const absDiff = Math.abs(left - right);
-    return (
-      absDiff <= absoluteEpsilon ||
-      absDiff <= relativeEpsilon * Math.max(Math.abs(left), Math.abs(right))
+    throw new MetadataError(
+      `Values ${a} and ${b} have invalid ` + `types ${typeof a} and ${typeof b}`
     );
   }
 
   /**
    * Checks whether two values are equal.
    *
-   * This considers the case that the values are numbers or
-   * (potentially multi-dimensional) arrays of numbers.
+   * This is only supposed to be used for scalars (number or bigint)
+   * or (potentially multi-dimensional) arrays of scalars.
    *
    * @param a - The first value
    * @param b - The second value
    * @returns Whether the values are equal
    */
-  static deepEquals(a: any, b: any) {
+  static deepEquals(a: any, b: any): boolean {
+    return ArrayValues.deepEqualsInternal(a, b);
+  }
+
+  /**
+   * Checks whether two values are equal.
+   *
+   * @param a - The first value
+   * @param b - The second value
+   * @returns Whether the values are equal
+   */
+  private static deepEqualsInternal<T extends NumericND>(a: T, b: T): boolean {
     if (Array.isArray(a) && Array.isArray(b)) {
       if (a.length !== b.length) {
         return false;
       }
       for (let i = 0; i < a.length; i++) {
-        if (!ArrayValues.deepEquals(a[i], b[i])) {
+        if (!ArrayValues.deepEqualsInternal(a[i], b[i])) {
           return false;
         }
       }
       return true;
     }
-    return a === b;
+    // Do a loose comparison, for the case of mixing bigint and number:
+    return a == b;
   }
 
   /**
    * Returns a deep clone of the given value.
    *
-   * This considers the case that the values are (potentially
-   * multi-dimensional) arrays. Non-array values (including
-   * objects!) will be returned directly.
+   * When the value is an array, then its elements are
+   * deep-cloned. Otherwise, the value itself is returned.
    *
    * @param value - The input value
    * @returns The result value
@@ -223,22 +294,43 @@ export class ArrayValues {
   /**
    * Returns whether one value is less than another.
    *
-   * This considers the case that the values are numbers or
-   * (potentially multi-dimensional) arrays of numbers.
-   *
-   * It returns whether the first number is smaller than
-   * the second number. For arrays, it recursively checks
+   * It returns whether the first value is smaller than
+   * the second value. For arrays, it recursively checks
    * whether ANY element of the first array is smaller
-   * than the corresponding element of the secon array.
+   * than the corresponding element of the second array.
    *
    * @param a - The first value
    * @param b - The second value
    * @returns Whether the first value is less than the second
+   * @throws MetadataError If the parameters have incompatible types
    */
   static anyDeepLessThan(a: any, b: any): boolean {
+    return ArrayValues.anyDeepLessThanInternal(a, b);
+  }
+
+  /**
+   * Returns whether one value is less than another.
+   *
+   * It returns whether the first value is smaller than
+   * the second value. For arrays, it recursively checks
+   * whether ANY element of the first array is smaller
+   * than the corresponding element of the second array.
+   *
+   * @param a - The first value
+   * @param b - The second value
+   * @returns Whether the first value is less than the second
+   * @throws MetadataError If the parameters have incompatible types
+   */
+  private static anyDeepLessThanInternal<T extends NumericND>(
+    a: T,
+    b: T
+  ): boolean {
     if (Array.isArray(a) && Array.isArray(b)) {
+      if (a.length != b.length) {
+        throw new MetadataError(`Values ${a} and ${b} have different lengths`);
+      }
       for (let i = 0; i < a.length; ++i) {
-        if (ArrayValues.anyDeepLessThan(a[i], b[i])) {
+        if (ArrayValues.anyDeepLessThanInternal(a[i], b[i])) {
           return true;
         }
       }
@@ -246,25 +338,47 @@ export class ArrayValues {
     }
     return a < b;
   }
+
   /**
    * Returns whether one value is greater than another.
    *
-   * This considers the case that the values are numbers or
-   * (potentially multi-dimensional) arrays of numbers.
-   *
-   * It returns whether the first number is greater than
-   * the second number. For arrays, it recursively checks
+   * It returns whether the first value is greater than
+   * the second value. For arrays, it recursively checks
    * whether ANY element of the first array is greater
-   * than the corresponding element of the secon array.
+   * than the corresponding element of the second array.
    *
    * @param a - The first value
    * @param b - The second value
    * @returns Whether the first value is greater than the second
+   * @throws MetadataError If the parameters have incompatible types
    */
   static anyDeepGreaterThan(a: any, b: any): boolean {
+    return ArrayValues.anyDeepGreaterThanInternal(a, b);
+  }
+
+  /**
+   * Returns whether one value is greater than another.
+   *
+   * It returns whether the first value is greater than
+   * the second value. For arrays, it recursively checks
+   * whether ANY element of the first array is greater
+   * than the corresponding element of the second array.
+   *
+   * @param a - The first value
+   * @param b - The second value
+   * @returns Whether the first value is greater than the second
+   * @throws MetadataError If the parameters have incompatible types
+   */
+  private static anyDeepGreaterThanInternal<T extends NumericND>(
+    a: T,
+    b: T
+  ): boolean {
     if (Array.isArray(a) && Array.isArray(b)) {
+      if (a.length != b.length) {
+        throw new MetadataError(`Values ${a} and ${b} have different lengths`);
+      }
       for (let i = 0; i < a.length; ++i) {
-        if (ArrayValues.anyDeepGreaterThan(a[i], b[i])) {
+        if (ArrayValues.anyDeepGreaterThanInternal(a[i], b[i])) {
           return true;
         }
       }

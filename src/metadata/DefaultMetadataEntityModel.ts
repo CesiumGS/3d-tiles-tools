@@ -43,7 +43,9 @@ export class DefaultMetadataEntityModel implements MetadataEntityModel {
       );
     }
     const value = this._json[propertyId];
-    return MetadataValues.processValue(property, undefined, undefined, value);
+    const offset = this._json.offset;
+    const scale = this._json.scale;
+    return MetadataValues.processValue(property, offset, scale, value);
   }
 
   /** {@inheritDoc MetadataEntityModel.getPropertyValueBySemantic} */
