@@ -28,6 +28,6 @@
  * @returns `true` if the value is not `undefined` and not `null`
  * @internal
  */
-export function defined<T>(value: any): value is NonNullable<T> {
+export function defined<T>(value: T): value is NonNullable<T> {
   return value !== undefined && value !== null;
 }
