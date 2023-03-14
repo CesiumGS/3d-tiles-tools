@@ -1,5 +1,10 @@
 import { OctreeCoordinates } from "./OctreeCoordinates";
 
+/**
+ * Methods related to octrees
+ * 
+ * @internal
+ */
 export class Octrees {
   /**
    * Computes the number of nodes of an octree with the given number of

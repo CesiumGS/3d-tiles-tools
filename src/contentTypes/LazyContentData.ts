@@ -79,7 +79,7 @@ export class LazyContentData implements ContentData {
    * the given resource resolver.
    *
    * @param uri - The URI of the content data
-   * @param resourceResolver The `ResourceResolver` that will be
+   * @param resourceResolver - The `ResourceResolver` that will be
    * used for resolving the data from the given URI
    */
   constructor(uri: string, resourceResolver: ResourceResolver) {

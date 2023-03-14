@@ -8,6 +8,8 @@ import { BinaryDataError } from "./BinaryDataError";
 
 /**
  * A class for resolving binary buffer data.
+ *
+ * @internal
  */
 export class BinaryBufferDataResolver {
   /**

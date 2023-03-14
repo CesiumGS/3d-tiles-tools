@@ -7,6 +7,8 @@ import { ClassProperty } from "../structure/Metadata/ClassProperty";
 
 /**
  * Utility methods related to `ClassProperty` objects
+ * 
+ * @internal
  */
 export class ClassProperties {
   /**

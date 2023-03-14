@@ -25,6 +25,8 @@ import { SubtreeMetadataModels } from "./SubtreeMetadataModels";
  * The methods will resolve the data for a subtree, based on the template
  * URI from the implicit tiling and the root coordinates of the subtree,
  * and offer this information as `SubtreeModel` objects.
+ * 
+ * @internal
  */
 export class SubtreeModels {
   /**
@@ -135,8 +137,8 @@ export class SubtreeModels {
    * Creates the `SubtreeModel` from the given binary subtree data
    *
    * @param binarySubtreeData - The binary subtree data
-   * @param implicitTiling The `TileImplicitTiling`
-   * @param schema The optional metadata schema
+   * @param implicitTiling - The `TileImplicitTiling`
+   * @param schema - The optional metadata schema
    * @returns The `SubtreeModel`
    * @throws ImplicitTilingError If the input was structurally invalid
    */

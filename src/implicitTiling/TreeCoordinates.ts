@@ -1,5 +1,7 @@
 /**
  * An interface for coordinates within a tree structure.
+ * 
+ * @internal
  */
 export interface TreeCoordinates {
   /**

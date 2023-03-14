@@ -1,5 +1,7 @@
 /**
  * An error that indicates that binary data was structurally invalid.
+ *
+ * @internal
  */
 export class BinaryDataError extends Error {
   constructor(message: string) {

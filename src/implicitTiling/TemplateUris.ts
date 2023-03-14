@@ -3,6 +3,8 @@ import { QuadtreeCoordinates } from "./QuadtreeCoordinates";
 
 /**
  * Method related to template URIs for implicit tiling.
+ * 
+ * @internal
  */
 export class TemplateUris {
   /**

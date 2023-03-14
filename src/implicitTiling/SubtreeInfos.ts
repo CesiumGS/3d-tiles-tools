@@ -10,6 +10,8 @@ import { TileImplicitTiling } from "../structure/TileImplicitTiling";
 
 /**
  * Methods to create `SubtreeInfo` instances.
+ * 
+ * @internal
  */
 export class SubtreeInfos {
   /**

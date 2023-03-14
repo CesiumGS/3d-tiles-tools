@@ -6,6 +6,8 @@ import { AvailabilityInfo } from "./AvailabilityInfo";
  *
  * It offers the availability information for tiles, child
  * subtrees, and contents, as `AvailabilityInfo` objects.
+ * 
+ * @internal
  */
 export interface SubtreeInfo {
   /**

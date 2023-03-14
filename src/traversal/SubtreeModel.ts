@@ -3,6 +3,8 @@ import { SubtreeMetadataModel } from "./SubtreeMetadataModel";
 
 /**
  * An interface that summarizes the information for a subtree.
+ * 
+ * @internal
  */
 export interface SubtreeModel {
   /**

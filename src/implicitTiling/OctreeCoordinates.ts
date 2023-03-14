@@ -4,6 +4,8 @@ import { TreeCoordinates } from "./TreeCoordinates";
 
 /**
  * An implementation of `TreeCoordinates` for octrees
+ * 
+ * @internal
  */
 export class OctreeCoordinates implements TreeCoordinates {
   private readonly _level: number;

@@ -2,6 +2,8 @@ import { QuadtreeCoordinates } from "./QuadtreeCoordinates";
 
 /**
  * Methods related to quadtrees.
+ * 
+ * @internal
  */
 export class Quadtrees {
   /**

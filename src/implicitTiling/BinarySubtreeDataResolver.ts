@@ -110,7 +110,7 @@ export class BinarySubtreeDataResolver {
    *
    * @param subtree - The `Subtree`
    * @param binaryBuffer - The binary buffer of the subtree
-   * @param resourceResolver The resource resolver
+   * @param resourceResolver - The resource resolver
    * @returns A promise to the resolved binary subtree data
    */
   static async resolveInternal(

@@ -198,7 +198,7 @@ export class ExplicitTraversedTile implements TraversedTile {
     return finalContents;
   }
 
-  /** {@inheritDoc TraversedTile.getSubtreeUri} - PRELIMINARY */
+  /** {@inheritDoc TraversedTile.getSubtreeUri} */
   getSubtreeUri(): string | undefined {
     const implicitTiling = this._tile.implicitTiling;
     if (!implicitTiling) {
@@ -214,17 +214,17 @@ export class ExplicitTraversedTile implements TraversedTile {
     return subtreeUri;
   }
 
-  /** {@inheritDoc TraversedTile.getImplicitTiling} - PRELIMINARY */
+  /** {@inheritDoc TraversedTile.getImplicitTiling} */
   getImplicitTiling(): TileImplicitTiling | undefined {
     return this._tile.implicitTiling;
   }
 
-  /** {@inheritDoc TraversedTile.getMetadata} - PRELIMINARY */
+  /** {@inheritDoc TraversedTile.getMetadata} */
   getMetadata(): MetadataEntity | undefined {
     return this._tile.metadata;
   }
 
-  /** {@inheritDoc TraversedTile.resolveUri} - PRELIMINARY */
+  /** {@inheritDoc TraversedTile.resolveUri} */
   resolveUri(uri: string): string {
     return this._resourceResolver.resolveUri(uri);
   }
