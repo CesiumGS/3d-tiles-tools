@@ -4,7 +4,6 @@ import { defined } from "./defined";
 
 import { DataError } from "./DataError";
 
-
 /**
  * Methods related to buffers.
  *
@@ -53,21 +52,45 @@ export class Buffers {
   }
 
   /**
-   * Obtains the magic header from the given buffer.
+   * Obtains the magic header bytes from the given buffer.
+   *
+   * This returns up to `byteLength` bytes of the given buffer,
+   * starting at the given byte offset. If the buffer length
+   * is too small, then a shorter buffer may be returned.
+   *
+   * @param buffer - The buffer
+   * @param byteOffset - The byte offset, usually 0
+   * @param byteLength - The byte length
+   * @returns The magic header.
+   */
+  static getMagicBytes(
+    buffer: Buffer,
+    byteOffset: number,
+    byteLength: number
+  ): Buffer {
+    const start = Math.min(buffer.length, byteOffset);
+    const end = Math.min(buffer.length, start + byteLength);
+    return buffer.subarray(start, end);
+  }
+
+  /**
+   * Obtains the magic header from the given buffer, interpreted
+   * as an ASCII string
    *
    * This returns up to 4 bytes of the given buffer, starting at
-   * the given byte offset, converted to a string. If the buffer
-   * length is too small, then a shorter string may be returned.
+   * the given byte offset, converted to an ASCII string. If the
+   * buffer length is too small, then a shorter string may be
+   * returned.
    *
    * @param buffer - The buffer
    * @param byteOffset - The optional byte offset, defaulting to 0
    * @returns The magic header.
    */
-  static getMagic(buffer: Buffer, byteOffset?: number): string {
+  static getMagicString(buffer: Buffer, byteOffset?: number): string {
     const magicLength = 4;
     const start = Math.min(buffer.length, byteOffset ?? 0);
     const end = Math.min(buffer.length, start + magicLength);
-    return buffer.toString("utf8", start, end);
+    return buffer.toString("ascii", start, end);
   }
 
   /**
@@ -135,7 +158,6 @@ export class Buffers {
       const message = `Could not parse JSON from buffer: ${e}`;
       throw new DataError(message);
     }
-
   }
 
   /**

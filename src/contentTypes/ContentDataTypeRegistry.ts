@@ -45,42 +45,57 @@ export class ContentDataTypeRegistry {
     // In the future, there might be a mechanism for 'overriding' a
     // previously registered type.
     ContentDataTypeRegistry.register(
-      ContentDataTypeRegistry.byMagic("glTF"),
+      ContentDataTypeRegistry.byMagicString("glTF"),
       ContentDataTypes.CONTENT_TYPE_GLB
     );
 
     ContentDataTypeRegistry.register(
-      ContentDataTypeRegistry.byMagic("b3dm"),
+      ContentDataTypeRegistry.byMagicString("b3dm"),
       ContentDataTypes.CONTENT_TYPE_B3DM
     );
 
     ContentDataTypeRegistry.register(
-      ContentDataTypeRegistry.byMagic("i3dm"),
+      ContentDataTypeRegistry.byMagicString("i3dm"),
       ContentDataTypes.CONTENT_TYPE_I3DM
     );
 
     ContentDataTypeRegistry.register(
-      ContentDataTypeRegistry.byMagic("cmpt"),
+      ContentDataTypeRegistry.byMagicString("cmpt"),
       ContentDataTypes.CONTENT_TYPE_CMPT
     );
 
     ContentDataTypeRegistry.register(
-      ContentDataTypeRegistry.byMagic("pnts"),
+      ContentDataTypeRegistry.byMagicString("pnts"),
       ContentDataTypes.CONTENT_TYPE_PNTS
     );
 
     ContentDataTypeRegistry.register(
-      ContentDataTypeRegistry.byMagic("geom"),
+      ContentDataTypeRegistry.byMagicString("geom"),
       ContentDataTypes.CONTENT_TYPE_GEOM
     );
+
     ContentDataTypeRegistry.register(
-      ContentDataTypeRegistry.byMagic("vctr"),
+      ContentDataTypeRegistry.byMagicString("vctr"),
       ContentDataTypes.CONTENT_TYPE_VCTR
     );
+
     ContentDataTypeRegistry.register(
-      ContentDataTypeRegistry.byMagic("subt"),
+      ContentDataTypeRegistry.byMagicString("subt"),
       ContentDataTypes.CONTENT_TYPE_SUBT
     );
+
+    const pngMagicHeader = [0x89, 0x50, 0x4e, 0x47];
+    ContentDataTypeRegistry.register(
+      ContentDataTypeRegistry.byMagicBytes(pngMagicHeader),
+      ContentDataTypes.CONTENT_TYPE_PNG
+    );
+
+    const jpegMagicHeader = [0xff, 0xd8, 0xff];
+    ContentDataTypeRegistry.register(
+      ContentDataTypeRegistry.byMagicBytes(jpegMagicHeader),
+      ContentDataTypes.CONTENT_TYPE_JPEG
+    );
+
     ContentDataTypeRegistry.register(
       ContentDataTypeRegistry.byExtension(".geojson"),
       ContentDataTypes.CONTENT_TYPE_GEOJSON
@@ -131,16 +146,42 @@ export class ContentDataTypeRegistry {
 
   /**
    * Creates a predicate that checks whether the magic header of
-   * a ContentData matches the given magic header string.
+   * a ContentData (interpreted as ASCII characters) starts with
+   * the given magic header string.
    *
    * @param magic - The magic header string
    * @returns The predicate
    */
-  private static byMagic(
+  private static byMagicString(
     magic: string
   ): (contentData: ContentData) => Promise<boolean> {
-    const predicate = async (contentData: ContentData) =>
-      (await contentData.getMagic()) === magic;
+    const predicate = async (contentData: ContentData) => {
+      const contentMagic = await contentData.getMagic();
+      const contentMagicString = contentMagic.toString("ascii");
+      return contentMagicString.startsWith(magic);
+    };
+    return predicate;
+  }
+
+  /**
+   * Creates a predicate that checks whether the magic header of
+   * a ContentData starts with the given bytes
+   *
+   * @param magic - The magic bytes
+   * @returns The predicate
+   */
+  private static byMagicBytes(
+    magic: number[]
+  ): (contentData: ContentData) => Promise<boolean> {
+    const predicate = async (contentData: ContentData) => {
+      const contentMagic = await contentData.getMagic();
+      for (let i = 0; i < magic.length; i++) {
+        if (contentMagic[i] != magic[i]) {
+          return false;
+        }
+      }
+      return true;
+    };
     return predicate;
   }
 

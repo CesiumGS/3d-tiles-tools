@@ -59,6 +59,20 @@ describe("ContentDataTypeRegistry.findContentDataType", function () {
     expect(type).toEqual(ContentDataTypes.CONTENT_TYPE_SUBT);
   });
 
+  it("detects PNG", async function () {
+    const contentUri = "specs/data/contentTypes/content.png";
+    const c = BufferedContentData.create(contentUri);
+    const type = await ContentDataTypeRegistry.findContentDataType(c);
+    expect(type).toEqual(ContentDataTypes.CONTENT_TYPE_PNG);
+  });
+
+  it("detects JPEG", async function () {
+    const contentUri = "specs/data/contentTypes/content.jpg";
+    const c = BufferedContentData.create(contentUri);
+    const type = await ContentDataTypeRegistry.findContentDataType(c);
+    expect(type).toEqual(ContentDataTypes.CONTENT_TYPE_JPEG);
+  });
+
   it("detects GEOJSON", async function () {
     const contentUri = "specs/data/contentTypes/content.geojson";
     const c = BufferedContentData.create(contentUri);

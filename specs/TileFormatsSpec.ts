@@ -271,7 +271,7 @@ describe("TileFormats", function () {
     ]);
     const cmpt = TileFormats.createCompositeTileDataBuffer(cmptTileData);
 
-    const magic = Buffers.getMagic(cmpt);
+    const magic = Buffers.getMagicString(cmpt);
     const version = cmpt.readUInt32LE(4);
     const byteLength = cmpt.readUInt32LE(8);
     const tilesLength = cmpt.readUInt32LE(12);
@@ -288,12 +288,12 @@ describe("TileFormats", function () {
     expect(byteLength).toBe(expectedByteLength);
     expect(tilesLength).toBe(2);
 
-    const b3dmMagic = Buffers.getMagic(cmpt, headerByteLength);
+    const b3dmMagic = Buffers.getMagicString(cmpt, headerByteLength);
     const b3dmByteLength = cmpt.readUInt32LE(headerByteLength + 8);
     expect(b3dmMagic).toBe("b3dm");
     expect(b3dmByteLength % 8 === 0).toBe(true); // b3dm is aligned
 
-    const i3dmMagic = Buffers.getMagic(cmpt, headerByteLength + b3dmByteLength);
+    const i3dmMagic = Buffers.getMagicString(cmpt, headerByteLength + b3dmByteLength);
     const i3dmByteLength = cmpt.readUInt32LE(
       headerByteLength + b3dmByteLength + 8
     );

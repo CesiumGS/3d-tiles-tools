@@ -19,7 +19,7 @@ export class TileFormats {
    * @returns Whether the given buffer contains composite tile data
    */
   static isComposite(buffer: Buffer): boolean {
-    const magic = Buffers.getMagic(buffer);
+    const magic = Buffers.getMagicString(buffer);
     return magic === "cmpt";
   }
 
@@ -37,7 +37,7 @@ export class TileFormats {
    */
   static readCompositeTileData(buffer: Buffer): CompositeTileData {
     // Basic checks for magic number, length and version
-    const magic = Buffers.getMagic(buffer);
+    const magic = Buffers.getMagicString(buffer);
     if (magic !== "cmpt") {
       throw new TileFormatError(`Expected magic "cmpt", but found "${magic}"`);
     }
@@ -106,7 +106,7 @@ export class TileFormats {
    */
   static readTileData(buffer: Buffer): TileData {
     // Basic checks for magic number, length and version
-    const magic = Buffers.getMagic(buffer);
+    const magic = Buffers.getMagicString(buffer);
     if (magic !== "b3dm" && magic !== "pnts" && magic !== "i3dm") {
       throw new TileFormatError(
         `Expected magic "b3dm", "i3dm", or "pnts", but found "${magic}"`
