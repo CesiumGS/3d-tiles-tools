@@ -16,10 +16,7 @@ export class TilesetSourceResourceResolver implements ResourceResolver {
   private readonly _basePath: string;
   private readonly _tilesetSource: TilesetSource;
 
-  constructor(
-    basePath: string,
-    tilesetSource: TilesetSource
-  ) {
+  constructor(basePath: string, tilesetSource: TilesetSource) {
     this._basePath = basePath;
     this._tilesetSource = tilesetSource;
   }

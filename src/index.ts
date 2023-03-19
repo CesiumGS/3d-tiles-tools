@@ -115,4 +115,3 @@ export * from "./traversal/SubtreeModels";
 export * from "./traversal/TilesetTraverser";
 export * from "./traversal/TraversedTile";
 export * from "./traversal/TraversalCallback";
-

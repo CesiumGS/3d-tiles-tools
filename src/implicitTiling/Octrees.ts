@@ -2,7 +2,7 @@ import { OctreeCoordinates } from "./OctreeCoordinates";
 
 /**
  * Methods related to octrees
- * 
+ *
  * @internal
  */
 export class Octrees {

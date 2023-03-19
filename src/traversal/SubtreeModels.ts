@@ -25,7 +25,7 @@ import { SubtreeMetadataModels } from "./SubtreeMetadataModels";
  * The methods will resolve the data for a subtree, based on the template
  * URI from the implicit tiling and the root coordinates of the subtree,
  * and offer this information as `SubtreeModel` objects.
- * 
+ *
  * @internal
  */
 export class SubtreeModels {

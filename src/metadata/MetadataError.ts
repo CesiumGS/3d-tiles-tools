@@ -3,7 +3,7 @@
  *
  * This may be thrown by methods that create the convenience classes
  * for this package, when the given inputs are not valid.
- * 
+ *
  * @internal
  */
 export class MetadataError extends Error {
