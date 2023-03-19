@@ -14,16 +14,13 @@ import { ResourceResolver } from "./ResourceResolver";
  */
 export class TilesetSourceResourceResolver implements ResourceResolver {
   private readonly _basePath: string;
-  private readonly _tilesetSourceFileName: string;
   private readonly _tilesetSource: TilesetSource;
 
   constructor(
     basePath: string,
-    tilesetSourceFileName: string,
     tilesetSource: TilesetSource
   ) {
     this._basePath = basePath;
-    this._tilesetSourceFileName = tilesetSourceFileName;
     this._tilesetSource = tilesetSource;
   }
 
@@ -64,7 +61,6 @@ export class TilesetSourceResourceResolver implements ResourceResolver {
     const resolved = Paths.join(this._basePath, decodeURIComponent(uri));
     const result = new TilesetSourceResourceResolver(
       resolved,
-      this._tilesetSourceFileName,
       this._tilesetSource
     );
     return result;
