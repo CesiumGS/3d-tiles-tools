@@ -2,6 +2,9 @@ import zlib from "zlib";
 
 import { defined } from "./defined";
 
+import { DataError } from "./DataError";
+
+
 /**
  * Methods related to buffers.
  *
@@ -31,11 +34,18 @@ export class Buffers {
    *
    * @param inputBuffer - The input buffer
    * @returns The resulting buffer
+   * @throws DataError If the buffer looked like GZIPped
+   * data, but could not be decompressed.
    */
   static gunzip(inputBuffer: Buffer): Buffer {
     let outputBuffer: Buffer;
     if (Buffers.isGzipped(inputBuffer)) {
-      outputBuffer = zlib.gunzipSync(inputBuffer);
+      try {
+        outputBuffer = zlib.gunzipSync(inputBuffer);
+      } catch (e) {
+        const message = `Could not gunzip buffer: ${e}`;
+        throw new DataError(message);
+      }
     } else {
       outputBuffer = inputBuffer;
     }
@@ -113,13 +123,19 @@ export class Buffers {
    *
    * @param buffer - The buffer
    * @returns The parsed object
-   * @throws Possible errors from `JSON:parse`
+   * @throws DataError If the JSON could not be parsed
    */
   static getJson(buffer: Buffer): any {
     if (buffer.length === 0) {
       return {};
     }
-    return JSON.parse(buffer.toString("utf8"));
+    try {
+      return JSON.parse(buffer.toString("utf8"));
+    } catch (e) {
+      const message = `Could not parse JSON from buffer: ${e}`;
+      throw new DataError(message);
+    }
+
   }
 
   /**
