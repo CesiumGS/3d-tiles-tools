@@ -111,7 +111,7 @@ export class SubtreeModels {
 
     // For SUBT (binary subtree data), create the SubtreeModel
     // from the whole buffer
-    const isSubt = Buffers.getMagic(subtreeData) === "subt";
+    const isSubt = Buffers.getMagicString(subtreeData) === "subt";
     if (isSubt) {
       const binarySubtreeData =
         await BinarySubtreeDataResolver.resolveFromBuffer(
