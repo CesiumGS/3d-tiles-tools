@@ -24,14 +24,14 @@ async function tilesetTraversalDemo(filePath: string) {
   // Traverse the tileset, and pass each tile to
   // the StatsCollector
   console.log("Traversing tileset");
-  const statsCollector = new StatsCollector();
+  const tilesetStatsCollector = new TilesetStatsCollector();
   const depthFirst = false;
   await TilesetTraverser.traverse(
     tileset,
     schema,
     resourceResolver,
     async (traversedTile) => {
-      statsCollector.accept(traversedTile);
+      tilesetStatsCollector.accept(traversedTile);
       return true;
     },
     depthFirst
@@ -40,53 +40,25 @@ async function tilesetTraversalDemo(filePath: string) {
 
   // Print the statistics summary to the console
   console.log("Stats:");
-  const json = statsCollector.createJson();
+  const json = tilesetStatsCollector.createJson();
   const jsonString = JSON.stringify(json, null, 2);
   console.log(jsonString);
 }
 
-// A simple class to collect statistical information about a tileset,
-// from the tiles that are traversed with a TilesetTraverser
+// A simple class to collect statistical information
 class StatsCollector {
-  private totalNumberOfTiles = 0;
-  private totalNumberOfSubtrees = 0;
+  // A mapping from value names to counters
+  private readonly counters: {
+    [key: string]: Counter;
+  } = {};
 
   // A mapping from value names to statistical summaries
   private readonly summaries: {
     [key: string]: Summary;
   } = {};
 
-  // Accept the given tile during traversal, and collect
-  // statistical information
-  accept(traversedTile: TraversedTile) {
-    this.totalNumberOfTiles++;
-
-    // NOTE: This is a means of checking whether a tile
-    // is the root of an implicit tileset. This may be
-    // refactored at some point.
-    if (traversedTile.getImplicitTiling()) {
-      this.totalNumberOfSubtrees++;
-    } else {
-      // Obtain all content URIs, resolve them, and obtain
-      // the sizes of the corresponding files, storing them
-      // in the "tileFileSize" summary
-      const contentUris = traversedTile.getFinalContents().map((c) => c.uri);
-      for (const contentUri of contentUris) {
-        const resolvedContentUri = traversedTile.resolveUri(contentUri);
-        const stats = fs.statSync(resolvedContentUri);
-        const tileFileSizeInBytes = stats.size;
-        this.acceptEntry("tileFileSize", tileFileSizeInBytes);
-      }
-    }
-
-    // Store the geometric error in the "geometricError" summary
-    const finalTile = traversedTile.asFinalTile();
-    const geometricError = finalTile.geometricError;
-    this.acceptEntry("geometricError", geometricError);
-  }
-
   // Add one entry to a summary, creating it when necessary
-  private acceptEntry(name: string, value: number) {
+  acceptEntry(name: string, value: number) {
     let summary = this.summaries[name];
     if (!summary) {
       summary = new Summary();
@@ -95,11 +67,23 @@ class StatsCollector {
     summary.accept(value);
   }
 
+  // Increment a counter, creating it when necessary
+  increment(name: string) {
+    let counter = this.counters[name];
+    if (!counter) {
+      counter = new Counter();
+      this.counters[name] = counter;
+    }
+    counter.increment();
+  }
+
   // Create a short JSON representation of the collected data
   createJson(): any {
     const json: any = {};
-    json.totalNumberOfTiles = this.totalNumberOfTiles;
-    json.totalNumberOfSubtrees = this.totalNumberOfSubtrees;
+    for (const key of Object.keys(this.counters)) {
+      const counter = this.counters[key];
+      json[key] = counter.getCount();
+    }
     for (const key of Object.keys(this.summaries)) {
       const summary = this.summaries[key];
       json[key] = {
@@ -112,6 +96,25 @@ class StatsCollector {
       };
     }
     return json;
+  }
+}
+
+/**
+ * A class that serves as a counter in the `StatsCollector`
+ */
+class Counter {
+  private count: number;
+
+  public constructor() {
+    this.count = 0;
+  }
+
+  increment() {
+    this.count++;
+  }
+
+  getCount() {
+    return this.count;
   }
 }
 
@@ -168,6 +171,40 @@ class Summary {
 
   getStandardDeviation() {
     return Math.sqrt(this.varianceTracker / this.count);
+  }
+}
+
+// A specialization of the `StatsColleror` that collects
+// information about the tiles that are traversed with
+// a TilesetTraverser
+class TilesetStatsCollector extends StatsCollector {
+  // Accept the given tile during traversal, and collect
+  // statistical information
+  accept(traversedTile: TraversedTile) {
+    this.increment("totalNumberOfTiles");
+
+    // NOTE: This is a means of checking whether a tile
+    // is the root of an implicit tileset. This may be
+    // refactored at some point.
+    if (traversedTile.getImplicitTiling()) {
+      this.increment("totalNumberOfSubtres");
+    } else {
+      // Obtain all content URIs, resolve them, and obtain
+      // the sizes of the corresponding files, storing them
+      // in the "tileFileSize" summary
+      const contentUris = traversedTile.getFinalContents().map((c) => c.uri);
+      for (const contentUri of contentUris) {
+        const resolvedContentUri = traversedTile.resolveUri(contentUri);
+        const stats = fs.statSync(resolvedContentUri);
+        const tileFileSizeInBytes = stats.size;
+        this.acceptEntry("tileFileSize", tileFileSizeInBytes);
+      }
+    }
+
+    // Store the geometric error in the "geometricError" summary
+    const finalTile = traversedTile.asFinalTile();
+    const geometricError = finalTile.geometricError;
+    this.acceptEntry("geometricError", geometricError);
   }
 }
 
