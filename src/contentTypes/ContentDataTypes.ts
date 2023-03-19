@@ -15,6 +15,7 @@ export class ContentDataTypes {
   static readonly CONTENT_TYPE_PNTS = "CONTENT_TYPE_PNTS";
   static readonly CONTENT_TYPE_GEOM = "CONTENT_TYPE_GEOM";
   static readonly CONTENT_TYPE_VCTR = "CONTENT_TYPE_VCTR";
+  static readonly CONTENT_TYPE_SUBT = "CONTENT_TYPE_SUBT";
 
   static readonly CONTENT_TYPE_GEOJSON = "CONTENT_TYPE_GEOJSON";
   static readonly CONTENT_TYPE_3TZ = "CONTENT_TYPE_3TZ";

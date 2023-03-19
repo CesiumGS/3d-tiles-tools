@@ -52,6 +52,13 @@ describe("ContentDataTypeRegistry.findContentDataType", function () {
     expect(type).toEqual(ContentDataTypes.CONTENT_TYPE_VCTR);
   });
 
+  it("detects SUBT", async function () {
+    const contentUri = "specs/data/contentTypes/content.subtree";
+    const c = BufferedContentData.create(contentUri);
+    const type = await ContentDataTypeRegistry.findContentDataType(c);
+    expect(type).toEqual(ContentDataTypes.CONTENT_TYPE_SUBT);
+  });
+
   it("detects GEOJSON", async function () {
     const contentUri = "specs/data/contentTypes/content.geojson";
     const c = BufferedContentData.create(contentUri);

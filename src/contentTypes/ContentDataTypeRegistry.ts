@@ -78,6 +78,10 @@ export class ContentDataTypeRegistry {
       ContentDataTypes.CONTENT_TYPE_VCTR
     );
     ContentDataTypeRegistry.register(
+      ContentDataTypeRegistry.byMagic("subt"),
+      ContentDataTypes.CONTENT_TYPE_SUBT
+    );
+    ContentDataTypeRegistry.register(
       ContentDataTypeRegistry.byExtension(".geojson"),
       ContentDataTypes.CONTENT_TYPE_GEOJSON
     );
