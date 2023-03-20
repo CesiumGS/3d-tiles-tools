@@ -73,6 +73,28 @@ export class ExplicitTraversedTile implements TraversedTile {
     this._resourceResolver = resourceResolver;
   }
 
+  /**
+   * Returns the `metadata` from the input JSON that defines the
+   * `MetadataEntity` that is associated with this tile, or 
+   * `undefined` if the input did not contain a metadata entity.
+   * 
+   * @returns The `MetadataEntity` object, or `undefined`
+   */
+  getMetadata(): MetadataEntity | undefined {
+    return this._tile.metadata;
+  }
+
+  /**
+   * Returns the `implicitTiling` from the input JSON that defines the
+   * `TileImplicitTiling` that is associated with this tile, or 
+   * `undefined` if this tile does not define an implicit tiling.
+   * 
+   * @returns The `TileImplicitTiling` object
+   */
+  getImplicitTiling(): TileImplicitTiling | undefined {
+    return this._tile.implicitTiling;
+  }
+
   /** {@inheritDoc TraversedTile.asRawTile} */
   asRawTile(): Tile {
     return this._tile;
@@ -198,6 +220,16 @@ export class ExplicitTraversedTile implements TraversedTile {
     return finalContents;
   }
 
+  /** {@inheritDoc TraversedTile.resolveUri} */
+  resolveUri(uri: string): string {
+    return this._resourceResolver.resolveUri(uri);
+  }
+
+  /** {@inheritDoc TraversedTile.isImplicitTilesetRoot} */
+  isImplicitTilesetRoot() : boolean {
+    return this._tile.implicitTiling !== undefined;
+  }
+
   /** {@inheritDoc TraversedTile.getSubtreeUri} */
   getSubtreeUri(): string | undefined {
     const implicitTiling = this._tile.implicitTiling;
@@ -212,21 +244,6 @@ export class ExplicitTraversedTile implements TraversedTile {
       rootCoordinates
     );
     return subtreeUri;
-  }
-
-  /** {@inheritDoc TraversedTile.getImplicitTiling} */
-  getImplicitTiling(): TileImplicitTiling | undefined {
-    return this._tile.implicitTiling;
-  }
-
-  /** {@inheritDoc TraversedTile.getMetadata} */
-  getMetadata(): MetadataEntity | undefined {
-    return this._tile.metadata;
-  }
-
-  /** {@inheritDoc TraversedTile.resolveUri} */
-  resolveUri(uri: string): string {
-    return this._resourceResolver.resolveUri(uri);
   }
 
   // TODO For debugging

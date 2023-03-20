@@ -183,12 +183,11 @@ class TilesetStatsCollector extends StatsCollector {
   accept(traversedTile: TraversedTile) {
     this.increment("totalNumberOfTiles");
 
-    // NOTE: This is a means of checking whether a tile
-    // is the root of an implicit tileset. This may be
-    // refactored at some point.
-    if (traversedTile.getImplicitTiling()) {
+    const subtreeUri = traversedTile.getSubtreeUri();
+    if (subtreeUri !== undefined) {
       this.increment("totalNumberOfSubtres");
-    } else {
+    }
+    if (!traversedTile.isImplicitTilesetRoot()) {
       // Obtain all content URIs, resolve them, and obtain
       // the sizes of the corresponding files, storing them
       // in the "tileFileSize" summary

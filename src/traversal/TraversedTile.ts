@@ -1,7 +1,5 @@
 import { Tile } from "../structure/Tile";
 import { Content } from "../structure/Content";
-import { MetadataEntity } from "../structure/MetadataEntity";
-import { TileImplicitTiling } from "../structure/TileImplicitTiling";
 
 /**
  * An interface that summarizes context information for
@@ -15,15 +13,13 @@ export interface TraversedTile {
    * of the tile. This is just a plain data structure corresponding
    * to the tile.
    *
-   * The returned object reflects the "raw" state of the tile that
+   * The returned object reflects the "raw" state of the object that
    * is either contained in the tileset JSON, or derived from the
-   * subdivision rules of implicit tiles.
-   *
-   * Specifically: This is the state BEFORE any semantic-based
-   * overrides have been applied. When there is metadata
-   * associated with the tile, and this metadata has semantics
-   * that override certain tile properties, then these overrides
-   * are NOT reflected in the returned tile.
+   * subdivision rules of implicit tiles. Specifically: This is the 
+   * state BEFORE any semantic-based overrides have been applied. 
+   * When there is metadata associated with the object, and this 
+   * metadata has semantics that override certain properties, then 
+   * these overrides are NOT reflected in the returned object.
    *
    * In order to obtain a tile where the semantic-based overrides
    * are applied, `asFinalTile` can be used.
@@ -109,21 +105,74 @@ export interface TraversedTile {
    * content), or a single-element array (when the tile has a
    * single `tile.content` object), or an array that resembles
    * the `tile.contents` array.
+   * 
+   * Note that the returned content objects may contain
+   * template URIs for tiles that are roots of implicit
+   * tilesets. Use `isImplicitTilesetRoot` to detect 
+   * whether this tile is the root of an implicit tileset,
+   * and the content URIs may be template URIs.
+   * 
+   * The returned content objects reflect the state BEFORE
+   * any semantic-based overrides have been applied. 
+   * See `asRawTile` for details about the semantic-based
+   * overrides.
    *
    * @returns The contents
    */
   getRawContents(): Content[];
 
-  // TODO Document or improve this - the same difference as between
-  // asRawTile and asFinalTile
+  /**
+   * Returns the `Content` objects of the tile.
+   *
+   * The returned objects correspond to the ones returned by
+   * `getRawContents`, but in a state where semantic-based 
+   * overrides have been applied. 
+   * 
+   * See `asRawTile` and `asFinalTile` for details about the 
+   * semantic-based overrides.
+   *
+   * @returns The contents
+   */
   getFinalContents(): Content[];
 
-  // TODO Some information has to be exposed here solely
-  // for the validation. This should preferably not be
-  // visible in this interface. The traversal might be
-  // refactored to hide this information here.
-  getSubtreeUri(): string | undefined;
-  getImplicitTiling(): TileImplicitTiling | undefined;
-  getMetadata(): MetadataEntity | undefined;
+  /**
+   * Resolves the given URI against the context in which this
+   * tile appears.
+   * 
+   * This is primarily intended for (relative) content URIs. 
+   * It will usually just resolve the given URI against the 
+   * path that contained the tileset, resulting in an absolute
+   * URI that can be used to access the content.
+   * 
+   * @param uri - The (content) uri
+   * @returns The resolved URI
+   */
   resolveUri(uri: string): string;
+
+  /**
+   * Returns whether this tile is the root of an implicit tileset.
+   * 
+   * This is `true` for tiles that appear in the explicit
+   * tile hierarchy of a tileset JSON, and which have a
+   * `tile.implicitTiling` property.
+   * 
+   * For these tiles, the `content.uri` properties do not define
+   * actual URIs, but *template* URIs.
+   * 
+   * @returns Whether this is an implicit tileset root
+   */
+  isImplicitTilesetRoot() : boolean;
+
+  /**
+   * Returns the URI of the subtree file for this tile, or 
+   * `undefined` if this is not the root of a subtree.
+   * 
+   * If this tile is the root of a subtree in an implicit tileset, then 
+   * the returned URI will contain the actual subtree URI that was 
+   * created by substituting the coordinates of this tile into the
+   * `implicitTiling.subtrees.uri` template URI. 
+   * 
+   * @returns The subtree URI, or `undefined` 
+   */
+  getSubtreeUri(): string | undefined;
 }

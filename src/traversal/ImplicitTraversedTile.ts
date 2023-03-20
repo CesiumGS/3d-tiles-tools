@@ -377,6 +377,16 @@ export class ImplicitTraversedTile implements TraversedTile {
     return contents;
   }
 
+  /** {@inheritDoc TraversedTile.resolveUri} */
+  resolveUri(uri: string): string {
+    return this._resourceResolver.resolveUri(uri);
+  }
+
+  /** {@inheritDoc TraversedTile.isImplicitTilesetRoot} */
+  isImplicitTilesetRoot() : boolean {
+    return false;
+  }
+
   /** {@inheritDoc TraversedTile.getSubtreeUri} */
   getSubtreeUri(): string | undefined {
     const localCoordinate = this._localCoordinate;
@@ -391,24 +401,6 @@ export class ImplicitTraversedTile implements TraversedTile {
       return subtreeUri;
     }
     return undefined;
-  }
-
-  /** {@inheritDoc TraversedTile.getImplicitTiling} */
-  getImplicitTiling(): TileImplicitTiling | undefined {
-    const localCoordinate = this._localCoordinate;
-    if (localCoordinate.level === 0) {
-      return this._implicitTiling;
-    }
-  }
-
-  /** {@inheritDoc TraversedTile.getMetadata} */
-  getMetadata(): MetadataEntity | undefined {
-    return undefined;
-  }
-
-  /** {@inheritDoc TraversedTile.resolveUri} */
-  resolveUri(uri: string): string {
-    return this._resourceResolver.resolveUri(uri);
   }
 
   // TODO For debugging
