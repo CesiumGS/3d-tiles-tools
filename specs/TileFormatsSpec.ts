@@ -293,7 +293,10 @@ describe("TileFormats", function () {
     expect(b3dmMagic).toBe("b3dm");
     expect(b3dmByteLength % 8 === 0).toBe(true); // b3dm is aligned
 
-    const i3dmMagic = Buffers.getMagicString(cmpt, headerByteLength + b3dmByteLength);
+    const i3dmMagic = Buffers.getMagicString(
+      cmpt,
+      headerByteLength + b3dmByteLength
+    );
     const i3dmByteLength = cmpt.readUInt32LE(
       headerByteLength + b3dmByteLength + 8
     );

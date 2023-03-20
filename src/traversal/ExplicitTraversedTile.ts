@@ -75,9 +75,9 @@ export class ExplicitTraversedTile implements TraversedTile {
 
   /**
    * Returns the `metadata` from the input JSON that defines the
-   * `MetadataEntity` that is associated with this tile, or 
+   * `MetadataEntity` that is associated with this tile, or
    * `undefined` if the input did not contain a metadata entity.
-   * 
+   *
    * @returns The `MetadataEntity` object, or `undefined`
    */
   getMetadata(): MetadataEntity | undefined {
@@ -86,9 +86,9 @@ export class ExplicitTraversedTile implements TraversedTile {
 
   /**
    * Returns the `implicitTiling` from the input JSON that defines the
-   * `TileImplicitTiling` that is associated with this tile, or 
+   * `TileImplicitTiling` that is associated with this tile, or
    * `undefined` if this tile does not define an implicit tiling.
-   * 
+   *
    * @returns The `TileImplicitTiling` object
    */
   getImplicitTiling(): TileImplicitTiling | undefined {
@@ -226,7 +226,7 @@ export class ExplicitTraversedTile implements TraversedTile {
   }
 
   /** {@inheritDoc TraversedTile.isImplicitTilesetRoot} */
-  isImplicitTilesetRoot() : boolean {
+  isImplicitTilesetRoot(): boolean {
     return this._tile.implicitTiling !== undefined;
   }
 

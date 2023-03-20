@@ -15,10 +15,10 @@ export interface TraversedTile {
    *
    * The returned object reflects the "raw" state of the object that
    * is either contained in the tileset JSON, or derived from the
-   * subdivision rules of implicit tiles. Specifically: This is the 
-   * state BEFORE any semantic-based overrides have been applied. 
-   * When there is metadata associated with the object, and this 
-   * metadata has semantics that override certain properties, then 
+   * subdivision rules of implicit tiles. Specifically: This is the
+   * state BEFORE any semantic-based overrides have been applied.
+   * When there is metadata associated with the object, and this
+   * metadata has semantics that override certain properties, then
    * these overrides are NOT reflected in the returned object.
    *
    * In order to obtain a tile where the semantic-based overrides
@@ -105,15 +105,15 @@ export interface TraversedTile {
    * content), or a single-element array (when the tile has a
    * single `tile.content` object), or an array that resembles
    * the `tile.contents` array.
-   * 
+   *
    * Note that the returned content objects may contain
    * template URIs for tiles that are roots of implicit
-   * tilesets. Use `isImplicitTilesetRoot` to detect 
+   * tilesets. Use `isImplicitTilesetRoot` to detect
    * whether this tile is the root of an implicit tileset,
    * and the content URIs may be template URIs.
-   * 
+   *
    * The returned content objects reflect the state BEFORE
-   * any semantic-based overrides have been applied. 
+   * any semantic-based overrides have been applied.
    * See `asRawTile` for details about the semantic-based
    * overrides.
    *
@@ -125,10 +125,10 @@ export interface TraversedTile {
    * Returns the `Content` objects of the tile.
    *
    * The returned objects correspond to the ones returned by
-   * `getRawContents`, but in a state where semantic-based 
-   * overrides have been applied. 
-   * 
-   * See `asRawTile` and `asFinalTile` for details about the 
+   * `getRawContents`, but in a state where semantic-based
+   * overrides have been applied.
+   *
+   * See `asRawTile` and `asFinalTile` for details about the
    * semantic-based overrides.
    *
    * @returns The contents
@@ -138,12 +138,12 @@ export interface TraversedTile {
   /**
    * Resolves the given URI against the context in which this
    * tile appears.
-   * 
-   * This is primarily intended for (relative) content URIs. 
-   * It will usually just resolve the given URI against the 
+   *
+   * This is primarily intended for (relative) content URIs.
+   * It will usually just resolve the given URI against the
    * path that contained the tileset, resulting in an absolute
    * URI that can be used to access the content.
-   * 
+   *
    * @param uri - The (content) uri
    * @returns The resolved URI
    */
@@ -151,28 +151,28 @@ export interface TraversedTile {
 
   /**
    * Returns whether this tile is the root of an implicit tileset.
-   * 
+   *
    * This is `true` for tiles that appear in the explicit
    * tile hierarchy of a tileset JSON, and which have a
    * `tile.implicitTiling` property.
-   * 
+   *
    * For these tiles, the `content.uri` properties do not define
    * actual URIs, but *template* URIs.
-   * 
+   *
    * @returns Whether this is an implicit tileset root
    */
-  isImplicitTilesetRoot() : boolean;
+  isImplicitTilesetRoot(): boolean;
 
   /**
-   * Returns the URI of the subtree file for this tile, or 
+   * Returns the URI of the subtree file for this tile, or
    * `undefined` if this is not the root of a subtree.
-   * 
-   * If this tile is the root of a subtree in an implicit tileset, then 
-   * the returned URI will contain the actual subtree URI that was 
+   *
+   * If this tile is the root of a subtree in an implicit tileset, then
+   * the returned URI will contain the actual subtree URI that was
    * created by substituting the coordinates of this tile into the
-   * `implicitTiling.subtrees.uri` template URI. 
-   * 
-   * @returns The subtree URI, or `undefined` 
+   * `implicitTiling.subtrees.uri` template URI.
+   *
+   * @returns The subtree URI, or `undefined`
    */
   getSubtreeUri(): string | undefined;
 }

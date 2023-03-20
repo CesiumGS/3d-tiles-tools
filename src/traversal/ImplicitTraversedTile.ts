@@ -383,7 +383,7 @@ export class ImplicitTraversedTile implements TraversedTile {
   }
 
   /** {@inheritDoc TraversedTile.isImplicitTilesetRoot} */
-  isImplicitTilesetRoot() : boolean {
+  isImplicitTilesetRoot(): boolean {
     return false;
   }
 
