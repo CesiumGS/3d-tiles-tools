@@ -6,7 +6,6 @@ import { ResourceResolvers } from "../src/io/ResourceResolvers";
 import { TilesetTraverser } from "../src/traversal/TilesetTraverser";
 
 async function tilesetTraversalDemo(filePath: string) {
-
   console.log(`Traversing tileset ${filePath}`);
 
   const directory = path.dirname(filePath);
@@ -39,14 +38,12 @@ async function tilesetTraversalDemo(filePath: string) {
 }
 
 async function runBasicDemo() {
-  const tilesetFileName =
-    "./specs/data/TilesetWithUris/tileset.json";
+  const tilesetFileName = "./specs/data/TilesetWithUris/tileset.json";
   await tilesetTraversalDemo(tilesetFileName);
 }
 
 async function runExternalDemo() {
-  const tilesetFileName =
-    "./specs/data/TilesetOfTilesetsWithUris/tileset.json";
+  const tilesetFileName = "./specs/data/TilesetOfTilesetsWithUris/tileset.json";
   await tilesetTraversalDemo(tilesetFileName);
 }
 

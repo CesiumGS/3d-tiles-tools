@@ -1,0 +1,10 @@
+{
+  "buffers": [{ "uri": "validBuffer.bin", "byteLength": 16 }],
+  "bufferViews": [
+    { "buffer": 0, "byteOffset": 0, "byteLength": 3 },
+    { "buffer": 0, "byteOffset": 8, "byteLength": 8 }
+  ],
+  "tileAvailability": { "bitstream": 0, "availableCount": 7 },
+  "contentAvailability": [{ "availableCount": 0, "constant": 0 }],
+  "childSubtreeAvailability": { "bitstream": 1, "availableCount": 8 }
+}
