@@ -26,6 +26,7 @@ async function tilesetTraversalDemo(filePath: string) {
   console.log("Traversing tileset");
   const tilesetStatsCollector = new TilesetStatsCollector();
   const depthFirst = false;
+  const traverseExternalTilesets = false;
   await TilesetTraverser.traverse(
     tileset,
     schema,
@@ -34,7 +35,8 @@ async function tilesetTraversalDemo(filePath: string) {
       tilesetStatsCollector.accept(traversedTile);
       return true;
     },
-    depthFirst
+    depthFirst,
+    traverseExternalTilesets
   );
   console.log("Traversing tileset DONE");
 
