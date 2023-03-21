@@ -119,7 +119,7 @@ export class TilesetContentProcessor {
    */
   private processImplicitTilesetRootContentCallback:
     | ProcessImplicitTilesetRootContentCallback
-    | undefined = this.processImplicitTilesetRootContentNoOp.bind(this);
+    | undefined = undefined;
 
   /**
    * Creates a new instance
@@ -411,8 +411,10 @@ export class TilesetContentProcessor {
     this.log(`Processing all entries`);
     await this.processAllEntries();
 
-    this.log(`Processing all implicit tileset roots`);
-    await this.processImplicitTilesetRoots(tileset);
+    if (this.processImplicitTilesetRootContentCallback) {
+      this.log(`Processing all implicit tileset roots`);
+      await this.processImplicitTilesetRoots(tileset);
+    }
   }
 
   /**
@@ -501,12 +503,17 @@ export class TilesetContentProcessor {
    *
    * @param tile - The tile
    * @returns A promise that resolves when the process is finished
+   * @throws DeveloperError If `processImplicitTilesetRootContentCallback`
+   * is not defined
    * @throws TilesetError When the input could not be processed
    */
   private async processImplicitTilesetRoot(tile: Tile): Promise<void> {
-    const callback =
-      this.processImplicitTilesetRootContentCallback ??
-      this.processImplicitTilesetRootContentNoOp;
+    const callback = this.processImplicitTilesetRootContentCallback;
+    if (!callback) {
+      throw new DeveloperError(
+        "No callback for implicit tileset root contents"
+      );
+    }
     if (tile.content) {
       const content = tile.content;
       await callback(content);
@@ -515,24 +522,6 @@ export class TilesetContentProcessor {
         await callback(content);
       }
     }
-  }
-
-  /**
-   * Process the given content, which is the content of a root of an
-   * implicit tileset, doing nothing.
-   *
-   * @param content - The content
-   * @returns A promise that resolves when the process is finished
-   * @throws TilesetError When the input could not be processed
-   */
-  private async processImplicitTilesetRootContentNoOp(
-    content: Content
-  ): Promise<Content> {
-    console.log(
-      "Performing no-op on implicit tileset root content with URI " +
-        content.uri
-    );
-    return content;
   }
 
   /**
@@ -564,6 +553,7 @@ export class TilesetContentProcessor {
       this.tilesetSource
     );
     const depthFirst = false;
+    const traverseExternalTilesets = false;
     await TilesetTraverser.traverse(
       tileset,
       schema,
@@ -579,7 +569,8 @@ export class TilesetContentProcessor {
         }
         return true;
       },
-      depthFirst
+      depthFirst,
+      traverseExternalTilesets
     );
   }
 

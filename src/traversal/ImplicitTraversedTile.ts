@@ -8,7 +8,6 @@ import { SubtreeModels } from "./SubtreeModels";
 
 import { Tile } from "../structure/Tile";
 import { Content } from "../structure/Content";
-import { MetadataEntity } from "../structure/MetadataEntity";
 import { TileImplicitTiling } from "../structure/TileImplicitTiling";
 
 import { TreeCoordinates } from "../implicitTiling/TreeCoordinates";
