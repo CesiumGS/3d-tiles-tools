@@ -6,6 +6,9 @@ import { ResourceResolvers } from "../src/io/ResourceResolvers";
 import { TilesetTraverser } from "../src/traversal/TilesetTraverser";
 
 async function tilesetTraversalDemo(filePath: string) {
+
+  console.log(`Traversing tileset ${filePath}`);
+
   const directory = path.dirname(filePath);
   const resourceResolver =
     ResourceResolvers.createFileResourceResolver(directory);
@@ -13,7 +16,7 @@ async function tilesetTraversalDemo(filePath: string) {
   // Note: External schemas are not considered here
   const schema = tileset.schema;
   const depthFirst = false;
-  console.log("Traversing tileset");
+  const traverseExternalTilesets = true;
   await TilesetTraverser.traverse(
     tileset,
     schema,
@@ -29,15 +32,27 @@ async function tilesetTraversalDemo(filePath: string) {
       );
       return true;
     },
-    depthFirst
+    depthFirst,
+    traverseExternalTilesets
   );
   console.log("Traversing tileset DONE");
 }
 
-async function runDemo() {
+async function runBasicDemo() {
   const tilesetFileName =
-    "../3d-tiles-samples/1.1/SparseImplicitQuadtree/tileset.json";
+    "./specs/data/TilesetWithUris/tileset.json";
   await tilesetTraversalDemo(tilesetFileName);
+}
+
+async function runExternalDemo() {
+  const tilesetFileName =
+    "./specs/data/TilesetOfTilesetsWithUris/tileset.json";
+  await tilesetTraversalDemo(tilesetFileName);
+}
+
+async function runDemo() {
+  await runBasicDemo();
+  await runExternalDemo();
 }
 
 runDemo();
