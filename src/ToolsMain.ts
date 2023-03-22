@@ -7,8 +7,8 @@ import { Tilesets } from "./tilesets/Tilesets";
 
 import { TileFormats } from "./tileFormats/TileFormats";
 
-import { ContentOps } from "./contentOperations/ContentOps";
-import { GltfUtilities } from "./contentOperations/GtlfUtilities";
+import { ContentOps } from "./contentProcessing/ContentOps";
+import { GltfUtilities } from "./contentProcessing/GtlfUtilities";
 
 import { ContentDataTypes } from "./contentTypes/ContentDataTypes";
 

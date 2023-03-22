@@ -77,14 +77,15 @@ export * from "./implicitTiling/BinarySubtreeData";
 export * from "./implicitTiling/BinarySubtreeDataResolver";
 export * from "./implicitTiling/ImplicitTilingError";
 export * from "./implicitTiling/ImplicitTilings";
-export * from "./implicitTiling/OctreeCoordinates";
-export * from "./implicitTiling/Octrees";
-export * from "./implicitTiling/QuadtreeCoordinates";
-export * from "./implicitTiling/Quadtrees";
 export * from "./implicitTiling/SubtreeInfo";
 export * from "./implicitTiling/SubtreeInfos";
 export * from "./implicitTiling/TemplateUris";
-export * from "./implicitTiling/TreeCoordinates";
+
+export * from "./spatial/OctreeCoordinates";
+export * from "./spatial/Octrees";
+export * from "./spatial/QuadtreeCoordinates";
+export * from "./spatial/Quadtrees";
+export * from "./spatial/TreeCoordinates";
 
 export * from "./metadata/ArrayValues";
 export * from "./metadata/ClassProperties";

@@ -2,7 +2,7 @@ import fs from "fs";
 
 import { Paths } from "../src/base/Paths";
 
-import { GltfUtilities } from "../src/contentOperations/GtlfUtilities";
+import { GltfUtilities } from "../src/contentProcessing/GtlfUtilities";
 import { TileFormats } from "../src/tileFormats/TileFormats";
 
 function glbToB3dm(inputFileName: string, outputFileName: string) {

@@ -10,7 +10,8 @@ import { Tile } from "../structure/Tile";
 import { Content } from "../structure/Content";
 import { TileImplicitTiling } from "../structure/TileImplicitTiling";
 
-import { TreeCoordinates } from "../implicitTiling/TreeCoordinates";
+import { TreeCoordinates } from "../spatial/TreeCoordinates";
+
 import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError";
 import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
 

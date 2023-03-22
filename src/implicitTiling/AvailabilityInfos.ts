@@ -1,12 +1,13 @@
+import { defined } from "../base/defined";
+
 import { AvailabilityInfo } from "./AvailabilityInfo";
 import { BufferAvailabilityInfo } from "./BufferAvailabilityInfo";
 import { ConstantAvailabilityInfo } from "./ConstantAvailabilityInfo";
 import { ImplicitTilings } from "./ImplicitTilings";
+import { ImplicitTilingError } from "./ImplicitTilingError";
 
 import { Availability } from "../structure/Availability";
 import { TileImplicitTiling } from "../structure/TileImplicitTiling";
-import { defined } from "../base/defined";
-import { MetadataError } from "../metadata/MetadataError";
 
 /**
  * Methods for creating `AvailabilityInfo` instances
@@ -66,7 +67,7 @@ export class AvailabilityInfos {
    * @param bufferViewDatas - The `BufferView` data chunks
    * @param length - The length of the availability info
    * @returns The `AvailabilityInfo` object
-   * @throws MetadataError If the data is structurally invalid
+   * @throws ImplicitTilingError If the data is structurally invalid
    */
   private static create(
     availability: Availability,
@@ -81,7 +82,7 @@ export class AvailabilityInfos {
     // The bitstream MUST be defined when constant is undefined
     const bitstream = availability.bitstream;
     if (!defined(bitstream)) {
-      throw new MetadataError(
+      throw new ImplicitTilingError(
         "The availability neither defines a constant nor a bitstream"
       );
     }
