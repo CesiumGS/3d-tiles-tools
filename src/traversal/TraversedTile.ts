@@ -39,7 +39,7 @@ export interface TraversedTile {
   /**
    * Returns a `Tile` object that contains the "JSON"-representation
    * of the tile. This is just a plain data structure corresponding
-   * the tile.
+   * to the tile.
    *
    * In contrast to `asRawTile`, this method returns a `Tile` object
    * where semantic-based overrides have already been applied. When
