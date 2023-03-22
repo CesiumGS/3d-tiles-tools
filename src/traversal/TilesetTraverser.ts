@@ -90,16 +90,18 @@ export class TilesetTraverser {
               traversedTile,
               resourceResolver
             );
-          for (let i = 0; i < externalRoots.length; i++) {
-            const externalRoot = externalRoots[i];
-            stack.push(externalRoot);
-          }
+          stack.push(...externalRoots);
         }
       }
     }
   }
 
   /**
+   * Create the nodes that are the roots of external tilesets
+   * that are referred to by the given traversed tile.
+   *
+   * If the given tile does not have any contents or none of
+   * them refers to a tileset, then an empty array is returned.
    *
    * @param traversedTile - The `TraversedTile`
    * @param resourceResolver The `ResourceResolver` for the
@@ -111,7 +113,7 @@ export class TilesetTraverser {
   private static async createExternalTilesetRoots(
     traversedTile: TraversedTile,
     resourceResolver: ResourceResolver
-  ) {
+  ): Promise<TraversedTile[]> {
     if (traversedTile.isImplicitTilesetRoot()) {
       return [];
     }
@@ -121,20 +123,18 @@ export class TilesetTraverser {
     }
     const externalRoots: TraversedTile[] = [];
     for (const content of contents) {
-      // Check if the the content is an external tileset
       const contentUri = content.uri;
-      const contentData = new LazyContentData(contentUri, resourceResolver);
-      const contentDataType = await ContentDataTypeRegistry.findContentDataType(
-        contentData
-      );
-      const isTileset = contentDataType === "CONTENT_TYPE_TILESET";
 
-      if (isTileset) {
-        // If an external tileset was found, parse it, derive
-        // a resource resolver for its base directory, obtain
-        // its metadata schema, and create an explicit traversed
-        // tile for its root.
-        const externalTileset = await contentData.getParsedObject();
+      // Try to obtain an external tileset from the content
+      const externalTileset = await TilesetTraverser.resolveExternalTileset(
+        contentUri,
+        resourceResolver
+      );
+
+      if (externalTileset) {
+        // If an external tileset was found, derive a resource resolver
+        // for its base directory, obtain its metadata schema, and
+        // create an explicit traversed tile for its root.
         const derivedResourceResolver = resourceResolver.derive(contentUri);
         const externalSchema = await TilesetTraverser.resolveSchema(
           externalTileset,
@@ -152,6 +152,31 @@ export class TilesetTraverser {
       }
     }
     return externalRoots;
+  }
+
+  /**
+   * Fetch the external tileset from the given URI. If the given
+   * URI does not refer to an external tileset, then `undefined`
+   * is returned.
+   *
+   * @param uri - The URI
+   * @param resourceResolver - The `ResourceResolver`
+   * @returns The tileset
+   */
+  private static async resolveExternalTileset(
+    uri: string,
+    resourceResolver: ResourceResolver
+  ): Promise<Tileset | undefined> {
+    const contentData = new LazyContentData(uri, resourceResolver);
+    const contentDataType = await ContentDataTypeRegistry.findContentDataType(
+      contentData
+    );
+    const isTileset = contentDataType === "CONTENT_TYPE_TILESET";
+    if (isTileset) {
+      const externalTileset = await contentData.getParsedObject();
+      return externalTileset;
+    }
+    return undefined;
   }
 
   /**
