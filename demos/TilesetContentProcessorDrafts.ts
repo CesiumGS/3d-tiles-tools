@@ -1,5 +1,5 @@
 import { Paths } from "../src/base/Paths";
-import { ContentOps } from "../src/contentOperations/ContentOps";
+import { ContentOps } from "../src/contentProcessing/ContentOps";
 import { TilesetEntry } from "../src/tilesetData/TilesetEntry";
 import { TilesetContentProcessor } from "../src/tilesetProcessing/TilesetContentProcessor";
 
