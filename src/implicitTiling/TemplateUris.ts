@@ -1,9 +1,9 @@
-import { OctreeCoordinates } from "./OctreeCoordinates";
-import { QuadtreeCoordinates } from "./QuadtreeCoordinates";
+import { OctreeCoordinates } from "../spatial/OctreeCoordinates";
+import { QuadtreeCoordinates } from "../spatial/QuadtreeCoordinates";
 
 /**
  * Method related to template URIs for implicit tiling.
- * 
+ *
  * @internal
  */
 export class TemplateUris {

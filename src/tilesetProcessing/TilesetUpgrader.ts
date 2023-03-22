@@ -19,7 +19,7 @@ import { Tilesets } from "../tilesets/Tilesets";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 
-import { GltfUtilities } from "../contentOperations/GtlfUtilities";
+import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
 
 /**
  * The options for the upgrade. This is only used internally,

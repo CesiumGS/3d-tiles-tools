@@ -4,7 +4,6 @@ import { defined } from "./defined";
 
 import { DataError } from "./DataError";
 
-
 /**
  * Methods related to buffers.
  *
@@ -135,7 +134,6 @@ export class Buffers {
       const message = `Could not parse JSON from buffer: ${e}`;
       throw new DataError(message);
     }
-
   }
 
   /**

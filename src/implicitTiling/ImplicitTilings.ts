@@ -1,10 +1,10 @@
-import { TreeCoordinates } from "./TreeCoordinates";
-import { Quadtrees } from "./Quadtrees";
-import { QuadtreeCoordinates } from "./QuadtreeCoordinates";
-import { Octrees } from "./Octrees";
-import { OctreeCoordinates } from "./OctreeCoordinates";
-import { TemplateUris } from "./TemplateUris";
+import { TreeCoordinates } from "../spatial/TreeCoordinates";
+import { Quadtrees } from "../spatial/Quadtrees";
+import { QuadtreeCoordinates } from "../spatial/QuadtreeCoordinates";
+import { Octrees } from "../spatial/Octrees";
+import { OctreeCoordinates } from "../spatial/OctreeCoordinates";
 
+import { TemplateUris } from "./TemplateUris";
 import { ImplicitTilingError } from "./ImplicitTilingError";
 
 import { TileImplicitTiling } from "../structure/TileImplicitTiling";

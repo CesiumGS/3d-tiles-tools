@@ -10,7 +10,8 @@ import { BinarySubtreeDataResolver } from "../implicitTiling/BinarySubtreeDataRe
 import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError";
 import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
 import { SubtreeInfos } from "../implicitTiling/SubtreeInfos";
-import { TreeCoordinates } from "../implicitTiling/TreeCoordinates";
+
+import { TreeCoordinates } from "../spatial/TreeCoordinates";
 
 import { Subtree } from "../structure/Subtree";
 import { TileImplicitTiling } from "../structure/TileImplicitTiling";
@@ -25,7 +26,7 @@ import { SubtreeMetadataModels } from "./SubtreeMetadataModels";
  * The methods will resolve the data for a subtree, based on the template
  * URI from the implicit tiling and the root coordinates of the subtree,
  * and offer this information as `SubtreeModel` objects.
- * 
+ *
  * @internal
  */
 export class SubtreeModels {

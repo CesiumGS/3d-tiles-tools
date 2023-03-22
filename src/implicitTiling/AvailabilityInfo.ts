@@ -2,7 +2,7 @@
  * An interface that describes the availability information
  * in a subtree. This is used for tile, content, and child
  * subtree availability.
- * 
+ *
  * @internal
  */
 export interface AvailabilityInfo {

@@ -36,7 +36,7 @@ type NumberND = NumberScalar | NumberND[];
  * that the values have the same structure, i.e. they are
  * both numeric/numbers or arrays with the same length. If this
  * is not the case, then a `MetadataError` will be thrown.
- * 
+ *
  * @internal
  */
 export class ArrayValues {
