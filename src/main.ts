@@ -54,116 +54,125 @@ const inputArrayDefinition: any = {
  */
 function parseToolArgs(a: string[]) {
   const args = yargs(a)
-    .usage("Usage: $0 <command> [options]")
-    .help("h")
-    .alias("h", "help")
-    .options({
-      o: {
-        alias: "output",
-        description: "Output path for the command.",
-        global: true,
-        normalize: true,
-        type: "string",
-        demandOption: true,
-      },
-      f: {
-        alias: "force",
-        default: false,
-        description: "Output can be overwritten if it already exists.",
-        global: true,
-        type: "boolean",
-      },
-    })
-    .command("tilesetToDatabase", "Create a sqlite database for a tileset.", {
-      i: inputStringDefinition,
-    })
-    .command(
-      "databaseToTileset",
-      "Unpack a tileset database to a tileset folder.",
-      { i: inputStringDefinition }
-    )
-    .command(
-      "glbToB3dm",
-      "Repackage the input glb as a b3dm with a basic header.",
-      { i: inputStringDefinition }
-    )
-    .command(
-      "glbToI3dm",
-      "Repackage the input glb as a i3dm with a basic header.",
-      { i: inputStringDefinition }
-    )
+  .usage("Usage: $0 <command> [options]")
+  .help("h")
+  .alias("h", "help")
+  .options({
+    o: {
+      alias: "output",
+      description: "Output path for the command.",
+      global: true,
+      normalize: true,
+      type: "string",
+      demandOption: true,
+    },
+    f: {
+      alias: "force",
+      default: false,
+      description: "Output can be overwritten if it already exists.",
+      global: true,
+      type: "boolean",
+    },
+  })
+  .command("tilesetToDatabase", "Create a sqlite database for a tileset.", {
+    i: inputStringDefinition,
+  })
+  .command(
+    "databaseToTileset",
+    "Unpack a tileset database to a tileset folder.",
+    { i: inputStringDefinition }
+  )
+  .command(
+    "glbToB3dm",
+    "Repackage the input glb as a b3dm with a basic header.",
+    { i: inputStringDefinition }
+  )
+  .command(
+    "glbToI3dm",
+    "Repackage the input glb as a i3dm with a basic header.",
+    { i: inputStringDefinition }
+  )
     .command(
       "b3dmToGlb",
       "Extract the binary glTF asset from the input b3dm.",
       {
-        i: inputStringDefinition,
+    i: inputStringDefinition,
       }
     )
     .command(
       "i3dmToGlb",
       "Extract the binary glTF asset from the input i3dm.",
       {
-        i: inputStringDefinition,
+    i: inputStringDefinition,
       }
     )
     .command(
       "cmptToGlb",
       "Extract the binary glTF assets from the input cmpt.",
       {
-        i: inputStringDefinition,
+    i: inputStringDefinition,
       }
     )
-    .command(
-      "optimizeB3dm",
-      "Pass the input b3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)",
-      {
+  .command(
+    "optimizeB3dm",
+    "Pass the input b3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)",
+    {
         i: inputStringDefinition,
-        options: {
-          description:
-            "All arguments after this flag will be passed to gltf-pipeline as command line options.",
-        },
-      }
-    )
-    .command(
-      "optimizeI3dm",
-      "Pass the input i3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)",
-      {
-        i: inputStringDefinition,
-        options: {
-          description:
-            "All arguments after this flag will be passed to gltf-pipeline as command line options.",
-        },
-      }
-    )
-    .command("gzip", "Gzips the input tileset directory.", {
-      i: inputStringDefinition,
-      t: {
-        alias: "tilesOnly",
-        default: false,
-        description: "Only tile content files should be gzipped.",
-        type: "boolean",
+      options: {
+        description:
+          "All arguments after this flag will be passed to gltf-pipeline as command line options.",
       },
-    })
-    .command("ungzip", "Ungzips the input tileset directory.", {
+    }
+  )
+  .command(
+    "optimizeI3dm",
+    "Pass the input i3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)",
+    {
       i: inputStringDefinition,
-    })
-    .command(
-      "combine",
-      "Combines all external tilesets into a single tileset.json file.",
-      { i: inputStringDefinition }
-    )
-    .command(
-      "merge",
-      "Merge any number of tilesets together into a single tileset.",
-      { i: inputArrayDefinition }
-    )
-    .command(
-      "upgrade",
-      "Upgrades the input tileset to the latest version of the 3D Tiles spec. Embedded glTF models will be upgraded to glTF 2.0.",
-      { i: inputStringDefinition }
-    )
-    .demandCommand(1)
-    .strict();
+      options: {
+        description:
+          "All arguments after this flag will be passed to gltf-pipeline as command line options.",
+      },
+    }
+  )
+  .command("gzip", "Gzips the input tileset directory.", {
+    i: inputStringDefinition,
+    t: {
+      alias: "tilesOnly",
+      default: false,
+      description: "Only tile content files should be gzipped.",
+      type: "boolean",
+    },
+  })
+  .command("ungzip", "Ungzips the input tileset directory.", {
+    i: inputStringDefinition,
+  })
+  .command(
+    "combine",
+    "Combines all external tilesets into a single tileset.json file.",
+    { i: inputStringDefinition }
+  )
+  .command(
+    "merge",
+    "Merge any number of tilesets together into a single tileset.",
+    { i: inputArrayDefinition }
+  )
+  .command(
+    "upgrade",
+    "Upgrades the input tileset to the latest version of the 3D Tiles spec. Embedded glTF models will be upgraded to glTF 2.0.",
+    { i: inputStringDefinition }
+  )
+  .command(
+    "analyze",
+    "Analyze the input file, and write the results to the output directory. " +
+      "This will accept B3DM, I3DM, PNTS, CMPT, and GLB files (both for glTF " +
+      "1.0 and for glTF 2.0), and write files into the output directory that " +
+      "contain the feature table, batch table, layout information, the GLB, " +
+      "and the JSON of the GLB",
+    { i: inputStringDefinition }
+  )
+  .demandCommand(1)
+  .strict();
 
   return args.argv as any;
 }
@@ -249,6 +258,8 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
     await ToolsMain.upgrade(input, output, force);
   } else if (command === "merge") {
     await ToolsMain.merge(inputs, output, force);
+  } else if (command === "analyze") {
+    await ToolsMain.analyze(input, output, force);
   } else {
     throw new DeveloperError(`Invalid command: ${command}`);
   }
