@@ -24,6 +24,8 @@ import { Tiles } from "../tilesets/Tiles";
 import { Tilesets } from "../tilesets/Tilesets";
 
 /**
+ * TODO Adjust this comment for the process* methods:
+ *
  * A function that can process one entry of a tileset dataset.
  *
  * This will be called ONCE for each entry of the tileset source,
@@ -61,22 +63,10 @@ import { Tilesets } from "../tilesets/Tilesets";
  * @throws TilesetError When the input could not be processed
  *
  */
-export type ProcessEntryCallback = (
+type ProcessEntryCallback = (
   sourceEntry: TilesetEntry,
   type: string | undefined
 ) => Promise<TilesetEntry | undefined>;
-
-/**
- * A callback that will be called ONCE for each content
- * that is contained in a tile that is a root of an
- * implicit tileset.
- *
- * Specifically, these are the contents where the `content.uri`
- * is a template URI.
- */
-export type ProcessImplicitTilesetRootContentCallback = (
-  content: Content
-) => Promise<Content>;
 
 /**
  */
@@ -99,27 +89,9 @@ export class TilesetContentProcessor {
   /**
    * The set of keys (file names) that have already been processed.
    * This includes the original keys, as well as new keys that
-   * have been assigned to entries in the `processEntryCallback`.
+   * have been assigned to entries while they have been processed.
    */
   private processedKeys: { [key: string]: boolean } = {};
-
-  /**
-   * The callback that will be called for each entry.
-   *
-   * See `ProcessEntryCallback` for details.
-   */
-  private processEntryCallback: ProcessEntryCallback | undefined =
-    this.processEntryNoOp.bind(this);
-
-  /**
-   * The callback that will be called for each content of a tile
-   * that is the root of an implicit tileset.
-   *
-   * See `ProcessImplicitTilesetRootContentCallback` for details.
-   */
-  private processImplicitTilesetRootContentCallback:
-    | ProcessImplicitTilesetRootContentCallback
-    | undefined = undefined;
 
   /**
    * Creates a new instance
@@ -133,29 +105,6 @@ export class TilesetContentProcessor {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
       this.logCallback = (message: any) => {};
     }
-  }
-
-  /**
-   * Set the callback that will be called for each entry.
-   *
-   * See `ProcessEntryCallback` for details.
-   *
-   * @param callback - The callback
-   */
-  setProcessEntryCallback(callback: ProcessEntryCallback | undefined) {
-    this.processEntryCallback = callback;
-  }
-
-  /**
-   * Set the callback that will be called for each content of a tile
-   * that is the root of an implicit tileset.
-   *
-   * See `ProcessImplicitTilesetRootContentCallback` for details.
-   */
-  setProcessImplicitTilesetRootContentCallback(
-    callback: ProcessImplicitTilesetRootContentCallback | undefined
-  ) {
-    this.processImplicitTilesetRootContentCallback = callback;
   }
 
   /**
@@ -390,9 +339,6 @@ export class TilesetContentProcessor {
    * - all entries (including all of the above)
    * if they haven't been processed yet.
    *
-   * All these operations will eventually end up in the
-   * `processEntryCallback` - see this field for details.
-   *
    * @param tileset - The tileset
    * @param schema - The optional metadata schema for the tileset
    * @returns A promise that resolves when the process is finished
@@ -411,17 +357,12 @@ export class TilesetContentProcessor {
     this.log(`Processing all entries`);
     await this.processAllEntries();
 
-    if (this.processImplicitTilesetRootContentCallback) {
-      this.log(`Processing all implicit tileset roots`);
-      await this.processImplicitTilesetRoots(tileset);
-    }
+    this.log(`Processing all implicit tileset roots`);
+    await this.processImplicitTilesetRoots(tileset);
   }
 
   /**
    * Process all entries that are tile content of explicit tiles.
-   *
-   * Each entry will eventually be processed with the
-   * `processEntryCallback` - see this field for details.
    *
    * @param tileset - The tileset
    * @returns A promise that resolves when the process is finished
@@ -441,9 +382,6 @@ export class TilesetContentProcessor {
   /**
    * Process all entries that are content of the given tile.
    *
-   * Each entry will eventually be processed with the
-   * `processEntryCallback` - see this field for details.
-   *
    * @param tile - The tile
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError When the input could not be processed
@@ -457,7 +395,10 @@ export class TilesetContentProcessor {
     }
     if (tile.content) {
       const content = tile.content;
-      const targetEntry = await this.processEntry(content.uri);
+      const targetEntry = await this.processEntry(
+        content.uri,
+        this.processExplicitTileContentEntry
+      );
       if (targetEntry) {
         content.uri = targetEntry.key;
       } else {
@@ -466,7 +407,10 @@ export class TilesetContentProcessor {
     } else if (tile.contents) {
       const newContents: Content[] = [];
       for (const content of tile.contents) {
-        const targetEntry = await this.processEntry(content.uri);
+        const targetEntry = await this.processEntry(
+          content.uri,
+          this.processExplicitTileContentEntry
+        );
         if (targetEntry) {
           content.uri = targetEntry.key;
           newContents.push(content);
@@ -503,23 +447,18 @@ export class TilesetContentProcessor {
    *
    * @param tile - The tile
    * @returns A promise that resolves when the process is finished
-   * @throws DeveloperError If `processImplicitTilesetRootContentCallback`
-   * is not defined
    * @throws TilesetError When the input could not be processed
    */
   private async processImplicitTilesetRoot(tile: Tile): Promise<void> {
-    const callback = this.processImplicitTilesetRootContentCallback;
-    if (!callback) {
-      throw new DeveloperError(
-        "No callback for implicit tileset root contents"
-      );
-    }
     if (tile.content) {
       const content = tile.content;
-      await callback(content);
+      const newContent = await this.processImplicitTilesetRootContent(content);
+      tile.content = newContent;
     } else if (tile.contents) {
-      for (const content of tile.contents) {
-        await callback(content);
+      for (let i=0; i<tile.contents.length; i++) {
+        const content = tile.contents[i];
+        const newContent = await this.processImplicitTilesetRootContent(content);
+        tile.contents[i] = newContent;
       }
     }
   }
@@ -527,9 +466,6 @@ export class TilesetContentProcessor {
   /**
    * Process all entries that are tile content (both of explicit
    * and implicit tiles).
-   *
-   * Each entry will eventually be processed with the
-   * `processEntryCallback` - see this field for details.
    *
    * @param tileset - The tileset
    * @param schema - The optional metadata schema for the tileset
@@ -564,7 +500,7 @@ export class TilesetContentProcessor {
             .getFinalContents()
             .map((c) => c.uri);
           for (const contentUri of contentUris) {
-            await this.processEntry(contentUri);
+            await this.processEntry(contentUri, this.processTileContentEntry);
           }
         }
         return true;
@@ -578,9 +514,6 @@ export class TilesetContentProcessor {
    * Process all entries that are contained in the current
    * tileset source.
    *
-   * Each entry will eventually be processed with the
-   * `processEntryCallback` - see this field for details.
-   *
    * @param tileset - The tileset
    * @returns A promise that resolves when the process is finished
    * @throws DeveloperError When the source or target is not opened
@@ -593,7 +526,7 @@ export class TilesetContentProcessor {
     const entries = TilesetSources.getEntries(this.tilesetSource);
     for (const entry of entries) {
       const key = entry.key;
-      await this.processEntry(key);
+      await this.processEntry(key, this.processGenericEntry);
     }
   }
 
@@ -620,7 +553,10 @@ export class TilesetContentProcessor {
    * @throws DeveloperError When the source or target is not opened
    * @throws TilesetError When the input could not be processed
    */
-  private async processEntry(key: string): Promise<TilesetEntry | undefined> {
+  private async processEntry(
+    key: string,
+    callback: ProcessEntryCallback
+  ): Promise<TilesetEntry | undefined> {
     if (!this.tilesetSource || !this.tilesetTarget) {
       throw new DeveloperError("The source and target must be defined");
     }
@@ -644,7 +580,6 @@ export class TilesetContentProcessor {
 
     this.log(`Processing source: ${sourceKey} with type ${type}`);
 
-    const callback = this.processEntryCallback ?? this.processEntryNoOp;
     const targetEntry = await callback(sourceEntry, type);
 
     this.log(`        to target: ${targetEntry?.key}`);
@@ -654,6 +589,28 @@ export class TilesetContentProcessor {
       this.processedKeys[targetEntry.key] = true;
     }
     return targetEntry;
+  }
+
+  async processExplicitTileContentEntry(
+    sourceEntry: TilesetEntry,
+    type: string | undefined
+  ): Promise<TilesetEntry | undefined> {
+    return sourceEntry;
+  }
+  async processTileContentEntry(
+    sourceEntry: TilesetEntry,
+    type: string | undefined
+  ): Promise<TilesetEntry | undefined> {
+    return sourceEntry;
+  }
+  async processGenericEntry(
+    sourceEntry: TilesetEntry,
+    type: string | undefined
+  ): Promise<TilesetEntry | undefined> {
+    return sourceEntry;
+  }
+  async processImplicitTilesetRootContent(content: Content): Promise<Content> {
+    return content;
   }
 
   /**
