@@ -455,9 +455,11 @@ export class TilesetContentProcessor {
       const newContent = await this.processImplicitTilesetRootContent(content);
       tile.content = newContent;
     } else if (tile.contents) {
-      for (let i=0; i<tile.contents.length; i++) {
+      for (let i = 0; i < tile.contents.length; i++) {
         const content = tile.contents[i];
-        const newContent = await this.processImplicitTilesetRootContent(content);
+        const newContent = await this.processImplicitTilesetRootContent(
+          content
+        );
         tile.contents[i] = newContent;
       }
     }

@@ -36,11 +36,11 @@ async function runB3dmToGlbTest() {
   );
 }
 
-
 async function runOptimizeTest() {
   const tilesetSourceName =
     "../3d-tiles-samples/1.1/SparseImplicitQuadtree/tileset.json";
-  const tilesetTargetName = "./output/SparseImplicitQuadtree-optimized/tileset.json";
+  const tilesetTargetName =
+    "./output/SparseImplicitQuadtree-optimized/tileset.json";
   const overwrite = true;
 
   const quiet = false;
@@ -56,12 +56,16 @@ async function runOptimizeTest() {
         key: "optimized/" + sourceEntry.key,
         value: await GltfUtilities.optimizeGlb(sourceEntry.value, {}),
       };
-      console.log("    Optimized " + sourceEntry.key + " to " + targetEntry.key);
+      console.log(
+        "    Optimized " + sourceEntry.key + " to " + targetEntry.key
+      );
       return targetEntry;
     }
 
-    override async processImplicitTilesetRootContent(content: Content): Promise<Content> {
-      content.uri = "optimized/" + content.uri
+    override async processImplicitTilesetRootContent(
+      content: Content
+    ): Promise<Content> {
+      content.uri = "optimized/" + content.uri;
       return content;
     }
   })(quiet);
@@ -72,8 +76,6 @@ async function runOptimizeTest() {
     overwrite
   );
 }
-
-
 
 //runB3dmToGlbTest();
 runOptimizeTest();
