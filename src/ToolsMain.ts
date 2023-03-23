@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 
 import { Paths } from "./base/Paths";
 import { DeveloperError } from "./base/DeveloperError";
@@ -14,6 +15,8 @@ import { ContentDataTypes } from "./contentTypes/ContentDataTypes";
 
 import { PipelineExecutor } from "./pipelines/PipelineExecutor";
 import { Pipelines } from "./pipelines/Pipelines";
+import { Buffers } from "./base/Buffers";
+import { TileDataLayouts } from "./tileFormats/TileDataLayouts";
 
 /**
  * Functions that directly correspond to the command line functionality.
@@ -107,6 +110,142 @@ export class ToolsMain {
       options
     );
     fs.writeFileSync(output, outputBuffer);
+  }
+
+  static analyze(
+    inputFileName: string,
+    outputDirectoryName: string,
+    force: boolean
+  ) {
+    console.log(`Analyzing ${inputFileName}`);
+    console.log(`writing results to ${outputDirectoryName}`);
+
+    const inputBaseName = path.basename(inputFileName);
+    const inputBuffer = fs.readFileSync(inputFileName);
+    ToolsMain.analyzeInternal(
+      inputBaseName,
+      inputBuffer,
+      outputDirectoryName,
+      force
+    );
+  }
+  static analyzeInternal(
+    inputBaseName: string,
+    inputBuffer: Buffer,
+    outputDirectoryName: string,
+    force: boolean
+  ) {
+    // A function to create a JSON string from an
+    // object. The formatting will be controlled
+    // via a command line flag in the future.
+    const doFormatJson = true;
+    const stringify = (input: any) => {
+      if (doFormatJson) {
+        return JSON.stringify(input, null, 2);
+      }
+      return JSON.stringify(input);
+    };
+
+    // A function to write a JSON string to a file, if
+    // the JSON string does not represent an empty
+    // object, and if the file can be written.
+    const writeJsonFileOptional = (jsonString: string, fileName: string) => {
+      if (jsonString === "{}") {
+        return;
+      }
+      if (!ToolsMain.canWrite(fileName, force)) {
+        console.log(`Cannot write ${fileName}`);
+        return;
+      }
+      console.log(`Writing ${fileName}`);
+      fs.writeFileSync(fileName, Buffer.from(jsonString));
+    };
+
+    // A function to write a buffer to a file, if
+    // the buffer is not empty, and if the file
+    // can be written.
+    const writeFileOptional = (buffer: Buffer, fileName: string) => {
+      if (buffer.length === 0) {
+        return;
+      }
+      if (!ToolsMain.canWrite(fileName, force)) {
+        console.log(`Cannot write ${fileName}`);
+        return;
+      }
+      console.log(`Writing ${fileName}`);
+      fs.writeFileSync(fileName, buffer);
+    };
+
+    // Read the buffer and its magic header
+    const magic = Buffers.getMagic(inputBuffer, 0);
+
+    if (magic === "b3dm" || magic === "i3dm" || magic === "pnts") {
+      // Handle the basic legacy tile formats
+      const tileDataLayout = TileDataLayouts.create(inputBuffer);
+      const tileData = TileFormats.extractTileData(inputBuffer, tileDataLayout);
+
+      // Create the JSON strings for the layout information,
+      // feature table, batch table, and the GLB JSON
+      const layoutJsonString = stringify(tileDataLayout);
+      const featureTableJsonString = stringify(tileData.featureTable.json);
+      const batchTableJsonString = stringify(tileData.batchTable.json);
+      let glbJsonString = "{}";
+      if (tileData.payload.length !== 0) {
+        const glbJsonBuffer = GltfUtilities.extractJsonFromGlb(
+          tileData.payload
+        );
+        glbJsonString = glbJsonBuffer.toString();
+      }
+      if (doFormatJson) {
+        const glbJson = JSON.parse(glbJsonString);
+        glbJsonString = stringify(glbJson);
+      }
+
+      // Determine the output file names. They are files in the
+      // output directory, prefixed with the name of the input
+      // file, and with suffixes that indicate the actual contents
+      const outputBaseName = Paths.resolve(outputDirectoryName, inputBaseName);
+      const layoutFileName = outputBaseName + ".layout.json";
+      const featureTableJsonFileName = outputBaseName + ".featureTable.json";
+      const batchTableJsonFileName = outputBaseName + ".batchTable.json";
+      const glbFileName = outputBaseName + ".glb";
+      const glbJsonFileName = outputBaseName + ".glb.json";
+
+      // Write all output files
+      Paths.ensureDirectoryExists(outputDirectoryName);
+      writeJsonFileOptional(layoutJsonString, layoutFileName);
+      writeFileOptional(tileData.payload, glbFileName);
+      writeJsonFileOptional(featureTableJsonString, featureTableJsonFileName);
+      writeJsonFileOptional(batchTableJsonString, batchTableJsonFileName);
+      writeJsonFileOptional(glbJsonString, glbJsonFileName);
+    } else if (magic === "cmpt") {
+      // Handle composite tiles
+      const compositeTileData = TileFormats.readCompositeTileData(inputBuffer);
+      const n = compositeTileData.innerTileBuffers.length;
+      for (let i = 0; i < n; i++) {
+        const innerTileDataBuffer = compositeTileData.innerTileBuffers[i];
+        const innerTileBaseName = inputBaseName + ".inner[" + i + "]";
+        ToolsMain.analyzeInternal(
+          innerTileBaseName,
+          innerTileDataBuffer,
+          outputDirectoryName,
+          force
+        );
+      }
+    } else if (magic === "glTF") {
+      // Handle GLB files
+      let glbJsonString = "{}";
+      const glbJsonBuffer = GltfUtilities.extractJsonFromGlb(inputBuffer);
+      glbJsonString = glbJsonBuffer.toString();
+      if (doFormatJson) {
+        const glbJson = JSON.parse(glbJsonString);
+        glbJsonString = stringify(glbJson);
+      }
+      const outputBaseName = Paths.resolve(outputDirectoryName, inputBaseName);
+      const glbJsonFileName = outputBaseName + ".glb.json";
+      Paths.ensureDirectoryExists(outputDirectoryName);
+      writeJsonFileOptional(glbJsonString, glbJsonFileName);
+    }
   }
 
   private static createGzipPipelineJson(
@@ -266,6 +405,26 @@ export class ToolsMain {
   }
 
   /**
+   * Returns whether the specified file can be written.
+   *
+   * This is the case when `force` is `true`, or when it does not
+   * exist yet.
+   *
+   * @param fileName - The file name
+   * @param force The 'force' flag state from the command line
+   * @returns Whether the file can be written
+   */
+  static canWrite(fileName: string, force: boolean): boolean {
+    if (force) {
+      return true;
+    }
+    if (!fs.existsSync(fileName)) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Ensures that the specified file can be written, and throws
    * a `DeveloperError` otherwise.
    *
@@ -275,10 +434,7 @@ export class ToolsMain {
    * @throws DeveloperError When the file exists and `force` was `false`.
    */
   static ensureCanWrite(fileName: string, force: boolean): true {
-    if (force) {
-      return true;
-    }
-    if (!fs.existsSync(fileName)) {
+    if (ToolsMain.canWrite(fileName, force)) {
       return true;
     }
     throw new DeveloperError(
