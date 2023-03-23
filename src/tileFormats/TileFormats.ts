@@ -2,7 +2,8 @@ import { Buffers } from "../base/Buffers";
 
 import { CompositeTileData } from "./CompositeTileData";
 import { TileData } from "./TileData";
-import { TileDataLayout, TileDataLayouts } from "./TileDataLayouts";
+import { TileDataLayout } from "./TileDataLayouts";
+import { TileDataLayouts } from "./TileDataLayouts";
 import { TileFormatError } from "./TileFormatError";
 
 /**
