@@ -2,6 +2,7 @@ import { Buffers } from "../base/Buffers";
 
 import { CompositeTileData } from "./CompositeTileData";
 import { TileData } from "./TileData";
+import { TileDataLayout, TileDataLayouts } from "./TileDataLayouts";
 import { TileFormatError } from "./TileFormatError";
 
 /**
@@ -105,35 +106,30 @@ export class TileFormats {
    * valid tile data.
    */
   static readTileData(buffer: Buffer): TileData {
-    // Basic checks for magic number, length and version
-    const magic = Buffers.getMagicString(buffer);
-    if (magic !== "b3dm" && magic !== "pnts" && magic !== "i3dm") {
-      throw new TileFormatError(
-        `Expected magic "b3dm", "i3dm", or "pnts", but found "${magic}"`
-      );
-    }
-    let headerByteLength = 28;
-    if (magic === "i3dm") {
-      headerByteLength = 32;
-    }
-    if (buffer.length < headerByteLength) {
-      throw new TileFormatError(
-        `Expected ${headerByteLength} bytes for ${magic} header, ` +
-          `but only got ${buffer.length}`
-      );
-    }
-    const version = buffer.readUInt32LE(4);
-    if (version !== 1) {
-      throw new TileFormatError(`Expected version "1", but got: "${version}'"`);
-    }
+    // Compute the tile data layout, containing information
+    // about the start and end of each data block. This will
+    // handle the case that legacy B3DM data was given, and
+    // throw an error if the header information is invalid.
+    const tileDataLayout = TileDataLayouts.create(buffer);
+    return this.extractTileData(buffer, tileDataLayout);
+  }
 
-    // Read the basic data layout information, i.e. the lengths
-    // of feature- and batch table JSON and binaries.
-    const byteLength = buffer.readUInt32LE(8);
-    let featureTableJsonByteLength = buffer.readUInt32LE(12);
-    let featureTableBinaryByteLength = buffer.readUInt32LE(16);
-    let batchTableJsonByteLength = buffer.readUInt32LE(20);
-    let batchTableBinaryByteLength = buffer.readUInt32LE(24);
+  /**
+   * Extracts a `TileData` object from the given buffer, based
+   * on the given layout information.
+   *
+   * This method can be applied to a buffer that contains valid B3DM,
+   * I3DM or PNTS data, with a tile data layout that was created
+   * with the `TileDataLayouts.create` method.
+   *
+   * @param buffer - The buffer
+   * @param tileDataLayout - The tile data layout
+   * @return The `TileData`
+   * @internal
+   */
+  static extractTileData(buffer: Buffer, tileDataLayout: TileDataLayout) {
+    const magic = Buffers.getMagicString(buffer);
+    const version = buffer.readUInt32LE(4);
 
     // The `gltfFormat` is only stored for I3DM
     let gltfFormat = undefined;
@@ -141,66 +137,27 @@ export class TileFormats {
       gltfFormat = buffer.readUInt32LE(28);
     }
 
-    let batchLength = undefined;
-    if (magic === "b3dm") {
-      // Keep this legacy check in for now since a lot of tilesets are still using the old header.
-      // Legacy header #1: [batchLength] [batchTableByteLength]
-      // Legacy header #2: [batchTableJsonByteLength] [batchTableBinaryByteLength] [batchLength]
-      // Current header: [featureTableJsonByteLength] [featureTableBinaryByteLength] [batchTableJsonByteLength] [batchTableBinaryByteLength]
-      // If the header is in the first legacy format 'batchTableJsonByteLength'
-      // will be the start of the JSON string (a quotation mark) or the glTF magic.
-      // Accordingly its first byte will be either 0x22 or 0x67, and so the minimum uint32 expected
-      // is 0x22000000 = 570425344 = 570MB. It is unlikely that the feature table Json will exceed this length.
-      // The check for the second legacy format is similar, except it checks 'batchTableBinaryByteLength' instead
-      if (batchTableJsonByteLength >= 570425344) {
-        // First legacy check
-        headerByteLength = 20;
-        batchLength = featureTableJsonByteLength;
-        batchTableJsonByteLength = featureTableBinaryByteLength;
-        batchTableBinaryByteLength = 0;
-        featureTableJsonByteLength = 0;
-        featureTableBinaryByteLength = 0;
-      } else if (batchTableBinaryByteLength >= 570425344) {
-        // Second legacy check
-        headerByteLength = 24;
-        batchLength = batchTableJsonByteLength;
-        batchTableJsonByteLength = featureTableJsonByteLength;
-        batchTableBinaryByteLength = featureTableBinaryByteLength;
-        featureTableJsonByteLength = 0;
-        featureTableBinaryByteLength = 0;
-      }
-    }
-
-    // Compute the offsets for the table data within the buffer
-    // from the layout information
-    const featureTableJsonByteOffset = headerByteLength;
-    const featureTableBinaryByteOffset =
-      featureTableJsonByteOffset + featureTableJsonByteLength;
-    const batchTableJsonByteOffset =
-      featureTableBinaryByteOffset + featureTableBinaryByteLength;
-    const batchTableBinaryByteOffset =
-      batchTableJsonByteOffset + batchTableJsonByteLength;
-    const payloadByteOffset =
-      batchTableBinaryByteOffset + batchTableBinaryByteLength;
-
     // Extract the table data
     const featureTableJsonBuffer = buffer.subarray(
-      featureTableJsonByteOffset,
-      featureTableBinaryByteOffset
+      tileDataLayout.featureTableJson.start,
+      tileDataLayout.featureTableJson.end
     );
     const featureTableBinaryBuffer = buffer.subarray(
-      featureTableBinaryByteOffset,
-      batchTableJsonByteOffset
+      tileDataLayout.featureTableBinary.start,
+      tileDataLayout.featureTableBinary.end
     );
     const batchTableJsonBuffer = buffer.subarray(
-      batchTableJsonByteOffset,
-      batchTableBinaryByteOffset
+      tileDataLayout.batchTableJson.start,
+      tileDataLayout.batchTableJson.end
     );
     const batchTableBinaryBuffer = buffer.subarray(
-      batchTableBinaryByteOffset,
-      payloadByteOffset
+      tileDataLayout.batchTableBinary.start,
+      tileDataLayout.batchTableBinary.end
     );
-    const payloadBuffer = buffer.subarray(payloadByteOffset, byteLength);
+    const payloadBuffer = buffer.subarray(
+      tileDataLayout.payload.start,
+      tileDataLayout.payload.end
+    );
 
     let featureTableJson = Buffers.getJson(featureTableJsonBuffer);
     const batchTableJson = Buffers.getJson(batchTableJsonBuffer);
@@ -213,7 +170,7 @@ export class TileFormats {
     if (magic === "b3dm") {
       if (Object.keys(featureTableJson).length === 0) {
         featureTableJson = {
-          BATCH_LENGTH: batchLength,
+          BATCH_LENGTH: tileDataLayout.legacyBatchLength,
         };
       }
     }
