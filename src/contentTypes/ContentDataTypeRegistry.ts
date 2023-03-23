@@ -97,6 +97,11 @@ export class ContentDataTypeRegistry {
     );
 
     ContentDataTypeRegistry.register(
+      ContentDataTypeRegistry.byMagicString("GIF8"),
+      ContentDataTypes.CONTENT_TYPE_GIF
+    );
+
+    ContentDataTypeRegistry.register(
       ContentDataTypeRegistry.byExtension(".geojson"),
       ContentDataTypes.CONTENT_TYPE_GEOJSON
     );

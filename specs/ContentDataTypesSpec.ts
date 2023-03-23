@@ -73,6 +73,13 @@ describe("ContentDataTypeRegistry.findContentDataType", function () {
     expect(type).toEqual(ContentDataTypes.CONTENT_TYPE_JPEG);
   });
 
+  it("detects GIF", async function () {
+    const contentUri = "specs/data/contentTypes/content.gif";
+    const c = BufferedContentData.create(contentUri);
+    const type = await ContentDataTypeRegistry.findContentDataType(c);
+    expect(type).toEqual(ContentDataTypes.CONTENT_TYPE_GIF);
+  });
+
   it("detects GEOJSON", async function () {
     const contentUri = "specs/data/contentTypes/content.geojson";
     const c = BufferedContentData.create(contentUri);
