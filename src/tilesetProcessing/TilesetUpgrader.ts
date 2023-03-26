@@ -20,6 +20,7 @@ import { Tilesets } from "../tilesets/Tilesets";
 import { TileFormats } from "../tileFormats/TileFormats";
 
 import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
+import { Extensions } from "../tilesets/Extensions";
 
 /**
  * The options for the upgrade. This is only used internally,
@@ -35,6 +36,7 @@ type UpgradeOptions = {
   upgradeContentUrlToUri: boolean;
   upgradeB3dmGltf1ToGltf2: boolean;
   upgradeI3dmGltf1ToGltf2: boolean;
+  upgradeExtensionDeclarations: boolean;
 };
 
 /**
@@ -83,6 +85,7 @@ export class TilesetUpgrader {
       upgradeContentUrlToUri: true,
       upgradeB3dmGltf1ToGltf2: true,
       upgradeI3dmGltf1ToGltf2: true,
+      upgradeExtensionDeclarations: true,
     };
   }
 
@@ -191,7 +194,7 @@ export class TilesetUpgrader {
   async upgradeTileset(tileset: Tileset): Promise<void> {
     if (this.upgradeOptions.upgradeAssetVersionNumber) {
       this.logCallback(`Upgrading asset version number`);
-      await this.upgradeAssetVersionNumber(tileset);
+      this.upgradeAssetVersionNumber(tileset);
     }
     if (this.upgradeOptions.upgradeRefineCase) {
       this.logCallback(`Upgrading refine to be in uppercase`);
@@ -200,6 +203,10 @@ export class TilesetUpgrader {
     if (this.upgradeOptions.upgradeContentUrlToUri) {
       this.logCallback(`Upgrading content.url to content.uri`);
       await this.upgradeEachContentUrlToUri(tileset);
+    }
+    if (this.upgradeOptions.upgradeExtensionDeclarations) {
+      this.logCallback(`Upgrading extension declarations`);
+      Extensions.removeExtensionUsed(tileset, "3DTILES_content_gltf");
     }
   }
 
