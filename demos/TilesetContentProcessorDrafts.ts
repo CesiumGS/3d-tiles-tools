@@ -3,7 +3,9 @@ import { ContentOps } from "../src/contentProcessing/ContentOps";
 import { GltfUtilities } from "../src/contentProcessing/GtlfUtilities";
 import { Content } from "../src/structure/Content";
 import { TilesetEntry } from "../src/tilesetData/TilesetEntry";
+
 import { TilesetContentProcessor } from "../src/tilesetProcessing/TilesetContentProcessor";
+import { TilesetExplicitContentProcessor } from "../src/tilesetProcessing/TilesetExplicitContentProcessor";
 
 async function runB3dmToGlbTest() {
   const tilesetSourceName =
@@ -12,22 +14,25 @@ async function runB3dmToGlbTest() {
   const overwrite = true;
 
   const quiet = false;
-  const tilesetContentProcessor = new (class extends TilesetContentProcessor {
-    override async processExplicitTileContentEntry(
-      sourceEntry: TilesetEntry,
-      type: string | undefined
-    ): Promise<TilesetEntry | undefined> {
-      if (type !== "CONTENT_TYPE_B3DM") {
-        return sourceEntry;
+  const tilesetContentProcessor =
+    new (class extends TilesetExplicitContentProcessor {
+      override async processExplicitTileContentEntry(
+        sourceEntry: TilesetEntry,
+        type: string | undefined
+      ): Promise<TilesetEntry[]> {
+        if (type !== "CONTENT_TYPE_B3DM") {
+          return [sourceEntry];
+        }
+        const targetEntry = {
+          key: Paths.replaceExtension(sourceEntry.key, ".glb"),
+          value: ContentOps.b3dmToGlbBuffer(sourceEntry.value),
+        };
+        console.log(
+          "    Updated " + sourceEntry.key + " to " + targetEntry.key
+        );
+        return [targetEntry];
       }
-      const targetEntry = {
-        key: Paths.replaceExtension(sourceEntry.key, ".glb"),
-        value: ContentOps.b3dmToGlbBuffer(sourceEntry.value),
-      };
-      console.log("    Updated " + sourceEntry.key + " to " + targetEntry.key);
-      return targetEntry;
-    }
-  })(quiet);
+    })(quiet);
 
   await tilesetContentProcessor.process(
     tilesetSourceName,
@@ -48,9 +53,9 @@ async function runOptimizeTest() {
     override async processTileContentEntry(
       sourceEntry: TilesetEntry,
       type: string | undefined
-    ): Promise<TilesetEntry | undefined> {
+    ): Promise<TilesetEntry[]> {
       if (type !== "CONTENT_TYPE_GLB") {
-        return sourceEntry;
+        return [sourceEntry];
       }
       const targetEntry = {
         key: "optimized/" + sourceEntry.key,
@@ -59,7 +64,7 @@ async function runOptimizeTest() {
       console.log(
         "    Optimized " + sourceEntry.key + " to " + targetEntry.key
       );
-      return targetEntry;
+      return [targetEntry];
     }
 
     override async processImplicitTilesetRootContent(

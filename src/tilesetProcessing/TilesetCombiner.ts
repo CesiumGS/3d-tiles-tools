@@ -87,13 +87,17 @@ export class TilesetCombiner {
     this.tilesetSource = tilesetSource;
     this.tilesetTarget = tilesetTarget;
 
-    const tilesetJsonFileName =
+    const tilesetSourceJsonFileName =
       Tilesets.determineTilesetJsonFileName(tilesetSourceName);
+
+    const tilesetTargetJsonFileName =
+      Tilesets.determineTilesetJsonFileName(tilesetTargetName);
 
     await this.combineInternal(
       tilesetSource,
-      tilesetJsonFileName,
-      tilesetTarget
+      tilesetSourceJsonFileName,
+      tilesetTarget,
+      tilesetTargetJsonFileName
     );
 
     tilesetSource.close();
@@ -111,9 +115,11 @@ export class TilesetCombiner {
    * source and target.
    *
    * @param tilesetSource The tileset source
-   * @param tilesetJsonFileName The name of the top-level tileset in
+   * @param tilesetSourceJsonFileName The name of the top-level tileset in
    * the given source (usually `tileset.json`).
    * @param tilesetTarget The tileset target
+   * @param tilesetTargetJsonFileName The name of the top-level tileset in
+   * the given target (usually `tileset.json`).
    * @returns A promise that resolves when the process is finished.
    * @throws TilesetError When the input tileset file can not be
    * found
@@ -122,12 +128,13 @@ export class TilesetCombiner {
    */
   private async combineInternal(
     tilesetSource: TilesetSource,
-    tilesetJsonFileName: string,
-    tilesetTarget: TilesetTarget
+    tilesetSourceJsonFileName: string,
+    tilesetTarget: TilesetTarget,
+    tilesetTargetJsonFileName: string
   ): Promise<void> {
-    const tilesetJsonBuffer = tilesetSource.getValue(tilesetJsonFileName);
+    const tilesetJsonBuffer = tilesetSource.getValue(tilesetSourceJsonFileName);
     if (!tilesetJsonBuffer) {
-      const message = `No ${tilesetJsonFileName} found in input`;
+      const message = `No ${tilesetSourceJsonFileName} found in input`;
       throw new TilesetError(message);
     }
     const tileset = JSON.parse(tilesetJsonBuffer.toString()) as Tileset;
@@ -139,7 +146,10 @@ export class TilesetCombiner {
 
     const combinedTilesetJsonString = JSON.stringify(tileset, null, 2);
     const combinedTilesetJsonBuffer = Buffer.from(combinedTilesetJsonString);
-    tilesetTarget.addEntry("tileset.json", combinedTilesetJsonBuffer);
+    tilesetTarget.addEntry(
+      tilesetTargetJsonFileName,
+      combinedTilesetJsonBuffer
+    );
   }
 
   /**
