@@ -37,7 +37,7 @@ export class GltfUtilities {
    * @throws TileFormatError If the input does not contain valid GLB data.
    */
   static extractJsonFromGlb(glbBuffer: Buffer): Buffer {
-    const magic = Buffers.getMagic(glbBuffer);
+    const magic = Buffers.getMagicString(glbBuffer);
     if (magic !== "glTF") {
       throw new TileFormatError(
         `Expected magic header to be 'gltf', but found ${magic}`
