@@ -29,7 +29,7 @@
     "@types/better-sqlite3": "^7.6.2",
     "archiver": "^5.3.1",
     "better-sqlite3": "^7.5.3",
-    "cesium": "^1.102.0",
+    "cesium": "^1.103.0",
     "gltf-pipeline": "^4.0.1",
     "minimist": "^1.2.7",
     "node-stream-zip": "^1.15.0",

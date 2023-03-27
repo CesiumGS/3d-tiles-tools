@@ -45,6 +45,7 @@ export class TilesetTarget3tz implements TilesetTarget {
     this.indexBuilder = new IndexBuilder();
   }
 
+  /** {@inheritDoc TilesetTarget.begin} */
   begin(fullOutputName: string, overwrite: boolean) {
     if (fs.existsSync(fullOutputName)) {
       if (overwrite) {
@@ -83,6 +84,17 @@ export class TilesetTarget3tz implements TilesetTarget {
     });
   }
 
+  /**
+   * Creates a promise that is fulfilled when the data has fully been
+   * written to the target. Or maybe not. In any case, one has to wait
+   * for the promise that is returned from "archiver.finalize()" AND for
+   * this promise, to make sure that everything is written. For details,
+   * see https://github.com/archiverjs/node-archiver/issues/476 ...
+   *
+   * @param archive - The archiver archive
+   * @param outputStream - The output stream that the archive is writing to
+   * @returns The promise that has to be waited for in "close"
+   */
   private static createFinishedPromise(
     archive: archiver.Archiver,
     outputStream: fs.WriteStream
@@ -95,6 +107,7 @@ export class TilesetTarget3tz implements TilesetTarget {
     return finishedPromise;
   }
 
+  /** {@inheritDoc TilesetTarget.addEntry} */
   addEntry(key: string, content: Buffer) {
     if (!this.archive) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");
@@ -103,6 +116,7 @@ export class TilesetTarget3tz implements TilesetTarget {
     this.indexBuilder.addEntry(key, content.length);
   }
 
+  /** {@inheritDoc TilesetTarget.end} */
   async end() {
     if (!this.archive) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");
@@ -111,7 +125,7 @@ export class TilesetTarget3tz implements TilesetTarget {
     // Create the index data, and add it as the LAST entry of the ZIP
     const indexData = this.indexBuilder.createBuffer();
     this.archive.append(indexData, { name: "@3dtilesIndex1@" });
-    this.archive.finalize();
+    await this.archive.finalize();
 
     await this.finishedPromise;
     this.finishedPromise = undefined;

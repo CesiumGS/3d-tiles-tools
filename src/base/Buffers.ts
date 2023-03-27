@@ -1,4 +1,8 @@
+import zlib from "zlib";
+
 import { defined } from "./defined";
+
+import { DataError } from "./DataError";
 
 /**
  * Methods related to buffers.
@@ -10,6 +14,43 @@ import { defined } from "./defined";
  * @internal
  */
 export class Buffers {
+  /**
+   * Applies GZIP compression to the given buffer, and returns
+   * the result.
+   *
+   * @param inputBuffer - The input buffer
+   * @returns The resulting buffer
+   */
+  static gzip(inputBuffer: Buffer): Buffer {
+    const outputBuffer = zlib.gzipSync(inputBuffer);
+    return outputBuffer;
+  }
+
+  /**
+   * If the given buffer is compressed with GZIP, then it is
+   * unzipped, and the result is returned. Otherwise, the
+   * given buffer is returned as it is.
+   *
+   * @param inputBuffer - The input buffer
+   * @returns The resulting buffer
+   * @throws DataError If the buffer looked like GZIPped
+   * data, but could not be decompressed.
+   */
+  static gunzip(inputBuffer: Buffer): Buffer {
+    let outputBuffer: Buffer;
+    if (Buffers.isGzipped(inputBuffer)) {
+      try {
+        outputBuffer = zlib.gunzipSync(inputBuffer);
+      } catch (e) {
+        const message = `Could not gunzip buffer: ${e}`;
+        throw new DataError(message);
+      }
+    } else {
+      outputBuffer = inputBuffer;
+    }
+    return outputBuffer;
+  }
+
   /**
    * Obtains the magic header from the given buffer.
    *
@@ -81,13 +122,18 @@ export class Buffers {
    *
    * @param buffer - The buffer
    * @returns The parsed object
-   * @throws Possible errors from `JSON:parse`
+   * @throws DataError If the JSON could not be parsed
    */
   static getJson(buffer: Buffer): any {
     if (buffer.length === 0) {
       return {};
     }
-    return JSON.parse(buffer.toString("utf8"));
+    try {
+      return JSON.parse(buffer.toString("utf8"));
+    } catch (e) {
+      const message = `Could not parse JSON from buffer: ${e}`;
+      throw new DataError(message);
+    }
   }
 
   /**
@@ -190,5 +236,20 @@ export class Buffers {
       }
     }
     return true;
+  }
+
+  /**
+   * Creates a string representation of the given buffer where each
+   * byte is encoded in its binary form, consisting of 8 bits.
+   *
+   * Warning: This is primarily intended for debugging. The resulting
+   * string may be very long...
+   *
+   * @param buffer - The input buffer
+   * @returns The resulting string
+   */
+  static createBinaryString(buffer: Buffer): string {
+    const s = [...buffer].map((b) => b.toString(2).padStart(8, "0")).join("");
+    return s;
   }
 }

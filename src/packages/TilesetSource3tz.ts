@@ -41,6 +41,7 @@ export class TilesetSource3tz implements TilesetSource {
     return this.zipIndex;
   }
 
+  /** {@inheritDoc TilesetSource.open} */
   open(fullInputName: string) {
     if (defined(this.fd)) {
       throw new TilesetError("Source already opened");
@@ -50,6 +51,7 @@ export class TilesetSource3tz implements TilesetSource {
     this.zipIndex = ArchiveFunctions3tz.readZipIndex(this.fd);
   }
 
+  /** {@inheritDoc TilesetSource.getKeys} */
   getKeys(): IterableIterator<string> {
     if (!defined(this.fd) || !this.zipIndex) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
@@ -81,7 +83,8 @@ export class TilesetSource3tz implements TilesetSource {
     return iterator;
   }
 
-  getValue(key: string) {
+  /** {@inheritDoc TilesetSource.getValue} */
+  getValue(key: string): Buffer | undefined {
     if (!defined(this.fd) || !this.zipIndex) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
@@ -93,6 +96,7 @@ export class TilesetSource3tz implements TilesetSource {
     return entryData;
   }
 
+  /** {@inheritDoc TilesetSource.close} */
   close() {
     if (!defined(this.fd) || !this.zipIndex) {
       throw new TilesetError("Source is not opened. Call 'open' first.");

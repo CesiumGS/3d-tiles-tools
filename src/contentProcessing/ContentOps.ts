@@ -1,26 +1,8 @@
-import zlib from "zlib";
-
-import { Buffers } from "../base/Buffers";
 import { GltfUtilities } from "./GtlfUtilities";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 
 export class ContentOps {
-  static gzipBuffer(inputBuffer: Buffer): Buffer {
-    const outputBuffer = zlib.gzipSync(inputBuffer);
-    return outputBuffer;
-  }
-
-  static gunzipBuffer(inputBuffer: Buffer): Buffer {
-    let outputBuffer: Buffer;
-    if (Buffers.isGzipped(inputBuffer)) {
-      outputBuffer = zlib.gunzipSync(inputBuffer);
-    } else {
-      outputBuffer = inputBuffer;
-    }
-    return outputBuffer;
-  }
-
   static b3dmToGlbBuffer(inputBuffer: Buffer): Buffer {
     const inputTileData = TileFormats.readTileData(inputBuffer);
     const outputBuffer = inputTileData.payload;

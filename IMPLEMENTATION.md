@@ -9,28 +9,50 @@ Parts of the current implementation may still change. This page is only a short 
 - `./src/base`: Generic, low-level utility functions.
   Most of the functions here are grouped into classes.
   - `Buffers`: Padding, detecting GZIPpedness, obtaining "magic" bytes...
+  - `DataError`: An error indicating that input data was invalid on a low level (e.g. invalid binary data, or unparseable JSON)
   - `DeveloperError`: An error that was caused by the _developer_ (i.e. someone used the API in a wrong way)
   - `Iterables`: Iterating over files, filtering, mapping...
   - `Paths`: Resolving, checking/changing file extensions, ...
   - `Uris`: Detect data URIs or absolute URIs
   - Special cases: `defined` and `defaultValue`. These have some documentation explaining why they should rarely be used in TypeScript.
 
-- `./src/contentOperations`: Operations that are applied to tile content
-  - `ContentOps`: Functions like ZIP/unZIP, conversions like `glbToB3dm`, _always_ operating on buffers: "Buffer in - Buffer out"
+- `./src/contentProcessing`: Operations that are applied to tile content
+  - `ContentOps`: Functions like `glbToB3dm`, _always_ operating on buffers: "Buffer in - Buffer out"
   - `GltfUtilites`/`GltfPipelineLegacy`: Wrappers around `gltf-pipeline` (e.g. for optimizing/upgrading the GLB in a B3DM)
 
 - `./src/contentTypes`: Classes for determining the type of content data
   - `ContentData` as the main interface, implemented as `BufferedContentData` (to be created from a buffer that already exists in memory), or `LazyContentData` (that resolves "as little data as possible" to determine the content type)
-  - `ContentDataTypeRegistry`: Receives a `ContentData` object and returns a string that indicates the type, like `CONTENT_TYPE_B3DM` or `CONTENT_TYPE_TILESET`.
+  - `ContentDataTypes`: A set of strings representing different content data types, like `CONTENT_TYPE_B3DM` or `CONTENT_TYPE_TILESET`.
+  - `ContentDataTypeRegistry`: Receives a `ContentData` object and returns one of the `ContentDataTypes` strings
   - `ContentDataTypeChecks`: Offers methods to create predicates that check for certain `included/excluded` content types
 
+- `./src/implicitTiling/`: Classes that represent the structure and information of implicit tilesets
+  - `AvailabilityInfo`: A simple interface for representing information about the availability of tiles, content, or child subtrees in implicit tiling. This is accessed with an _index_. Instances of classes implementing this interface can be created with the `AvailabilityInfos` class. 
+  - `SubtreeInfo`: A structure that combines the `AvailabilityInfo` for tiles, content, and child subtrees (as it is defined in the input data). Instances of this structure can be created from a subtree JSON file or from binary subtree data, using the `SubtreeInfos` class.
+  - `BinarySubtreeData`: A simple structure from which the `SubtreeInfo` is created. It combines the data that represents a 'subtree' in implicit tiling, in its 'raw' form: It contains the `Subtree` JSON object, as well as a `BinaryBufferStructure`/`BinaryBufferData` that was created from the `buffers/bufferViews` and the resolved binary data
+  - `BinarySubtreeDataResolver`: A class that receives a `Subtree` JSON object, and returns the `BinarySubtreeData`, resolving all external `buffer.uri` references
+  - `ImplicitTilingError`: An error indicating that implicit tiling data was structurally invalid
+  - `ImplicitTilings`: Methods that try to hide the difference between `QUADTREE` and `OCTREE` tilings. They usually receive a `TileImplicitTiling` JSON object, and perform operations that _depend_ on the `subdivisionScheme`, but can be applied _agnostically_ of the subvision scheme. (Note: Some of this could be done in a cleaner and more generic way, involving ... generics (sic). This _does_ already exist (in a different language), but carrying type parameters along, as in `Availability<TreeCoordinates<Octree>>` can look obscure and "overengineered" at the first glance. I only hope that the current solution here does not turn out to be _underengineered_ ...)
+  - `TemplateUris`: Internal method to substitute quadtree- or octree coordinates into template URIs
+  
 - `./src/io`: Classes for "loading data" in a very generic way, from different sources
   - `ResourceResolver` is the main interface, with the core functionality of receiving a URI and returning the data for that URI, with implementations to obtain that data e.g. from a file system or from a 3D Tiles Package.
+
+- `./src/metadata/`: Classes for an implementation of the 3D Metadata Specification
+  - Utilities for dealing with the JSON representations of metadata objects `ClassProperties`/`MetadataTypes`/`MetadataComponentTypes`...
+  - Internal utilities for processing metadata values (e.g. normalization, `offset` and `scale` etc.), in `MetadataValues` and `ArrayValues`.
+  - The `PropertyTableModel`, `MetadataEntityModel` and `PropertyModel` interfaces offer a very thin and simple abstraction layer for 3D Metadata. The structure of these classes is shown here:
+  ![PropertyTable](figures/PropertyTable.png)
+  - Implementations of these interfaces exist:
+    - For the JSON-based representation of metadata entities, metadata entity model instances can be created with `MetadataEntityModels`
+    - `./src/metadata/binary` contains implementations of the metadata interfaces for _binary_ data, with `BinaryPropertyTableModel` being the top-level class, implementing the `PropertyTableModel` interface.
 
 - `./src/packages`: Classes for reading or creating 3D Tiles Package files
   - These are implementations of the `TilesetSource` and `TilesetTarget` interface (see `./src/tilesetData`), based on 3TZ or 3DTILES
 
 - `./src/pipelines`: **Preliminary** classes for modeling "processing pipelines" for tilesets
+
+- `./src/spatial`: Basic classes for dealing with tree structures, specifically with quadtrees and octrees
 
 - `./src/structure`: Plain old data objects for the elements of a Tileset JSON
   - E.g. `Tileset`, `Tile`, `Content`, ...
@@ -56,6 +78,11 @@ Parts of the current implementation may still change. This page is only a short 
   - `Tiles` for traversing (explicit!) tile hierarchies
   - `Tilesets` offering convenience functions for `merge/combine/upgrade`
 
+- `./src/traversal`: Classes for traversing tilesets
+  - NOTE: The `SubtreeModel`/`SubtreeMetadataModel` interfaces _might_ at some point be moved into `implicitTiling`, but are currently tailored for the use in the traversal classes, and should be considered to be an "implementation detail" here.
+  - The `TilesetTraverser` class is the entry point for the traversal. It allows traversing a tileset, and offer each traversed tile as a `TraversedTile` instance. The `TraversedTile` describes a tile during traversal (e.g. with a parent, and semantic-based overrides)
+
+
 ## Demos
 
 The `./demos/` folder contains demos that show how to use various parts of the API
@@ -71,6 +98,8 @@ The `./demos/` folder contains demos that show how to use various parts of the A
 - `TileFormatsDemoConversions`: Demos showing how to use the `TileFormats` class for conversions (like extracting GLB from B3DM etc.)
 - `TilesetProcessingDemos`: Demos for the `combine/merge/upgrade` functions
 - `TilesetUpgraderDemos`: More fine-grained demos for the upgrade functionality
+- `TraversalDemo`: A basic example showing how to traverse a tileset
+- `TraversalStatsDemo`: A basic example showing how to traverse a tileset and collect statistical information in the process.
 
 The `./demos/benchmarks` folder contains very basic benchmarks for creating/reading different 3D Tiles package formats.
 

@@ -63,3 +63,56 @@ export * from "./io/UnzippingResourceResolver";
 
 export * from "./contentTypes/ContentData";
 export * from "./contentTypes/ContentDataTypeRegistry";
+export * from "./contentTypes/LazyContentData";
+
+export * from "./binary/BinaryBufferData";
+export * from "./binary/BinaryBufferDataResolver";
+export * from "./binary/BinaryBuffers";
+export * from "./binary/BinaryBufferStructure";
+export * from "./binary/BinaryDataError";
+
+export * from "./implicitTiling/AvailabilityInfo";
+export * from "./implicitTiling/AvailabilityInfos";
+export * from "./implicitTiling/BinarySubtreeData";
+export * from "./implicitTiling/BinarySubtreeDataResolver";
+export * from "./implicitTiling/ImplicitTilingError";
+export * from "./implicitTiling/ImplicitTilings";
+export * from "./implicitTiling/SubtreeInfo";
+export * from "./implicitTiling/SubtreeInfos";
+export * from "./implicitTiling/TemplateUris";
+
+export * from "./spatial/OctreeCoordinates";
+export * from "./spatial/Octrees";
+export * from "./spatial/QuadtreeCoordinates";
+export * from "./spatial/Quadtrees";
+export * from "./spatial/TreeCoordinates";
+
+export * from "./metadata/ArrayValues";
+export * from "./metadata/ClassProperties";
+export * from "./metadata/DefaultMetadataEntityModel";
+export * from "./metadata/MetadataComponentTypes";
+export * from "./metadata/MetadataUtilities";
+export * from "./metadata/MetadataEntityModel";
+export * from "./metadata/MetadataEntityModels";
+export * from "./metadata/MetadataError";
+export * from "./metadata/MetadataTypes";
+export * from "./metadata/MetadataUtilities";
+export * from "./metadata/MetadataValues";
+export * from "./metadata/PropertyModel";
+export * from "./metadata/PropertyTableModel";
+
+export * from "./metadata/binary/BinaryPropertyTable";
+export * from "./metadata/binary/BinaryPropertyTables";
+export * from "./metadata/binary/BinaryPropertyTableModel";
+export * from "./metadata/binary/NumericBuffers";
+
+export * from "./traversal/ExplicitTraversedTile";
+export * from "./traversal/ExplicitTraversedTiles";
+export * from "./traversal/ImplicitTraversedTile";
+export * from "./traversal/SubtreeMetadataModel";
+export * from "./traversal/SubtreeMetadataModels";
+export * from "./traversal/SubtreeModel";
+export * from "./traversal/SubtreeModels";
+export * from "./traversal/TilesetTraverser";
+export * from "./traversal/TraversedTile";
+export * from "./traversal/TraversalCallback";

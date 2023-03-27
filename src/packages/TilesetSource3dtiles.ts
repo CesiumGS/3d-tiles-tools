@@ -25,6 +25,7 @@ export class TilesetSource3dtiles implements TilesetSource {
     this.db = undefined;
   }
 
+  /** {@inheritDoc TilesetSource.open} */
   open(fullInputName: string): void {
     if (this.db) {
       throw new TilesetError("Database already opened");
@@ -32,6 +33,7 @@ export class TilesetSource3dtiles implements TilesetSource {
     this.db = new DatabaseConstructor(fullInputName);
   }
 
+  /** {@inheritDoc TilesetSource.getKeys} */
   getKeys(): IterableIterator<string> {
     if (!this.db) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
@@ -41,6 +43,7 @@ export class TilesetSource3dtiles implements TilesetSource {
     return Iterables.map(iterator, (row) => row.key);
   }
 
+  /** {@inheritDoc TilesetSource.getValue} */
   getValue(key: string): Buffer | undefined {
     if (!this.db) {
       throw new Error("Source is not opened. Call 'open' first.");
@@ -53,6 +56,7 @@ export class TilesetSource3dtiles implements TilesetSource {
     return undefined;
   }
 
+  /** {@inheritDoc TilesetSource.close} */
   close() {
     if (!this.db) {
       throw new Error("Source is not opened. Call 'open' first.");

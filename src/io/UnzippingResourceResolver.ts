@@ -17,10 +17,12 @@ export class UnzippingResourceResolver implements ResourceResolver {
     this._delegate = delegate;
   }
 
+  /** {@inheritDoc ResourceResolver.resolveUri} */
   resolveUri(uri: string): string {
     return this._delegate.resolveUri(uri);
   }
 
+  /** {@inheritDoc ResourceResolver.resolveData} */
   async resolveData(uri: string): Promise<Buffer | null> {
     const delegateData = await this._delegate.resolveData(uri);
     if (delegateData === null) {
@@ -34,6 +36,7 @@ export class UnzippingResourceResolver implements ResourceResolver {
     return data;
   }
 
+  /** {@inheritDoc ResourceResolver.resolveDataPartial} */
   async resolveDataPartial(
     uri: string,
     maxBytes: number
@@ -56,6 +59,8 @@ export class UnzippingResourceResolver implements ResourceResolver {
     const data = zlib.gunzipSync(fullDelegateData);
     return data;
   }
+
+  /** {@inheritDoc ResourceResolver.derive} */
   derive(uri: string): ResourceResolver {
     return new UnzippingResourceResolver(this._delegate.derive(uri));
   }

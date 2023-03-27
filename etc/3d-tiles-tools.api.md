@@ -28,6 +28,20 @@ export class ArchiveFunctions3tz {
     static zipIndexFind(zipIndex: IndexEntry[], searchHash: Buffer): number;
 }
 
+// Warning: (ae-internal-missing-underscore) The name "ArrayValues" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class ArrayValues {
+    static anyDeepGreaterThan(a: any, b: any): boolean;
+    static anyDeepLessThan(a: any, b: any): boolean;
+    static deepAdd(value: any, addend: any): any;
+    static deepClone(value: any): any;
+    static deepEquals(a: any, b: any): boolean;
+    static deepMax(a: any, b: any): any;
+    static deepMin(a: any, b: any): any;
+    static deepMultiply(value: any, factor: any): any;
+}
+
 // Warning: (ae-internal-missing-underscore) The name "Asset" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
@@ -48,6 +62,113 @@ export interface Availability extends RootProperty {
     bitstream?: number;
     // (undocumented)
     constant?: number;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "AvailabilityInfo" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface AvailabilityInfo {
+    isAvailable(index: number): boolean;
+    get length(): number;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "AvailabilityInfos" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class AvailabilityInfos {
+    static createChildSubtree(availability: Availability, bufferViewDatas: Buffer[], implicitTiling: TileImplicitTiling): AvailabilityInfo;
+    static createTileOrContent(availability: Availability, bufferViewDatas: Buffer[], implicitTiling: TileImplicitTiling): AvailabilityInfo;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "BinaryBufferData" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface BinaryBufferData {
+    buffersData: Buffer[];
+    bufferViewsData: Buffer[];
+}
+
+// Warning: (ae-internal-missing-underscore) The name "BinaryBufferDataResolver" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class BinaryBufferDataResolver {
+    static resolve(binaryBufferStructure: BinaryBufferStructure, binaryBuffer: Buffer | undefined, resourceResolver: ResourceResolver): Promise<BinaryBufferData>;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "BinaryBuffers" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class BinaryBuffers {
+    static createBinaryBufferStructure(binaryBufferData: BinaryBufferData, newBufferViewsData: Buffer[]): BinaryBufferStructure;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "BinaryBufferStructure" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface BinaryBufferStructure {
+    // (undocumented)
+    buffers: BufferObject[];
+    // (undocumented)
+    bufferViews: BufferView[];
+}
+
+// Warning: (ae-internal-missing-underscore) The name "BinaryDataError" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class BinaryDataError extends Error {
+    constructor(message: string);
+    // (undocumented)
+    toString: () => string;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "BinaryPropertyTable" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface BinaryPropertyTable {
+    binaryBufferData: BinaryBufferData;
+    binaryBufferStructure: BinaryBufferStructure;
+    // Warning: (ae-forgotten-export) The symbol "BinaryEnumInfo" needs to be exported by the entry point index.d.ts
+    binaryEnumInfo: BinaryEnumInfo;
+    metadataClass: MetadataClass;
+    propertyTable: PropertyTable;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "BinaryPropertyTableModel" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class BinaryPropertyTableModel implements PropertyTableModel {
+    constructor(binaryPropertyTable: BinaryPropertyTable);
+    getClassProperty(propertyId: string): ClassProperty | undefined;
+    getMetadataEntityModel(index: number): MetadataEntityModel;
+    getPropertyModel(propertyId: string): PropertyModel | undefined;
+    getPropertyTableProperty(propertyId: string): PropertyTableProperty | undefined;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "BinaryPropertyTables" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class BinaryPropertyTables {
+    static createBinaryPropertyTable(schema: Schema, className: string, propertyName: string, values: any, arrayOffsetType: string | undefined, stringOffsetType: string | undefined): BinaryPropertyTable;
+    static createBinaryPropertyTableFromProperty(propertyName: string, classProperty: ClassProperty, values: any, arrayOffsetType: string | undefined, stringOffsetType: string | undefined, metadataEnum: MetadataEnum | undefined): BinaryPropertyTable;
+    static createSchemaFromClassProperty(propertyName: string, classProperty: ClassProperty, metadataEnum: MetadataEnum | undefined): Schema;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "BinarySubtreeData" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface BinarySubtreeData {
+    binaryBufferData: BinaryBufferData;
+    binaryBufferStructure: BinaryBufferStructure;
+    subtree: Subtree;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "BinarySubtreeDataResolver" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class BinarySubtreeDataResolver {
+    static resolveFromBuffer(input: Buffer, resourceResolver: ResourceResolver): Promise<BinarySubtreeData>;
+    static resolveFromJson(subtree: Subtree, resourceResolver: ResourceResolver): Promise<BinarySubtreeData>;
+    static resolveInternal(subtree: Subtree, binaryBuffer: Buffer | undefined, resourceResolver: ResourceResolver): Promise<BinarySubtreeData>;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "BoundingVolume" should be prefixed with an underscore because the declaration is marked as @internal
@@ -78,11 +199,14 @@ export interface BufferObject extends RootProperty {
 //
 // @internal
 export class Buffers {
+    static createBinaryString(buffer: Buffer): string;
     static getBufferPadded(buffer: Buffer, byteOffset?: number): Buffer;
     static getJson(buffer: Buffer): any;
     static getJsonBufferPadded(json: any, byteOffset?: number): Buffer;
     static getMagic(buffer: Buffer, byteOffset?: number): string;
     static getUnicodeBOMDescription(buffer: Buffer): string | undefined;
+    static gunzip(inputBuffer: Buffer): Buffer;
+    static gzip(inputBuffer: Buffer): Buffer;
     static isGzipped(buffer: Buffer): boolean;
     static isProbablyJson(buffer: Buffer): boolean;
 }
@@ -99,6 +223,14 @@ export interface BufferView extends RootProperty {
     byteOffset: number;
     // (undocumented)
     name?: string;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "ClassProperties" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class ClassProperties {
+    static hasEffectivelyFloatingPointType(property: ClassProperty): boolean;
+    static hasNumericType(property: ClassProperty): boolean;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "ClassProperty" should be prefixed with an underscore because the declaration is marked as @internal
@@ -172,6 +304,17 @@ export class ContentDataTypeRegistry {
     static findContentDataType(contentData: ContentData): Promise<string | undefined>;
 }
 
+// Warning: (ae-internal-missing-underscore) The name "DefaultMetadataEntityModel" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class DefaultMetadataEntityModel implements MetadataEntityModel {
+    constructor(metadataClass: MetadataClass, semanticToPropertyId: {
+        [key: string]: string;
+    }, json: any);
+    getPropertyValue(propertyId: string): any;
+    getPropertyValueBySemantic(semantic: string): any;
+}
+
 // Warning: (ae-internal-missing-underscore) The name "defaultValue" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
@@ -180,7 +323,7 @@ export function defaultValue<T>(a: T | undefined, b: T): T;
 // Warning: (ae-internal-missing-underscore) The name "defined" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
-export function defined<T>(value: any): value is NonNullable<T>;
+export function defined<T>(value: T): value is NonNullable<T>;
 
 // Warning: (ae-internal-missing-underscore) The name "DeveloperError" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -203,18 +346,47 @@ export interface EnumValue extends RootProperty {
     value: number;
 }
 
+// Warning: (ae-internal-missing-underscore) The name "ExplicitTraversedTile" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class ExplicitTraversedTile implements TraversedTile {
+    constructor(tile: Tile, path: string, level: number, parent: TraversedTile | undefined, schema: Schema | undefined, resourceResolver: ResourceResolver);
+    asFinalTile(): Tile;
+    asRawTile(): Tile;
+    getChildren(): Promise<TraversedTile[]>;
+    // (undocumented)
+    getFinalContents(): Content[];
+    // (undocumented)
+    getImplicitTiling(): TileImplicitTiling | undefined;
+    // (undocumented)
+    getMetadata(): MetadataEntity | undefined;
+    getParent(): TraversedTile | undefined;
+    getRawContents(): Content[];
+    // (undocumented)
+    getSubtreeUri(): string | undefined;
+    get level(): number;
+    get path(): string;
+    // (undocumented)
+    resolveUri(uri: string): string;
+    // (undocumented)
+    toString: () => string;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "ExplicitTraversedTiles" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class ExplicitTraversedTiles {
+    static createTraversedChildren(implicitTiling: TileImplicitTiling, schema: Schema | undefined, parent: ExplicitTraversedTile, resourceResolver: ResourceResolver): Promise<TraversedTile[]>;
+}
+
 // Warning: (ae-internal-missing-underscore) The name "FileResourceResolver" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
 export class FileResourceResolver implements ResourceResolver {
     constructor(basePath: string);
-    // (undocumented)
     derive(uri: string): ResourceResolver;
-    // (undocumented)
     resolveData(uri: string): Promise<Buffer | null>;
-    // (undocumented)
     resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
-    // (undocumented)
     resolveUri(uri: string): string;
 }
 
@@ -222,6 +394,56 @@ export class FileResourceResolver implements ResourceResolver {
 //
 // @internal (undocumented)
 export interface Group extends MetadataEntity {
+}
+
+// Warning: (ae-internal-missing-underscore) The name "ImplicitTilingError" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class ImplicitTilingError extends Error {
+    constructor(message: string);
+    // (undocumented)
+    toString: () => string;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "ImplicitTilings" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class ImplicitTilings {
+    static computeNumberOfNodesInLevel(implicitTiling: TileImplicitTiling, level: number): number;
+    static computeNumberOfNodesPerSubtree(implicitTiling: TileImplicitTiling): number;
+    static createRootCoordinates(implicitTiling: TileImplicitTiling): TreeCoordinates;
+    static createString(coordinates: TreeCoordinates): string;
+    static createSubtreeCoordinatesIterator(implicitTiling: TileImplicitTiling): IterableIterator<TreeCoordinates>;
+    static globalizeCoordinates(implicitTiling: TileImplicitTiling, rootCoordinates: TreeCoordinates, coordinates: TreeCoordinates): TreeCoordinates;
+    static substituteTemplateUri(subdivisionScheme: string, templateUri: string, coordinates: TreeCoordinates): string;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "ImplicitTraversedTile" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class ImplicitTraversedTile implements TraversedTile {
+    constructor(implicitTiling: TileImplicitTiling, resourceResolver: ResourceResolver, root: TraversedTile, path: string, subtreeModel: SubtreeModel, globalLevel: number, globalCoordinate: TreeCoordinates, rootCoordinate: TreeCoordinates, localCoordinate: TreeCoordinates, parent: TraversedTile);
+    asFinalTile(): Tile;
+    asRawTile(): Tile;
+    getChildren(): Promise<TraversedTile[]>;
+    // (undocumented)
+    getFinalContents(): Content[];
+    getGlobalCoordinate(): TreeCoordinates;
+    // (undocumented)
+    getImplicitTiling(): TileImplicitTiling | undefined;
+    getLocalCoordinate(): TreeCoordinates;
+    // (undocumented)
+    getMetadata(): MetadataEntity | undefined;
+    getParent(): TraversedTile | undefined;
+    getRawContents(): Content[];
+    // (undocumented)
+    getSubtreeUri(): string | undefined;
+    get level(): number;
+    get path(): string;
+    // (undocumented)
+    resolveUri(uri: string): string;
+    // (undocumented)
+    toString: () => string;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "IndexBuilder" should be prefixed with an underscore because the declaration is marked as @internal
@@ -261,6 +483,19 @@ export class Iterables {
     static overFiles(directory: string | PathLike, recurse?: boolean): IterableIterator<string>;
 }
 
+// Warning: (ae-internal-missing-underscore) The name "LazyContentData" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class LazyContentData implements ContentData {
+    constructor(uri: string, resourceResolver: ResourceResolver);
+    exists(): Promise<boolean>;
+    get extension(): string;
+    getData(): Promise<Buffer | null>;
+    getMagic(): Promise<string>;
+    getParsedObject(): Promise<any>;
+    get uri(): string;
+}
+
 // Warning: (ae-internal-missing-underscore) The name "MetadataClass" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
@@ -275,6 +510,20 @@ export interface MetadataClass extends RootProperty {
     };
 }
 
+// Warning: (ae-internal-missing-underscore) The name "MetadataComponentTypes" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class MetadataComponentTypes {
+    static allComponentTypes: string[];
+    static byteSizeForComponentType(componentType: string): number;
+    static integerComponentTypes: string[];
+    static isIntegerComponentType(componentType: string | undefined): boolean;
+    static isUnsignedComponentType(componentType: string | undefined): boolean;
+    // (undocumented)
+    static normalize(value: number, componentType: string | undefined): number;
+    static unsignedComponentTypes: string[];
+}
+
 // Warning: (ae-internal-missing-underscore) The name "MetadataEntity" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
@@ -285,6 +534,27 @@ export interface MetadataEntity extends RootProperty {
     properties?: {
         [key: string]: any;
     };
+}
+
+// Warning: (ae-internal-missing-underscore) The name "MetadataEntityModel" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface MetadataEntityModel {
+    getPropertyValue(propertyId: string): any;
+    getPropertyValueBySemantic(semantic: string): any;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "MetadataEntityModels" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class MetadataEntityModels {
+    static computeSemanticToPropertyIdMapping(metadataClass: MetadataClass): {
+        [key: string]: string;
+    };
+    static create(schema: Schema, entity: MetadataEntity): MetadataEntityModel;
+    static createFromClass(metadataClass: MetadataClass, entityProperties: {
+        [key: string]: any;
+    }): DefaultMetadataEntityModel;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "MetadataEnum" should be prefixed with an underscore because the declaration is marked as @internal
@@ -299,6 +569,80 @@ export interface MetadataEnum extends RootProperty {
     values: EnumValue[];
     // (undocumented)
     valueType?: string;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "MetadataError" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class MetadataError extends Error {
+    constructor(message: string);
+    // (undocumented)
+    toString: () => string;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "MetadataTypes" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class MetadataTypes {
+    static allTypes: string[];
+    static componentCountForType(type: string): number;
+    static isNumericType(type: string): boolean;
+    static numericTypes: string[];
+}
+
+// Warning: (ae-internal-missing-underscore) The name "MetadataUtilities" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class MetadataUtilities {
+    static computeBinaryEnumInfo(schema: Schema): BinaryEnumInfo;
+    static obtainEnumValueNames(classProperty: ClassProperty, schema: Schema): string[];
+}
+
+// Warning: (ae-internal-missing-underscore) The name "MetadataValues" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class MetadataValues {
+    static processValue(classProperty: ClassProperty, offsetOverride: any, scaleOverride: any, value: any): any;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "NumericBuffers" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class NumericBuffers {
+    static getNumericArrayFromBuffer(buffer: Buffer, index: number, arrayLength: number, componentType: string): any;
+    static getNumericBufferAsArray(buffer: Buffer, componentType: string): any;
+    static getNumericFromBuffer(buffer: Buffer, index: number, componentType: string): any;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "OctreeCoordinates" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class OctreeCoordinates implements TreeCoordinates {
+    constructor(level: number, x: number, y: number, z: number);
+    children(): IterableIterator<OctreeCoordinates>;
+    descendants(maxLevelInclusive: number, depthFirst: boolean): IterableIterator<OctreeCoordinates>;
+    get level(): number;
+    parent(): OctreeCoordinates | null;
+    toArray(): number[];
+    toIndex(): number;
+    toIndexInLevel(): number;
+    // (undocumented)
+    toString: () => string;
+    // (undocumented)
+    get x(): number;
+    // (undocumented)
+    get y(): number;
+    // (undocumented)
+    get z(): number;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "Octrees" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class Octrees {
+    static computeNumberOfNodesForLevels(levels: number): number;
+    static coordinatesForLevel(level: number): Generator<OctreeCoordinates, void, unknown>;
+    static isValid(c: OctreeCoordinates): boolean;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "Paths" should be prefixed with an underscore because the declaration is marked as @internal
@@ -324,6 +668,13 @@ export interface Properties extends RootProperty {
     minimum: number;
 }
 
+// Warning: (ae-internal-missing-underscore) The name "PropertyModel" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface PropertyModel {
+    getPropertyValue(index: number): any;
+}
+
 // Warning: (ae-internal-missing-underscore) The name "PropertyTable" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
@@ -338,6 +689,16 @@ export interface PropertyTable extends RootProperty {
     properties?: {
         [key: string]: PropertyTableProperty;
     };
+}
+
+// Warning: (ae-internal-missing-underscore) The name "PropertyTableModel" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface PropertyTableModel {
+    getClassProperty(propertyId: string): ClassProperty | undefined;
+    getMetadataEntityModel(index: number): MetadataEntityModel;
+    getPropertyModel(propertyId: string): PropertyModel | undefined;
+    getPropertyTableProperty(propertyId: string): PropertyTableProperty | undefined;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "PropertyTableProperty" should be prefixed with an underscore because the declaration is marked as @internal
@@ -362,6 +723,35 @@ export interface PropertyTableProperty extends RootProperty {
     stringOffsetType?: string;
     // (undocumented)
     values: number;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "QuadtreeCoordinates" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class QuadtreeCoordinates implements TreeCoordinates {
+    constructor(level: number, x: number, y: number);
+    children(): IterableIterator<QuadtreeCoordinates>;
+    descendants(maxLevelInclusive: number, depthFirst: boolean): IterableIterator<QuadtreeCoordinates>;
+    get level(): number;
+    parent(): QuadtreeCoordinates | null;
+    toArray(): number[];
+    toIndex(): number;
+    toIndexInLevel(): number;
+    // (undocumented)
+    toString: () => string;
+    // (undocumented)
+    get x(): number;
+    // (undocumented)
+    get y(): number;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "Quadtrees" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class Quadtrees {
+    static computeNumberOfNodesForLevels(levels: number): number;
+    static coordinatesForLevel(level: number): Generator<QuadtreeCoordinates, void, unknown>;
+    static isValid(c: QuadtreeCoordinates): boolean;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "ResourceResolver" should be prefixed with an underscore because the declaration is marked as @internal
@@ -489,12 +879,73 @@ export interface Subtree extends RootProperty {
     tileMetadata?: number;
 }
 
+// Warning: (ae-internal-missing-underscore) The name "SubtreeInfo" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface SubtreeInfo {
+    childSubtreeAvailabilityInfo: AvailabilityInfo;
+    contentAvailabilityInfos: AvailabilityInfo[];
+    tileAvailabilityInfo: AvailabilityInfo;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "SubtreeInfos" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class SubtreeInfos {
+    static create(binarySubtreeData: BinarySubtreeData, implicitTiling: TileImplicitTiling): SubtreeInfo;
+    static createFromBuffer(input: Buffer, implicitTiling: TileImplicitTiling, resourceResolver: ResourceResolver): Promise<SubtreeInfo>;
+    static createFromJson(subtree: Subtree, implicitTiling: TileImplicitTiling, resourceResolver: ResourceResolver): Promise<SubtreeInfo>;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "SubtreeMetadataModel" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface SubtreeMetadataModel {
+    contentIndexMappings: number[][];
+    contentMetadataModels: PropertyTableModel[];
+    schema: Schema;
+    tileIndexMapping: number[] | undefined;
+    tileMetadataModel: PropertyTableModel | undefined;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "SubtreeMetadataModels" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class SubtreeMetadataModels {
+    static create(binarySubtreeData: BinarySubtreeData, subtreeInfo: SubtreeInfo, schema: Schema): SubtreeMetadataModel;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "SubtreeModel" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface SubtreeModel {
+    subtreeInfo: SubtreeInfo;
+    subtreeMetadataModel: SubtreeMetadataModel | undefined;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "SubtreeModels" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class SubtreeModels {
+    static resolve(implicitTiling: TileImplicitTiling, schema: Schema | undefined, resourceResolver: ResourceResolver, coordinates: TreeCoordinates): Promise<SubtreeModel>;
+}
+
 // Warning: (ae-internal-missing-underscore) The name "Subtrees" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
 export interface Subtrees extends RootProperty {
     // (undocumented)
     uri: string;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "TemplateUris" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class TemplateUris {
+    static substituteOctree(templateUri: string, coordinates: OctreeCoordinates): string;
+    static substituteOctreeInternal(templateUri: string, level: number, x: number, y: number, z: number): string;
+    static substituteQuadtree(templateUri: string, coordinates: QuadtreeCoordinates): string;
+    static substituteQuadtreeInternal(templateUri: string, level: number, x: number, y: number): string;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "Tile" should be prefixed with an underscore because the declaration is marked as @internal
@@ -597,13 +1048,9 @@ export interface TilesetSource {
 // @internal
 export class TilesetSource3dtiles implements TilesetSource {
     constructor();
-    // (undocumented)
     close(): void;
-    // (undocumented)
     getKeys(): IterableIterator<string>;
-    // (undocumented)
     getValue(key: string): Buffer | undefined;
-    // (undocumented)
     open(fullInputName: string): void;
 }
 
@@ -612,15 +1059,11 @@ export class TilesetSource3dtiles implements TilesetSource {
 // @internal
 export class TilesetSource3tz implements TilesetSource {
     constructor();
-    // (undocumented)
     close(): void;
-    // (undocumented)
     getKeys(): IterableIterator<string>;
-    // (undocumented)
     getValue(key: string): Buffer | undefined;
     // (undocumented)
     getZipIndex(): IndexEntry[] | undefined;
-    // (undocumented)
     open(fullInputName: string): void;
 }
 
@@ -629,13 +1072,9 @@ export class TilesetSource3tz implements TilesetSource {
 // @internal
 export class TilesetSourceFs implements TilesetSource {
     constructor();
-    // (undocumented)
     close(): void;
-    // (undocumented)
     getKeys(): IterableIterator<string>;
-    // (undocumented)
     getValue(key: string): Buffer | undefined;
-    // (undocumented)
     open(fullInputName: string): void;
 }
 
@@ -644,13 +1083,9 @@ export class TilesetSourceFs implements TilesetSource {
 // @internal
 export class TilesetSourceResourceResolver implements ResourceResolver {
     constructor(basePath: string, tilesetSourceFileName: string, tilesetSource: TilesetSource);
-    // (undocumented)
     derive(uri: string): ResourceResolver;
-    // (undocumented)
     resolveData(uri: string): Promise<Buffer | null>;
-    // (undocumented)
     resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
-    // (undocumented)
     resolveUri(uri: string): string;
 }
 
@@ -677,11 +1112,8 @@ export interface TilesetTarget {
 // @internal
 export class TilesetTarget3dtiles implements TilesetTarget {
     constructor();
-    // (undocumented)
     addEntry(key: string, content: Buffer): void;
-    // (undocumented)
     begin(fullOutputName: string, overwrite: boolean): void;
-    // (undocumented)
     end(): Promise<void>;
 }
 
@@ -690,11 +1122,8 @@ export class TilesetTarget3dtiles implements TilesetTarget {
 // @internal
 export class TilesetTarget3tz implements TilesetTarget {
     constructor();
-    // (undocumented)
     addEntry(key: string, content: Buffer): void;
-    // (undocumented)
     begin(fullOutputName: string, overwrite: boolean): void;
-    // (undocumented)
     end(): Promise<void>;
 }
 
@@ -703,11 +1132,8 @@ export class TilesetTarget3tz implements TilesetTarget {
 // @internal
 export class TilesetTargetFs implements TilesetTarget {
     constructor();
-    // (undocumented)
     addEntry(key: string, content: Buffer): void;
-    // (undocumented)
     begin(fullOutputName: string, overwrite: boolean): void;
-    // (undocumented)
     end(): Promise<void>;
 }
 
@@ -720,18 +1146,64 @@ export class TilesetTargets {
     static putEntries(tilesetTarget: TilesetTarget, entries: IterableIterator<TilesetEntry>): void;
 }
 
+// Warning: (ae-internal-missing-underscore) The name "TilesetTraverser" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class TilesetTraverser {
+    static traverse(tileset: Tileset, schema: Schema | undefined, resourceResolver: ResourceResolver, traversalCallback: TraversalCallback, depthFirst: boolean): Promise<void>;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "TraversalCallback" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface TraversalCallback {
+    (traversedTile: TraversedTile): Promise<boolean>;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "TraversedTile" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface TraversedTile {
+    asFinalTile(): Tile;
+    asRawTile(): Tile;
+    getChildren(): Promise<TraversedTile[]>;
+    // (undocumented)
+    getFinalContents(): Content[];
+    // (undocumented)
+    getImplicitTiling(): TileImplicitTiling | undefined;
+    // (undocumented)
+    getMetadata(): MetadataEntity | undefined;
+    getParent(): TraversedTile | undefined;
+    getRawContents(): Content[];
+    // (undocumented)
+    getSubtreeUri(): string | undefined;
+    get level(): number;
+    get path(): string;
+    // (undocumented)
+    resolveUri(uri: string): string;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "TreeCoordinates" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface TreeCoordinates {
+    children(): IterableIterator<TreeCoordinates>;
+    descendants(maxLevelInclusive: number, depthFirst: boolean): IterableIterator<TreeCoordinates>;
+    get level(): number;
+    parent(): TreeCoordinates | null;
+    toArray(): number[];
+    toIndex(): number;
+    toIndexInLevel(): number;
+}
+
 // Warning: (ae-internal-missing-underscore) The name "UnzippingResourceResolver" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
 export class UnzippingResourceResolver implements ResourceResolver {
     constructor(delegate: ResourceResolver);
-    // (undocumented)
     derive(uri: string): ResourceResolver;
-    // (undocumented)
     resolveData(uri: string): Promise<Buffer | null>;
-    // (undocumented)
     resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
-    // (undocumented)
     resolveUri(uri: string): string;
 }
 

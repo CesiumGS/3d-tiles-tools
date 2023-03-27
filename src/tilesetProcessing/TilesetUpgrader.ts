@@ -19,8 +19,7 @@ import { Tilesets } from "../tilesets/Tilesets";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 
-import { GltfUtilities } from "../contentOperations/GtlfUtilities";
-import { ContentOps } from "../contentOperations/ContentOps";
+import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
 
 /**
  * The options for the upgrade. This is only used internally,
@@ -164,7 +163,7 @@ export class TilesetUpgrader {
     let tilesetJsonBufferWasZipped = false;
     if (Buffers.isGzipped(tilesetJsonBuffer)) {
       tilesetJsonBufferWasZipped = true;
-      tilesetJsonBuffer = ContentOps.gunzipBuffer(tilesetJsonBuffer);
+      tilesetJsonBuffer = Buffers.gunzip(tilesetJsonBuffer);
     }
     const tileset = JSON.parse(tilesetJsonBuffer.toString()) as Tileset;
 
@@ -176,7 +175,7 @@ export class TilesetUpgrader {
     const resultTilesetJsonString = JSON.stringify(tileset, null, 2);
     let resultTilesetJsonBuffer = Buffer.from(resultTilesetJsonString);
     if (tilesetJsonBufferWasZipped) {
-      resultTilesetJsonBuffer = ContentOps.gzipBuffer(resultTilesetJsonBuffer);
+      resultTilesetJsonBuffer = Buffers.gzip(resultTilesetJsonBuffer);
     }
     this.tilesetTarget.addEntry(
       tilesetTargetJsonFileName,

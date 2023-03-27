@@ -15,8 +15,8 @@
  * const value = 0;
  * if (defined(value)) console.log('defined');
  * else                console.log('not defined');
- * if (value)          console.log('truthy);
- * else                console.log('not truthy);
+ * if (value)          console.log('truthy');
+ * else                console.log('not truthy');
  * ```
  * will be
  * ```
@@ -28,6 +28,6 @@
  * @returns `true` if the value is not `undefined` and not `null`
  * @internal
  */
-export function defined<T>(value: any): value is NonNullable<T> {
+export function defined<T>(value: T): value is NonNullable<T> {
   return value !== undefined && value !== null;
 }

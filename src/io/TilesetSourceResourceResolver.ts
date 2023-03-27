@@ -14,24 +14,20 @@ import { ResourceResolver } from "./ResourceResolver";
  */
 export class TilesetSourceResourceResolver implements ResourceResolver {
   private readonly _basePath: string;
-  private readonly _tilesetSourceFileName: string;
   private readonly _tilesetSource: TilesetSource;
 
-  constructor(
-    basePath: string,
-    tilesetSourceFileName: string,
-    tilesetSource: TilesetSource
-  ) {
+  constructor(basePath: string, tilesetSource: TilesetSource) {
     this._basePath = basePath;
-    this._tilesetSourceFileName = tilesetSourceFileName;
     this._tilesetSource = tilesetSource;
   }
 
+  /** {@inheritDoc ResourceResolver.resolveUri} */
   resolveUri(uri: string): string {
     const resolved = path.resolve(this._basePath, decodeURIComponent(uri));
     return resolved;
   }
 
+  /** {@inheritDoc ResourceResolver.resolveData} */
   async resolveData(uri: string): Promise<Buffer | null> {
     if (Uris.isDataUri(uri)) {
       const data = Buffer.from(uri.split(",")[1], "base64");
@@ -48,6 +44,7 @@ export class TilesetSourceResourceResolver implements ResourceResolver {
     return value;
   }
 
+  /** {@inheritDoc ResourceResolver.resolveDataPartial} */
   async resolveDataPartial(
     uri: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -56,11 +53,11 @@ export class TilesetSourceResourceResolver implements ResourceResolver {
     return await this.resolveData(uri);
   }
 
+  /** {@inheritDoc ResourceResolver.derive} */
   derive(uri: string): ResourceResolver {
     const resolved = Paths.join(this._basePath, decodeURIComponent(uri));
     const result = new TilesetSourceResourceResolver(
       resolved,
-      this._tilesetSourceFileName,
       this._tilesetSource
     );
     return result;
