@@ -1,6 +1,7 @@
 import { Paths } from "../src/base/Paths";
 import { ContentOps } from "../src/contentProcessing/ContentOps";
 import { GltfUtilities } from "../src/contentProcessing/GtlfUtilities";
+import { ContentDataTypes } from "../src/contentTypes/ContentDataTypes";
 import { Content } from "../src/structure/Content";
 import { TilesetEntry } from "../src/tilesetData/TilesetEntry";
 
@@ -20,7 +21,7 @@ async function runB3dmToGlbTest() {
         sourceEntry: TilesetEntry,
         type: string | undefined
       ): Promise<TilesetEntry[]> {
-        if (type !== "CONTENT_TYPE_B3DM") {
+        if (type !== ContentDataTypes.CONTENT_TYPE_B3DM) {
           return [sourceEntry];
         }
         const targetEntry = {
@@ -54,7 +55,7 @@ async function runOptimizeTest() {
       sourceEntry: TilesetEntry,
       type: string | undefined
     ): Promise<TilesetEntry[]> {
-      if (type !== "CONTENT_TYPE_GLB") {
+      if (type !== ContentDataTypes.CONTENT_TYPE_GLB) {
         return [sourceEntry];
       }
       const targetEntry = {

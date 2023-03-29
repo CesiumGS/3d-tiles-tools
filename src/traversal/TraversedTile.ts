@@ -1,5 +1,6 @@
 import { Tile } from "../structure/Tile";
 import { Content } from "../structure/Content";
+import { ResourceResolver } from "../io/ResourceResolver";
 
 /**
  * An interface that summarizes context information for
@@ -136,18 +137,13 @@ export interface TraversedTile {
   getFinalContents(): Content[];
 
   /**
-   * Resolves the given URI against the context in which this
-   * tile appears.
+   * Returns the `ResourceResolver` that can be used for
+   * resolving the data that appears as `content.uri` in
+   * this tile.
    *
-   * This is primarily intended for (relative) content URIs.
-   * It will usually just resolve the given URI against the
-   * path that contained the tileset, resulting in an absolute
-   * URI that can be used to access the content.
-   *
-   * @param uri - The (content) uri
-   * @returns The resolved URI
+   * @returns The `ResourceResolver`
    */
-  resolveUri(uri: string): string;
+  getResourceResolver(): ResourceResolver;
 
   /**
    * Returns whether this tile is the root of an implicit tileset.

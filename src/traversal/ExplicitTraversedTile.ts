@@ -57,6 +57,44 @@ export class ExplicitTraversedTile implements TraversedTile {
    */
   private readonly _resourceResolver;
 
+  /**
+   * Convenience function to create the root tile for a tile
+   * traversal.
+   *
+   * @param root - The root tile from the tileset
+   * @param schema - The optional metadata schema
+   * @param resourceResolver - The `ResourceResolver` for
+   * external references (like subtree files)
+   * @returns The root `TraversedTile`
+   */
+  static createRoot(
+    root: Tile,
+    schema: Schema | undefined,
+    resourceResolver: ResourceResolver
+  ): TraversedTile {
+    const traversedRoot = new ExplicitTraversedTile(
+      root,
+      "/root",
+      0,
+      undefined,
+      schema,
+      resourceResolver
+    );
+    return traversedRoot;
+  }
+
+  /**
+   * Creates a new instance
+   *
+   * @param tile - The `Tile` from the tileset JSON
+   * @param path - A JSON-path-like string describing this tile
+   * @param level - The level, referring to the root of the
+   * traversal, starting at 0
+   * @param parent The optional parent tile
+   * @param schema The optional metadata schema
+   * @param resourceResolver - The `ResourceResolver` for
+   * external references (like subtree files)
+   */
   constructor(
     tile: Tile,
     path: string,
@@ -220,9 +258,9 @@ export class ExplicitTraversedTile implements TraversedTile {
     return finalContents;
   }
 
-  /** {@inheritDoc TraversedTile.resolveUri} */
-  resolveUri(uri: string): string {
-    return this._resourceResolver.resolveUri(uri);
+  /** {@inheritDoc TraversedTile.getResourceResolver} */
+  getResourceResolver(): ResourceResolver {
+    return this._resourceResolver;
   }
 
   /** {@inheritDoc TraversedTile.isImplicitTilesetRoot} */

@@ -4,6 +4,7 @@ import { readJsonUnchecked } from "./readJsonUnchecked";
 
 import { ResourceResolvers } from "../src/io/ResourceResolvers";
 import { TilesetTraverser } from "../src/traversal/TilesetTraverser";
+import { TraversedTile } from "../src/traversal/TraversedTile";
 
 async function tilesetTraversalDemo(filePath: string) {
   console.log(`Traversing tileset ${filePath}`);
@@ -12,15 +13,14 @@ async function tilesetTraversalDemo(filePath: string) {
   const resourceResolver =
     ResourceResolvers.createFileResourceResolver(directory);
   const tileset = await readJsonUnchecked(filePath);
-  // Note: External schemas are not considered here
-  const schema = tileset.schema;
-  const depthFirst = false;
-  const traverseExternalTilesets = true;
-  await TilesetTraverser.traverse(
+
+  const tilesetTraverser = new TilesetTraverser(directory, resourceResolver, {
+    depthFirst: false,
+    traverseExternalTilesets: true,
+  });
+  await tilesetTraverser.traverse(
     tileset,
-    schema,
-    resourceResolver,
-    async (traversedTile) => {
+    async (traversedTile: TraversedTile) => {
       const contentUris = traversedTile.getFinalContents().map((c) => c.uri);
       const geometricError = traversedTile.asFinalTile().geometricError;
       console.log(
@@ -30,9 +30,7 @@ async function tilesetTraversalDemo(filePath: string) {
           `geometricError ${geometricError}`
       );
       return true;
-    },
-    depthFirst,
-    traverseExternalTilesets
+    }
   );
   console.log("Traversing tileset DONE");
 }

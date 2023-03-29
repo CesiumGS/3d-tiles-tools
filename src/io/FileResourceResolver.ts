@@ -17,8 +17,7 @@ export class FileResourceResolver implements ResourceResolver {
     this._basePath = basePath;
   }
 
-  /** {@inheritDoc ResourceResolver.resolveUri} */
-  resolveUri(uri: string): string {
+  private resolveUri(uri: string): string {
     let resolved = path.resolve(this._basePath, decodeURIComponent(uri));
     resolved = resolved.replace(/\\/g, "/");
     return resolved;

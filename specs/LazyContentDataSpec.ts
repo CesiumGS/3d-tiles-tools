@@ -9,10 +9,6 @@ class SpecResourceResolver implements ResourceResolver {
     this.dataMap[uri] = buffer;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  resolveUri(uri: string): string {
-    throw new DeveloperError("Not supposed to be called.");
-  }
   async resolveData(uri: string): Promise<Buffer | null> {
     const data = this.dataMap[uri] as Buffer;
     if (!data) {

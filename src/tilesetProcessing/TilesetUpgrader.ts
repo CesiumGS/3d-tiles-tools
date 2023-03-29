@@ -3,6 +3,7 @@ import { DeveloperError } from "../base/DeveloperError";
 
 import { BufferedContentData } from "../contentTypes/BufferedContentData";
 import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
+import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 
 import { Tile } from "../structure/Tile";
 import { Tileset } from "../structure/Tileset";
@@ -16,11 +17,11 @@ import { TilesetSources } from "../tilesetData/TilesetSources";
 
 import { Tiles } from "../tilesets/Tiles";
 import { Tilesets } from "../tilesets/Tilesets";
+import { Extensions } from "../tilesets/Extensions";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 
 import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
-import { Extensions } from "../tilesets/Extensions";
 
 /**
  * The options for the upgrade. This is only used internally,
@@ -343,14 +344,14 @@ export class TilesetUpgrader {
     value: Buffer,
     type: string | undefined
   ): Promise<Buffer> {
-    if (type === "CONTENT_TYPE_B3DM") {
+    if (type === ContentDataTypes.CONTENT_TYPE_B3DM) {
       if (this.upgradeOptions.upgradeB3dmGltf1ToGltf2) {
         this.logCallback(`  Upgrading GLB in ${key}`);
         value = await TilesetUpgrader.upgradeB3dmGltf1ToGltf2(value);
       } else {
         this.logCallback(`  Not upgrading GLB in ${key} (disabled via option)`);
       }
-    } else if (type === "CONTENT_TYPE_I3DM") {
+    } else if (type === ContentDataTypes.CONTENT_TYPE_I3DM) {
       if (this.upgradeOptions.upgradeI3dmGltf1ToGltf2) {
         this.logCallback(`  Upgrading GLB in ${key}`);
         value = await TilesetUpgrader.upgradeI3dmGltf1ToGltf2(value);

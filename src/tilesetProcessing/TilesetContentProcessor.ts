@@ -126,12 +126,13 @@ export abstract class TilesetContentProcessor extends TilesetProcessor {
       ".",
       tilesetSource
     );
-    const depthFirst = false;
-    const traverseExternalTilesets = false;
-    await TilesetTraverser.traverse(
+    const tilesetTraverser = new TilesetTraverser(".", resourceResolver, {
+      depthFirst: false,
+      traverseExternalTilesets: true,
+    });
+    await tilesetTraverser.traverseWithSchema(
       tileset,
       schema,
-      resourceResolver,
       async (traversedTile) => {
         if (!traversedTile.isImplicitTilesetRoot()) {
           const contentUris = traversedTile
@@ -145,9 +146,7 @@ export abstract class TilesetContentProcessor extends TilesetProcessor {
           }
         }
         return true;
-      },
-      depthFirst,
-      traverseExternalTilesets
+      }
     );
   }
 
