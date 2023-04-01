@@ -1,28 +1,60 @@
-import { TilesetSource } from "../tilesetData/TilesetSource";
-import { TilesetSources } from "../tilesetData/TilesetSources";
-import { TilesetTarget } from "../tilesetData/TilesetTarget";
-import { TilesetTargets } from "../tilesetData/TilesetTargets";
-
 import { TilesetStage } from "./TilesetStage";
 import { ContentStageExecutor } from "./ContentStageExecutor";
 
+import { BasicTilesetProcessor } from "../tilesetProcessing/BasicTilesetProcessor";
+
+/**
+ * Methods to execute `TilesetStage` objects.
+ */
 export class TilesetStageExecutor {
-  static async executeTilesetStageInternal(
-    tilesetSource: TilesetSource,
-    tilesetTarget: TilesetTarget,
-    tilesetStage: TilesetStage
+  /**
+   * Executes the given `TilesetStage`.
+   *
+   * @param tilesetStage - The `TilesetStage` object
+   * @param currentInput - The current input name, or a temporary
+   * name for intermediate steps (see `Pipeline.input` for details)
+   * @param currentOutput - The current output name, or a temporary
+   * name for intermediate steps (see `Pipeline.input` for details)
+   * @param overwrite - Whether outputs should be overwritten if
+   * they already exist
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError If one of the processing steps causes
+   * an error.
+   */
+  static async executeTilesetStage(
+    tilesetStage: TilesetStage,
+    currentInput: string,
+    currentOutput: string,
+    overwrite: boolean
+  ) {
+    console.log(`  Executing tilesetStage : ${tilesetStage.name}`);
+    console.log(`    currentInput:  ${currentInput}`);
+    console.log(`    currentOutput: ${currentOutput}`);
+
+    const tilesetProcessor = new BasicTilesetProcessor();
+    await tilesetProcessor.begin(currentInput, currentOutput, overwrite);
+    await TilesetStageExecutor.executeTilesetStageInternal(
+      tilesetStage,
+      tilesetProcessor
+    );
+    await tilesetProcessor.end();
+  }
+
+  /**
+   * Implementation for `executeTilesetStage`.
+   *
+   * @param tilesetStage - The `TilesetStage` object
+   * @param tilesetProcessor The `BasicTilesetProcessor`
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError If one of the processing steps causes
+   * an error.
+   */
+  private static async executeTilesetStageInternal(
+    tilesetStage: TilesetStage,
+    tilesetProcessor: BasicTilesetProcessor
   ) {
     const contentStages = tilesetStage.contentStages;
-
     if (contentStages.length === 0) {
-      // TODO This should probably not cause a message.
-      // A TilesetStage might be something like `databaseToTileset`
-      // that is self-contained and "atomic", and does not have
-      // any content stages.
-      const message = `    No contentStages - performing no-op`;
-      console.log(message);
-      const inputEntries = TilesetSources.getEntries(tilesetSource);
-      TilesetTargets.putEntries(tilesetTarget, inputEntries);
       return;
     }
 
@@ -35,45 +67,9 @@ export class TilesetStageExecutor {
       console.log(message);
 
       await ContentStageExecutor.executeContentStage(
-        tilesetSource,
-        tilesetTarget,
-        contentStage
+        contentStage,
+        tilesetProcessor
       );
-    }
-  }
-
-  static async executeTilesetStage(
-    tilesetStage: TilesetStage,
-    currentInput: string,
-    currentOutput: string,
-    overwrite: boolean
-  ) {
-    console.log(`  Executing tilesetStage : ${tilesetStage.name}`);
-    console.log(`    currentInput:  ${currentInput}`);
-    console.log(`    currentOutput: ${currentOutput}`);
-
-    let tilesetSource;
-    let tilesetTarget;
-    try {
-      tilesetSource = TilesetSources.createAndOpen(currentInput);
-      tilesetTarget = TilesetTargets.createAndBegin(currentOutput, overwrite);
-
-      await TilesetStageExecutor.executeTilesetStageInternal(
-        tilesetSource,
-        tilesetTarget,
-        tilesetStage
-      );
-
-      tilesetSource.close();
-      await tilesetTarget.end();
-    } catch (error) {
-      if (tilesetSource) {
-        tilesetSource.close();
-      }
-      if (tilesetTarget) {
-        await tilesetTarget.end();
-      }
-      throw error;
     }
   }
 }

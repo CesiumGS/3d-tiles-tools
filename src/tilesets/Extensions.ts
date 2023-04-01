@@ -1,5 +1,12 @@
-import { RootProperty } from "../structure/RootProperty";
-import { Tileset } from "../structure/Tileset";
+/**
+ * A type for objects that can contain extensions
+ */
+type Extended = { extensions?: object };
+
+/**
+ * A type for objects that can contain extension declarations
+ */
+type Extensible = { extensionsUsed?: any; extensionsRequired?: any };
 
 /**
  * Utility methods for handling extensions
@@ -11,81 +18,81 @@ export class Extensions {
    * That is, whether the `object.extensions` contains a key
    * that is the given extension name.
    *
-   * @param rootProperty - The object that may contain the extension
+   * @param extensible - The object that may contain the extension
    * @param extension The extension (i.e. its name as a string)
    * @returns Whether the object contains the extension
    */
-  static contains(rootProperty: RootProperty, extension: string) {
-    if (!rootProperty.extensions) {
+  static contains(extended: Extended, extension: string) {
+    if (!extended.extensions) {
       return false;
     }
-    return Object.keys(rootProperty.extensions).includes(extension);
+    return Object.keys(extended.extensions).includes(extension);
   }
 
   /**
-   * Add the given extension to the `extensionsUsed` of the given tileset.
+   * Add the given extension to the `extensionsUsed` of the given object.
    *
    * The extension will be added if it was not yet contained in the
    * array, creating the array of necessary.
    *
-   * @param tileset - The tileset
+   * @param extensible - The object
    * @param extension - The extension name
    */
-  static addExtensionUsed(tileset: Tileset, extension: string) {
-    tileset.extensionsUsed = Extensions.addUnique(
-      tileset.extensionsUsed,
+  static addExtensionUsed(extensible: Extensible, extension: string) {
+    extensible.extensionsUsed = Extensions.addUnique(
+      extensible.extensionsUsed,
       extension
     );
   }
 
   /**
-   * Remove the given extension from the `extensionsUsed` of the given tileset.
+   * Remove the given extension from the `extensionsUsed` of the given object.
    *
    * The array will be set to `undefined` if it becomes empty, and the
    * extension will also be removed from `extensionsRequired`.
    *
-   * @param tileset - The tileset
+   * @param extensible - The object
    * @param extension - The extension name
    */
-  static removeExtensionUsed(tileset: Tileset, extension: string) {
-    tileset.extensionsUsed = Extensions.removeUnique(
-      tileset.extensionsUsed,
+  static removeExtensionUsed(extensible: Extensible, extension: string) {
+    extensible.extensionsUsed = Extensions.removeUnique(
+      extensible.extensionsUsed,
       extension
     );
-    Extensions.removeExtensionRequired(tileset, extension);
+    Extensions.removeExtensionRequired(extensible, extension);
   }
 
   /**
-   * Add the given extension to the `extensionsRequired` of the given tileset.
+   * Add the given extension to the `extensionsRequired` of the given object.
    *
    * The extension will be added if it was not yet contained in the
    * array, creating the array of necessary. This will also add
    * the extension to `extensionsUsed`.
    *
-   * @param tileset - The tileset
+   * @param extensible - The object
    * @param extension - The extension name
    */
-  static addExtensionRequired(tileset: Tileset, extension: string) {
-    tileset.extensionsRequired = Extensions.addUnique(
-      tileset.extensionsRequired,
+  static addExtensionRequired(extensible: Extensible, extension: string) {
+    extensible.extensionsRequired = Extensions.addUnique(
+      extensible.extensionsRequired,
       extension
     );
-    Extensions.addExtensionUsed(tileset, extension);
+    Extensions.addExtensionUsed(extensible, extension);
   }
 
   /**
-   * Remove the given extension to the `extensionsUsed` of the given tileset.
+   * Remove the given extension to the `extensionsUsed` of the given object.
    *
    * The array will be set to `undefined` if it becomes empty.
    *
    * This will *not* remove the extension from the `extensionsUsed`!
    *
-   * @param tileset - The tileset
+   * @param extensible - The object
    * @param extension - The extension name
    */
-  static removeExtensionRequired(tileset: Tileset, extension: string) {
-    tileset.extensionsRequired = Extensions.removeUnique(
-      tileset.extensionsRequired,
+  static removeExtensionRequired(extensible: Extensible, extension: string) {
+    extensible.extensionsRequired = Extensions.removeUnique(
+      extensible.extensionsRequired,
       extension
     );
   }

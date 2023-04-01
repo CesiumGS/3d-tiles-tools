@@ -1,4 +1,3 @@
-import fs from "fs";
 import path from "path";
 
 import { readJsonUnchecked } from "./readJsonUnchecked";
@@ -8,7 +7,6 @@ import { ResourceResolvers } from "../src/io/ResourceResolvers";
 import { TilesetTraverser } from "../src/traversal/TilesetTraverser";
 import { TraversedTile } from "../src/traversal/TraversedTile";
 import { BufferedContentData } from "../src/contentTypes/BufferedContentData";
-import { ContentDataTypeRegistry } from "../src/contentTypes/ContentDataTypeRegistry";
 import { ContentDataTypeChecks } from "../src/contentTypes/ContentDataTypeChecks";
 import { ContentDataTypes } from "../src/contentTypes/ContentDataTypes";
 
@@ -37,6 +35,21 @@ async function tilesetTraversalDemo(filePath: string) {
   // tileset traverser, and store information about the
   // traversed tiles in the `StatsCollector`
   const statsTraversalCallback = async (traversedTile: TraversedTile) => {
+    {
+      const indent = "  ".repeat(traversedTile.level);
+      const contentUris = traversedTile.getFinalContents().map((c) => c.uri);
+      const geometricError = traversedTile.asFinalTile().geometricError;
+      const message =
+        indent +
+        "Level " +
+        traversedTile.level +
+        ", geometricError " +
+        geometricError +
+        ", contents " +
+        contentUris;
+      console.log(message);
+    }
+
     statsCollector.increment("totalNumberOfTiles");
     const subtreeUri = traversedTile.getSubtreeUri();
     if (subtreeUri !== undefined) {
@@ -50,13 +63,17 @@ async function tilesetTraversalDemo(filePath: string) {
       const tileResourceResolver = traversedTile.getResourceResolver();
       for (const contentUri of contentUris) {
         const data = await tileResourceResolver.resolveData(contentUri);
-        const contentData = new BufferedContentData(contentUri, data);
-        const isTileFile = await isTileFileContent(contentData);
-        if (isTileFile) {
-          if (data) {
+        if (!data) {
+          statsCollector.increment("unresolvableContents");
+        } else {
+          const contentData = new BufferedContentData(contentUri, data);
+          const isTileFile = await isTileFileContent(contentData);
+          if (isTileFile) {
             statsCollector.acceptEntry("tileFileSize", data.length);
-          } else {
-            statsCollector.increment("unresolvableContents");
+            statsCollector.acceptEntry(
+              "tileFileSize_" + traversedTile.level,
+              data.length
+            );
           }
         }
       }
@@ -66,6 +83,10 @@ async function tilesetTraversalDemo(filePath: string) {
     const finalTile = traversedTile.asFinalTile();
     const geometricError = finalTile.geometricError;
     statsCollector.acceptEntry("geometricError", geometricError);
+    statsCollector.acceptEntry(
+      "geometricError_" + traversedTile.level,
+      geometricError
+    );
     return true;
   };
 
