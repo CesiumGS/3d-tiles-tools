@@ -53,7 +53,7 @@ async function tilesetTraversalDemo(filePath: string) {
     statsCollector.increment("totalNumberOfTiles");
     const subtreeUri = traversedTile.getSubtreeUri();
     if (subtreeUri !== undefined) {
-      statsCollector.increment("totalNumberOfSubtres");
+      statsCollector.increment("totalNumberOfSubtrees");
     }
     if (!traversedTile.isImplicitTilesetRoot()) {
       // Obtain all content URIs, resolve the associated data,

@@ -28,7 +28,7 @@ async function example() {
     }
   );
 
-  // Apply a callback to each (explicit) `Tile
+  // Apply a callback to each (explicit) `Tile`
   await tilesetProcessor.forEachExplicitTile(
     async (tile: Tile): Promise<void> => {
       console.log("In forEachExplicitTile");
