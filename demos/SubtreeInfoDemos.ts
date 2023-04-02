@@ -4,7 +4,7 @@ import { readJsonUnchecked } from "./readJsonUnchecked";
 
 import { ResourceResolvers } from "../src/io/ResourceResolvers";
 
-import { QuadtreeCoordinates } from "../src/implicitTiling/QuadtreeCoordinates";
+import { QuadtreeCoordinates } from "../src/spatial/QuadtreeCoordinates";
 import { SubtreeInfos } from "../src/implicitTiling/SubtreeInfos";
 
 async function testSubtreeInfo() {
