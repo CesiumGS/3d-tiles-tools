@@ -1,7 +1,8 @@
-import { Quadtrees } from "../src/implicitTiling/Quadtrees";
+import { Quadtrees } from "../src/spatial/Quadtrees";
+import { QuadtreeCoordinates } from "../src/spatial/QuadtreeCoordinates";
+import { OctreeCoordinates } from "../src/spatial/OctreeCoordinates";
+
 import { TemplateUris } from "../src/implicitTiling/TemplateUris";
-import { QuadtreeCoordinates } from "../src/implicitTiling/QuadtreeCoordinates";
-import { OctreeCoordinates } from "../src/implicitTiling/OctreeCoordinates";
 
 /**
  * A basic demo of the `QuadtreeCoordinates.children` method
