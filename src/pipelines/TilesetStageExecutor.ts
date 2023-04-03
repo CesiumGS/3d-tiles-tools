@@ -18,7 +18,7 @@ export class TilesetStageExecutor {
    * @param overwrite - Whether outputs should be overwritten if
    * they already exist
    * @returns A promise that resolves when the process is finished
-   * @throws TilesetError If one of the processing steps causes
+   * @throws PipelineError If one of the processing steps causes
    * an error.
    */
   static async executeTilesetStage(
@@ -46,7 +46,7 @@ export class TilesetStageExecutor {
    * @param tilesetStage - The `TilesetStage` object
    * @param tilesetProcessor The `BasicTilesetProcessor`
    * @returns A promise that resolves when the process is finished
-   * @throws TilesetError If one of the processing steps causes
+   * @throws PipelineError If one of the processing steps causes
    * an error.
    */
   private static async executeTilesetStageInternal(

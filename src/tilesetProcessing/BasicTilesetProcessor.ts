@@ -23,16 +23,10 @@ import { TilesetTraverser } from "../traversal/TilesetTraverser";
  * The operations are applied by callbacks on certain elements
  * of the tileset data:
  *
- * - Tiles and their content
- * - Explicit tiles and their content
- * - Unspecified entries (files) in the tileset
+ * - All tiles (as `TraversedTile` instances)
+ * - Explicit tiles (as `Tile` instances)
+ * - Unspecified entries (files) in the tileset (as `TilesetEntry` objects)
  * - The tileset (and its schema) itself
- *
- * Each entry that is processed with one of the `forEach*Entry`
- * methods will be processed only _once_, and then marked as
- * already having been processed. Entries that have not been
- * processed when `TilesetProcessor.end` is called will be
- * moved to the tileset target as they are.
  */
 export class BasicTilesetProcessor extends TilesetProcessor {
   /**
@@ -57,8 +51,30 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     callback: (traversedTile: TraversedTile) => Promise<void>
   ): Promise<void> {
     const context = this.getContext();
-    const tilesetSource = context.tilesetSource;
     const tileset = context.tileset;
+    await this.forEachTileAt(tileset.root, callback);
+  }
+
+  /**
+   * Apply the given callback to all `TraversedTile` instances
+   * that result from traversing the tile hierarchy, starting
+   * at the given tile.
+   *
+   * The given tile is assumed to be an explicit tile in the
+   * current tileset.
+   *
+   * @param tile The tile where to start the traversal
+   * @param callback - The callback
+   * @returns A promise that resolves when the process is finished
+   * @throws DeveloperError If `begin` was not called yet
+   * @throws TilesetError When an error is thrown during processing
+   */
+  async forEachTileAt(
+    tile: Tile,
+    callback: (traversedTile: TraversedTile) => Promise<void>
+  ): Promise<void> {
+    const context = this.getContext();
+    const tilesetSource = context.tilesetSource;
     const schema = context.schema;
 
     // Create the resource resolver that will be used for
@@ -72,38 +88,12 @@ export class BasicTilesetProcessor extends TilesetProcessor {
       depthFirst: false,
       traverseExternalTilesets: true,
     });
-    await tilesetTraverser.traverseWithSchema(
-      tileset,
+    await tilesetTraverser.traverseWithSchemaAt(
+      tile,
       schema,
       async (traversedTile) => {
         await callback(traversedTile);
         return true;
-      }
-    );
-  }
-
-  /**
-   * Apply the given callback to all entries that represent tile
-   * content, if they have not been processed yet.
-   *
-   * @param callback - The callback
-   * @returns A promise that resolves when the process is finished
-   * @throws DeveloperError If `begin` was not called yet
-   * @throws TilesetError When an error is thrown during processing
-   */
-  async forEachTileContentEntry(
-    callback: TilesetEntryProcessor
-  ): Promise<void> {
-    await this.forEachTile(
-      async (traversedTile: TraversedTile): Promise<void> => {
-        if (!traversedTile.isImplicitTilesetRoot()) {
-          const contentUris = traversedTile
-            .getFinalContents()
-            .map((c) => c.uri);
-          for (const contentUri of contentUris) {
-            await this.processEntryInternal(contentUri, callback);
-          }
-        }
       }
     );
   }
@@ -131,69 +121,159 @@ export class BasicTilesetProcessor extends TilesetProcessor {
   }
 
   /**
-   * Apply the given callback to all entries that represent the content
-   * of explicit tiles (i.e. tiles that appear as `Tile` objects in
-   * the tileset JSON), if they have not been processed yet.
+   * Applies the given callback to each `TilesetEntry` that has not
+   * yet been processed.
    *
-   * The tileset JSON will automatically be updated to take into account
-   * the result of the given callback: When the callback receives an
-   * entry with a certain `key` (file name), and returns an entry with
-   * a different `key`, then the `content.uri` will be updated
-   * accordingly (also taking into account whether the content was
-   * deleted to split into multiple contents).
+   * @param callback - The callback
+   * @returns A promise that resolves when the process is finished
+   * @throws DeveloperError If `begin` was not called yet
+   * @throws TilesetError When the input could not be processed
+   */
+  async forEachEntry(callback: TilesetEntryProcessor) {
+    const context = this.getContext();
+    const tilesetSource = context.tilesetSource;
+    const entries = TilesetSources.getEntries(tilesetSource);
+    for (const entry of entries) {
+      await this.processEntry(entry, callback);
+    }
+  }
+
+  /**
+   * Apply the given callback to the `Tileset` and the metadata
+   * schema.
    *
    * @param callback - The callback
    * @returns A promise that resolves when the process is finished
    * @throws DeveloperError If `begin` was not called yet
    * @throws TilesetError When an error is thrown during processing
    */
-  async forEachExplicitTileContentEntry(
-    callback: TilesetEntryProcessor
-  ): Promise<void> {
-    await this.forEachExplicitTile(async (tile: Tile) => {
-      await this.processExplicitTileContentEntries(tile, callback);
-    });
+  async forTileset(
+    callback: (tileset: Tileset, schema: Schema | undefined) => Promise<void>
+  ) {
+    const context = this.getContext();
+    const tileset = context.tileset;
+    const schema = context.schema;
+    await callback(tileset, schema);
   }
 
   /**
-   * Process all entries that are content of the given tile, and
-   * update the tile content to reflect the changes from the
-   * callback (see `forEachExplicitTileContentEntry` and
-   * `updateTileContent`)
+   * Process all entries that correspond to content of the given tile.
+   *
+   * This determines the entries in the tileset source that represent
+   * content of the given tile, calls `processEntry` for each of them,
+   * and stores the resulting entries.
+   *
+   * The `tile.content.uri` or `tile.contents[i].uri` of the given tile
+   * will be updated to reflect possible changes of the keys (file
+   * names) that pare performed by the `entryProcessor`.
    *
    * @param tile - The tile
+   * @param entryProcessor The `TilesetEntryProcessor`
    * @returns A promise that resolves when the process is finished
-   * @throws DeveloperError If `begin` was not called yet
-   * @throws TilesetError When the input could not be processed
    */
-  private async processExplicitTileContentEntries(
+  async processTileContentEntries(
     tile: Tile,
-    callback: TilesetEntryProcessor
+    entryProcessor: TilesetEntryProcessor
   ): Promise<void> {
-    // For roots of implicit tilesets, the content URI
-    // is a template URI (i.e. they are not explicit,
-    // and therefore not considered here)
-    if (tile.implicitTiling) {
-      return;
+    const sourceEntries = await this.fetchTileContentEntries(tile);
+    const targetEntries = await this.processEntries(
+      sourceEntries,
+      entryProcessor
+    );
+    BasicTilesetProcessor.updateTileContent(tile, targetEntries);
+    this.storeTargetEntries(...targetEntries);
+  }
+
+  /**
+   * Process all entries that correspond to content of the given traversed tile.
+   *
+   * This determines the entries in the tileset source that represent
+   * content of the given tile, calls `processEntry` for each of them,
+   * and stores the resulting entries.
+   *
+   * @param traversedTile - The traversed tile
+   * @param entryProcessor The `TilesetEntryProcessor`
+   * @returns A promise that resolves when the process is finished
+   */
+  async processTraversedTileContentEntries(
+    traversedTile: TraversedTile,
+    entryProcessor: TilesetEntryProcessor
+  ): Promise<void> {
+    const sourceEntries = await this.fetchTraversedTileContentEntries(
+      traversedTile
+    );
+    const targetEntries = await this.processEntries(
+      sourceEntries,
+      entryProcessor
+    );
+    this.storeTargetEntries(...targetEntries);
+  }
+
+  /**
+   * Fetch all entries from the tileset source that correspond to the
+   * contents of the given tile.
+   *
+   * @param tile - The tile
+   * @returns A promise with the entries
+   */
+  private async fetchTileContentEntries(tile: Tile): Promise<TilesetEntry[]> {
+    const contents = BasicTilesetProcessor.getTileContents(tile);
+    const entries = await this.fetchContentEntries(contents);
+    return entries;
+  }
+
+  /**
+   * Fetch all entries from the tileset source that correspond to the
+   * contents of the given traversed tile.
+   *
+   * @param traversedTile - The traversed tile
+   * @returns A promise with the entries
+   */
+  private async fetchTraversedTileContentEntries(
+    traversedTile: TraversedTile
+  ): Promise<TilesetEntry[]> {
+    if (traversedTile.isImplicitTilesetRoot()) {
+      return [];
     }
-    if (tile.content) {
-      const content = tile.content;
-      const targetEntries = await this.processEntryInternal(
-        content.uri,
-        callback
-      );
-      BasicTilesetProcessor.updateTileContent(tile, targetEntries);
-    } else if (tile.contents) {
-      const allTargetEntries = [];
-      for (const content of tile.contents) {
-        const targetEntries = await this.processEntryInternal(
-          content.uri,
-          callback
-        );
-        allTargetEntries.push(...targetEntries);
+    const contents = traversedTile.getFinalContents();
+    const entries = await this.fetchContentEntries(contents);
+    return entries;
+  }
+
+  /**
+   * Fetch all entries from the tileset source that correspond to the
+   * given contents.
+   *
+   * @param contents - The contents
+   * @returns A promise with the entries
+   */
+  private async fetchContentEntries(
+    contents: Content[]
+  ): Promise<TilesetEntry[]> {
+    const entries = [];
+    for (const content of contents) {
+      const entry = await this.fetchSourceEntry(content.uri);
+      if (entry) {
+        entries.push(entry);
       }
-      BasicTilesetProcessor.updateTileContent(tile, allTargetEntries);
     }
+    return entries;
+  }
+
+  /**
+   * Returns an array with all contents of the give tile.
+   *
+   * @param contents - The contents
+   * @returns A promise with the entries
+   */
+  private static getTileContents(tile: Tile): Content[] {
+    if (tile.content) {
+      return [tile.content];
+    }
+    if (tile.contents) {
+      return tile.contents;
+    }
+    return [];
   }
 
   /**
@@ -239,65 +319,5 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     }
     tile.contents = newContents;
     delete tile.content;
-  }
-
-  /**
-   * Applies the given callback to each `TilesetEntry` that has not
-   * yet been processed.
-   *
-   * @param callback - The callback
-   * @returns A promise that resolves when the process is finished
-   * @throws DeveloperError If `begin` was not called yet
-   * @throws TilesetError When the input could not be processed
-   */
-  async forEachEntry(callback: TilesetEntryProcessor) {
-    const context = this.getContext();
-    const tilesetSource = context.tilesetSource;
-    const entries = TilesetSources.getEntries(tilesetSource);
-    for (const entry of entries) {
-      const key = entry.key;
-      await this.processEntryInternal(key, callback);
-    }
-  }
-
-  /**
-   * Apply the given callback to the `Tileset` and the metadata
-   * schema.
-   *
-   * @param callback - The callback
-   * @returns A promise that resolves when the process is finished
-   * @throws DeveloperError If `begin` was not called yet
-   * @throws TilesetError When an error is thrown during processing
-   */
-  async forTileset(
-    callback: (tileset: Tileset, schema: Schema | undefined) => Promise<void>
-  ) {
-    const context = this.getContext();
-    const tileset = context.tileset;
-    const schema = context.schema;
-    await callback(tileset, schema);
-  }
-
-  /**
-   * Creates a callback that receives a `Tile` object, and calls
-   * the given callback on each of its `Content` objects.
-   *
-   * @param callback - The callback for the content
-   * @returns The callback for the tile
-   */
-  static callbackForEachContent(
-    callback: (content: Content) => Promise<void>
-  ): (tile: Tile) => Promise<void> {
-    return async (tile: Tile) => {
-      if (tile.content) {
-        const content = tile.content;
-        await callback(content);
-      }
-      if (tile.contents) {
-        for (const content of tile.contents) {
-          await callback(content);
-        }
-      }
-    };
   }
 }

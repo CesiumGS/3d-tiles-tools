@@ -177,13 +177,16 @@ export abstract class TilesetProcessor {
     const entries = TilesetSources.getEntries(tilesetSource);
     for (const entry of entries) {
       const key = entry.key;
-      await this.processEntryInternal(
+      const targetEntry = await this.processSourceEntry(
         key,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         async (sourceEntry: TilesetEntry, type: string | undefined) => {
-          return [sourceEntry];
+          return sourceEntry;
         }
       );
+      if (targetEntry) {
+        this.storeTargetEntries(targetEntry);
+      }
     }
 
     const tilesetTargetJsonFileName = context.tilesetTargetJsonFileName;
@@ -220,9 +223,7 @@ export abstract class TilesetProcessor {
    * then this method does nothing.
    *
    * Otherwise, the specified entry will be looked up in the tileset
-   * source. Its content type will be determined. The source entry
-   * will be passed to the given processor, which returns the target
-   * entries that will be inserted into the tileset target.
+   * source, and passed to `processEntry`.
    *
    * @param key - The key (file name) of the entry
    * @param entryProcessor - The `TilesetEntryProcessor` that will
@@ -232,56 +233,114 @@ export abstract class TilesetProcessor {
    * @throws DeveloperError When the source or target is not opened
    * @throws TilesetError When the input could not be processed
    */
-  protected async processEntryInternal(
+  private async processSourceEntry(
     key: string,
     entryProcessor: TilesetEntryProcessor
-  ): Promise<TilesetEntry[]> {
-    const context = this.getContext();
-    const tilesetSource = context.tilesetSource;
-    const tilesetTarget = context.tilesetTarget;
-
+  ): Promise<TilesetEntry | undefined> {
     const sourceKey = key;
     if (this.isProcessed(sourceKey)) {
-      return [];
+      return undefined;
     }
-    this.markAsProcessed(sourceKey);
-
-    const sourceValue = tilesetSource.getValue(sourceKey);
-    if (!sourceValue) {
+    const sourceEntry = await this.fetchSourceEntry(key);
+    if (!sourceEntry) {
       const message = `No ${sourceKey} found in input`;
       throw new TilesetError(message);
     }
-    const sourceEntry: TilesetEntry = {
-      key: sourceKey,
-      value: sourceValue,
-    };
-    const type = await this.determineContentDataType(sourceKey, sourceValue);
+    const targetEntry = await this.processEntry(sourceEntry, entryProcessor);
+    return targetEntry;
+  }
 
-    this.log(`Processing source : ${sourceKey} with type ${type}`);
+  /**
+   * Process the given source entry, and return the processed result.
+   *
+   * This will determine the content type of the given entry, pass
+   * it together with its type information to the `entryProcessor`,
+   * and mark the entry (and the possible target entry) as "processed".
+   *
+   * This will *not* store the returned target entry in the tileset
+   * target. To do so, `storeTargetEntries` has to be called with
+   * the result.
+   *
+   * @param sourceEntry - The source entry
+   * @param entryProcessor The `TilesetEntryProcessor`
+   * @returns The target entry
+   */
+  async processEntry(
+    sourceEntry: TilesetEntry,
+    entryProcessor: TilesetEntryProcessor
+  ): Promise<TilesetEntry | undefined> {
+    const type = await this.determineContentDataType(sourceEntry);
 
-    const targetEntries = await entryProcessor(sourceEntry, type);
+    this.log(`Processing source: ${sourceEntry.key} with type ${type}`);
 
-    this.log(`        to targets: ${targetEntries?.map((t) => t.key)}`);
+    const targetEntry = await entryProcessor(sourceEntry, type);
 
-    if (targetEntries) {
-      for (const targetEntry of targetEntries) {
-        tilesetTarget.addEntry(targetEntry.key, targetEntry.value);
-        this.markAsProcessed(targetEntry.key);
+    this.log(`        to target: ${targetEntry?.key}`);
+
+    this.markAsProcessed(sourceEntry.key);
+    if (targetEntry) {
+      this.markAsProcessed(targetEntry.key);
+    }
+    return targetEntry;
+  }
+
+  /**
+   * Calls `processEntry` on each input, and returns the results.
+
+   * @param sourceEntries - The source entries
+   * @param entryProcessor The `TilesetEntryProcessor`
+   * @returns The target entries
+   */
+  async processEntries(
+    sourceEntries: TilesetEntry[],
+    entryProcessor: TilesetEntryProcessor
+  ): Promise<TilesetEntry[]> {
+    const targetEntries = [];
+    for (const sourceEntry of sourceEntries) {
+      const targetEntry = await this.processEntry(sourceEntry, entryProcessor);
+      if (targetEntry) {
+        targetEntries.push(targetEntry);
       }
     }
     return targetEntries;
   }
 
   /**
-   * Store the given entry in the current target
+   * Fetch the entry for the specified key from the current tileset
+   * source. If there is no entry for the given key, then `undefined`
+   * is returned.
    *
-   * @param targetEntry - The target entry
+   * @param key - The key (file name)
+   * @returns The object containing the entry and its type
    */
-  storeTargetEntry(targetEntry: TilesetEntry) {
+  async fetchSourceEntry(key: string): Promise<TilesetEntry | undefined> {
+    const context = this.getContext();
+    const tilesetSource = context.tilesetSource;
+
+    const sourceKey = key;
+    const sourceValue = tilesetSource.getValue(sourceKey);
+    if (!sourceValue) {
+      console.warn("No input found for " + sourceKey);
+      return undefined;
+    }
+    const sourceEntry: TilesetEntry = {
+      key: sourceKey,
+      value: sourceValue,
+    };
+    return sourceEntry;
+  }
+
+  /**
+   * Store the given entries in the current target
+   *
+   * @param targetEntries - The target entries
+   */
+  storeTargetEntries(...targetEntries: TilesetEntry[]) {
     const context = this.getContext();
     const tilesetTarget = context.tilesetTarget;
-    tilesetTarget.addEntry(targetEntry.key, targetEntry.value);
-    this.markAsProcessed(targetEntry.key);
+    for (const targetEntry of targetEntries) {
+      tilesetTarget.addEntry(targetEntry.key, targetEntry.value);
+    }
   }
 
   /**
@@ -290,7 +349,7 @@ export abstract class TilesetProcessor {
    *
    * @param key - The key (file name)
    */
-  protected markAsProcessed(key: string) {
+  markAsProcessed(key: string) {
     const context = this.getContext();
     context.processedKeys[key] = true;
   }
@@ -302,26 +361,24 @@ export abstract class TilesetProcessor {
    * @param key - The key (file name)
    * @returns Whether the entry was already processed
    */
-  protected isProcessed(key: string): boolean {
+  isProcessed(key: string): boolean {
     const context = this.getContext();
     return context.processedKeys[key] === true;
   }
 
   /**
-   * Determine the type of the given content data.
+   * Determine the type of the given entry
    *
    * The string will either be one of the `ContentDataTypes` strings,
    * or `undefined` if the type cannot be determined.
    *
-   * @param key - The key (file name)
-   * @param value - The value (file contents)
+   * @param entry - The entry
    * @returns A promise with the content data type string
    */
   private async determineContentDataType(
-    key: string,
-    value: Buffer
+    entry: TilesetEntry
   ): Promise<string | undefined> {
-    const contentData = new BufferedContentData(key, value);
+    const contentData = new BufferedContentData(entry.key, entry.value);
     const type = await ContentDataTypeRegistry.findContentDataType(contentData);
     return type;
   }
