@@ -19,6 +19,33 @@ export class ContentDataTypeChecks {
     includedContentDataTypes: string[] | undefined,
     excludedContentDataTypes: string[] | undefined
   ): (contentData: ContentData) => Promise<boolean> {
+    const typeCheck = ContentDataTypeChecks.createTypeCheck(
+      includedContentDataTypes,
+      excludedContentDataTypes
+    );
+    return async (contentData: ContentData) => {
+      const contentDataType = await ContentDataTypeRegistry.findContentDataType(
+        contentData
+      );
+      const result = typeCheck(contentDataType);
+      return result;
+    };
+  }
+
+  /**
+   * Creates a predicate that checks whether a given string
+   * (that represents one of the `ContentDataTypes`) is
+   * contained in the given included types, and NOT
+   * contained in the given excluded types.
+   *
+   * @param includedContentDataTypes - The included types
+   * @param excludedContentDataTypes - The excluded types
+   * @returns The predicate
+   */
+  static createTypeCheck(
+    includedContentDataTypes: string[] | undefined,
+    excludedContentDataTypes: string[] | undefined
+  ): (contentDataType: string | undefined) => boolean {
     const localIncluded: string[] = [];
     if (includedContentDataTypes) {
       localIncluded.push(...includedContentDataTypes);
@@ -27,10 +54,7 @@ export class ContentDataTypeChecks {
     if (excludedContentDataTypes) {
       localExcluded.push(...excludedContentDataTypes);
     }
-    return async (contentData: ContentData) => {
-      const contentDataType = await ContentDataTypeRegistry.findContentDataType(
-        contentData
-      );
+    return (contentDataType: string | undefined) => {
       if (!contentDataType) {
         return false;
       }
