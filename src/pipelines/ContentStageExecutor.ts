@@ -1,9 +1,11 @@
+import path from "path";
 import GltfPipeline from "gltf-pipeline";
 
 import { Paths } from "../base/Paths";
 import { Buffers } from "../base/Buffers";
 
 import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
+import { ContentDataTypeChecks } from "../contentTypes/ContentDataTypeChecks";
 
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
 
@@ -14,11 +16,7 @@ import { BasicTilesetProcessor } from "../tilesetProcessing/BasicTilesetProcesso
 
 import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
 import { ContentOps } from "../contentProcessing/ContentOps";
-
-import { Tile } from "../structure/Tile";
-
-import { TraversedTile } from "../traversal/TraversedTile";
-import { Tiles } from "../tilesets/Tiles";
+import { ContentStages } from "./ContentStages";
 
 /**
  * Methods to execute `ContentStage` objects.
@@ -60,19 +58,22 @@ export class ContentStageExecutor {
     contentStage: ContentStage,
     tilesetProcessor: BasicTilesetProcessor
   ) {
-    if (contentStage.name === "gzip") {
-      await ContentStageExecutor.executeGzip(
-        tilesetProcessor,
-        contentStage.condition
+    if (contentStage.name === ContentStages.CONTENT_STAGE_GZIP) {
+      const condition = ContentDataTypeChecks.createTypeCheck(
+        contentStage.includedContentTypes,
+        contentStage.excludedContentTypes
       );
-    } else if (contentStage.name === "ungzip") {
+      await ContentStageExecutor.executeGzip(tilesetProcessor, condition);
+    } else if (contentStage.name === ContentStages.CONTENT_STAGE_UNGZIP) {
       await ContentStageExecutor.executeGunzip(tilesetProcessor);
-    } else if (contentStage.name === "b3dmToGlb") {
+    } else if (contentStage.name === ContentStages.CONTENT_STAGE_B3DM_TO_GLB) {
       await ContentStageExecutor.executeB3dmToGlb(tilesetProcessor);
-    } else if (contentStage.name === "optimizeGlb") {
+    } else if (contentStage.name === ContentStages.CONTENT_STAGE_OPTIMIZE_GLB) {
       const options = contentStage.options;
       await ContentStageExecutor.executeOptimizeGlb(tilesetProcessor, options);
-    } else if (contentStage.name === "separateGltf") {
+    } else if (
+      contentStage.name === ContentStages.CONTENT_STAGE_SEPARATE_GLTF
+    ) {
       await ContentStageExecutor.executeSeparateGltf(tilesetProcessor);
     } else {
       const message = `    Unknown contentStage name: ${contentStage.name}`;
@@ -88,32 +89,39 @@ export class ContentStageExecutor {
    * compressed with gzip. Other entries remain unaffected.
    *
    * @param tilesetProcessor - The `BasicTilesetProcessor`
-   * @param condition The condition from the `ContentStage`
+   * @param condition The condition that was created from
+   * the included- and excluded types that have been defined
+   * in the `ContentStage`
    * @returns A promise that resolves when the process is finished
    * @throws Error If one of the processing steps causes
    * an error.
    */
   private static async executeGzip(
     tilesetProcessor: BasicTilesetProcessor,
-    condition: ((e: TilesetEntry) => Promise<boolean>) | undefined
+    condition: ((type: string | undefined) => boolean) | undefined
   ): Promise<void> {
-    await tilesetProcessor.forEachEntry(
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      async (sourceEntry: TilesetEntry, type: string | undefined) => {
-        let targetValue = sourceEntry.value;
-        if (condition) {
-          const shouldZip = await condition(sourceEntry);
-          if (shouldZip) {
-            targetValue = Buffers.gzip(sourceEntry.value);
-          }
+    // The entry processor receives the source entry, and
+    // returns a target entry where the `value` is zipped
+    // if the source entry matches the given condition.
+    const entryProcessor = async (
+      sourceEntry: TilesetEntry,
+      type: string | undefined
+    ) => {
+      let targetValue = sourceEntry.value;
+      if (condition) {
+        const shouldZip = condition(type);
+        if (shouldZip) {
+          targetValue = Buffers.gzip(sourceEntry.value);
         }
-        const targetEntry = {
-          key: sourceEntry.key,
-          value: targetValue,
-        };
-        return targetEntry;
       }
-    );
+      const targetEntry = {
+        key: sourceEntry.key,
+        value: targetValue,
+      };
+      return targetEntry;
+    };
+
+    await tilesetProcessor.processAllEntries(entryProcessor);
   }
 
   /**
@@ -131,16 +139,23 @@ export class ContentStageExecutor {
   private static async executeGunzip(
     tilesetProcessor: BasicTilesetProcessor
   ): Promise<void> {
-    await tilesetProcessor.forEachEntry(
+    // The entry processor receives the source entry, and
+    // returns a target entry where the `value` is unzipped
+    // (If the data was not zipped, then `Buffers.gunzip`
+    // returns an unmodified result)
+    const entryProcessor = async (
+      sourceEntry: TilesetEntry,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      async (sourceEntry: TilesetEntry, type: string | undefined) => {
-        const targetEntry = {
-          key: sourceEntry.key,
-          value: Buffers.gunzip(sourceEntry.value),
-        };
-        return targetEntry;
-      }
-    );
+      type: string | undefined
+    ) => {
+      const targetEntry = {
+        key: sourceEntry.key,
+        value: Buffers.gunzip(sourceEntry.value),
+      };
+      return targetEntry;
+    };
+
+    await tilesetProcessor.processAllEntries(entryProcessor);
   }
 
   /**
@@ -164,7 +179,7 @@ export class ContentStageExecutor {
     // Define the rule for updating the key (file name) of
     // the entries, as well as possible template URIs of
     // implicit tileset roots.
-    const updateUri = (uri: string) => {
+    const uriProcessor = (uri: string) => {
       if (Paths.hasExtension(uri, ".b3dm")) {
         return Paths.replaceExtension(uri, ".glb");
       }
@@ -181,42 +196,14 @@ export class ContentStageExecutor {
         return sourceEntry;
       }
       const targetEntry = {
-        key: updateUri(sourceEntry.key),
+        key: uriProcessor(sourceEntry.key),
         value: ContentOps.b3dmToGlbBuffer(sourceEntry.value),
       };
       return targetEntry;
     };
-
-    // Traverse the (explicit) tiles of the input tileset
-    await tilesetProcessor.forEachExplicitTile(
-      async (tile: Tile): Promise<void> => {
-        // When the tile is not an implicit tiling root,
-        // then just update the entries that correspond
-        // to the tile contents.
-        if (!tile.implicitTiling) {
-          tilesetProcessor.processTileContentEntries(tile, entryProcessor);
-        } else {
-          // For implicit tiling roots, traverse the implicit tile hierarchy
-          // that starts at this tile, and process each entry that corresponds
-          // to the content of one of the implicit tiles.
-          await tilesetProcessor.forEachTileAt(
-            tile,
-            async (traversedTile: TraversedTile) => {
-              await tilesetProcessor.processTraversedTileContentEntries(
-                traversedTile,
-                entryProcessor
-              );
-            }
-          );
-
-          // After the traversal, update the content URIs of the
-          // implicit tiling root (which are template URIs)
-          const contents = Tiles.getContents(tile);
-          for (const content of contents) {
-            content.uri = updateUri(content.uri);
-          }
-        }
-      }
+    await tilesetProcessor.processTileContentEntries(
+      uriProcessor,
+      entryProcessor
     );
   }
 
@@ -237,6 +224,10 @@ export class ContentStageExecutor {
     tilesetProcessor: BasicTilesetProcessor,
     options: any
   ): Promise<void> {
+    // The entry processor receives the source entry, and
+    // returns a target entry where the the `value` contains
+    // GLB data that was optimized with `gltf-pipeline`
+    // and the given options
     const entryProcessor = async (
       sourceEntry: TilesetEntry,
       type: string | undefined
@@ -254,16 +245,14 @@ export class ContentStageExecutor {
       };
       return targetEntry;
     };
-    await tilesetProcessor.forEachTile(async (traversedTile: TraversedTile) => {
-      await tilesetProcessor.processTraversedTileContentEntries(
-        traversedTile,
-        entryProcessor
-      );
-    });
+    await tilesetProcessor.processTileContentEntries(
+      (uri: string) => uri,
+      entryProcessor
+    );
   }
 
   /**
-   * Internal experiments.
+   * Performs the 'separateGltf' content stage with the given processor.
    *
    * @param tilesetProcessor - The `BasicTilesetProcessor`
    * @returns A promise that resolves when the process is finished
@@ -273,13 +262,21 @@ export class ContentStageExecutor {
   private static async executeSeparateGltf(
     tilesetProcessor: BasicTilesetProcessor
   ): Promise<void> {
-    const updateUri = (uri: string) => {
+    // Define the rule for updating the key (file name) of
+    // the entries, as well as possible template URIs of
+    // implicit tileset roots.
+    const uriProcessor = (uri: string) => {
       if (Paths.hasExtension(uri, ".glb")) {
         return Paths.replaceExtension(uri, ".gltf");
       }
       return uri;
     };
 
+    // The entry processor receives the source entry, and
+    // returns a target entry where the the `value` contains
+    // the glTF data that was generated with `gltf-pipeline`.
+    // The additional external resources will be passed to
+    // the tileset processor, to be stored in the target.
     const entryProcessor = async (
       sourceEntry: TilesetEntry,
       type: string | undefined
@@ -287,9 +284,11 @@ export class ContentStageExecutor {
       if (type !== ContentDataTypes.CONTENT_TYPE_GLB) {
         return sourceEntry;
       }
+      const dirname = path.dirname(sourceEntry.key);
+      const prefix = Paths.replaceExtension(path.basename(sourceEntry.key), "");
       const options = {
         separate: true,
-        name: Paths.replaceExtension(sourceEntry.key, ""),
+        name: prefix,
       };
       const gltfPipelineResults = await GltfPipeline.glbToGltf(
         sourceEntry.value,
@@ -297,7 +296,7 @@ export class ContentStageExecutor {
       );
       const targetValue = Buffer.from(JSON.stringify(gltfPipelineResults.gltf));
       const targetEntry = {
-        key: updateUri(sourceEntry.key),
+        key: uriProcessor(sourceEntry.key),
         value: targetValue,
       };
 
@@ -306,7 +305,7 @@ export class ContentStageExecutor {
       for (const resourceKey of resourceKeys) {
         const resourceValue = separateResources[resourceKey];
         const resourceTargetEntry = {
-          key: resourceKey,
+          key: Paths.join(dirname, resourceKey),
           value: resourceValue,
         };
         tilesetProcessor.storeTargetEntries(resourceTargetEntry);
@@ -314,30 +313,9 @@ export class ContentStageExecutor {
       }
       return targetEntry;
     };
-
-    await tilesetProcessor.forEachExplicitTile(
-      async (tile: Tile): Promise<void> => {
-        if (!tile.implicitTiling) {
-          await tilesetProcessor.processTileContentEntries(
-            tile,
-            entryProcessor
-          );
-        } else {
-          await tilesetProcessor.forEachTileAt(
-            tile,
-            async (traversedTile: TraversedTile) => {
-              await tilesetProcessor.processTraversedTileContentEntries(
-                traversedTile,
-                entryProcessor
-              );
-            }
-          );
-          const contents = Tiles.getContents(tile);
-          for (const content of contents) {
-            content.uri = updateUri(content.uri);
-          }
-        }
-      }
+    await tilesetProcessor.processTileContentEntries(
+      uriProcessor,
+      entryProcessor
     );
   }
 }

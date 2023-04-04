@@ -171,21 +171,25 @@ export abstract class TilesetProcessor {
     const context = this.getContext();
     const tilesetSource = context.tilesetSource;
     const tilesetTarget = context.tilesetTarget;
+    const tilesetSourceJsonFileName = context.tilesetSourceJsonFileName;
 
     // Perform a no-op on all entries that have not yet
     // been marked as processed
     const entries = TilesetSources.getEntries(tilesetSource);
     for (const entry of entries) {
       const key = entry.key;
-      const targetEntry = await this.processSourceEntry(
-        key,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        async (sourceEntry: TilesetEntry, type: string | undefined) => {
-          return sourceEntry;
+      // The tileset JSON file will be added explicitly below
+      if (key !== tilesetSourceJsonFileName) {
+        const targetEntry = await this.processSourceEntry(
+          key,
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          async (sourceEntry: TilesetEntry, type: string | undefined) => {
+            return sourceEntry;
+          }
+        );
+        if (targetEntry) {
+          this.storeTargetEntries(targetEntry);
         }
-      );
-      if (targetEntry) {
-        this.storeTargetEntries(targetEntry);
       }
     }
 

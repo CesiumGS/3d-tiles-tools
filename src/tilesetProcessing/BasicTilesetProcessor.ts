@@ -69,7 +69,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * @throws DeveloperError If `begin` was not called yet
    * @throws TilesetError When an error is thrown during processing
    */
-  async forEachTileAt(
+  private async forEachTileAt(
     tile: Tile,
     callback: (traversedTile: TraversedTile) => Promise<void>
   ): Promise<void> {
@@ -121,24 +121,6 @@ export class BasicTilesetProcessor extends TilesetProcessor {
   }
 
   /**
-   * Applies the given callback to each `TilesetEntry` that has not
-   * yet been processed.
-   *
-   * @param callback - The callback
-   * @returns A promise that resolves when the process is finished
-   * @throws DeveloperError If `begin` was not called yet
-   * @throws TilesetError When the input could not be processed
-   */
-  async forEachEntry(callback: TilesetEntryProcessor) {
-    const context = this.getContext();
-    const tilesetSource = context.tilesetSource;
-    const entries = TilesetSources.getEntries(tilesetSource);
-    for (const entry of entries) {
-      await this.processEntry(entry, callback);
-    }
-  }
-
-  /**
    * Apply the given callback to the `Tileset` and the metadata
    * schema.
    *
@@ -157,6 +139,71 @@ export class BasicTilesetProcessor extends TilesetProcessor {
   }
 
   /**
+   * Applies the given callback to each `TilesetEntry` that has not
+   * yet been processed.
+   *
+   * @param callback - The callback
+   * @returns A promise that resolves when the process is finished
+   * @throws DeveloperError If `begin` was not called yet
+   * @throws TilesetError When the input could not be processed
+   */
+  async processAllEntries(entryProcessor: TilesetEntryProcessor) {
+    const context = this.getContext();
+    const tilesetSource = context.tilesetSource;
+    const entries = TilesetSources.getEntries(tilesetSource);
+    for (const entry of entries) {
+      await this.processEntry(entry, entryProcessor);
+    }
+  }
+
+  /**
+   * Process all entries that are tile content.
+   *
+   * This will process all tile content entries of the source tileset
+   * with the given `TilesetEntryProcessor`. The given `uriProcessor`
+   * will be used for updating the `key` (file name) of the entries,
+   * as well as possible template URIs at the roots of implicit
+   * tilesets.
+   *
+   * @param uriProcessor - The processor that updates keys and URIs
+   * @param entryProcessor - The `TilesetEntryProcessor`
+   * @returns A promise that resolves when the process is finished
+   * @throws Error If one of the processing steps causes
+   * an error.
+   */
+  async processTileContentEntries(
+    uriProcessor: (uri: string) => string,
+    entryProcessor: TilesetEntryProcessor
+  ): Promise<void> {
+    // Traverse the (explicit) tiles of the input tileset
+    await this.forEachExplicitTile(async (tile: Tile): Promise<void> => {
+      // When the tile is not an implicit tiling root,
+      // then just update the entries that correspond
+      // to the tile contents.
+      if (!tile.implicitTiling) {
+        await this.processExplicitTileContentEntries(tile, entryProcessor);
+      } else {
+        // For implicit tiling roots, traverse the implicit tile hierarchy
+        // that starts at this tile, and process each entry that corresponds
+        // to the content of one of the implicit tiles.
+        await this.forEachTileAt(tile, async (traversedTile: TraversedTile) => {
+          await this.processTraversedTileContentEntries(
+            traversedTile,
+            entryProcessor
+          );
+        });
+
+        // After the traversal, update the content URIs of the
+        // implicit tiling root (which are template URIs)
+        const contents = Tiles.getContents(tile);
+        for (const content of contents) {
+          content.uri = uriProcessor(content.uri);
+        }
+      }
+    });
+  }
+
+  /**
    * Process all entries that correspond to content of the given tile.
    *
    * This determines the entries in the tileset source that represent
@@ -165,13 +212,13 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    *
    * The `tile.content.uri` or `tile.contents[i].uri` of the given tile
    * will be updated to reflect possible changes of the keys (file
-   * names) that pare performed by the `entryProcessor`.
+   * names) that are performed by the `entryProcessor`.
    *
    * @param tile - The tile
    * @param entryProcessor The `TilesetEntryProcessor`
    * @returns A promise that resolves when the process is finished
    */
-  async processTileContentEntries(
+  private async processExplicitTileContentEntries(
     tile: Tile,
     entryProcessor: TilesetEntryProcessor
   ): Promise<void> {
@@ -195,7 +242,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * @param entryProcessor The `TilesetEntryProcessor`
    * @returns A promise that resolves when the process is finished
    */
-  async processTraversedTileContentEntries(
+  private async processTraversedTileContentEntries(
     traversedTile: TraversedTile,
     entryProcessor: TilesetEntryProcessor
   ): Promise<void> {

@@ -37,6 +37,7 @@ type UpgradeOptions = {
   upgradeContentUrlToUri: boolean;
   upgradeB3dmGltf1ToGltf2: boolean;
   upgradeI3dmGltf1ToGltf2: boolean;
+  upgradeExternalTilesets: boolean;
   upgradeExtensionDeclarations: boolean;
 };
 
@@ -86,6 +87,7 @@ export class TilesetUpgrader {
       upgradeContentUrlToUri: true,
       upgradeB3dmGltf1ToGltf2: true,
       upgradeI3dmGltf1ToGltf2: true,
+      upgradeExternalTilesets: true,
       upgradeExtensionDeclarations: true,
     };
   }
@@ -122,9 +124,12 @@ export class TilesetUpgrader {
     const tilesetTargetJsonFileName =
       Tilesets.determineTilesetJsonFileName(tilesetTargetName);
 
-    await this.upgradeInternal(
-      tilesetSourceJsonFileName,
-      tilesetTargetJsonFileName
+    const upgradedTilesetJsonBuffer = await this.upgradeInternal(
+      tilesetSourceJsonFileName
+    );
+    this.tilesetTarget.addEntry(
+      tilesetTargetJsonFileName,
+      upgradedTilesetJsonBuffer
     );
     await this.upgradeResources(tilesetSourceJsonFileName);
 
@@ -138,19 +143,17 @@ export class TilesetUpgrader {
   /**
    * Internal method for the actual upgrade.
    *
-   * It justo obtains the tileset JSON data from the source, passes
-   * it to `upgradeTileset`, and writes the result under the given
-   * name into the target.
+   * It just obtains the tileset JSON data from the source, passes
+   * it to `upgradeTileset`, and returns the buffer containing the
+   * JSON data of the upgraded result.
    *
    * @param tilesetSourceJsonFileName - The name of the tileset JSON in the source
-   * @param tilesetTargetJsonFileName - The name of the tileset JSON in the target
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError When the input could not be processed
    */
   private async upgradeInternal(
-    tilesetSourceJsonFileName: string,
-    tilesetTargetJsonFileName: string
-  ): Promise<void> {
+    tilesetSourceJsonFileName: string
+  ): Promise<Buffer> {
     if (!this.tilesetSource || !this.tilesetTarget) {
       throw new DeveloperError("The source and target must be defined");
     }
@@ -181,10 +184,7 @@ export class TilesetUpgrader {
     if (tilesetJsonBufferWasZipped) {
       resultTilesetJsonBuffer = Buffers.gzip(resultTilesetJsonBuffer);
     }
-    this.tilesetTarget.addEntry(
-      tilesetTargetJsonFileName,
-      resultTilesetJsonBuffer
-    );
+    return resultTilesetJsonBuffer;
   }
 
   /**
@@ -357,6 +357,15 @@ export class TilesetUpgrader {
         value = await TilesetUpgrader.upgradeI3dmGltf1ToGltf2(value);
       } else {
         this.logCallback(`  Not upgrading GLB in ${key} (disabled via option)`);
+      }
+    } else if (type == ContentDataTypes.CONTENT_TYPE_TILESET) {
+      if (this.upgradeOptions.upgradeExternalTilesets) {
+        this.logCallback(`  Upgrading external tileset in ${key}`);
+        value = await this.upgradeInternal(key);
+      } else {
+        this.logCallback(
+          `  Not upgrading external tileset in ${key} (disabled via option)`
+        );
       }
     } else {
       this.logCallback(`  No upgrade operation to perform for ${key}`);

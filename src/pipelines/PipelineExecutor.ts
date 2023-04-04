@@ -59,7 +59,8 @@ export class PipelineExecutor {
         currentOutput = pipeline.output;
         currentOverwrite = overwrite;
       } else {
-        currentOutput = `${tempBasePath}/tilesetStage-${t}`;
+        const nameSuffix = tilesetStage.name.replace(/[^\w\s]/gi, "");
+        currentOutput = `${tempBasePath}/tilesetStage-${t}-${nameSuffix}`;
         currentOverwrite = true;
       }
 

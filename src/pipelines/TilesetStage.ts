@@ -13,5 +13,5 @@ export interface TilesetStage extends Stage {
    * The `ContentStage` steps representing the sequence of
    * operations that should be applied to content.
    */
-  contentStages: ContentStage[];
+  contentStages?: ContentStage[];
 }
