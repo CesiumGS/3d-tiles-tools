@@ -1,24 +1,39 @@
 import { TilesetSource } from "../src/tilesetData/TilesetSource";
 import { TilesetSourceFs } from "../src/tilesetData/TilesetSourceFs";
+import { TilesetInMemory } from "../src/tilesetData/TilesetInMemory";
+
 import { TilesetSource3tz } from "../src/packages/TilesetSource3tz";
 import { TilesetSource3dtiles } from "../src/packages/TilesetSource3dtiles";
+
+async function createTilesetInMemory() {
+  const tileset = new TilesetInMemory();
+  tileset.begin("", true);
+  tileset.addEntry("tileset.json", Buffer.alloc(0));
+  await tileset.end();
+  return tileset;
+}
 
 // The basic contract that is established by the `TilesetSource`
 // interface is checked for these implementations:
 const testCases = [
   {
     description: "TilesetSourceFs",
-    constructorFunction: TilesetSourceFs,
+    creationFunction: () => new TilesetSourceFs(),
     sourceName: "./specs/data/Tileset/",
   },
   {
     description: "TilesetSource3tz",
-    constructorFunction: TilesetSource3tz,
+    creationFunction: () => new TilesetSource3tz(),
     sourceName: "./specs/data/tileset.3tz",
   },
   {
     description: "TilesetSource3dtiles",
-    constructorFunction: TilesetSource3dtiles,
+    creationFunction: () => new TilesetSource3dtiles(),
+    sourceName: "./specs/data/tileset.3dtiles",
+  },
+  {
+    description: "TilesetInMemory",
+    creationFunction: createTilesetInMemory,
     sourceName: "./specs/data/tileset.3dtiles",
   },
 ];
@@ -28,8 +43,8 @@ for (const testCase of testCases) {
     let tilesetSource: TilesetSource;
     let sourceName: string;
 
-    beforeEach(function () {
-      tilesetSource = new testCase.constructorFunction();
+    beforeEach(async function () {
+      tilesetSource = await testCase.creationFunction();
       sourceName = testCase.sourceName;
     });
 

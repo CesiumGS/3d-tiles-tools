@@ -1,5 +1,7 @@
 import { TilesetTarget } from "../src/tilesetData/TilesetTarget";
 import { TilesetTargetFs } from "../src/tilesetData/TilesetTargetFs";
+import { TilesetInMemory } from "../src/tilesetData/TilesetInMemory";
+
 import { TilesetTarget3tz } from "../src/packages/TilesetTarget3tz";
 import { TilesetTarget3dtiles } from "../src/packages/TilesetTarget3dtiles";
 
@@ -8,18 +10,23 @@ import { TilesetTarget3dtiles } from "../src/packages/TilesetTarget3dtiles";
 const testCases = [
   {
     description: "TilesetTargetFs",
-    constructorFunction: TilesetTargetFs,
+    creationFunction: () => new TilesetTargetFs(),
     targetName: "./specs/data/output/Tileset/",
   },
   {
     description: "TilesetTarget3tz",
-    constructorFunction: TilesetTarget3tz,
+    creationFunction: () => new TilesetTarget3tz(),
     targetName: "./specs/data/output/tileset.3tz",
   },
   {
     description: "TilesetTarget3dtiles",
-    constructorFunction: TilesetTarget3dtiles,
+    creationFunction: () => new TilesetTarget3dtiles(),
     targetName: "./specs/data/output/tileset.3dtiles",
+  },
+  {
+    description: "TilesetInMemory",
+    creationFunction: () => new TilesetInMemory(),
+    targetName: "",
   },
 ];
 
@@ -28,8 +35,8 @@ for (const testCase of testCases) {
     let tilesetTarget: TilesetTarget;
     let targetName: string;
 
-    beforeEach(function () {
-      tilesetTarget = new testCase.constructorFunction();
+    beforeEach(async function () {
+      tilesetTarget = testCase.creationFunction();
       targetName = testCase.targetName;
     });
 
