@@ -231,8 +231,8 @@ export class TilesetUpgrader {
    *
    * This will examine each `tile.content` in the explicit representation
    * of the tile hierarchy in the given tileset. If any content does not
-   * define a `uri`, but a (legacy) `url` property, then a warning is
-   * printed and the `url` is renamed to `uri`.
+   * define a `uri`, but a (legacy) `url` property, then the `url` is
+   * renamed to `uri`.
    *
    * @param tileset - The tileset
    */
