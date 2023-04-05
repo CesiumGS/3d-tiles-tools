@@ -21,6 +21,22 @@ export class TilesetSourceResourceResolver implements ResourceResolver {
 
   /** {@inheritDoc ResourceResolver.resolveData} */
   async resolveData(uri: string): Promise<Buffer | null> {
+    return this.resolveDataInternal(uri);
+  }
+
+  /** {@inheritDoc ResourceResolver.resolveDataPartial} */
+  async resolveDataPartial(
+    uri: string,
+    maxBytes: number
+  ): Promise<Buffer | null> {
+    const buffer = await this.resolveDataInternal(uri);
+    if (!buffer) {
+      return null;
+    }
+    return buffer.subarray(0, maxBytes);
+  }
+
+  private async resolveDataInternal(uri: string): Promise<Buffer | null> {
     if (Uris.isDataUri(uri)) {
       const data = Buffer.from(uri.split(",")[1], "base64");
       return data;
@@ -34,15 +50,6 @@ export class TilesetSourceResourceResolver implements ResourceResolver {
       return null;
     }
     return value;
-  }
-
-  /** {@inheritDoc ResourceResolver.resolveDataPartial} */
-  async resolveDataPartial(
-    uri: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    maxBytes: number
-  ): Promise<Buffer | null> {
-    return await this.resolveData(uri);
   }
 
   /** {@inheritDoc ResourceResolver.derive} */
