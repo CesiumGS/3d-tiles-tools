@@ -20,14 +20,6 @@ async function example() {
   const tilesetProcessor = new BasicTilesetProcessor();
   await tilesetProcessor.begin(tilesetSourceName, tilesetTargetName, overwrite);
 
-  // Apply a callback to each `TraversedTile`
-  await tilesetProcessor.forEachTile(
-    async (traversedTile: TraversedTile): Promise<void> => {
-      console.log("In forEachTile");
-      return;
-    }
-  );
-
   // Apply a callback to each (explicit) `Tile`
   await tilesetProcessor.forEachExplicitTile(
     async (tile: Tile): Promise<void> => {
