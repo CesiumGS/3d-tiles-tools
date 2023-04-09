@@ -5,9 +5,6 @@ import { Schema } from "../structure/Metadata/Schema";
 
 import { TilesetSourceResourceResolver } from "../io/TilesetSourceResourceResolver";
 
-import { TilesetEntry } from "../tilesetData/TilesetEntry";
-import { TilesetSources } from "../tilesetData/TilesetSources";
-
 import { Tiles } from "../tilesets/Tiles";
 
 import { TilesetProcessor } from "./TilesetProcessor";
@@ -139,10 +136,10 @@ export class BasicTilesetProcessor extends TilesetProcessor {
   }
 
   /**
-   * Applies the given callback to each `TilesetEntry` that has not
-   * yet been processed.
+   * Applies the given entry processor to each `TilesetEntry` that
+   * has not yet been processed
    *
-   * @param callback - The callback
+   * @param entryProcessor - The callback
    * @returns A promise that resolves when the process is finished
    * @throws DeveloperError If `begin` was not called yet
    * @throws TilesetError When the input could not be processed
@@ -150,9 +147,12 @@ export class BasicTilesetProcessor extends TilesetProcessor {
   async processAllEntries(entryProcessor: TilesetEntryProcessor) {
     const context = this.getContext();
     const tilesetSource = context.tilesetSource;
-    const entries = TilesetSources.getEntries(tilesetSource);
-    for (const entry of entries) {
-      await this.processEntry(entry, entryProcessor);
+    const tilesetSourceJsonFileName = context.tilesetSourceJsonFileName;
+    const sourceKeys = tilesetSource.getKeys();
+    for (const sourceKey of sourceKeys) {
+      if (sourceKey !== tilesetSourceJsonFileName) {
+        await this.processEntry(sourceKey, entryProcessor);
+      }
     }
   }
 
@@ -206,10 +206,6 @@ export class BasicTilesetProcessor extends TilesetProcessor {
   /**
    * Process all entries that correspond to content of the given tile.
    *
-   * This determines the entries in the tileset source that represent
-   * content of the given tile, calls `processEntry` for each of them,
-   * and stores the resulting entries.
-   *
    * The `tile.content.uri` or `tile.contents[i].uri` of the given tile
    * will be updated to reflect possible changes of the keys (file
    * names) that are performed by the `entryProcessor`.
@@ -222,20 +218,19 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     tile: Tile,
     entryProcessor: TilesetEntryProcessor
   ): Promise<void> {
-    const sourceEntries = await this.fetchTileContentEntries(tile);
-    const targetEntries = await this.processEntries(
-      sourceEntries,
+    const contents = BasicTilesetProcessor.getTileContents(tile);
+    const targetContentUris = await this.processContentEntries(
+      contents,
       entryProcessor
     );
-    BasicTilesetProcessor.updateTileContent(tile, targetEntries);
-    this.storeTargetEntries(...targetEntries);
+    BasicTilesetProcessor.updateTileContent(tile, targetContentUris);
   }
 
   /**
    * Process all entries that correspond to content of the given traversed tile.
    *
    * This determines the entries in the tileset source that represent
-   * content of the given tile, calls `processEntry` for each of them,
+   * content of the given tile, calls `processEntries` on them,
    * and stores the resulting entries.
    *
    * @param traversedTile - The traversed tile
@@ -246,65 +241,40 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     traversedTile: TraversedTile,
     entryProcessor: TilesetEntryProcessor
   ): Promise<void> {
-    const sourceEntries = await this.fetchTraversedTileContentEntries(
-      traversedTile
-    );
-    const targetEntries = await this.processEntries(
-      sourceEntries,
-      entryProcessor
-    );
-    this.storeTargetEntries(...targetEntries);
-  }
-
-  /**
-   * Fetch all entries from the tileset source that correspond to the
-   * contents of the given tile.
-   *
-   * @param tile - The tile
-   * @returns A promise with the entries
-   */
-  private async fetchTileContentEntries(tile: Tile): Promise<TilesetEntry[]> {
-    const contents = BasicTilesetProcessor.getTileContents(tile);
-    const entries = await this.fetchContentEntries(contents);
-    return entries;
-  }
-
-  /**
-   * Fetch all entries from the tileset source that correspond to the
-   * contents of the given traversed tile.
-   *
-   * @param traversedTile - The traversed tile
-   * @returns A promise with the entries
-   */
-  private async fetchTraversedTileContentEntries(
-    traversedTile: TraversedTile
-  ): Promise<TilesetEntry[]> {
     if (traversedTile.isImplicitTilesetRoot()) {
-      return [];
+      return;
     }
     const contents = traversedTile.getFinalContents();
-    const entries = await this.fetchContentEntries(contents);
-    return entries;
+    await this.processContentEntries(contents, entryProcessor);
   }
 
   /**
-   * Fetch all entries from the tileset source that correspond to the
-   * given contents.
+   * Process all entries that correspond to the given contents.
    *
-   * @param contents - The contents
-   * @returns A promise with the entries
+   * @param tile - The tile
+   * @param entryProcessor The `TilesetEntryProcessor`
+   * @returns A promise that resolves when the process is finished,
+   * containing the new names that the entries have after processing
    */
-  private async fetchContentEntries(
-    contents: Content[]
-  ): Promise<TilesetEntry[]> {
-    const entries = [];
+  private async processContentEntries(
+    contents: Content[],
+    entryProcessor: TilesetEntryProcessor
+  ): Promise<string[]> {
+    const targetContentUris: string[] = [];
     for (const content of contents) {
-      const entry = await this.fetchSourceEntry(content.uri);
-      if (entry) {
-        entries.push(entry);
+      const sourceContentUri = content.uri;
+      let targetContentUri;
+      if (this.isProcessed(sourceContentUri)) {
+        targetContentUri = this.getTargetKey(sourceContentUri);
+      } else {
+        await this.processEntry(sourceContentUri, entryProcessor);
+        targetContentUri = this.getTargetKey(sourceContentUri);
+      }
+      if (targetContentUri) {
+        targetContentUris.push(targetContentUri);
       }
     }
-    return entries;
+    return targetContentUris;
   }
 
   /**
@@ -324,33 +294,33 @@ export class BasicTilesetProcessor extends TilesetProcessor {
   }
 
   /**
-   * Update the content of the given tile to reflect the given entries.
+   * Update the content of the given tile to reflect the given URIs.
    *
-   * When the given entries are empty, then the `content` and `contents`
+   * When the given array is empty, then the `content` and `contents`
    * of the given tile will be deleted.
    *
-   * When there is one entry, then the `content` of the given tile will
-   * receive the `key` (file name) of this entry as the content `uri`.
+   * When there is one element, then the `content` of the given tile will
+   * receive this element as the content `uri`.
    *
-   * When there are multiple entries, the tile will receive `contents`
-   * where each content `uri` is one `key` file name of the entries.
+   * When there are multiple elements, the tile will receive `contents`
+   * where each content `uri` is one element of the array.
    *
    * @param tile - The tile
-   * @param targetEntries - The target entries
+   * @param contentUris - The content URIs
    */
-  private static updateTileContent(tile: Tile, targetEntries: TilesetEntry[]) {
-    if (targetEntries.length === 0) {
+  private static updateTileContent(tile: Tile, contentUris: string[]) {
+    if (contentUris.length === 0) {
       delete tile.content;
       delete tile.contents;
       return;
     }
-    if (targetEntries.length === 1) {
-      const targetEntry = targetEntries[0];
+    if (contentUris.length === 1) {
+      const contentUri = contentUris[0];
       if (tile.content) {
-        tile.content.uri = targetEntry.key;
+        tile.content.uri = contentUri;
       } else {
         const content = {
-          uri: targetEntry.key,
+          uri: contentUri,
         };
         tile.content = content;
         delete tile.contents;
@@ -358,9 +328,9 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     }
 
     const newContents: Content[] = [];
-    for (const targetEntry of targetEntries) {
+    for (const contentUri of contentUris) {
       const content = {
-        uri: targetEntry.key,
+        uri: contentUri,
       };
       newContents.push(content);
     }

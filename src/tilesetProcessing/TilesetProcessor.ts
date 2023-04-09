@@ -98,6 +98,9 @@ export abstract class TilesetProcessor {
     tilesetTargetName: string,
     overwrite: boolean
   ): Promise<void> {
+    if (this.context) {
+      throw new TilesetError("Processing has already begun");
+    }
     let tilesetSource;
     let tilesetTarget;
     try {
@@ -138,6 +141,7 @@ export abstract class TilesetProcessor {
         tilesetTarget: tilesetTarget,
         tilesetTargetJsonFileName: tilesetTargetJsonFileName,
         processedKeys: {},
+        targetKeys: {},
       };
     } catch (error) {
       if (tilesetSource) {
@@ -175,21 +179,26 @@ export abstract class TilesetProcessor {
 
     // Perform a no-op on all entries that have not yet
     // been marked as processed
-    const entries = TilesetSources.getEntries(tilesetSource);
-    for (const entry of entries) {
-      const key = entry.key;
-      // The tileset JSON file will be added explicitly below
-      if (key !== tilesetSourceJsonFileName) {
-        const targetEntry = await this.processSourceEntry(
-          key,
+    const sourceKeys = tilesetSource.getKeys();
+    for (const sourceKey of sourceKeys) {
+      if (sourceKey !== tilesetSourceJsonFileName) {
+        await this.processEntry(
+          sourceKey,
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           async (sourceEntry: TilesetEntry, type: string | undefined) => {
             return sourceEntry;
           }
         );
-        if (targetEntry) {
-          this.storeTargetEntries(targetEntry);
-        }
+      }
+    }
+
+    const entries = TilesetSources.getEntries(tilesetSource);
+    for (const entry of entries) {
+      const key = entry.key;
+      // The tileset JSON file will be added explicitly below
+      if (!this.isProcessed(key) && key !== tilesetSourceJsonFileName) {
+        this.markAsProcessed(key);
+        this.storeTargetEntries(entry);
       }
     }
 
@@ -227,31 +236,46 @@ export abstract class TilesetProcessor {
    * then this method does nothing.
    *
    * Otherwise, the specified entry will be looked up in the tileset
-   * source, and passed to `processEntry`.
+   * source, and passed to the given entry processor, together with
+   * its type information.
    *
-   * @param key - The key (file name) of the entry
+   * The resulting target entry (if any) will be stored in the
+   * tileset target, and both the source and the target will
+   * be marked as 'processed'
+   *
+   * @param sourceKey - The key (file name) of the entry
    * @param entryProcessor - The `TilesetEntryProcessor` that will
    * be called to process the actual entry.
-   * @returns A promise that resolves when the process is finished,
-   * containing the resulting entries
+   * @returns A promise that resolves when the process is finished
    * @throws DeveloperError When the source or target is not opened
    * @throws TilesetError When the input could not be processed
    */
-  private async processSourceEntry(
-    key: string,
+  protected async processEntry(
+    sourceKey: string,
     entryProcessor: TilesetEntryProcessor
-  ): Promise<TilesetEntry | undefined> {
-    const sourceKey = key;
+  ): Promise<void> {
     if (this.isProcessed(sourceKey)) {
-      return undefined;
+      return;
     }
-    const sourceEntry = await this.fetchSourceEntry(key);
+    const sourceEntry = await this.fetchSourceEntry(sourceKey);
     if (!sourceEntry) {
+      this.markAsProcessed(sourceKey);
       const message = `No ${sourceKey} found in input`;
-      throw new TilesetError(message);
+      //throw new TilesetError(message);
+      console.warn(message);
+      return;
     }
-    const targetEntry = await this.processEntry(sourceEntry, entryProcessor);
-    return targetEntry;
+    const targetEntry = await this.processEntryInternal(
+      sourceEntry,
+      entryProcessor
+    );
+
+    this.markAsProcessed(sourceEntry.key);
+    if (targetEntry) {
+      this.putTargetKey(sourceEntry.key, targetEntry.key);
+      this.markAsProcessed(targetEntry.key);
+      this.storeTargetEntries(targetEntry);
+    }
   }
 
   /**
@@ -269,7 +293,7 @@ export abstract class TilesetProcessor {
    * @param entryProcessor The `TilesetEntryProcessor`
    * @returns The target entry
    */
-  async processEntry(
+  private async processEntryInternal(
     sourceEntry: TilesetEntry,
     entryProcessor: TilesetEntryProcessor
   ): Promise<TilesetEntry | undefined> {
@@ -281,32 +305,7 @@ export abstract class TilesetProcessor {
 
     this.log(`        to target: ${targetEntry?.key}`);
 
-    this.markAsProcessed(sourceEntry.key);
-    if (targetEntry) {
-      this.markAsProcessed(targetEntry.key);
-    }
     return targetEntry;
-  }
-
-  /**
-   * Calls `processEntry` on each input, and returns the results.
-
-   * @param sourceEntries - The source entries
-   * @param entryProcessor The `TilesetEntryProcessor`
-   * @returns The target entries
-   */
-  async processEntries(
-    sourceEntries: TilesetEntry[],
-    entryProcessor: TilesetEntryProcessor
-  ): Promise<TilesetEntry[]> {
-    const targetEntries = [];
-    for (const sourceEntry of sourceEntries) {
-      const targetEntry = await this.processEntry(sourceEntry, entryProcessor);
-      if (targetEntry) {
-        targetEntries.push(targetEntry);
-      }
-    }
-    return targetEntries;
   }
 
   /**
@@ -317,7 +316,9 @@ export abstract class TilesetProcessor {
    * @param key - The key (file name)
    * @returns The object containing the entry and its type
    */
-  async fetchSourceEntry(key: string): Promise<TilesetEntry | undefined> {
+  protected async fetchSourceEntry(
+    key: string
+  ): Promise<TilesetEntry | undefined> {
     const context = this.getContext();
     const tilesetSource = context.tilesetSource;
 
@@ -368,6 +369,35 @@ export abstract class TilesetProcessor {
   isProcessed(key: string): boolean {
     const context = this.getContext();
     return context.processedKeys[key] === true;
+  }
+
+  /**
+   * Stores the new key (file name) that the the entry with the
+   * given key received during processing.
+   *
+   * @param sourceKey - The key (file name)
+   * @returns The target key, or `undefined`
+   */
+  protected putTargetKey(sourceKey: string, targetKey: string) {
+    const context = this.getContext();
+    context.targetKeys[sourceKey] = targetKey;
+  }
+
+  /**
+   * Returns the new key (file name) that the the entry with the
+   * given key received during processing.
+   *
+   * When this is `undefined`, then this may either mean that
+   * the entry was removed during processing, or that it has
+   * not been procesed yet. The latter can be checked with
+   * `isProcessed`.
+   *
+   * @param sourceKey - The key (file name)
+   * @returns The target key, or `undefined`
+   */
+  protected getTargetKey(sourceKey: string): string | undefined {
+    const context = this.getContext();
+    return context.targetKeys[sourceKey];
   }
 
   /**
