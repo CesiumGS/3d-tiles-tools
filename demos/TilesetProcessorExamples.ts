@@ -36,57 +36,40 @@ async function example() {
     }
   );
 
-  // Create a callback that receives a `Tile` and
-  // applies a callback to each content
-  const contentCallback = BasicTilesetProcessor.callbackForEachContent(
-    async (content: Content): Promise<void> => {
-      console.log("In contentCallback for implicit tiling roots", content.uri);
-      return;
-    }
-  );
-
-  // Apply a callback to each content of an (explicit) `Tile`
+  // Apply a callback to each `Tile`
   await tilesetProcessor.forEachExplicitTile(
     async (tile: Tile): Promise<void> => {
-      console.log("In forEachExplicitTile ");
-      if (tile.implicitTiling) {
-        contentCallback(tile);
-      }
+      console.log("In forEachExplicitTile");
     }
   );
 
-  // Apply a callback to each entry that is the content
-  // of an explicit `Tile`
-  await tilesetProcessor.forEachExplicitTileContentEntry(
-    async (
-      sourceEntry: TilesetEntry,
-      type: string | undefined
-    ): Promise<TilesetEntry[]> => {
-      console.log("In forEachExplicitTileContentEntry");
-      return [sourceEntry];
+  // Apply a callback to each `TraversedTile`
+  await tilesetProcessor.forEachTile(
+    async (traversedTile: TraversedTile): Promise<void> => {
+      console.log("In forEachTile");
     }
   );
 
-  // Apply a callback to each entry that is the content
-  // of a tile
-  await tilesetProcessor.forEachTileContentEntry(
+  // Process all entries
+  await tilesetProcessor.processAllEntries(
     async (
       sourceEntry: TilesetEntry,
       type: string | undefined
-    ): Promise<TilesetEntry[]> => {
-      console.log("In forEachTileContentEntry");
-      return [sourceEntry];
+    ): Promise<TilesetEntry> => {
+      console.log("In processAllEntries");
+      return sourceEntry;
     }
   );
 
-  // Apply a callback to each entry
-  await tilesetProcessor.forEachEntry(
+  // Process all entries
+  await tilesetProcessor.processTileContentEntries(
+    (uri: string) => uri,
     async (
       sourceEntry: TilesetEntry,
       type: string | undefined
-    ): Promise<TilesetEntry[]> => {
-      console.log("In forEachEntry");
-      return [sourceEntry];
+    ): Promise<TilesetEntry> => {
+      console.log("In processTileContentEntries");
+      return sourceEntry;
     }
   );
 

@@ -3,6 +3,7 @@ import { ContentDataTypes } from "./ContentDataTypes";
 import { ContentDataTypeEntry } from "./ContentDataTypeEntry";
 import { defined } from "../base/defined";
 import { DeveloperError } from "../base/DeveloperError";
+import { BufferedContentData } from "./BufferedContentData";
 
 /**
  * A class for determining the type of data that a URI points to.
@@ -121,6 +122,29 @@ export class ContentDataTypeRegistry {
     );
 
     ContentDataTypeRegistry._registeredDefaults = true;
+  }
+
+  /**
+   * Tries to find the string that describes the type of the given data.
+   * If the type of the data cannot be determined, then `undefined` is
+   * returned.
+   *
+   * This is a convenience method for `findContentDataType`, for the
+   * case that the data is already fully available as a buffer. If
+   * the data should be fetched lazily, then `findContentDataType`
+   * should be called with a `LazyContentData` object.
+   *
+   * @param uri - The URI of the data
+   * @param data - the actual data
+   * @returns The string, or `undefined`
+   */
+  static async findType(
+    uri: string,
+    data: Buffer
+  ): Promise<string | undefined> {
+    const contentData = new BufferedContentData(uri, data);
+    const contentDataType = await this.findContentDataType(contentData);
+    return contentDataType;
   }
 
   /**

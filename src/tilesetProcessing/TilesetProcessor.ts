@@ -1,7 +1,6 @@
 import { Buffers } from "../base/Buffers";
 import { DeveloperError } from "../base/DeveloperError";
 
-import { BufferedContentData } from "../contentTypes/BufferedContentData";
 import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
 
 import { Tileset } from "../structure/Tileset";
@@ -281,9 +280,8 @@ export abstract class TilesetProcessor {
   /**
    * Process the given source entry, and return the processed result.
    *
-   * This will determine the content type of the given entry, pass
-   * it together with its type information to the `entryProcessor`,
-   * and mark the entry (and the possible target entry) as "processed".
+   * This will determine the content type of the given entry, and pass
+   * it together with its type information to the `entryProcessor`.
    *
    * This will *not* store the returned target entry in the tileset
    * target. To do so, `storeTargetEntries` has to be called with
@@ -297,7 +295,10 @@ export abstract class TilesetProcessor {
     sourceEntry: TilesetEntry,
     entryProcessor: TilesetEntryProcessor
   ): Promise<TilesetEntry | undefined> {
-    const type = await this.determineContentDataType(sourceEntry);
+    const type = await ContentDataTypeRegistry.findType(
+      sourceEntry.key,
+      sourceEntry.value
+    );
 
     this.log(`Processing source: ${sourceEntry.key} with type ${type}`);
 
@@ -316,7 +317,7 @@ export abstract class TilesetProcessor {
    * @param key - The key (file name)
    * @returns The object containing the entry and its type
    */
-  protected async fetchSourceEntry(
+  private async fetchSourceEntry(
     key: string
   ): Promise<TilesetEntry | undefined> {
     const context = this.getContext();
@@ -398,23 +399,6 @@ export abstract class TilesetProcessor {
   protected getTargetKey(sourceKey: string): string | undefined {
     const context = this.getContext();
     return context.targetKeys[sourceKey];
-  }
-
-  /**
-   * Determine the type of the given entry
-   *
-   * The string will either be one of the `ContentDataTypes` strings,
-   * or `undefined` if the type cannot be determined.
-   *
-   * @param entry - The entry
-   * @returns A promise with the content data type string
-   */
-  private async determineContentDataType(
-    entry: TilesetEntry
-  ): Promise<string | undefined> {
-    const contentData = new BufferedContentData(entry.key, entry.value);
-    const type = await ContentDataTypeRegistry.findContentDataType(contentData);
-    return type;
   }
 
   /**

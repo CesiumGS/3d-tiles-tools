@@ -2,8 +2,18 @@ import fs from "fs";
 
 import { Iterables } from "../src/base/Iterables";
 import { Paths } from "../src/base/Paths";
+import { DeveloperError } from "../src/base/DeveloperError";
+
 import { Tile } from "../src/structure/Tile";
+import { Tileset } from "../src/structure/Tileset";
+
 import { Tiles } from "../src/tilesets/Tiles";
+
+import { TilesetSourceResourceResolver } from "../src/io/TilesetSourceResourceResolver";
+
+import { TilesetTraverser } from "../src/traversal/TilesetTraverser";
+
+import { TilesetSource } from "../src/tilesetData/TilesetSource";
 
 /**
  * Utility methods for the specs
@@ -69,5 +79,57 @@ export class SpecHelpers {
       return true;
     });
     return allContentUris;
+  }
+
+  /**
+   * Collect all content URIs (excluding possible template URIs in
+   * implicit tiling roots) that appear in the given tileset, in
+   * unspecified order.
+   *
+   * @param tileset - The tileset
+   * @param tilesetSource - The tileset source
+   * @returns A promise to all content URIs
+   */
+  static async collectContentUris(
+    tileset: Tileset,
+    tilesetSource: TilesetSource
+  ) {
+    const resourceResolver = new TilesetSourceResourceResolver(
+      ".",
+      tilesetSource
+    );
+    const tilesetTraverser = new TilesetTraverser(".", resourceResolver, {
+      depthFirst: false,
+      traverseExternalTilesets: true,
+    });
+    const allContentUris: string[] = [];
+    await tilesetTraverser.traverse(tileset, async (traversedTile) => {
+      if (!traversedTile.isImplicitTilesetRoot()) {
+        const contentUris = traversedTile.getFinalContents().map((c) => c.uri);
+        allContentUris.push(...contentUris);
+      }
+      return true;
+    });
+    return allContentUris;
+  }
+
+  /**
+   * Parse the tileset from the 'tileset.json' in the given source
+   *
+   * @param tilesetSource - The tileset source
+   * @returns The tileset
+   * @throws DeveloperError if the tileset could not be read
+   */
+  static parseTileset(tilesetSource: TilesetSource) {
+    const tilesetJsonBuffer = tilesetSource.getValue("tileset.json");
+    if (!tilesetJsonBuffer) {
+      throw new DeveloperError("No tileset.json found in input");
+    }
+    try {
+      const tileset = JSON.parse(tilesetJsonBuffer.toString()) as Tileset;
+      return tileset;
+    } catch (e) {
+      throw new DeveloperError(`${e}`);
+    }
   }
 }

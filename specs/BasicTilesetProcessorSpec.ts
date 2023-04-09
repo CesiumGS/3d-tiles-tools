@@ -2,6 +2,7 @@
 import fs from "fs";
 
 import { SpecHelpers } from "./SpecHelpers";
+import { SpecProcessor } from "./SpecEntryProcessor";
 
 import { Paths } from "../src/base/Paths";
 
@@ -11,41 +12,20 @@ import { Tiles } from "../src/tilesets/Tiles";
 
 import { Tile } from "../src/structure/Tile";
 
-import { TilesetEntry } from "../src/tilesetData/TilesetEntry";
+import { TraversedTile } from "../src/traversal/TraversedTile";
 
 const basicInput = "./specs/data/tilesetProcessing/basicProcessing";
 const basicOutput = "./specs/data/output/tilesetProcessing/basicProcessing";
+const quiet = true;
 const overwrite = true;
 
-// Utility class that offers methods for a "dummy" modification
-// of the URIs (file names) and content processing, and stores
-// all processed entry names
-class SpecProcessor {
-  processedKeys: string[] = [];
-
-  processUri = (uri: string) => {
-    return "PROCESSED_" + uri;
-  };
-
-  processEntry = async (
-    sourceEntry: TilesetEntry,
-    type: string | undefined
-  ) => {
-    this.processedKeys.push(sourceEntry.key);
-    return {
-      key: this.processUri(sourceEntry.key),
-      value: sourceEntry.value,
-    };
-  };
-}
-
-describe("BasicTilesetProcessor", function () {
+describe("BasicTilesetProcessor on explicit input", function () {
   afterEach(function () {
-    //SpecHelpers.forceDeleteDirectory(basicOutput);
+    SpecHelpers.forceDeleteDirectory(basicOutput);
   });
 
-  it("forEachExplicitTile covers all tiles", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor();
+  it("forEachExplicitTile covers all explicit tiles", async function () {
+    const tilesetProcessor = new BasicTilesetProcessor(quiet);
     await tilesetProcessor.begin(basicInput, basicOutput, overwrite);
 
     const actualContentUris: string[][] = [];
@@ -55,6 +35,32 @@ describe("BasicTilesetProcessor", function () {
     });
     await tilesetProcessor.end();
 
+    // NOTE: The order is actually not specified.
+    // This should be sorted lexographically for
+    // the comparison...
+    const expectedContentUris = [
+      ["tileA.b3dm"],
+      ["tileB.b3dm", "sub/tileB.b3dm"],
+      ["tileC.b3dm"],
+      ["tileA.b3dm"],
+    ];
+    expect(actualContentUris).toEqual(expectedContentUris);
+  });
+
+  it("forEachTile covers all tiles", async function () {
+    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    await tilesetProcessor.begin(basicInput, basicOutput, overwrite);
+
+    const actualContentUris: string[][] = [];
+    await tilesetProcessor.forEachTile(async (traversedTile: TraversedTile) => {
+      const contentUris = traversedTile.getFinalContents().map((c) => c.uri);
+      actualContentUris.push(contentUris);
+    });
+    await tilesetProcessor.end();
+
+    // NOTE: The order is actually not specified.
+    // This should be sorted lexographically for
+    // the comparison...
     const expectedContentUris = [
       ["tileA.b3dm"],
       ["tileB.b3dm", "sub/tileB.b3dm"],
@@ -65,10 +71,7 @@ describe("BasicTilesetProcessor", function () {
   });
 
   it("processAllEntries processes all entries exactly once", async function () {
-    // XXX DEBUG
-    SpecHelpers.forceDeleteDirectory(basicOutput);
-
-    const tilesetProcessor = new BasicTilesetProcessor();
+    const tilesetProcessor = new BasicTilesetProcessor(quiet);
     await tilesetProcessor.begin(basicInput, basicOutput, overwrite);
     const specProcessor = new SpecProcessor();
     await tilesetProcessor.processAllEntries(specProcessor.processEntry);
@@ -103,10 +106,7 @@ describe("BasicTilesetProcessor", function () {
   });
 
   it("processTileContentEntries processes the tile content entries", async function () {
-    // XXX DEBUG
-    SpecHelpers.forceDeleteDirectory(basicOutput);
-
-    const tilesetProcessor = new BasicTilesetProcessor();
+    const tilesetProcessor = new BasicTilesetProcessor(quiet);
     await tilesetProcessor.begin(basicInput, basicOutput, overwrite);
     const specProcessor = new SpecProcessor();
     await tilesetProcessor.processTileContentEntries(
@@ -141,10 +141,7 @@ describe("BasicTilesetProcessor", function () {
   });
 
   it("processTileContentEntries updates the content URIs", async function () {
-    // XXX DEBUG
-    SpecHelpers.forceDeleteDirectory(basicOutput);
-
-    const tilesetProcessor = new BasicTilesetProcessor();
+    const tilesetProcessor = new BasicTilesetProcessor(quiet);
     await tilesetProcessor.begin(basicInput, basicOutput, overwrite);
     const specProcessor = new SpecProcessor();
     await tilesetProcessor.processTileContentEntries(
@@ -175,10 +172,7 @@ describe("BasicTilesetProcessor", function () {
   });
 
   it("processAllEntries only processes unprocessed entries", async function () {
-    // XXX DEBUG
-    SpecHelpers.forceDeleteDirectory(basicOutput);
-
-    const tilesetProcessor = new BasicTilesetProcessor();
+    const tilesetProcessor = new BasicTilesetProcessor(quiet);
     await tilesetProcessor.begin(basicInput, basicOutput, overwrite);
 
     // First, process all content entries
