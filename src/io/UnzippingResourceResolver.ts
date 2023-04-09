@@ -17,11 +17,6 @@ export class UnzippingResourceResolver implements ResourceResolver {
     this._delegate = delegate;
   }
 
-  /** {@inheritDoc ResourceResolver.resolveUri} */
-  resolveUri(uri: string): string {
-    return this._delegate.resolveUri(uri);
-  }
-
   /** {@inheritDoc ResourceResolver.resolveData} */
   async resolveData(uri: string): Promise<Buffer | null> {
     const delegateData = await this._delegate.resolveData(uri);

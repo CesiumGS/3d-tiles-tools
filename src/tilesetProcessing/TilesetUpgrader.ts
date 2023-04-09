@@ -3,6 +3,7 @@ import { DeveloperError } from "../base/DeveloperError";
 
 import { BufferedContentData } from "../contentTypes/BufferedContentData";
 import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
+import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 
 import { Tile } from "../structure/Tile";
 import { Tileset } from "../structure/Tileset";
@@ -16,6 +17,7 @@ import { TilesetSources } from "../tilesetData/TilesetSources";
 
 import { Tiles } from "../tilesets/Tiles";
 import { Tilesets } from "../tilesets/Tilesets";
+import { Extensions } from "../tilesets/Extensions";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 
@@ -35,6 +37,7 @@ type UpgradeOptions = {
   upgradeContentUrlToUri: boolean;
   upgradeB3dmGltf1ToGltf2: boolean;
   upgradeI3dmGltf1ToGltf2: boolean;
+  upgradeExtensionDeclarations: boolean;
 };
 
 /**
@@ -83,6 +86,7 @@ export class TilesetUpgrader {
       upgradeContentUrlToUri: true,
       upgradeB3dmGltf1ToGltf2: true,
       upgradeI3dmGltf1ToGltf2: true,
+      upgradeExtensionDeclarations: true,
     };
   }
 
@@ -191,7 +195,7 @@ export class TilesetUpgrader {
   async upgradeTileset(tileset: Tileset): Promise<void> {
     if (this.upgradeOptions.upgradeAssetVersionNumber) {
       this.logCallback(`Upgrading asset version number`);
-      await this.upgradeAssetVersionNumber(tileset);
+      this.upgradeAssetVersionNumber(tileset);
     }
     if (this.upgradeOptions.upgradeRefineCase) {
       this.logCallback(`Upgrading refine to be in uppercase`);
@@ -200,6 +204,10 @@ export class TilesetUpgrader {
     if (this.upgradeOptions.upgradeContentUrlToUri) {
       this.logCallback(`Upgrading content.url to content.uri`);
       await this.upgradeEachContentUrlToUri(tileset);
+    }
+    if (this.upgradeOptions.upgradeExtensionDeclarations) {
+      this.logCallback(`Upgrading extension declarations`);
+      Extensions.removeExtensionUsed(tileset, "3DTILES_content_gltf");
     }
   }
 
@@ -336,14 +344,14 @@ export class TilesetUpgrader {
     value: Buffer,
     type: string | undefined
   ): Promise<Buffer> {
-    if (type === "CONTENT_TYPE_B3DM") {
+    if (type === ContentDataTypes.CONTENT_TYPE_B3DM) {
       if (this.upgradeOptions.upgradeB3dmGltf1ToGltf2) {
         this.logCallback(`  Upgrading GLB in ${key}`);
         value = await TilesetUpgrader.upgradeB3dmGltf1ToGltf2(value);
       } else {
         this.logCallback(`  Not upgrading GLB in ${key} (disabled via option)`);
       }
-    } else if (type === "CONTENT_TYPE_I3DM") {
+    } else if (type === ContentDataTypes.CONTENT_TYPE_I3DM) {
       if (this.upgradeOptions.upgradeI3dmGltf1ToGltf2) {
         this.logCallback(`  Upgrading GLB in ${key}`);
         value = await TilesetUpgrader.upgradeI3dmGltf1ToGltf2(value);

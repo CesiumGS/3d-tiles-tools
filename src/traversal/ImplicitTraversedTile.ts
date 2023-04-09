@@ -8,7 +8,6 @@ import { SubtreeModels } from "./SubtreeModels";
 
 import { Tile } from "../structure/Tile";
 import { Content } from "../structure/Content";
-import { MetadataEntity } from "../structure/MetadataEntity";
 import { TileImplicitTiling } from "../structure/TileImplicitTiling";
 
 import { TreeCoordinates } from "../spatial/TreeCoordinates";
@@ -330,10 +329,9 @@ export class ImplicitTraversedTile implements TraversedTile {
     const contents = [];
     const subtreeInfo = this._subtreeModel.subtreeInfo;
     const contentAvailabilityInfos = subtreeInfo.contentAvailabilityInfos;
+    const tileIndex = this._localCoordinate.toIndex();
     for (const contentAvailabilityInfo of contentAvailabilityInfos) {
-      const available = contentAvailabilityInfo.isAvailable(
-        this._localCoordinate.toIndex()
-      );
+      const available = contentAvailabilityInfo.isAvailable(tileIndex);
       if (available) {
         // TODO The existence of the root content URI should
         // have been validated. So this could also throw
@@ -365,9 +363,9 @@ export class ImplicitTraversedTile implements TraversedTile {
     if (!subtreeMetadataModel) {
       return contents;
     }
+    const tileIndex = this._localCoordinate.toIndex();
     for (let i = 0; i < contents.length; i++) {
       const content = contents[i];
-      const tileIndex = this._localCoordinate.toIndex();
       MetadataSemanticOverrides.applyImplicitContentMetadataSemanticOverrides(
         content,
         i,
@@ -376,6 +374,16 @@ export class ImplicitTraversedTile implements TraversedTile {
       );
     }
     return contents;
+  }
+
+  /** {@inheritDoc TraversedTile.getResourceResolver} */
+  getResourceResolver(): ResourceResolver {
+    return this._resourceResolver;
+  }
+
+  /** {@inheritDoc TraversedTile.isImplicitTilesetRoot} */
+  isImplicitTilesetRoot(): boolean {
+    return false;
   }
 
   /** {@inheritDoc TraversedTile.getSubtreeUri} */
@@ -392,24 +400,6 @@ export class ImplicitTraversedTile implements TraversedTile {
       return subtreeUri;
     }
     return undefined;
-  }
-
-  /** {@inheritDoc TraversedTile.getImplicitTiling} */
-  getImplicitTiling(): TileImplicitTiling | undefined {
-    const localCoordinate = this._localCoordinate;
-    if (localCoordinate.level === 0) {
-      return this._implicitTiling;
-    }
-  }
-
-  /** {@inheritDoc TraversedTile.getMetadata} */
-  getMetadata(): MetadataEntity | undefined {
-    return undefined;
-  }
-
-  /** {@inheritDoc TraversedTile.resolveUri} */
-  resolveUri(uri: string): string {
-    return this._resourceResolver.resolveUri(uri);
   }
 
   // TODO For debugging

@@ -1,5 +1,3 @@
-import path from "path";
-
 import { Paths } from "../base/Paths";
 import { Uris } from "../base/Uris";
 
@@ -19,12 +17,6 @@ export class TilesetSourceResourceResolver implements ResourceResolver {
   constructor(basePath: string, tilesetSource: TilesetSource) {
     this._basePath = basePath;
     this._tilesetSource = tilesetSource;
-  }
-
-  /** {@inheritDoc ResourceResolver.resolveUri} */
-  resolveUri(uri: string): string {
-    const resolved = path.resolve(this._basePath, decodeURIComponent(uri));
-    return resolved;
   }
 
   /** {@inheritDoc ResourceResolver.resolveData} */

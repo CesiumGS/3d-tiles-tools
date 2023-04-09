@@ -20,10 +20,18 @@ const unitBoundingBox = {
 // - The `refine` value must be given in uppercase
 // - The `content.url` must be a `content.uri`
 //   (checked for both `content` and `contents`)
+// - The `extensionsUsed` and `extensionsRequired` should no
+//   longer contain `3DTILES_content_gltf`
 const inputTilesetJsonRaw: unknown = {
   asset: {
     version: "0.0",
   },
+  extensionsUsed: [
+    "3DTILES_content_gltf",
+    "EXAMPLE_extension_A",
+    "EXAMPLE_extension_B",
+  ],
+  extensionsRequired: ["3DTILES_content_gltf", "EXAMPLE_extension_A"],
   geometricError: 2.0,
   root: {
     boundingVolume: unitBoundingBox,
@@ -84,5 +92,15 @@ describe("TilesetUpgrader", function () {
     expect(tileset.root.refine).toBe("REPLACE");
     expect(tileset.root.children![0].refine).toBe("ADD");
     expect(tileset.root.children![1].refine).toBeUndefined();
+  });
+
+  it("removes the unnecessary extension declaration for 3DTILES_content_gltf", async function () {
+    const tilesetUpgrader = new TilesetUpgrader(quiet);
+
+    const tileset = JSON.parse(inputTilesetJsonString) as Tileset;
+    await tilesetUpgrader.upgradeTileset(tileset);
+
+    expect(tileset.extensionsUsed).not.toContain("3DTILES_content_gltf");
+    expect(tileset.extensionsRequired).not.toContain("3DTILES_content_gltf");
   });
 });

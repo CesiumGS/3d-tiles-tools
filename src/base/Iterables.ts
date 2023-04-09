@@ -15,14 +15,13 @@ export class Iterables {
    * `recurse` is `true`.
    *
    * @param directory - The directory
-   * @param recurse - [true] Whether the files should
+   * @param recurse - Whether the files should
    * be listed recursively
    * @returns The generator for path strings
    */
   static *overFiles(
     directory: string | PathLike,
-    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
-    recurse: boolean = true
+    recurse: boolean
   ): IterableIterator<string> {
     const fileNames = fs.readdirSync(directory);
     for (const fileName of fileNames) {

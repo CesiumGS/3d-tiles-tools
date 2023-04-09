@@ -177,7 +177,7 @@ export class ToolsMain {
     };
 
     // Read the buffer and its magic header
-    const magic = Buffers.getMagic(inputBuffer, 0);
+    const magic = Buffers.getMagicString(inputBuffer, 0);
 
     if (magic === "b3dm" || magic === "i3dm" || magic === "pnts") {
       // Handle the basic legacy tile formats

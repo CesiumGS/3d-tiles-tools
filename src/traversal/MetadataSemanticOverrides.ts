@@ -21,7 +21,7 @@ export class MetadataSemanticOverrides {
   // TODO There are far too few error checks (e.g. for invalid
   // indices) here. This COULD be delegated to the assumption
   // that the input is "valid" (as determined by the validator),
-  // but the error handling here should still be improvev.
+  // but the error handling here should still be improved.
 
   /**
    * Perform the overrides of the properties of the given tile that
@@ -195,7 +195,7 @@ export class MetadataSemanticOverrides {
     const semanticGeometricError =
       metadataEntityModel.getPropertyValueBySemantic("TILE_GEOMETRIC_ERROR");
     if (defined(semanticGeometricError)) {
-      tile.geometricError = semanticGeometricError as number;
+      tile.geometricError = semanticGeometricError;
     }
 
     const semanticRefine =
@@ -255,13 +255,13 @@ export class MetadataSemanticOverrides {
     const semanticUri =
       metadataEntityModel.getPropertyValueBySemantic("CONTENT_URI");
     if (defined(semanticUri)) {
-      content.uri = semanticUri as string;
+      content.uri = semanticUri;
     }
 
     const semanticGroupId =
       metadataEntityModel.getPropertyValueBySemantic("CONTENT_GROUP_ID");
     if (defined(semanticGroupId)) {
-      content.group = semanticGroupId as number;
+      content.group = semanticGroupId;
     }
   }
 }

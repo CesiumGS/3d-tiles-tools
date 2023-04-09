@@ -2,7 +2,8 @@ import { Buffers } from "../base/Buffers";
 
 import { CompositeTileData } from "./CompositeTileData";
 import { TileData } from "./TileData";
-import { TileDataLayout, TileDataLayouts } from "./TileDataLayouts";
+import { TileDataLayout } from "./TileDataLayouts";
+import { TileDataLayouts } from "./TileDataLayouts";
 import { TileFormatError } from "./TileFormatError";
 
 /**
@@ -20,7 +21,7 @@ export class TileFormats {
    * @returns Whether the given buffer contains composite tile data
    */
   static isComposite(buffer: Buffer): boolean {
-    const magic = Buffers.getMagic(buffer);
+    const magic = Buffers.getMagicString(buffer);
     return magic === "cmpt";
   }
 
@@ -38,7 +39,7 @@ export class TileFormats {
    */
   static readCompositeTileData(buffer: Buffer): CompositeTileData {
     // Basic checks for magic number, length and version
-    const magic = Buffers.getMagic(buffer);
+    const magic = Buffers.getMagicString(buffer);
     if (magic !== "cmpt") {
       throw new TileFormatError(`Expected magic "cmpt", but found "${magic}"`);
     }
@@ -128,7 +129,7 @@ export class TileFormats {
    * @internal
    */
   static extractTileData(buffer: Buffer, tileDataLayout: TileDataLayout) {
-    const magic = Buffers.getMagic(buffer);
+    const magic = Buffers.getMagicString(buffer);
     const version = buffer.readUInt32LE(4);
 
     // The `gltfFormat` is only stored for I3DM

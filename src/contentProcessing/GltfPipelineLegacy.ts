@@ -1,6 +1,7 @@
 import { defaultValue } from "../base/defaultValue";
 
 import { Cartesian3, defined, DeveloperError, Ellipsoid } from "cesium";
+import { Extensions } from "../tilesets/Extensions";
 
 /**
  * Methods and fragments ported from a legacy version of gltf-pipeline.
@@ -57,8 +58,7 @@ export class GltfPipelineLegacy {
     extensions.CESIUM_RTC = {
       center: positionArray,
     };
-    GltfPipelineLegacy.addExtensionsRequired(gltf, "CESIUM_RTC");
-    GltfPipelineLegacy.addExtensionsUsed(gltf, "CESIUM_RTC");
+    Extensions.addExtensionRequired(gltf, "CESIUM_RTC");
   }
 
   private static fixBatchIdSemantic(gltf: any) {
@@ -91,41 +91,5 @@ export class GltfPipelineLegacy {
         }
       }
     }
-  }
-
-  private static addExtensionsRequired(gltf: any, extension: string) {
-    let extensionsRequired = gltf.extensionsRequired;
-    if (!defined(extensionsRequired)) {
-      extensionsRequired = [];
-      gltf.extensionsRequired = extensionsRequired;
-    }
-    GltfPipelineLegacy.addToArray(extensionsRequired, extension, true);
-    GltfPipelineLegacy.addExtensionsUsed(gltf, extension);
-  }
-
-  private static addExtensionsUsed(gltf: any, extension: string) {
-    let extensionsUsed = gltf.extensionsUsed;
-    if (!defined(extensionsUsed)) {
-      extensionsUsed = [];
-      gltf.extensionsUsed = extensionsUsed;
-    }
-    GltfPipelineLegacy.addToArray(extensionsUsed, extension, true);
-  }
-
-  private static addToArray(
-    array: string[],
-    element: string,
-    checkDuplicates: boolean
-  ) {
-    checkDuplicates = defaultValue(checkDuplicates, false);
-    if (checkDuplicates) {
-      const index = array.indexOf(element);
-      if (index > -1) {
-        return index;
-      }
-    }
-
-    array.push(element);
-    return array.length - 1;
   }
 }

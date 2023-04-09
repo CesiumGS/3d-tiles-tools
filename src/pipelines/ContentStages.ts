@@ -14,6 +14,7 @@ export class ContentStages {
       const contentStage: ContentStage = {
         name: contentStageJson,
         condition: undefined,
+        options: undefined,
       };
       return contentStage;
     }

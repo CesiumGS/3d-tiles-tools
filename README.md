@@ -45,7 +45,7 @@ npx ts-node ./src/main.ts combine -i ./specs/data/combineTilesets/input -o ./spe
 
 Merge multiple tilesets into a single one that refers to the input tilesets as external tilesets.
 ```
-npx ts-node ./src/main.ts merge -i ./specs/data/mergeTilesets/input/TilesetA -i ./specs/data/mergeTilesets/input/sub/TilesetA -o ./specs/data/mergeTilesets/output
+npx ts-node ./src/main.ts merge -i ./specs/data/mergeTilesets/TilesetA -i ./specs/data/mergeTilesets/sub/TilesetA -o ./specs/data/mergeTilesets/output
 ```
 
 
