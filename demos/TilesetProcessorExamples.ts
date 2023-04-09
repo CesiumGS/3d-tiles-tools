@@ -36,13 +36,6 @@ async function example() {
     }
   );
 
-  // Apply a callback to each `Tile`
-  await tilesetProcessor.forEachExplicitTile(
-    async (tile: Tile): Promise<void> => {
-      console.log("In forEachExplicitTile");
-    }
-  );
-
   // Apply a callback to each `TraversedTile`
   await tilesetProcessor.forEachTile(
     async (traversedTile: TraversedTile): Promise<void> => {
