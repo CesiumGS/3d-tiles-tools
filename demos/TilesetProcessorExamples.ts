@@ -46,7 +46,7 @@ async function example() {
     }
   );
 
-  // Process all entries
+  // Process all entries that are tile content
   await tilesetProcessor.processTileContentEntries(
     (uri: string) => uri,
     async (
