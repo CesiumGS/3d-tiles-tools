@@ -245,7 +245,7 @@ class Summary {
 
 async function runDemo() {
   const tilesetFileName =
-    "../3d-tiles-samples/1.1/SparseImplicitQuadtree/tileset.json";
+    "./specs/data/tilesetProcessing/implicitProcessing/tileset.json";
   await tilesetTraversalDemo(tilesetFileName);
 }
 
