@@ -45,6 +45,15 @@ const inputArrayDefinition: any = {
   demandOption: true,
 };
 
+const outputStringDefinition: any = {
+  alias: "output",
+  description: "Output path for the command.",
+  global: true,
+  normalize: true,
+  type: "string",
+  demandOption: true,
+};
+
 /**
  * Parses the arguments that are intended for the actual 3D Tiles tools
  * (ignoring the option arguments), and returns the result.
@@ -58,14 +67,6 @@ function parseToolArgs(a: string[]) {
     .help("h")
     .alias("h", "help")
     .options({
-      o: {
-        alias: "output",
-        description: "Output path for the command.",
-        global: true,
-        normalize: true,
-        type: "string",
-        demandOption: true,
-      },
       f: {
         alias: "force",
         default: false,
@@ -76,27 +77,39 @@ function parseToolArgs(a: string[]) {
     })
     .command("tilesetToDatabase", "Create a sqlite database for a tileset.", {
       i: inputStringDefinition,
+      o: outputStringDefinition,
     })
     .command(
       "databaseToTileset",
       "Unpack a tileset database to a tileset folder.",
-      { i: inputStringDefinition }
+      { i: inputStringDefinition, o: outputStringDefinition }
+    )
+    .command(
+      "convert",
+      "Convert between tilesets and tileset package formats. " +
+        "The input and output can be paths to tileset JSON files, " +
+        "'.3tz', or '.3dtiles' files.",
+      {
+        i: inputStringDefinition,
+        o: outputStringDefinition,
+      }
     )
     .command(
       "glbToB3dm",
       "Repackage the input glb as a b3dm with a basic header.",
-      { i: inputStringDefinition }
+      { i: inputStringDefinition, o: outputStringDefinition }
     )
     .command(
       "glbToI3dm",
       "Repackage the input glb as a i3dm with a basic header.",
-      { i: inputStringDefinition }
+      { i: inputStringDefinition, o: outputStringDefinition }
     )
     .command(
       "b3dmToGlb",
       "Extract the binary glTF asset from the input b3dm.",
       {
         i: inputStringDefinition,
+        o: outputStringDefinition,
       }
     )
     .command(
@@ -104,6 +117,7 @@ function parseToolArgs(a: string[]) {
       "Extract the binary glTF asset from the input i3dm.",
       {
         i: inputStringDefinition,
+        o: outputStringDefinition,
       }
     )
     .command(
@@ -111,6 +125,7 @@ function parseToolArgs(a: string[]) {
       "Extract the binary glTF assets from the input cmpt.",
       {
         i: inputStringDefinition,
+        o: outputStringDefinition,
       }
     )
     .command(
@@ -118,6 +133,7 @@ function parseToolArgs(a: string[]) {
       "Pass the input b3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)",
       {
         i: inputStringDefinition,
+        o: outputStringDefinition,
         options: {
           description:
             "All arguments after this flag will be passed to gltf-pipeline as command line options.",
@@ -129,6 +145,7 @@ function parseToolArgs(a: string[]) {
       "Pass the input i3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)",
       {
         i: inputStringDefinition,
+        o: outputStringDefinition,
         options: {
           description:
             "All arguments after this flag will be passed to gltf-pipeline as command line options.",
@@ -137,6 +154,7 @@ function parseToolArgs(a: string[]) {
     )
     .command("gzip", "Gzips the input tileset directory.", {
       i: inputStringDefinition,
+      o: outputStringDefinition,
       t: {
         alias: "tilesOnly",
         default: false,
@@ -146,22 +164,26 @@ function parseToolArgs(a: string[]) {
     })
     .command("ungzip", "Ungzips the input tileset directory.", {
       i: inputStringDefinition,
+      o: outputStringDefinition,
     })
     .command(
       "combine",
       "Combines all external tilesets into a single tileset.json file.",
-      { i: inputStringDefinition }
+      { i: inputStringDefinition, o: outputStringDefinition }
     )
     .command(
       "merge",
       "Merge any number of tilesets together into a single tileset.",
-      { i: inputArrayDefinition }
+      { i: inputArrayDefinition, o: outputStringDefinition }
     )
     .command(
       "upgrade",
       "Upgrades the input tileset to the latest version of the 3D Tiles spec. Embedded glTF models will be upgraded to glTF 2.0.",
-      { i: inputStringDefinition }
+      { i: inputStringDefinition, o: outputStringDefinition }
     )
+    .command("pipeline", "Execute a pipeline that is provided as a JSON file", {
+      i: inputStringDefinition,
+    })
     .command(
       "analyze",
       "Analyze the input file, and write the results to the output directory. " +
@@ -169,7 +191,7 @@ function parseToolArgs(a: string[]) {
         "1.0 and for glTF 2.0), and write files into the output directory that " +
         "contain the feature table, batch table, layout information, the GLB, " +
         "and the JSON of the GLB",
-      { i: inputStringDefinition }
+      { i: inputStringDefinition, o: outputStringDefinition }
     )
     .demandCommand(1)
     .strict();
@@ -249,17 +271,27 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   } else if (command === "ungzip") {
     await ToolsMain.ungzip(input, output, force);
   } else if (command === "tilesetToDatabase") {
-    await ToolsMain.tilesetToDatabase(input, output, force);
+    console.log(
+      `The 'tilesetToDatabase' command is deprecated. Use 'convert' instead.`
+    );
+    await ToolsMain.convert(input, output, force);
   } else if (command === "databaseToTileset") {
-    await ToolsMain.databaseToTileset(input, output, force);
+    console.log(
+      `The 'databaseToTileset' command is deprecated. Use 'convert' instead.`
+    );
+    await ToolsMain.convert(input, output, force);
+  } else if (command === "convert") {
+    await ToolsMain.convert(input, output, force);
   } else if (command === "combine") {
     await ToolsMain.combine(input, output, force);
   } else if (command === "upgrade") {
     await ToolsMain.upgrade(input, output, force);
   } else if (command === "merge") {
     await ToolsMain.merge(inputs, output, force);
+  } else if (command === "pipeline") {
+    await ToolsMain.pipeline(input, force);
   } else if (command === "analyze") {
-    await ToolsMain.analyze(input, output, force);
+    ToolsMain.analyze(input, output, force);
   } else {
     throw new DeveloperError(`Invalid command: ${command}`);
   }
