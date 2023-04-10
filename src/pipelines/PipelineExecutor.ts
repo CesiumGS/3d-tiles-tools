@@ -10,6 +10,29 @@ import { TilesetStageExecutor } from "./TilesetStageExecutor";
  */
 export class PipelineExecutor {
   /**
+   * The directory to store temporary files in.
+   *
+   * If this is `undefined`, then a directory in the
+   * default system temp directory will be used.
+   */
+  private static tempBaseDirectory: string | undefined;
+
+  /**
+   * Set the directory to store temporary files in.
+   *
+   * If this is `undefined`, then a directory in the
+   * default system temp directory will be used.
+   *
+   * This is primarily intended for testing, demos, and
+   * debugging.
+   *
+   * @param directory - The directory
+   */
+  static setTempBaseDirectory(directory: string | undefined) {
+    PipelineExecutor.tempBaseDirectory = directory;
+  }
+
+  /**
    * Executes the given `Pipeline`.
    *
    * @param pipeline - The `Pipeline` object
@@ -31,14 +54,8 @@ export class PipelineExecutor {
     // Create a temporary directory for the intermediate
     // processing steps (if there are more than one)
     // TODO: This is not cleaned up at the end...
-    let tempBasePath = "";
-
-    // TODO Store locally for experiments...
-    const EXPERIMENTS = true;
-    if (EXPERIMENTS) {
-      tempBasePath = "./output/TEMP";
-      console.warn("Using temp path for experiments: " + tempBasePath);
-    } else {
+    let tempBasePath = PipelineExecutor.tempBaseDirectory;
+    if (!tempBasePath) {
       if (tilesetStages.length > 1) {
         tempBasePath = fs.mkdtempSync(
           path.join(os.tmpdir(), "3d-tiles-tools-pipeline-")
