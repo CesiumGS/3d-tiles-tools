@@ -20,6 +20,11 @@ const implicitOutput =
 const quiet = true;
 const overwrite = true;
 
+/**
+ * Tests that verify that the `forEach...` and `process...` methods
+ * of the BasicTilesetProcessor visit and process the correct
+ * elements on implicit tilesets
+ */
 describe("BasicTilesetProcessor on implicit input", function () {
   afterEach(function () {
     SpecHelpers.forceDeleteDirectory(implicitOutput);
@@ -29,6 +34,7 @@ describe("BasicTilesetProcessor on implicit input", function () {
     const tilesetProcessor = new BasicTilesetProcessor(quiet);
     await tilesetProcessor.begin(implicitInput, implicitOutput, overwrite);
 
+    // There is only one explicit tile in the 'implicitProcessing' data
     const actualContentUris: string[][] = [];
     await tilesetProcessor.forEachExplicitTile(async (tile: Tile) => {
       const contentUris = Tiles.getContentUris(tile);

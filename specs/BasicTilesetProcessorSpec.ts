@@ -19,6 +19,11 @@ const basicOutput = "./specs/data/output/tilesetProcessing/basicProcessing";
 const quiet = true;
 const overwrite = true;
 
+/**
+ * Tests that verify that the `forEach...` and `process...` methods
+ * of the BasicTilesetProcessor visit and process the correct
+ * elements on explicit tilesets
+ */
 describe("BasicTilesetProcessor on explicit input", function () {
   afterEach(function () {
     SpecHelpers.forceDeleteDirectory(basicOutput);

@@ -7,6 +7,11 @@ const basicOutput = "./specs/data/output/tilesetProcessing/basicProcessing";
 const quiet = true;
 const overwrite = true;
 
+/**
+ * Tests for the base functionality of the (abstract) TilesetProcessor
+ * base class, using its only concrete implementation, namely the
+ * BasicTilesetProcessor
+ */
 describe("TilesetProcessor", function () {
   afterEach(function () {
     SpecHelpers.forceDeleteDirectory(basicOutput);

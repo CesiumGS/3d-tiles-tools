@@ -14,6 +14,7 @@ import { TilesetSourceResourceResolver } from "../src/io/TilesetSourceResourceRe
 import { TilesetTraverser } from "../src/traversal/TilesetTraverser";
 
 import { TilesetSource } from "../src/tilesetData/TilesetSource";
+import { TilesetSources } from "../src/tilesetData/TilesetSources";
 
 /**
  * Utility methods for the specs
@@ -130,6 +131,96 @@ export class SpecHelpers {
       return tileset;
     } catch (e) {
       throw new DeveloperError(`${e}`);
+    }
+  }
+
+  /**
+   * Returns whether the specified packages are equal.
+   *
+   * This means that they contain the same keys, and the
+   * keys are mapped to the same values.
+   *
+   * @param nameA - The first package name
+   * @param nameB - The second package name
+   * @returns A string describing the difference, or `undefined`
+   * if there is no difference.
+   */
+  static computePackageDifference(
+    nameA: string,
+    nameB: string
+  ): string | undefined {
+    const tilesetSourceA = TilesetSources.createAndOpen(nameA);
+    const tilesetSourceB = TilesetSources.createAndOpen(nameB);
+    const result = SpecHelpers.computePackageDifferenceInternal(
+      nameA,
+      tilesetSourceA,
+      nameB,
+      tilesetSourceB
+    );
+    tilesetSourceA.close();
+    tilesetSourceB.close();
+    return result;
+  }
+
+  /**
+   * Returns whether the specified packages are equal.
+   *
+   * This means that they contain the same keys, and the
+   * keys are mapped to the same values.
+   *
+   * Entries that end in `.json` will be parsed and strigified
+   * for the comparison (to handle formatting differences),
+   * whereas other entries will be treated as "binary", and
+   * their values will be compared byte-wise.
+   *
+   * @param nameA - The first package name
+   * @param tilesetSourceA - The first package
+   * @param nameB - The second package name
+   * @param tilesetSourceB - The second package
+   * @returns A string describing the difference, or `undefined`
+   * if there is no difference.
+   */
+  static computePackageDifferenceInternal(
+    nameA: string,
+    tilesetSourceA: TilesetSource,
+    nameB: string,
+    tilesetSourceB: TilesetSource
+  ): string | undefined {
+    const keysA = [...tilesetSourceA.getKeys()];
+    const keysB = [...tilesetSourceB.getKeys()];
+
+    if (keysA.length != keysB.length) {
+      return `There are ${keysA.length} keys in ${nameA} and ${keysB.length} keys in ${nameB}`;
+    }
+    for (let i = 0; i < keysA.length; i++) {
+      if (keysA[i] != keysB[i]) {
+        return `Key ${i} is ${keysA[i]} in ${nameA} and ${keysA[i]} in ${nameB}`;
+      }
+    }
+    for (let i = 0; i < keysA.length; i++) {
+      const valueA = tilesetSourceA.getValue(keysA[i]);
+      const valueB = tilesetSourceB.getValue(keysB[i]);
+      if (valueA && valueB) {
+        if (keysA[i].endsWith(".json")) {
+          const jsonA = JSON.parse(valueA.toString());
+          const jsonB = JSON.parse(valueB.toString());
+          const stringA = JSON.stringify(jsonA);
+          const stringB = JSON.stringify(jsonB);
+          if (stringA !== stringB) {
+            return `Value ${keysA[i]} has different JSON contents in ${nameA} and in ${nameB}`;
+          }
+        } else {
+          if (valueA?.length != valueB?.length) {
+            return `Value ${keysA[i]} has ${valueA?.length} bytes in ${nameA} and ${valueB?.length} bytes in ${nameB}`;
+          }
+          const n = valueA.length;
+          for (let j = 0; j < n; j++) {
+            if (valueA[i] != valueB[i]) {
+              return `Value ${keysA[i]} has ${valueA[i]} at index ${j} in ${nameA} but ${valueB[i]} in ${nameB}`;
+            }
+          }
+        }
+      }
     }
   }
 }
