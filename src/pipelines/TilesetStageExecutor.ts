@@ -1,47 +1,33 @@
-import { TilesetSource } from "../tilesetData/TilesetSource";
-import { TilesetSources } from "../tilesetData/TilesetSources";
-import { TilesetTarget } from "../tilesetData/TilesetTarget";
-import { TilesetTargets } from "../tilesetData/TilesetTargets";
-
 import { TilesetStage } from "./TilesetStage";
 import { ContentStageExecutor } from "./ContentStageExecutor";
+import { PipelineError } from "./PipelineError";
+import { TilesetStages } from "./TilesetStages";
 
+import { BasicTilesetProcessor } from "../tilesetProcessing/BasicTilesetProcessor";
+import { TilesetUpgrader } from "../tilesetProcessing/TilesetUpgrader";
+import { TilesetCombiner } from "../tilesetProcessing/TilesetCombiner";
+
+import { ContentDataTypeChecks } from "../contentTypes/ContentDataTypeChecks";
+import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
+
+/**
+ * Methods to execute `TilesetStage` objects.
+ */
 export class TilesetStageExecutor {
-  static async executeTilesetStageInternal(
-    tilesetSource: TilesetSource,
-    tilesetTarget: TilesetTarget,
-    tilesetStage: TilesetStage
-  ) {
-    const contentStages = tilesetStage.contentStages;
-
-    if (contentStages.length === 0) {
-      // TODO This should probably not cause a message.
-      // A TilesetStage might be something like `databaseToTileset`
-      // that is self-contained and "atomic", and does not have
-      // any content stages.
-      const message = `    No contentStages - performing no-op`;
-      console.log(message);
-      const inputEntries = TilesetSources.getEntries(tilesetSource);
-      TilesetTargets.putEntries(tilesetTarget, inputEntries);
-      return;
-    }
-
-    for (let c = 0; c < contentStages.length; c++) {
-      const contentStage = contentStages[c];
-
-      const message =
-        `    Executing contentStage ${c} of ` +
-        `${contentStages.length}: ${contentStage.name}`;
-      console.log(message);
-
-      await ContentStageExecutor.executeContentStage(
-        tilesetSource,
-        tilesetTarget,
-        contentStage
-      );
-    }
-  }
-
+  /**
+   * Executes the given `TilesetStage`.
+   *
+   * @param tilesetStage - The `TilesetStage` object
+   * @param currentInput - The current input name, or a temporary
+   * name for intermediate steps (see `Pipeline.input` for details)
+   * @param currentOutput - The current output name, or a temporary
+   * name for intermediate steps (see `Pipeline.input` for details)
+   * @param overwrite - Whether outputs should be overwritten if
+   * they already exist
+   * @returns A promise that resolves when the process is finished
+   * @throws PipelineError If one of the processing steps causes
+   * an error.
+   */
   static async executeTilesetStage(
     tilesetStage: TilesetStage,
     currentInput: string,
@@ -52,28 +38,99 @@ export class TilesetStageExecutor {
     console.log(`    currentInput:  ${currentInput}`);
     console.log(`    currentOutput: ${currentOutput}`);
 
-    let tilesetSource;
-    let tilesetTarget;
     try {
-      tilesetSource = TilesetSources.createAndOpen(currentInput);
-      tilesetTarget = TilesetTargets.createAndBegin(currentOutput, overwrite);
-
       await TilesetStageExecutor.executeTilesetStageInternal(
-        tilesetSource,
-        tilesetTarget,
-        tilesetStage
+        tilesetStage,
+        currentInput,
+        currentOutput,
+        overwrite
       );
+    } catch (e) {
+      throw new PipelineError(`${e}`);
+    }
+  }
 
-      tilesetSource.close();
-      await tilesetTarget.end();
-    } catch (error) {
-      if (tilesetSource) {
-        tilesetSource.close();
+  /**
+   * Implementation for `executeTilesetStage`.
+   *
+   * For details about the arguments, see `executeTilesetStage`.
+   *
+   * @param tilesetStage - The `TilesetStage` object
+   * @param currentInput - The current input name
+   * @param currentOutput - The current output name
+   * @param overwrite - Whether outputs should be overwritten
+   * @returns A promise that resolves when the process is finished
+   * @throws Error If one of the processing steps causes
+   * an error.
+   */
+  private static async executeTilesetStageInternal(
+    tilesetStage: TilesetStage,
+    currentInput: string,
+    currentOutput: string,
+    overwrite: boolean
+  ) {
+    if (tilesetStage.name === TilesetStages.TILESET_STAGE_UPGRADE) {
+      const quiet = false;
+      const tilesetUpgrader = new TilesetUpgrader(quiet);
+      await tilesetUpgrader.upgrade(currentInput, currentOutput, overwrite);
+    } else if (tilesetStage.name === TilesetStages.TILESET_STAGE_COMBINE) {
+      const externalTilesetDetector = ContentDataTypeChecks.createIncludedCheck(
+        ContentDataTypes.CONTENT_TYPE_TILESET
+      );
+      const tilesetCombiner = new TilesetCombiner(externalTilesetDetector);
+      await tilesetCombiner.combine(currentInput, currentOutput, overwrite);
+    } else {
+      await TilesetStageExecutor.executeTilesetContentStages(
+        tilesetStage,
+        currentInput,
+        currentOutput,
+        overwrite
+      );
+    }
+  }
+
+  /**
+   * Execute all `ContentStage` objects in the given `TilesetStage`.
+   *
+   * For details about the arguments, see `executeTilesetStage`.
+   *
+   * @param tilesetStage - The `TilesetStage` object
+   * @param currentInput - The current input name
+   * @param currentOutput - The current output name
+   * @param overwrite - Whether outputs should be overwritten
+   * @returns A promise that resolves when the process is finished
+   * @throws Error If one of the processing steps causes
+   * an error.
+   */
+  private static async executeTilesetContentStages(
+    tilesetStage: TilesetStage,
+    currentInput: string,
+    currentOutput: string,
+    overwrite: boolean
+  ) {
+    try {
+      const tilesetProcessor = new BasicTilesetProcessor();
+      await tilesetProcessor.begin(currentInput, currentOutput, overwrite);
+
+      const contentStages = tilesetStage.contentStages;
+      if (contentStages) {
+        for (let c = 0; c < contentStages.length; c++) {
+          const contentStage = contentStages[c];
+
+          const message =
+            `    Executing contentStage ${c} of ` +
+            `${contentStages.length}: ${contentStage.name}`;
+          console.log(message);
+
+          await ContentStageExecutor.executeContentStage(
+            contentStage,
+            tilesetProcessor
+          );
+        }
       }
-      if (tilesetTarget) {
-        await tilesetTarget.end();
-      }
-      throw error;
+      await tilesetProcessor.end();
+    } catch (e) {
+      throw new PipelineError(`${e}`);
     }
   }
 }

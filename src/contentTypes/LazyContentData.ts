@@ -42,12 +42,12 @@ export class LazyContentData implements ContentData {
   private _exists: boolean | undefined;
 
   /**
-   * The "magic string" from the content data. This is
-   * a string consisting of the first (up to) 4 bytes
-   * of the content data, or the empty string if the
-   * content data could not be resolved.
+   * The "magic header bytes" from the content data. These
+   * are the first (up to) 4 bytes of the content data,
+   * or the empty buffer if the content data could not
+   * be resolved.
    */
-  private _magic: string | undefined;
+  private _magic: Buffer | undefined;
 
   /**
    * The content data, or `null` if the data could not
@@ -117,19 +117,20 @@ export class LazyContentData implements ContentData {
   }
 
   /** {@inheritDoc ContentData.getMagic} */
-  async getMagic(): Promise<string> {
+  async getMagic(): Promise<Buffer> {
     if (defined(this._magic)) {
       return this._magic;
     }
+    const magicHeaderLength = 4;
     const partialData = await this._resourceResolver.resolveDataPartial(
       this._uri,
-      4
+      magicHeaderLength
     );
     if (partialData) {
-      this._magic = Buffers.getMagic(partialData);
+      this._magic = Buffers.getMagicBytes(partialData, 0, magicHeaderLength);
       this._exists = true;
     } else {
-      this._magic = "";
+      this._magic = Buffer.alloc(0);
       this._exists = false;
     }
     return this._magic;

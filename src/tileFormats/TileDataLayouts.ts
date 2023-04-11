@@ -45,7 +45,7 @@ export interface TileDataLayout {
 export class TileDataLayouts {
   static create(buffer: Buffer): TileDataLayout {
     // Basic checks for magic number, length and version
-    const magic = Buffers.getMagic(buffer);
+    const magic = Buffers.getMagicString(buffer);
     if (magic !== "b3dm" && magic !== "pnts" && magic !== "i3dm") {
       throw new TileFormatError(
         `Expected magic "b3dm", "i3dm", or "pnts", but found "${magic}"`

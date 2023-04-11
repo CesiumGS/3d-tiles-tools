@@ -1,0 +1,16 @@
+{
+  "input": "./specs/data/TilesetOfTilesetsWithUris",
+  "output": "./output/TilesetOfTilesetsWithUris.3tz",
+  "tilesetStages": [
+    {
+      "name": "B3DM to GLB",
+      "description": "Convert B3DM to GLB",
+      "contentStages": [
+        {
+          "name": "b3dmToGlb",
+          "description": "Convert each B3DM content into GLB"
+        }
+      ]
+    }
+  ]
+}

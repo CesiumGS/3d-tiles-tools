@@ -50,12 +50,12 @@ export class BufferedContentData implements ContentData {
   private readonly _extension: string;
 
   /**
-   * The "magic string" from the content data. This is
-   * a string consisting of the first (up to) 4 bytes
-   * of the content data, or the empty string if the
-   * content data could not be resolved.
+   * The "magic header bytes" from the content data. These
+   * are the first (up to) 4 bytes of the content data,
+   * or the empty buffer if the content data could not
+   * be resolved.
    */
-  private readonly _magic: string;
+  private readonly _magic: Buffer;
 
   /**
    * The content data, or `null` if the data could not
@@ -87,9 +87,10 @@ export class BufferedContentData implements ContentData {
     this._uri = uri;
     this._extension = path.extname(uri).toLowerCase();
     if (data) {
-      this._magic = Buffers.getMagic(data);
+      const magicHeaderLength = 4;
+      this._magic = Buffers.getMagicBytes(data, 0, magicHeaderLength);
     } else {
-      this._magic = "";
+      this._magic = Buffer.alloc(0);
     }
     this._data = data;
     this._parsedObject = undefined;
@@ -112,7 +113,7 @@ export class BufferedContentData implements ContentData {
   }
 
   /** {@inheritDoc ContentData.magic} */
-  async getMagic(): Promise<string> {
+  async getMagic(): Promise<Buffer> {
     return this._magic;
   }
 

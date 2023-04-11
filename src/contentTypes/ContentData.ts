@@ -26,13 +26,12 @@ export interface ContentData {
   exists(): Promise<boolean>;
 
   /**
-   * Returns a string that consists of the first 4 bytes
-   * of the buffer data (or fewer, if the buffer contains
-   * fewer than 4 bytes)
+   * Returns the first 4 bytes of the buffer data (or fewer, if the
+   * buffer contains fewer than 4 bytes)
    *
-   * @returns The magic string
+   * @returns The magic bytes
    */
-  getMagic(): Promise<string>;
+  getMagic(): Promise<Buffer>;
 
   /**
    * Returns the actual content data that was read from the URI.

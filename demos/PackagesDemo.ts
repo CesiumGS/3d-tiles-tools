@@ -51,7 +51,7 @@ async function readPackageExample(fileName: string) {
 async function run() {
   console.log("Running test");
 
-  const directory = "./data/";
+  const directory = "./output/";
   if (!fs.existsSync(directory)) {
     fs.mkdirSync(directory, { recursive: true });
   }

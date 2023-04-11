@@ -4,21 +4,23 @@ import { readJsonUnchecked } from "./readJsonUnchecked";
 
 import { ResourceResolvers } from "../src/io/ResourceResolvers";
 import { TilesetTraverser } from "../src/traversal/TilesetTraverser";
+import { TraversedTile } from "../src/traversal/TraversedTile";
 
 async function tilesetTraversalDemo(filePath: string) {
+  console.log(`Traversing tileset ${filePath}`);
+
   const directory = path.dirname(filePath);
   const resourceResolver =
     ResourceResolvers.createFileResourceResolver(directory);
   const tileset = await readJsonUnchecked(filePath);
-  // Note: External schemas are not considered here
-  const schema = tileset.schema;
-  const depthFirst = false;
-  console.log("Traversing tileset");
-  await TilesetTraverser.traverse(
+
+  const tilesetTraverser = new TilesetTraverser(directory, resourceResolver, {
+    depthFirst: false,
+    traverseExternalTilesets: true,
+  });
+  await tilesetTraverser.traverse(
     tileset,
-    schema,
-    resourceResolver,
-    async (traversedTile) => {
+    async (traversedTile: TraversedTile) => {
       const contentUris = traversedTile.getFinalContents().map((c) => c.uri);
       const geometricError = traversedTile.asFinalTile().geometricError;
       console.log(
@@ -28,16 +30,24 @@ async function tilesetTraversalDemo(filePath: string) {
           `geometricError ${geometricError}`
       );
       return true;
-    },
-    depthFirst
+    }
   );
   console.log("Traversing tileset DONE");
 }
 
-async function runDemo() {
-  const tilesetFileName =
-    "../3d-tiles-samples/1.1/SparseImplicitQuadtree/tileset.json";
+async function runBasicDemo() {
+  const tilesetFileName = "./specs/data/TilesetWithUris/tileset.json";
   await tilesetTraversalDemo(tilesetFileName);
+}
+
+async function runExternalDemo() {
+  const tilesetFileName = "./specs/data/TilesetOfTilesetsWithUris/tileset.json";
+  await tilesetTraversalDemo(tilesetFileName);
+}
+
+async function runDemo() {
+  await runBasicDemo();
+  await runExternalDemo();
 }
 
 runDemo();

@@ -39,7 +39,7 @@ export class TilesetMerger {
    * If the inputs are directories or files that do not end with ".json",
    * then these names will default to "tileset.json"
    */
-  private tilesetJsonFileNames: string[];
+  private tilesetSourceJsonFileNames: string[];
 
   /**
    * Identifiers for the external tilesets. These will usually
@@ -55,11 +55,17 @@ export class TilesetMerger {
   private tilesetTarget: TilesetTarget | undefined;
 
   /**
+   * The name of the tileset JSON file in the target.
+   * (Usually `tileset.json`)
+   */
+  private tilesetTargetJsonFileName: string | undefined;
+
+  /**
    * Creates a new instance
    */
   constructor() {
     this.tilesetSources = [];
-    this.tilesetJsonFileNames = [];
+    this.tilesetSourceJsonFileNames = [];
     this.tilesetSourceIdentifiers = [];
   }
 
@@ -84,7 +90,7 @@ export class TilesetMerger {
     // Create the sources and target
     for (const tilesetSourceName of tilesetSourceNames) {
       // Determine the name of the file that contains the tileset JSON data
-      const tilesetJsonFileName =
+      const tilesetSourceJsonFileName =
         Tilesets.determineTilesetJsonFileName(tilesetSourceName);
 
       // Determine an "identifier" for the tileset source
@@ -104,10 +110,12 @@ export class TilesetMerger {
 
       const tilesetSource = TilesetSources.createAndOpen(tilesetSourceName);
       this.tilesetSources.push(tilesetSource);
-      this.tilesetJsonFileNames.push(tilesetJsonFileName);
+      this.tilesetSourceJsonFileNames.push(tilesetSourceJsonFileName);
       this.tilesetSourceIdentifiers.push(tilesetSourceIdentifier);
     }
 
+    this.tilesetTargetJsonFileName =
+      Tilesets.determineTilesetJsonFileName(tilesetTargetName);
     this.tilesetTarget = TilesetTargets.createAndBegin(
       tilesetTargetName,
       overwrite
@@ -125,13 +133,18 @@ export class TilesetMerger {
     this.tilesetSources.length = 0;
     this.tilesetSourceIdentifiers.length = 0;
     this.tilesetTarget = undefined;
+    this.tilesetTargetJsonFileName = undefined;
   }
 
   /**
    * Internal method for `merge`
    */
   private mergeInternal() {
-    if (this.tilesetSources.length == 0 || !this.tilesetTarget) {
+    if (
+      this.tilesetSources.length == 0 ||
+      !this.tilesetTarget ||
+      !this.tilesetTargetJsonFileName
+    ) {
       throw new DeveloperError("The sources and target must be defined");
     }
 
@@ -140,10 +153,12 @@ export class TilesetMerger {
     const length = this.tilesetSources.length;
     for (let i = 0; i < length; ++i) {
       const tilesetSource = this.tilesetSources[i];
-      const tilesetJsonFileName = this.tilesetJsonFileNames[i];
-      const tilesetJsonBuffer = tilesetSource.getValue(tilesetJsonFileName);
+      const tilesetSourceJsonFileName = this.tilesetSourceJsonFileNames[i];
+      const tilesetJsonBuffer = tilesetSource.getValue(
+        tilesetSourceJsonFileName
+      );
       if (!tilesetJsonBuffer) {
-        const message = `No ${tilesetJsonFileName} found in input`;
+        const message = `No ${tilesetSourceJsonFileName} found in input`;
         throw new TilesetError(message);
       }
       const tileset = JSON.parse(tilesetJsonBuffer.toString()) as Tileset;
@@ -156,7 +171,7 @@ export class TilesetMerger {
     const children = TilesetMerger.getChildren(
       tilesets,
       this.tilesetSourceIdentifiers,
-      this.tilesetJsonFileNames
+      this.tilesetSourceJsonFileNames
     );
     const mergedTileset = {
       asset: {
@@ -176,7 +191,10 @@ export class TilesetMerger {
     // Write the merged tileset into the target
     const mergedTilesetJson = JSON.stringify(mergedTileset, null, 2);
     const mergedTilesetBuffer = Buffer.from(mergedTilesetJson);
-    this.tilesetTarget.addEntry("tileset.json", mergedTilesetBuffer);
+    this.tilesetTarget.addEntry(
+      this.tilesetTargetJsonFileName,
+      mergedTilesetBuffer
+    );
 
     // Copy the resources from the sources to the target
     this.copyResources();

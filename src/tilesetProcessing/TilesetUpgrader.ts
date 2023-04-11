@@ -3,6 +3,7 @@ import { DeveloperError } from "../base/DeveloperError";
 
 import { BufferedContentData } from "../contentTypes/BufferedContentData";
 import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
+import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 
 import { Tile } from "../structure/Tile";
 import { Tileset } from "../structure/Tileset";
@@ -16,6 +17,7 @@ import { TilesetSources } from "../tilesetData/TilesetSources";
 
 import { Tiles } from "../tilesets/Tiles";
 import { Tilesets } from "../tilesets/Tilesets";
+import { Extensions } from "../tilesets/Extensions";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 
@@ -35,6 +37,8 @@ type UpgradeOptions = {
   upgradeContentUrlToUri: boolean;
   upgradeB3dmGltf1ToGltf2: boolean;
   upgradeI3dmGltf1ToGltf2: boolean;
+  upgradeExternalTilesets: boolean;
+  upgradeExtensionDeclarations: boolean;
 };
 
 /**
@@ -83,6 +87,8 @@ export class TilesetUpgrader {
       upgradeContentUrlToUri: true,
       upgradeB3dmGltf1ToGltf2: true,
       upgradeI3dmGltf1ToGltf2: true,
+      upgradeExternalTilesets: true,
+      upgradeExtensionDeclarations: true,
     };
   }
 
@@ -118,9 +124,12 @@ export class TilesetUpgrader {
     const tilesetTargetJsonFileName =
       Tilesets.determineTilesetJsonFileName(tilesetTargetName);
 
-    await this.upgradeInternal(
-      tilesetSourceJsonFileName,
-      tilesetTargetJsonFileName
+    const upgradedTilesetJsonBuffer = await this.upgradeInternal(
+      tilesetSourceJsonFileName
+    );
+    this.tilesetTarget.addEntry(
+      tilesetTargetJsonFileName,
+      upgradedTilesetJsonBuffer
     );
     await this.upgradeResources(tilesetSourceJsonFileName);
 
@@ -134,19 +143,17 @@ export class TilesetUpgrader {
   /**
    * Internal method for the actual upgrade.
    *
-   * It justo obtains the tileset JSON data from the source, passes
-   * it to `upgradeTileset`, and writes the result under the given
-   * name into the target.
+   * It just obtains the tileset JSON data from the source, passes
+   * it to `upgradeTileset`, and returns the buffer containing the
+   * JSON data of the upgraded result.
    *
    * @param tilesetSourceJsonFileName - The name of the tileset JSON in the source
-   * @param tilesetTargetJsonFileName - The name of the tileset JSON in the target
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError When the input could not be processed
    */
   private async upgradeInternal(
-    tilesetSourceJsonFileName: string,
-    tilesetTargetJsonFileName: string
-  ): Promise<void> {
+    tilesetSourceJsonFileName: string
+  ): Promise<Buffer> {
     if (!this.tilesetSource || !this.tilesetTarget) {
       throw new DeveloperError("The source and target must be defined");
     }
@@ -177,10 +184,7 @@ export class TilesetUpgrader {
     if (tilesetJsonBufferWasZipped) {
       resultTilesetJsonBuffer = Buffers.gzip(resultTilesetJsonBuffer);
     }
-    this.tilesetTarget.addEntry(
-      tilesetTargetJsonFileName,
-      resultTilesetJsonBuffer
-    );
+    return resultTilesetJsonBuffer;
   }
 
   /**
@@ -191,7 +195,7 @@ export class TilesetUpgrader {
   async upgradeTileset(tileset: Tileset): Promise<void> {
     if (this.upgradeOptions.upgradeAssetVersionNumber) {
       this.logCallback(`Upgrading asset version number`);
-      await this.upgradeAssetVersionNumber(tileset);
+      this.upgradeAssetVersionNumber(tileset);
     }
     if (this.upgradeOptions.upgradeRefineCase) {
       this.logCallback(`Upgrading refine to be in uppercase`);
@@ -200,6 +204,10 @@ export class TilesetUpgrader {
     if (this.upgradeOptions.upgradeContentUrlToUri) {
       this.logCallback(`Upgrading content.url to content.uri`);
       await this.upgradeEachContentUrlToUri(tileset);
+    }
+    if (this.upgradeOptions.upgradeExtensionDeclarations) {
+      this.logCallback(`Upgrading extension declarations`);
+      Extensions.removeExtensionUsed(tileset, "3DTILES_content_gltf");
     }
   }
 
@@ -223,8 +231,8 @@ export class TilesetUpgrader {
    *
    * This will examine each `tile.content` in the explicit representation
    * of the tile hierarchy in the given tileset. If any content does not
-   * define a `uri`, but a (legacy) `url` property, then a warning is
-   * printed and the `url` is renamed to `uri`.
+   * define a `uri`, but a (legacy) `url` property, then the `url` is
+   * renamed to `uri`.
    *
    * @param tileset - The tileset
    */
@@ -336,19 +344,28 @@ export class TilesetUpgrader {
     value: Buffer,
     type: string | undefined
   ): Promise<Buffer> {
-    if (type === "CONTENT_TYPE_B3DM") {
+    if (type === ContentDataTypes.CONTENT_TYPE_B3DM) {
       if (this.upgradeOptions.upgradeB3dmGltf1ToGltf2) {
         this.logCallback(`  Upgrading GLB in ${key}`);
         value = await TilesetUpgrader.upgradeB3dmGltf1ToGltf2(value);
       } else {
         this.logCallback(`  Not upgrading GLB in ${key} (disabled via option)`);
       }
-    } else if (type === "CONTENT_TYPE_I3DM") {
+    } else if (type === ContentDataTypes.CONTENT_TYPE_I3DM) {
       if (this.upgradeOptions.upgradeI3dmGltf1ToGltf2) {
         this.logCallback(`  Upgrading GLB in ${key}`);
         value = await TilesetUpgrader.upgradeI3dmGltf1ToGltf2(value);
       } else {
         this.logCallback(`  Not upgrading GLB in ${key} (disabled via option)`);
+      }
+    } else if (type == ContentDataTypes.CONTENT_TYPE_TILESET) {
+      if (this.upgradeOptions.upgradeExternalTilesets) {
+        this.logCallback(`  Upgrading external tileset in ${key}`);
+        value = await this.upgradeInternal(key);
+      } else {
+        this.logCallback(
+          `  Not upgrading external tileset in ${key} (disabled via option)`
+        );
       }
     } else {
       this.logCallback(`  No upgrade operation to perform for ${key}`);

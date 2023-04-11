@@ -57,6 +57,44 @@ export class ExplicitTraversedTile implements TraversedTile {
    */
   private readonly _resourceResolver;
 
+  /**
+   * Convenience function to create the root tile for a tile
+   * traversal.
+   *
+   * @param root - The root tile from the tileset
+   * @param schema - The optional metadata schema
+   * @param resourceResolver - The `ResourceResolver` for
+   * external references (like subtree files)
+   * @returns The root `TraversedTile`
+   */
+  static createRoot(
+    root: Tile,
+    schema: Schema | undefined,
+    resourceResolver: ResourceResolver
+  ): TraversedTile {
+    const traversedRoot = new ExplicitTraversedTile(
+      root,
+      "/root",
+      0,
+      undefined,
+      schema,
+      resourceResolver
+    );
+    return traversedRoot;
+  }
+
+  /**
+   * Creates a new instance
+   *
+   * @param tile - The `Tile` from the tileset JSON
+   * @param path - A JSON-path-like string describing this tile
+   * @param level - The level, referring to the root of the
+   * traversal, starting at 0
+   * @param parent - The optional parent tile
+   * @param schema - The optional metadata schema
+   * @param resourceResolver - The `ResourceResolver` for
+   * external references (like subtree files)
+   */
   constructor(
     tile: Tile,
     path: string,
@@ -71,6 +109,28 @@ export class ExplicitTraversedTile implements TraversedTile {
     this._parent = parent;
     this._schema = schema;
     this._resourceResolver = resourceResolver;
+  }
+
+  /**
+   * Returns the `metadata` from the input JSON that defines the
+   * `MetadataEntity` that is associated with this tile, or
+   * `undefined` if the input did not contain a metadata entity.
+   *
+   * @returns The `MetadataEntity` object, or `undefined`
+   */
+  getMetadata(): MetadataEntity | undefined {
+    return this._tile.metadata;
+  }
+
+  /**
+   * Returns the `implicitTiling` from the input JSON that defines the
+   * `TileImplicitTiling` that is associated with this tile, or
+   * `undefined` if this tile does not define an implicit tiling.
+   *
+   * @returns The `TileImplicitTiling` object
+   */
+  getImplicitTiling(): TileImplicitTiling | undefined {
+    return this._tile.implicitTiling;
   }
 
   /** {@inheritDoc TraversedTile.asRawTile} */
@@ -198,6 +258,16 @@ export class ExplicitTraversedTile implements TraversedTile {
     return finalContents;
   }
 
+  /** {@inheritDoc TraversedTile.getResourceResolver} */
+  getResourceResolver(): ResourceResolver {
+    return this._resourceResolver;
+  }
+
+  /** {@inheritDoc TraversedTile.isImplicitTilesetRoot} */
+  isImplicitTilesetRoot(): boolean {
+    return this._tile.implicitTiling !== undefined;
+  }
+
   /** {@inheritDoc TraversedTile.getSubtreeUri} */
   getSubtreeUri(): string | undefined {
     const implicitTiling = this._tile.implicitTiling;
@@ -212,21 +282,6 @@ export class ExplicitTraversedTile implements TraversedTile {
       rootCoordinates
     );
     return subtreeUri;
-  }
-
-  /** {@inheritDoc TraversedTile.getImplicitTiling} */
-  getImplicitTiling(): TileImplicitTiling | undefined {
-    return this._tile.implicitTiling;
-  }
-
-  /** {@inheritDoc TraversedTile.getMetadata} */
-  getMetadata(): MetadataEntity | undefined {
-    return this._tile.metadata;
-  }
-
-  /** {@inheritDoc TraversedTile.resolveUri} */
-  resolveUri(uri: string): string {
-    return this._resourceResolver.resolveUri(uri);
   }
 
   // TODO For debugging

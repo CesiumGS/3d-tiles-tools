@@ -1,3 +1,4 @@
+import { Content } from "../structure/Content";
 import { Tile } from "../structure/Tile";
 import { Contents } from "./Contents";
 import { TileTraversalCallback } from "./TileTraversalCallback";
@@ -6,6 +7,27 @@ import { TileTraversalCallback } from "./TileTraversalCallback";
  * Utility methods related to tiles, given as `Tile` objects.
  */
 export class Tiles {
+  /**
+   * Obtains the contents from the given tile.
+   *
+   * This will either return a single-element array, when the tile
+   * defined `tile.content`, or a multi-element array, when the tile
+   * defined `tile.contents`, or an empty array, when the tile does
+   * not have contents.
+   *
+   * @param tile The `Tile`
+   * @returns The content URIs
+   */
+  static getContents(tile: Tile): Content[] {
+    if (tile.content) {
+      return [tile.content];
+    }
+    if (tile.contents) {
+      return tile.contents;
+    }
+    return [];
+  }
+
   /**
    * Obtains the content URIs from the given tile.
    *
@@ -20,18 +42,12 @@ export class Tiles {
    * @returns The content URIs
    */
   static getContentUris(tile: Tile): string[] {
+    const contents = Tiles.getContents(tile);
     const contentUris = [];
-    if (tile.content) {
-      const uri = Contents.getUri(tile.content);
+    for (const content of contents) {
+      const uri = Contents.getUri(content);
       if (uri) {
         contentUris.push(uri);
-      }
-    } else if (tile.contents) {
-      for (const content of tile.contents) {
-        const uri = Contents.getUri(content);
-        if (uri) {
-          contentUris.push(uri);
-        }
       }
     }
     return contentUris;

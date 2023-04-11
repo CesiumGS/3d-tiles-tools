@@ -1,0 +1,39 @@
+{
+  "asset" : {
+    "version" : "1.1"
+  },
+  "geometricError" : 4.0,
+  "root" : {
+    "boundingVolume" : {
+      "box" : [ 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5 ]
+    },
+    "geometricError" : 2.0,
+    "children": [
+      {
+        "boundingVolume" : {
+          "box" : [ 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5 ]
+        },
+        "geometricError" : 1.0,
+        "content": {
+          "uri": "b3dmContent.b3dm"
+        }
+      }, {
+        "boundingVolume" : {
+          "box" : [ 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5 ]
+        },
+        "geometricError" : 1.0,
+        "content": {
+          "uri": "i3dmContent.i3dm"
+        }
+      }, {
+        "boundingVolume" : {
+          "box" : [ 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5 ]
+        },
+        "geometricError" : 1.0,
+        "content": {
+          "uri": "glbContent.glb"
+        }
+      }      
+    ]
+  }
+}

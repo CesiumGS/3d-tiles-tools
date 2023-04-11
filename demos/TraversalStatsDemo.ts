@@ -1,4 +1,3 @@
-import fs from "fs";
 import path from "path";
 
 import { readJsonUnchecked } from "./readJsonUnchecked";
@@ -7,40 +6,110 @@ import { ResourceResolvers } from "../src/io/ResourceResolvers";
 
 import { TilesetTraverser } from "../src/traversal/TilesetTraverser";
 import { TraversedTile } from "../src/traversal/TraversedTile";
+import { BufferedContentData } from "../src/contentTypes/BufferedContentData";
+import { ContentDataTypeChecks } from "../src/contentTypes/ContentDataTypeChecks";
+import { ContentDataTypes } from "../src/contentTypes/ContentDataTypes";
 
 // A small demo that traverses a tileset, passes all
 // traversed tiles to a "StatsCollector" (defined below),
 // and creates a short JSON summary of some statistics.
 
 async function tilesetTraversalDemo(filePath: string) {
+  const statsCollector = new StatsCollector();
+
+  // Create a check that determines whether content
+  // data should count as "tile content"
+  const isTileFileContent = ContentDataTypeChecks.createIncludedCheck(
+    ContentDataTypes.CONTENT_TYPE_GLB,
+    ContentDataTypes.CONTENT_TYPE_B3DM,
+    ContentDataTypes.CONTENT_TYPE_I3DM,
+    ContentDataTypes.CONTENT_TYPE_CMPT,
+    ContentDataTypes.CONTENT_TYPE_PNTS,
+    ContentDataTypes.CONTENT_TYPE_GEOM,
+    ContentDataTypes.CONTENT_TYPE_VCTR,
+    ContentDataTypes.CONTENT_TYPE_GEOJSON,
+    ContentDataTypes.CONTENT_TYPE_GLTF
+  );
+
+  // A `TraversalCallback` that will be passed to the
+  // tileset traverser, and store information about the
+  // traversed tiles in the `StatsCollector`
+  const statsTraversalCallback = async (traversedTile: TraversedTile) => {
+    {
+      const indent = "  ".repeat(traversedTile.level);
+      const contentUris = traversedTile.getFinalContents().map((c) => c.uri);
+      const geometricError = traversedTile.asFinalTile().geometricError;
+      const message =
+        indent +
+        "Level " +
+        traversedTile.level +
+        ", geometricError " +
+        geometricError +
+        ", contents " +
+        contentUris;
+      console.log(message);
+    }
+
+    statsCollector.increment("totalNumberOfTiles");
+    const subtreeUri = traversedTile.getSubtreeUri();
+    if (subtreeUri !== undefined) {
+      statsCollector.increment("totalNumberOfSubtrees");
+    }
+    if (!traversedTile.isImplicitTilesetRoot()) {
+      // Obtain all content URIs, resolve the associated data,
+      // and store the size in the "tileFileSize"  summary if
+      // the data is one of the known tile content types
+      const contentUris = traversedTile.getFinalContents().map((c) => c.uri);
+      const tileResourceResolver = traversedTile.getResourceResolver();
+      for (const contentUri of contentUris) {
+        const data = await tileResourceResolver.resolveData(contentUri);
+        if (!data) {
+          statsCollector.increment("unresolvableContents");
+        } else {
+          const contentData = new BufferedContentData(contentUri, data);
+          const isTileFile = await isTileFileContent(contentData);
+          if (isTileFile) {
+            statsCollector.acceptEntry("tileFileSize", data.length);
+            statsCollector.acceptEntry(
+              "tileFileSize_" + traversedTile.level,
+              data.length
+            );
+          }
+        }
+      }
+    }
+
+    // Store the geometric error in the "geometricError" summary
+    const finalTile = traversedTile.asFinalTile();
+    const geometricError = finalTile.geometricError;
+    statsCollector.acceptEntry("geometricError", geometricError);
+    statsCollector.acceptEntry(
+      "geometricError_" + traversedTile.level,
+      geometricError
+    );
+    return true;
+  };
+
   // Read the tileset from the input path
   const directory = path.dirname(filePath);
   const resourceResolver =
     ResourceResolvers.createFileResourceResolver(directory);
   const tileset = await readJsonUnchecked(filePath);
-  // Note: External schemas are not considered here
-  const schema = tileset.schema;
 
-  // Traverse the tileset, and pass each tile to
-  // the StatsCollector
+  // Create the TilesetTraverser and traverse the tileset,
+  // passing each tile to the callback that stores the
+  // information in the StatsCollector
   console.log("Traversing tileset");
-  const tilesetStatsCollector = new TilesetStatsCollector();
-  const depthFirst = false;
-  await TilesetTraverser.traverse(
-    tileset,
-    schema,
-    resourceResolver,
-    async (traversedTile) => {
-      tilesetStatsCollector.accept(traversedTile);
-      return true;
-    },
-    depthFirst
-  );
+  const tilesetTraverser = new TilesetTraverser(directory, resourceResolver, {
+    depthFirst: false,
+    traverseExternalTilesets: true,
+  });
+  await tilesetTraverser.traverse(tileset, statsTraversalCallback);
   console.log("Traversing tileset DONE");
 
   // Print the statistics summary to the console
   console.log("Stats:");
-  const json = tilesetStatsCollector.createJson();
+  const json = statsCollector.createJson();
   const jsonString = JSON.stringify(json, null, 2);
   console.log(jsonString);
 }
@@ -174,43 +243,9 @@ class Summary {
   }
 }
 
-// A specialization of the `StatsColleror` that collects
-// information about the tiles that are traversed with
-// a TilesetTraverser
-class TilesetStatsCollector extends StatsCollector {
-  // Accept the given tile during traversal, and collect
-  // statistical information
-  accept(traversedTile: TraversedTile) {
-    this.increment("totalNumberOfTiles");
-
-    // NOTE: This is a means of checking whether a tile
-    // is the root of an implicit tileset. This may be
-    // refactored at some point.
-    if (traversedTile.getImplicitTiling()) {
-      this.increment("totalNumberOfSubtres");
-    } else {
-      // Obtain all content URIs, resolve them, and obtain
-      // the sizes of the corresponding files, storing them
-      // in the "tileFileSize" summary
-      const contentUris = traversedTile.getFinalContents().map((c) => c.uri);
-      for (const contentUri of contentUris) {
-        const resolvedContentUri = traversedTile.resolveUri(contentUri);
-        const stats = fs.statSync(resolvedContentUri);
-        const tileFileSizeInBytes = stats.size;
-        this.acceptEntry("tileFileSize", tileFileSizeInBytes);
-      }
-    }
-
-    // Store the geometric error in the "geometricError" summary
-    const finalTile = traversedTile.asFinalTile();
-    const geometricError = finalTile.geometricError;
-    this.acceptEntry("geometricError", geometricError);
-  }
-}
-
 async function runDemo() {
   const tilesetFileName =
-    "../3d-tiles-samples/1.1/SparseImplicitQuadtree/tileset.json";
+    "./specs/data/tilesetProcessing/implicitProcessing/tileset.json";
   await tilesetTraversalDemo(tilesetFileName);
 }
 

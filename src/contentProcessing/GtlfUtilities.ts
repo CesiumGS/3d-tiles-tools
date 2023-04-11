@@ -1,6 +1,11 @@
 import GltfPipeline from "gltf-pipeline";
+
 import { Buffers } from "../base/Buffers";
+
 import { TileFormatError } from "../tileFormats/TileFormatError";
+
+import { Extensions } from "../tilesets/Extensions";
+
 import { GltfPipelineLegacy } from "./GltfPipelineLegacy";
 
 /**
@@ -37,7 +42,7 @@ export class GltfUtilities {
    * @throws TileFormatError If the input does not contain valid GLB data.
    */
   static extractJsonFromGlb(glbBuffer: Buffer): Buffer {
-    const magic = Buffers.getMagic(glbBuffer);
+    const magic = Buffers.getMagicString(glbBuffer);
     if (magic !== "glTF") {
       throw new TileFormatError(
         `Expected magic header to be 'gltf', but found ${magic}`
@@ -129,5 +134,69 @@ export class GltfUtilities {
     options.customStages.push(customStage);
     const result = await GltfPipeline.processGlb(glbBuffer, options);
     return result.glb;
+  }
+
+  /**
+   * Given an input buffer containing a binary glTF asset, remove
+   * its use of the `CESIUM_RTC` extension by inserting new nodes
+   * (above the former root nodes) that contain the RTC center as
+   * their translation.
+   *
+   * @param glbBuffer The buffer containing the binary glTF.
+   * @returns A promise that resolves to the resulting binary glTF.
+   */
+  static async replaceCesiumRtcExtension(glbBuffer: Buffer) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const customStage = (gltf: any, options: any) => {
+      GltfUtilities.replaceCesiumRtcExtensionInternal(gltf);
+      return gltf;
+    };
+    const options = {
+      customStages: [customStage],
+      keepUnusedElements: true,
+    };
+    const result = await GltfPipeline.processGlb(glbBuffer, options);
+    return result.glb;
+  }
+
+  /**
+   * Replaces the `CESIUM_RTC` extension in the given glTF object.
+   *
+   * This will insert a new parent node above each root node of
+   * a scene. These new parent nodes will have a `translation`
+   * that is directly taken from the `CESIUM_RTC` `center`.
+   *
+   * The `CESIUM_RTC` extension object and its used/required
+   * usage declarations will be removed.
+   *
+   * @param gltf - The glTF object
+   */
+  private static replaceCesiumRtcExtensionInternal(gltf: any) {
+    const rtcExtension = gltf.extensions["CESIUM_RTC"];
+    if (!rtcExtension) {
+      return;
+    }
+    const rtcTranslation = rtcExtension.center;
+    const scenes = gltf.scenes;
+    if (!scenes) {
+      return;
+    }
+    for (const scene of scenes) {
+      const sceneNodes = scene.nodes;
+      if (sceneNodes) {
+        for (let i = 0; i < sceneNodes.length; i++) {
+          const nodeIndex = sceneNodes[i];
+          const newParent = {
+            translation: rtcTranslation,
+            children: [nodeIndex],
+          };
+          const newParentIndex = gltf.nodes.length;
+          gltf.nodes.push(newParent);
+          sceneNodes[i] = newParentIndex;
+        }
+      }
+    }
+    Extensions.removeExtensionUsed(gltf, "CESIUM_RTC");
+    Extensions.removeExtension(gltf, "CESIUM_RTC");
   }
 }

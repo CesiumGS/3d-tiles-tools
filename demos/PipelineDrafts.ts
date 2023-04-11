@@ -5,8 +5,8 @@ import { Pipelines } from "../src/pipelines/Pipelines";
 
 function createPipelineDraftJson() {
   const pipelineJson = {
-    input: "./data/Tileset",
-    output: "./data/testTileset_final",
+    input: "./specs/data/TilesetWithUris",
+    output: "./output/pipelineDrafts",
     tilesetStages: [
       {
         name: "unzip-and-zip-tiles-only",
