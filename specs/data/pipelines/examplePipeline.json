@@ -1,0 +1,62 @@
+{
+  "input": "./specs/data/TilesetOfTilesets",
+  "output": "./output/result",
+  "tilesetStages": [
+    {
+      "name": "upgrade",
+      "description": "Upgrade the input tileset to the latest version"
+    },
+    {
+      "name": "combine",
+      "description": "Combine all external tilesets into one"
+    },
+    {
+      "name": "_b3dmToGlb",
+      "description": "Convert B3DM to GLB",
+      "contentStages": [
+        {
+          "name": "b3dmToGlb",
+          "description": "Convert each B3DM content into GLB"
+        }
+      ]
+    },
+    {
+      "name": "_optimizeGlb",
+      "description": "Optimize GLB",
+      "contentStages": [
+        {
+          "name": "optimizeGlb",
+          "description": "Apply gltf-pipeline to each GLB content, with the given options",
+          "options": {
+            "dracoOptions": {
+              "compressionLevel": 10
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "_separateGltf",
+      "description": "Separate glTF",
+      "contentStages": [
+        {
+          "name": "separateGltf",
+          "description": "Convert each GLB content into a .gltf file with separate resources"
+        }
+      ]
+    },
+    {
+      "name": "_gzip",
+      "description": "Gzip (glTF only)",
+      "contentStages": [
+        {
+          "name": "gzip",
+          "description": "Compresses each entry with GZIP",
+          "includedContentTypes": [
+            "CONTENT_TYPE_GLTF"
+          ]
+        }
+      ]
+    }
+  ]
+}
