@@ -19,7 +19,6 @@ function createPipeline(tilesetStage: TilesetStage) {
 }
 
 async function example() {
-  const overwrite = true;
   const optimizeGlbOptions = {
     dracoOptions: {
       compressionLevel: 10,
@@ -27,41 +26,42 @@ async function example() {
   };
 
   const tilesetStageB3dmToGlb = TilesetStages.create(
-    "B3DM to GLB",
+    "_b3dmToGlb",
     "Convert B3DM to GLB",
     [ContentStages.createB3dmToGlb()]
   );
 
   const tilesetStageI3dmToGlb = TilesetStages.create(
-    "I3DM to GLB",
+    "_i3dmToGlb",
     "Convert I3DM to GLB",
     [ContentStages.createI3dmToGlb()]
   );
 
   const tilesetStageGlbToB3dm = TilesetStages.create(
-    "GLB to B3DM",
+    "_glbToB3dm",
     "Convert GLB to B3DM",
     [ContentStages.createGlbToB3dm()]
   );
 
   const tilesetStageGlbToI3dm = TilesetStages.create(
-    "GLB to I3DM",
+    "_glbToI3dm",
     "Convert GLB to I3DM",
     [ContentStages.createGlbToI3dm()]
   );
 
   const tilesetStageOptimizeB3dm = TilesetStages.create(
-    "Optimize B3DM",
+    "_optimizeB3dm",
     "Optimize the GLB part of B3DM",
     [ContentStages.createOptimizeB3dm(optimizeGlbOptions)]
   );
 
   const tilesetStageOptimizeI3dm = TilesetStages.create(
-    "Optimize I3DM",
+    "_optimizeI3dm",
     "Optimize the GLB part of I3DM",
     [ContentStages.createOptimizeI3dm(optimizeGlbOptions)]
   );
 
+  const overwrite = true;
   await PipelineExecutor.executePipeline(
     createPipeline(tilesetStageB3dmToGlb),
     overwrite
