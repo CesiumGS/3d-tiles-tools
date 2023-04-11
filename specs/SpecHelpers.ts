@@ -223,4 +223,47 @@ export class SpecHelpers {
       }
     }
   }
+
+  /**
+   * Compares two arrays lexicographically.
+   *
+   * When the arrays have different lengths, then the shorter
+   * one will be "padded" with elements that are smaller than
+   * all other elements in the other array.
+   *
+   * @param a - The first array
+   * @param b - The second array
+   * @returns The result of the comparison
+   */
+  private static compareLexicographically(a: number[], b: number[]) {
+    const n = Math.min(a.length, b.length);
+    for (let i = 0; i < n; i++) {
+      const d = a[i] - b[i];
+      if (d !== 0) {
+        return d;
+      }
+    }
+    if (a.length < b.length) {
+      return -1;
+    }
+    if (a.length > b.length) {
+      return 1;
+    }
+    return 0;
+  }
+
+  /**
+   * Sorts a 2D array lexicographically, in place.
+   *
+   * When two elements have different lengths, then the shorter
+   * one will be "padded" with elements that are smaller than
+   * all other elements in the other array.
+   *
+   * @param array - The array
+   * @returns The array
+   */
+  static sortLexicographically(array: number[][]) {
+    array.sort(SpecHelpers.compareLexicographically);
+    return array;
+  }
 }
