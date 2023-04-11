@@ -3,10 +3,12 @@ import path from "path";
 
 import { Paths } from "./base/Paths";
 import { DeveloperError } from "./base/DeveloperError";
+import { Buffers } from "./base/Buffers";
 
 import { Tilesets } from "./tilesets/Tilesets";
 
 import { TileFormats } from "./tileFormats/TileFormats";
+import { TileDataLayouts } from "./tileFormats/TileDataLayouts";
 
 import { ContentOps } from "./contentProcessing/ContentOps";
 import { GltfUtilities } from "./contentProcessing/GtlfUtilities";
@@ -15,10 +17,9 @@ import { ContentDataTypes } from "./contentTypes/ContentDataTypes";
 
 import { PipelineExecutor } from "./pipelines/PipelineExecutor";
 import { Pipelines } from "./pipelines/Pipelines";
-import { Buffers } from "./base/Buffers";
-import { TileDataLayouts } from "./tileFormats/TileDataLayouts";
-import { Pipeline } from "./pipelines/Pipeline";
+
 import { ZipToPackage } from "./packages/ZipToPackage";
+
 import { TilesetSources } from "./tilesetData/TilesetSources";
 import { TilesetTargets } from "./tilesetData/TilesetTargets";
 
