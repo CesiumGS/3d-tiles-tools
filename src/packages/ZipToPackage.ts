@@ -1,6 +1,6 @@
 import StreamZip from "node-stream-zip";
 
-import { TilesetTargets } from "../src/tilesetData/TilesetTargets";
+import { TilesetTargets } from "../tilesetData/TilesetTargets";
 
 /**
  * Methods for converting ZIP files into 3D Tiles packages.

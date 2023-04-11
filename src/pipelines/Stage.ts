@@ -8,4 +8,12 @@ export interface Stage {
    * The name of this stage.
    */
   name: string;
+
+  /**
+   * An optional description.
+   *
+   * This should be a single-line, human-readable description that
+   * summarizes what the stage is doing.
+   */
+  description?: string;
 }

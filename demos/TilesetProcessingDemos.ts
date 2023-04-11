@@ -53,16 +53,16 @@ async function tilesetProcessingDemos() {
   );
 
   await combineTilesets(
-    "./specs/data/combineTilesets/tileset.json",
-    "./specs/data/output/combineTilesets"
+    "./specs/data/combineTilesets/nestedExternal/tileset.json",
+    "./specs/data/output/nestedExternal/combineTilesets"
   );
 
   await mergeTilesets(
     [
-      "./specs/data/mergeTilesets/TilesetA/tileset.json",
-      "./specs/data/mergeTilesets/sub/TilesetA/tileset.json",
+      "./specs/data/mergeTilesets/basicMerge/TilesetA/tileset.json",
+      "./specs/data/mergeTilesets/basicMerge/sub/TilesetA/tileset.json",
     ],
-    "./specs/data/output/mergeTilesets/merged.3tz"
+    "./specs/data/output/mergeTilesets/basicMerge.3tz"
   );
 }
 

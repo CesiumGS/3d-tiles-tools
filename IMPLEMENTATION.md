@@ -51,6 +51,11 @@ Parts of the current implementation may still change. This page is only a short 
   - These are implementations of the `TilesetSource` and `TilesetTarget` interface (see `./src/tilesetData`), based on 3TZ or 3DTILES
 
 - `./src/pipelines`: **Preliminary** classes for modeling "processing pipelines" for tilesets
+  - The `Pipeline` class describes the pipeline with its input and output, and contains one or more `TilesetStage` objects
+  - The `TilesetStage` describes an operation that is applied to the tileset as a whole, usually focussing on modifications of the tileset JSON object. It may contain one or more `ContentStage` objects
+  - The `ContentStage` is an operation that may be applied to tile content (i.e. "files") that are part of the tileset
+  - Instances of these classes may be created with the `Pipelines`, `TilesetStages`, and `ContentStages` classes, respectively
+  - A pipeline may be executed by a `PipelineExecutor`.
 
 - `./src/spatial`: Basic classes for dealing with tree structures, specifically with quadtrees and octrees
 
@@ -73,10 +78,13 @@ Parts of the current implementation may still change. This page is only a short 
   - `TilesetCombiner`: Used to "inline" external tilesets into a single one
   - `TilesetMerger`: Used to create one tileset that refers to others as external tilesets
   - `TilesetUpgrader`: Upgrade a tileset to a newer version (many aspects unspecified here)
+  - The (abstract) `TilesetProcessor` class and the (concrete) `BasicTilesetProcessor` class offer an infrastructure for generic operations on the tilesets and their content. These classes serve as the basis for the implementation of the pipeline execution functionality. 
 
 - `./src/tilesets`: Utility functions for tileset operations
   - `Tiles` for traversing (explicit!) tile hierarchies
   - `Tilesets` offering convenience functions for `merge/combine/upgrade`
+  - `Contents` with utility functions related to tile `content` objects
+  - `Extensions` for handling extensions and extension declarations in tilesets (and glTF objects)
 
 - `./src/traversal`: Classes for traversing tilesets
   - NOTE: The `SubtreeModel`/`SubtreeMetadataModel` interfaces _might_ at some point be moved into `implicitTiling`, but are currently tailored for the use in the traversal classes, and should be considered to be an "implementation detail" here.

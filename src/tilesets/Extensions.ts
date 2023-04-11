@@ -1,7 +1,7 @@
 /**
  * A type for objects that can contain extensions
  */
-type Extended = { extensions?: object };
+type Extended = { extensions?: { [key: string]: any } };
 
 /**
  * A type for objects that can contain extension declarations
@@ -18,15 +18,33 @@ export class Extensions {
    * That is, whether the `object.extensions` contains a key
    * that is the given extension name.
    *
-   * @param extensible - The object that may contain the extension
+   * @param extended - The object that may contain the extension
    * @param extension The extension (i.e. its name as a string)
    * @returns Whether the object contains the extension
    */
-  static contains(extended: Extended, extension: string) {
+  static containsExtension(extended: Extended, extension: string) {
     if (!extended.extensions) {
       return false;
     }
     return Object.keys(extended.extensions).includes(extension);
+  }
+
+  /**
+   * Remove the specified extension from the `extensions` dictionary
+   * of the given object, deleting the `extensions` if they become
+   * empty.
+   *
+   * @param extended - The extended object
+   * @param extension The extension (i.e. its name as a string)
+   */
+  static removeExtension(extended: Extended, extension: string) {
+    if (!extended.extensions) {
+      return;
+    }
+    delete extended.extensions[extension];
+    if (Object.keys(extended.extensions).length === 0) {
+      delete extended.extensions;
+    }
   }
 
   /**
@@ -39,26 +57,20 @@ export class Extensions {
    * @param extension - The extension name
    */
   static addExtensionUsed(extensible: Extensible, extension: string) {
-    extensible.extensionsUsed = Extensions.addUnique(
-      extensible.extensionsUsed,
-      extension
-    );
+    Extensions.addUniqueTo(extensible, "extensionsUsed", extension);
   }
 
   /**
    * Remove the given extension from the `extensionsUsed` of the given object.
    *
-   * The array will be set to `undefined` if it becomes empty, and the
+   * The array will be deleted if it becomes empty, and the
    * extension will also be removed from `extensionsRequired`.
    *
    * @param extensible - The object
    * @param extension - The extension name
    */
   static removeExtensionUsed(extensible: Extensible, extension: string) {
-    extensible.extensionsUsed = Extensions.removeUnique(
-      extensible.extensionsUsed,
-      extension
-    );
+    Extensions.removeFrom(extensible, "extensionsUsed", extension);
     Extensions.removeExtensionRequired(extensible, extension);
   }
 
@@ -73,17 +85,14 @@ export class Extensions {
    * @param extension - The extension name
    */
   static addExtensionRequired(extensible: Extensible, extension: string) {
-    extensible.extensionsRequired = Extensions.addUnique(
-      extensible.extensionsRequired,
-      extension
-    );
+    Extensions.addUniqueTo(extensible, "extensionsRequired", extension);
     Extensions.addExtensionUsed(extensible, extension);
   }
 
   /**
    * Remove the given extension to the `extensionsUsed` of the given object.
    *
-   * The array will be set to `undefined` if it becomes empty.
+   * The array will be deleted if it becomes empty.
    *
    * This will *not* remove the extension from the `extensionsUsed`!
    *
@@ -91,52 +100,55 @@ export class Extensions {
    * @param extension - The extension name
    */
   static removeExtensionRequired(extensible: Extensible, extension: string) {
-    extensible.extensionsRequired = Extensions.removeUnique(
-      extensible.extensionsRequired,
-      extension
-    );
+    Extensions.removeFrom(extensible, "extensionsRequired", extension);
   }
 
   /**
-   * Adds the given element to the given array and returns the
-   * array, creating a new array if the array was `undefined`.
+   * Adds the given element to the specified array if it was not
+   * contained yet, creating a new array if it did not exist yet.
    *
-   * @param array - The array
+   * @param object - The object containing the array
+   * @param key - The name of the array property
    * @param element - The element
-   * @returns The new array
    */
-  private static addUnique<T>(array: T[] | undefined, element: T): T[] {
+  private static addUniqueTo<T>(
+    object: { [key: string]: T[] | undefined },
+    key: string,
+    element: T
+  ) {
+    let array = object[key];
     if (!array) {
       array = [];
+      object[key] = array;
     }
     if (!array.includes(element)) {
       array.push(element);
     }
-    return array;
   }
 
   /**
-   * Remove the given element from the given array and returns the
-   * array. If the array becomes empty, this method returns `undefined`.
+   * Remove the given element from the specified array. If the array
+   * becomes empty, it is deleted.
    *
-   * @param array - The array
+   * @param object - The object containing the array
+   * @param key - The name of the array property
    * @param element - The element
-   * @returns The new array
    */
-  private static removeUnique<T>(
-    array: T[] | undefined,
+  private static removeFrom<T>(
+    object: { [key: string]: T[] | undefined },
+    key: string,
     element: T
-  ): T[] | undefined {
+  ) {
+    const array = object[key];
     if (!array) {
-      return undefined;
+      return;
     }
     const index = array.indexOf(element);
     if (index !== -1) {
       array.splice(index, 1);
     }
     if (array.length === 0) {
-      return undefined;
+      delete object[key];
     }
-    return array;
   }
 }

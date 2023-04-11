@@ -38,14 +38,21 @@ export class ImplicitTilings {
    * @param implicitTiling - The `TileImplicitTiling` object
    * @returns The generator
    * @throws ImplicitTilingError if the given object does not
-   * have a valid `subdivisionScheme`.
+   * have a valid `subdivisionScheme`, or the number of subtree
+   * levels is not positive
    */
   static createSubtreeCoordinatesIterator(
     implicitTiling: TileImplicitTiling
   ): IterableIterator<TreeCoordinates> {
+    const levels = implicitTiling.subtreeLevels;
+    if (levels < 1) {
+      throw new ImplicitTilingError(
+        `Invalid number of subtree levels: ${levels}`
+      );
+    }
     const r = this.createRootCoordinates(implicitTiling);
     const depthFirst = false;
-    return r.descendants(implicitTiling.subtreeLevels - 1, depthFirst);
+    return r.descendants(levels - 1, depthFirst);
   }
 
   /**
@@ -55,12 +62,18 @@ export class ImplicitTilings {
    * @param implicitTiling - The `TileImplicitTiling` object
    * @returns The number of nodes
    * @throws ImplicitTilingError if the given object does not
-   * have a valid `subdivisionScheme`.
+   * have a valid `subdivisionScheme`, or the number of subtree
+   * levels is not positive
    */
   static computeNumberOfNodesPerSubtree(
     implicitTiling: TileImplicitTiling
   ): number {
     const levels = implicitTiling.subtreeLevels;
+    if (levels < 1) {
+      throw new ImplicitTilingError(
+        `Invalid number of subtree levels: ${levels}`
+      );
+    }
     if (implicitTiling.subdivisionScheme === "QUADTREE") {
       return Quadtrees.computeNumberOfNodesForLevels(levels);
     }

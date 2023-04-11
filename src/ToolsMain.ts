@@ -3,10 +3,12 @@ import path from "path";
 
 import { Paths } from "./base/Paths";
 import { DeveloperError } from "./base/DeveloperError";
+import { Buffers } from "./base/Buffers";
 
 import { Tilesets } from "./tilesets/Tilesets";
 
 import { TileFormats } from "./tileFormats/TileFormats";
+import { TileDataLayouts } from "./tileFormats/TileDataLayouts";
 
 import { ContentOps } from "./contentProcessing/ContentOps";
 import { GltfUtilities } from "./contentProcessing/GtlfUtilities";
@@ -15,8 +17,11 @@ import { ContentDataTypes } from "./contentTypes/ContentDataTypes";
 
 import { PipelineExecutor } from "./pipelines/PipelineExecutor";
 import { Pipelines } from "./pipelines/Pipelines";
-import { Buffers } from "./base/Buffers";
-import { TileDataLayouts } from "./tileFormats/TileDataLayouts";
+
+import { ZipToPackage } from "./packages/ZipToPackage";
+
+import { TilesetSources } from "./tilesetData/TilesetSources";
+import { TilesetTargets } from "./tilesetData/TilesetTargets";
 
 /**
  * Functions that directly correspond to the command line functionality.
@@ -327,66 +332,26 @@ export class ToolsMain {
     await PipelineExecutor.executePipeline(pipeline, force);
   }
 
-  private static createTilesetToDatabasePipeline(
-    input: string,
-    output: string
-  ) {
-    const pipelineJson = {
-      input: input,
-      output: output,
-      tilesetStages: [
-        {
-          name: "tilesetToDatabase",
-        },
-      ],
-    };
-    return pipelineJson;
-  }
-
-  static async tilesetToDatabase(
-    input: string,
-    output: string,
-    force: boolean
-  ) {
+  static async convert(input: string, output: string, force: boolean) {
     ToolsMain.ensureCanWrite(output, force);
+    const inputExtension = path.extname(input).toLowerCase();
 
-    const pipelineJson = ToolsMain.createTilesetToDatabasePipeline(
-      input,
-      output
-    );
-    const pipeline = Pipelines.createPipeline(pipelineJson);
-    await PipelineExecutor.executePipeline(pipeline, force);
-  }
+    if (inputExtension === ".zip") {
+      await ZipToPackage.convert(input, output, force);
+    } else {
+      const tilesetSource = TilesetSources.createAndOpen(input);
+      const tilesetTarget = TilesetTargets.createAndBegin(output, force);
 
-  private static createDatabaseToTilesetPipeline(
-    input: string,
-    output: string
-  ) {
-    const pipelineJson = {
-      input: input,
-      output: output,
-      tilesetStages: [
-        {
-          name: "databaseToTileset",
-        },
-      ],
-    };
-    return pipelineJson;
-  }
-
-  static async databaseToTileset(
-    input: string,
-    output: string,
-    force: boolean
-  ) {
-    ToolsMain.ensureCanWrite(output, force);
-
-    const pipelineJson = ToolsMain.createDatabaseToTilesetPipeline(
-      input,
-      output
-    );
-    const pipeline = Pipelines.createPipeline(pipelineJson);
-    await PipelineExecutor.executePipeline(pipeline, force);
+      const keys = tilesetSource.getKeys();
+      for (const key of keys) {
+        const content = tilesetSource.getValue(key);
+        if (content) {
+          tilesetTarget.addEntry(key, content);
+        }
+      }
+      tilesetSource.close();
+      await tilesetTarget.end();
+    }
   }
 
   static async combine(input: string, output: string, force: boolean) {
@@ -402,6 +367,13 @@ export class ToolsMain {
   static async merge(inputs: string[], output: string, force: boolean) {
     ToolsMain.ensureCanWrite(output, force);
     await Tilesets.merge(inputs, output, force);
+  }
+
+  static async pipeline(input: string, force: boolean) {
+    const pipelineJsonBuffer = fs.readFileSync(input);
+    const pipelineJson = JSON.parse(pipelineJsonBuffer.toString());
+    const pipeline = Pipelines.createPipeline(pipelineJson);
+    await PipelineExecutor.executePipeline(pipeline, force);
   }
 
   /**

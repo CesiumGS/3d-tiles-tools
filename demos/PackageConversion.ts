@@ -7,7 +7,7 @@ import minimist from "minimist";
 import { TilesetTargets } from "../src/tilesetData/TilesetTargets";
 import { TilesetSources } from "../src/tilesetData/TilesetSources";
 
-import { ZipToPackage } from "./ZipToPackage";
+import { ZipToPackage } from "../src/packages/ZipToPackage";
 
 /**
  * Print the help message showing the command line options
@@ -73,7 +73,7 @@ async function tilesetPackageConversion(options: any) {
   const inputExtension = path.extname(input).toLowerCase();
 
   if (inputExtension === ".zip") {
-    ZipToPackage.convert(input, output, overwrite);
+    await ZipToPackage.convert(input, output, overwrite);
   } else {
     const tilesetSource = TilesetSources.createAndOpen(input);
     const tilesetTarget = TilesetTargets.createAndBegin(output, overwrite);

@@ -52,8 +52,15 @@ export interface TilesetProcessorContext {
 
   /**
    * The set of keys (file names) that have already been processed.
+   *
    * This includes the original keys, as well as new keys that
    * have been assigned to entries while they have been processed.
    */
   processedKeys: { [key: string]: boolean };
+
+  /**
+   * A mapping from source keys (file names) to the target names
+   * that they received during processing.
+   */
+  targetKeys: { [key: string]: string };
 }

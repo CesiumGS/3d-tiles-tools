@@ -9,9 +9,12 @@ import { TraversalCallback } from "./TraversalCallback";
 import { TilesetTraversers } from "./TilesetTraversers";
 
 import { DeveloperError } from "../base/DeveloperError";
+import { Tile } from "../structure/Tile";
 
 /**
  * A collection of configuration options for the traversal.
+ *
+ * @internal
  */
 export type TraversalOptions = {
   /**
@@ -120,20 +123,51 @@ export class TilesetTraverser {
     schema: Schema | undefined,
     traversalCallback: TraversalCallback
   ): Promise<void> {
-    const root = tileset.root;
-    if (!root) {
-      return;
-    }
+    await this.traverseInternal(tileset.root, schema, traversalCallback);
+  }
+
+  /**
+   * Traverses the hierarchy of tiles, starting at the
+   * given tile.
+   *
+   * @param tile - The `Tile` where the traversal should start
+   * @param schema - The schema from the `tileset.schema` or the
+   * `tileset.schemaUri`, or `undefined` if the tileset does
+   * not have an associated schema.
+   * @param traversalCallback - The `TraversalCallback`
+   * @returns A Promise that resolves when the traversal finished
+   */
+  async traverseWithSchemaAt(
+    tile: Tile,
+    schema: Schema | undefined,
+    traversalCallback: TraversalCallback
+  ): Promise<void> {
+    await this.traverseInternal(tile, schema, traversalCallback);
+  }
+
+  /**
+   * Actual implementation of the traversal.
+   *
+   * @param tile - The `Tile` where to start the traversal
+   * @param tileset - The `Tileset`
+   * @param traversalCallback - The `TraversalCallback`
+   * @returns A Promise that resolves when the traversal finished
+   */
+  private async traverseInternal(
+    tile: Tile,
+    schema: Schema | undefined,
+    traversalCallback: TraversalCallback
+  ) {
     const depthFirst = this.options.depthFirst;
 
     const stack: TraversedTile[] = [];
 
-    const traversedRoot = ExplicitTraversedTile.createRoot(
-      root,
+    const traversalRoot = ExplicitTraversedTile.createRoot(
+      tile,
       schema,
       this.resourceResolver
     );
-    stack.push(traversedRoot);
+    stack.push(traversalRoot);
 
     while (stack.length > 0) {
       const traversedTile = depthFirst ? stack.pop() : stack.shift();
