@@ -203,7 +203,8 @@ export class Buffers {
     static getBufferPadded(buffer: Buffer, byteOffset?: number): Buffer;
     static getJson(buffer: Buffer): any;
     static getJsonBufferPadded(json: any, byteOffset?: number): Buffer;
-    static getMagic(buffer: Buffer, byteOffset?: number): string;
+    static getMagicBytes(buffer: Buffer, byteOffset: number, byteLength: number): Buffer;
+    static getMagicString(buffer: Buffer, byteOffset?: number): string;
     static getUnicodeBOMDescription(buffer: Buffer): string | undefined;
     static gunzip(inputBuffer: Buffer): Buffer;
     static gzip(inputBuffer: Buffer): Buffer;
@@ -292,7 +293,7 @@ export interface ContentData {
     exists(): Promise<boolean>;
     get extension(): string;
     getData(): Promise<Buffer | null>;
-    getMagic(): Promise<string>;
+    getMagic(): Promise<Buffer>;
     getParsedObject(): Promise<any>;
     get uri(): string;
 }
@@ -302,6 +303,7 @@ export interface ContentData {
 // @internal
 export class ContentDataTypeRegistry {
     static findContentDataType(contentData: ContentData): Promise<string | undefined>;
+    static findType(uri: string, data: Buffer): Promise<string | undefined>;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "DefaultMetadataEntityModel" should be prefixed with an underscore because the declaration is marked as @internal
@@ -353,21 +355,18 @@ export class ExplicitTraversedTile implements TraversedTile {
     constructor(tile: Tile, path: string, level: number, parent: TraversedTile | undefined, schema: Schema | undefined, resourceResolver: ResourceResolver);
     asFinalTile(): Tile;
     asRawTile(): Tile;
+    static createRoot(root: Tile, schema: Schema | undefined, resourceResolver: ResourceResolver): TraversedTile;
     getChildren(): Promise<TraversedTile[]>;
-    // (undocumented)
     getFinalContents(): Content[];
-    // (undocumented)
     getImplicitTiling(): TileImplicitTiling | undefined;
-    // (undocumented)
     getMetadata(): MetadataEntity | undefined;
     getParent(): TraversedTile | undefined;
     getRawContents(): Content[];
-    // (undocumented)
+    getResourceResolver(): ResourceResolver;
     getSubtreeUri(): string | undefined;
+    isImplicitTilesetRoot(): boolean;
     get level(): number;
     get path(): string;
-    // (undocumented)
-    resolveUri(uri: string): string;
     // (undocumented)
     toString: () => string;
 }
@@ -387,7 +386,6 @@ export class FileResourceResolver implements ResourceResolver {
     derive(uri: string): ResourceResolver;
     resolveData(uri: string): Promise<Buffer | null>;
     resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
-    resolveUri(uri: string): string;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "Group" should be prefixed with an underscore because the declaration is marked as @internal
@@ -426,22 +424,16 @@ export class ImplicitTraversedTile implements TraversedTile {
     asFinalTile(): Tile;
     asRawTile(): Tile;
     getChildren(): Promise<TraversedTile[]>;
-    // (undocumented)
     getFinalContents(): Content[];
     getGlobalCoordinate(): TreeCoordinates;
-    // (undocumented)
-    getImplicitTiling(): TileImplicitTiling | undefined;
     getLocalCoordinate(): TreeCoordinates;
-    // (undocumented)
-    getMetadata(): MetadataEntity | undefined;
     getParent(): TraversedTile | undefined;
     getRawContents(): Content[];
-    // (undocumented)
+    getResourceResolver(): ResourceResolver;
     getSubtreeUri(): string | undefined;
+    isImplicitTilesetRoot(): boolean;
     get level(): number;
     get path(): string;
-    // (undocumented)
-    resolveUri(uri: string): string;
     // (undocumented)
     toString: () => string;
 }
@@ -480,7 +472,7 @@ export class Iterables {
         next(): IteratorResult<T, void>;
     };
     static map<S, T>(iterable: IterableIterator<S>, mapper: (element: S) => T): IterableIterator<T>;
-    static overFiles(directory: string | PathLike, recurse?: boolean): IterableIterator<string>;
+    static overFiles(directory: string | PathLike, recurse: boolean): IterableIterator<string>;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "LazyContentData" should be prefixed with an underscore because the declaration is marked as @internal
@@ -491,7 +483,7 @@ export class LazyContentData implements ContentData {
     exists(): Promise<boolean>;
     get extension(): string;
     getData(): Promise<Buffer | null>;
-    getMagic(): Promise<string>;
+    getMagic(): Promise<Buffer>;
     getParsedObject(): Promise<any>;
     get uri(): string;
 }
@@ -761,7 +753,6 @@ export interface ResourceResolver {
     derive(uri: string): ResourceResolver;
     resolveData(uri: string): Promise<Buffer | null>;
     resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
-    resolveUri(uri: string): string;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "ResourceResolvers" should be prefixed with an underscore because the declaration is marked as @internal
@@ -1082,11 +1073,10 @@ export class TilesetSourceFs implements TilesetSource {
 //
 // @internal
 export class TilesetSourceResourceResolver implements ResourceResolver {
-    constructor(basePath: string, tilesetSourceFileName: string, tilesetSource: TilesetSource);
+    constructor(basePath: string, tilesetSource: TilesetSource);
     derive(uri: string): ResourceResolver;
     resolveData(uri: string): Promise<Buffer | null>;
     resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
-    resolveUri(uri: string): string;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "TilesetSources" should be prefixed with an underscore because the declaration is marked as @internal
@@ -1150,7 +1140,10 @@ export class TilesetTargets {
 //
 // @internal
 export class TilesetTraverser {
-    static traverse(tileset: Tileset, schema: Schema | undefined, resourceResolver: ResourceResolver, traversalCallback: TraversalCallback, depthFirst: boolean): Promise<void>;
+    constructor(baseUri: string, resourceResolver: ResourceResolver, options?: TraversalOptions);
+    traverse(tileset: Tileset, traversalCallback: TraversalCallback): Promise<void>;
+    traverseWithSchema(tileset: Tileset, schema: Schema | undefined, traversalCallback: TraversalCallback): Promise<void>;
+    traverseWithSchemaAt(tile: Tile, schema: Schema | undefined, traversalCallback: TraversalCallback): Promise<void>;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "TraversalCallback" should be prefixed with an underscore because the declaration is marked as @internal
@@ -1160,6 +1153,12 @@ export interface TraversalCallback {
     (traversedTile: TraversedTile): Promise<boolean>;
 }
 
+// @public
+export type TraversalOptions = {
+    depthFirst?: boolean;
+    traverseExternalTilesets?: boolean;
+};
+
 // Warning: (ae-internal-missing-underscore) The name "TraversedTile" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
@@ -1167,20 +1166,14 @@ export interface TraversedTile {
     asFinalTile(): Tile;
     asRawTile(): Tile;
     getChildren(): Promise<TraversedTile[]>;
-    // (undocumented)
     getFinalContents(): Content[];
-    // (undocumented)
-    getImplicitTiling(): TileImplicitTiling | undefined;
-    // (undocumented)
-    getMetadata(): MetadataEntity | undefined;
     getParent(): TraversedTile | undefined;
     getRawContents(): Content[];
-    // (undocumented)
+    getResourceResolver(): ResourceResolver;
     getSubtreeUri(): string | undefined;
+    isImplicitTilesetRoot(): boolean;
     get level(): number;
     get path(): string;
-    // (undocumented)
-    resolveUri(uri: string): string;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "TreeCoordinates" should be prefixed with an underscore because the declaration is marked as @internal
@@ -1204,7 +1197,6 @@ export class UnzippingResourceResolver implements ResourceResolver {
     derive(uri: string): ResourceResolver;
     resolveData(uri: string): Promise<Buffer | null>;
     resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
-    resolveUri(uri: string): string;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "Uris" should be prefixed with an underscore because the declaration is marked as @internal
