@@ -8,10 +8,10 @@ import { BufferedContentData } from "./BufferedContentData";
 /**
  * A class for determining the type of data that a URI points to.
  *
- * The only public methods (for now) are `registerDefaults`,
- * which registers all known content data types, and
- * `findContentDataType`, which returns the string that
- * describes the type of a `ContentData` object.
+ * The only public methods (for now) are `findType`, which
+ * determines the type of data that is given as a URI and
+ * a buffer, and `findContentDataType`, which returns the
+ * string that describes the type of a `ContentData` object.
  *
  * @internal
  */

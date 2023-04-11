@@ -4,20 +4,67 @@ import { DeveloperError } from "../base/DeveloperError";
 import { ContentStage } from "./ContentStage";
 
 /**
- * Methods to create `ContentStage` objects from JSON input.
+ * Methods to create `ContentStage` objects
  */
 export class ContentStages {
+  /**
+   * The `name` that identifies the "gzip" content stage
+   */
   public static readonly CONTENT_STAGE_GZIP = "gzip";
+
+  /**
+   * The `name` that identifies the "ungzip" content stage
+   */
   public static readonly CONTENT_STAGE_UNGZIP = "ungzip";
+
+  /**
+   * The `name` that identifies the "glbToB3dm" content stage
+   */
   public static readonly CONTENT_STAGE_GLB_TO_B3DM = "glbToB3dm";
+
+  /**
+   * The `name` that identifies the "glbToI3dm" content stage
+   */
   public static readonly CONTENT_STAGE_GLB_TO_I3DM = "glbToI3dm";
+
+  /**
+   * The `name` that identifies the "b3dmToGlb" content stage
+   */
   public static readonly CONTENT_STAGE_B3DM_TO_GLB = "b3dmToGlb";
+
+  /**
+   * The `name` that identifies the "i3dmToGlb" content stage
+   */
   public static readonly CONTENT_STAGE_I3DM_TO_GLB = "i3dmToGlb";
+
+  /**
+   * The `name` that identifies the "optimizeB3dm" content stage
+   */
   public static readonly CONTENT_STAGE_OPTIMIZE_B3DM = "optimizeB3dm";
+
+  /**
+   * The `name` that identifies the "optimizeI3dm" content stage
+   */
   public static readonly CONTENT_STAGE_OPTIMIZE_I3DM = "optimizeI3dm";
+
+  /**
+   * The `name` that identifies the "optimizeGlb" content stage
+   */
   public static readonly CONTENT_STAGE_OPTIMIZE_GLB = "optimizeGlb";
+
+  /**
+   * The `name` that identifies the "separateGltf" content stage
+   */
   public static readonly CONTENT_STAGE_SEPARATE_GLTF = "separateGltf";
 
+  /**
+   * Creates a content stage that performs the "gzip" operation
+   *
+   * @param - The array of `ContentDataType` strings that the operation
+   * should be applied to (or `undefined` if it should be applied to
+   * all data types)
+   * @returns The content stage
+   */
   public static createGzip(
     includedContentTypes: string[] | undefined
   ): ContentStage {
@@ -29,6 +76,11 @@ export class ContentStages {
     return contentStage;
   }
 
+  /**
+   * Creates a content stage that performs the "ungzip" operation
+   *
+   * @returns The content stage
+   */
   public static createUngzip(): ContentStage {
     const contentStage: ContentStage = {
       name: ContentStages.CONTENT_STAGE_UNGZIP,
@@ -37,6 +89,11 @@ export class ContentStages {
     return contentStage;
   }
 
+  /**
+   * Creates a content stage that performs the "glbToB3dm" operation
+   *
+   * @returns The content stage
+   */
   public static createGlbToB3dm(): ContentStage {
     const contentStage: ContentStage = {
       name: ContentStages.CONTENT_STAGE_GLB_TO_B3DM,
@@ -45,6 +102,11 @@ export class ContentStages {
     return contentStage;
   }
 
+  /**
+   * Creates a content stage that performs the "glbToI3dm" operation
+   *
+   * @returns The content stage
+   */
   public static createGlbToI3dm(): ContentStage {
     const contentStage: ContentStage = {
       name: ContentStages.CONTENT_STAGE_GLB_TO_I3DM,
@@ -53,6 +115,11 @@ export class ContentStages {
     return contentStage;
   }
 
+  /**
+   * Creates a content stage that performs the "b3dmToGlb" operation
+   *
+   * @returns The content stage
+   */
   public static createB3dmToGlb(): ContentStage {
     const contentStage: ContentStage = {
       name: ContentStages.CONTENT_STAGE_B3DM_TO_GLB,
@@ -61,6 +128,11 @@ export class ContentStages {
     return contentStage;
   }
 
+  /**
+   * Creates a content stage that performs the "i3dmToGlb" operation
+   *
+   * @returns The content stage
+   */
   public static createI3dmToGlb(): ContentStage {
     const contentStage: ContentStage = {
       name: ContentStages.CONTENT_STAGE_I3DM_TO_GLB,
@@ -69,6 +141,11 @@ export class ContentStages {
     return contentStage;
   }
 
+  /**
+   * Creates a content stage that performs the "optimizeGlb" operation
+   *
+   * @returns The content stage
+   */
   public static createOptimizeB3dm(options: any): ContentStage {
     const contentStage: ContentStage = {
       name: ContentStages.CONTENT_STAGE_OPTIMIZE_B3DM,
@@ -79,6 +156,11 @@ export class ContentStages {
     return contentStage;
   }
 
+  /**
+   * Creates a content stage that performs the "optimizeI3dm" operation
+   *
+   * @returns The content stage
+   */
   public static createOptimizeI3dm(options: any): ContentStage {
     const contentStage: ContentStage = {
       name: ContentStages.CONTENT_STAGE_OPTIMIZE_B3DM,
@@ -89,6 +171,11 @@ export class ContentStages {
     return contentStage;
   }
 
+  /**
+   * Creates a content stage that performs the "optimizeGlb" operation
+   *
+   * @returns The content stage
+   */
   public static createOptimizeGlb(options: any): ContentStage {
     const contentStage: ContentStage = {
       name: ContentStages.CONTENT_STAGE_OPTIMIZE_GLB,
@@ -99,6 +186,11 @@ export class ContentStages {
     return contentStage;
   }
 
+  /**
+   * Creates a content stage that performs the "separateGlb" operation
+   *
+   * @returns The content stage
+   */
   public static createSeparateGltf(): ContentStage {
     const contentStage: ContentStage = {
       name: ContentStages.CONTENT_STAGE_SEPARATE_GLTF,

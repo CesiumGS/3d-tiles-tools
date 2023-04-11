@@ -90,8 +90,8 @@ export class ExplicitTraversedTile implements TraversedTile {
    * @param path - A JSON-path-like string describing this tile
    * @param level - The level, referring to the root of the
    * traversal, starting at 0
-   * @param parent The optional parent tile
-   * @param schema The optional metadata schema
+   * @param parent - The optional parent tile
+   * @param schema - The optional metadata schema
    * @param resourceResolver - The `ResourceResolver` for
    * external references (like subtree files)
    */

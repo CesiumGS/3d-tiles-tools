@@ -6,12 +6,24 @@ import { TilesetStage } from "./TilesetStage";
 import { ContentStages } from "./ContentStages";
 
 /**
- * Methods to create `TilesetStage` objects from JSON input.
+ * Methods to create `TilesetStage` objects.
  */
 export class TilesetStages {
+  /**
+   * The `name` that identifies the "upgrade" tileset stage
+   */
   public static readonly TILESET_STAGE_UPGRADE = "upgrade";
+
+  /**
+   * The `name` that identifies the "combine" tileset stage
+   */
   public static readonly TILESET_STAGE_COMBINE = "combine";
 
+  /**
+   * Creates a tileset stage that performs the "upgrade" operation
+   *
+   * @returns The tileset stage
+   */
   public static createUpgrade(): TilesetStage {
     const tilesetStage: TilesetStage = {
       name: TilesetStages.TILESET_STAGE_UPGRADE,
@@ -20,6 +32,11 @@ export class TilesetStages {
     return tilesetStage;
   }
 
+  /**
+   * Creates a tileset stage that performs the "combine" operation
+   *
+   * @returns The tileset stage
+   */
   public static createCombine(): TilesetStage {
     const tilesetStage: TilesetStage = {
       name: TilesetStages.TILESET_STAGE_COMBINE,
@@ -28,6 +45,14 @@ export class TilesetStages {
     return tilesetStage;
   }
 
+  /**
+   * Creates a tileset stage from the given parameters.
+   *
+   * @param name - The `name` of the tileset stage
+   * @param description - The `description` of the tileset stage
+   * @param contentStages - The content stages
+   * @returns The tileset stage
+   */
   public static create(
     name: string,
     description: string,

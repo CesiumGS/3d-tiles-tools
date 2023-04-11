@@ -13,6 +13,8 @@ import { Tile } from "../structure/Tile";
 
 /**
  * A collection of configuration options for the traversal.
+ *
+ * @internal
  */
 export type TraversalOptions = {
   /**
