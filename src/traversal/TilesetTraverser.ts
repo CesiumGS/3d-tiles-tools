@@ -67,7 +67,7 @@ export class TilesetTraverser {
    * @param resourceResolver - The `ResourceResolver` that is used to
    * resolve resources like external metadata schema files, subtree
    * files for implicit tilesets, or external tilesets.
-   * @param options Options for the traveral process.
+   * @param options - Options for the traveral process.
    */
   constructor(
     baseUri: string,

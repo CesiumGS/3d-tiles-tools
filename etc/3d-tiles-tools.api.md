@@ -1153,7 +1153,9 @@ export interface TraversalCallback {
     (traversedTile: TraversedTile): Promise<boolean>;
 }
 
-// @public
+// Warning: (ae-internal-missing-underscore) The name "TraversalOptions" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
 export type TraversalOptions = {
     depthFirst?: boolean;
     traverseExternalTilesets?: boolean;
