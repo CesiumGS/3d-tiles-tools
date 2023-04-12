@@ -1,6 +1,18 @@
 # 3D Tiles Tools
 
-## Command line tools
+## Overview
+
+The 3D Tiles Tools are a collection of tools and utilities for converting, optimizing, processing, and analyzing 3D Tiles data.
+
+## Installation
+
+To install the 3D Tiles Tools locally into a directory, run
+```
+npm install 3d-tiles-tools
+```
+If you want to work directly with a clone of the Git repository, see [Developer Setup](#developer-setup).
+
+## Command Line Usage
 
 #### Common command line options for each function:
 
@@ -16,7 +28,7 @@
 
 Gzips the input tileset. 
 ``` 
-npx ts-node ./src/main.ts gzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-gzipped/
+npx 3d-tiles-tools gzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-gzipped/
 ```
 
 Additional command line options:
@@ -31,28 +43,28 @@ Additional command line options:
 
 Ungzips the input tileset.
 ``` 
-npx ts-node ./src/main.ts ungzip -i ./specs/data/TilesetOfTilesets-gzipped/ -o ./output/TilesetOfTilesets-ungzipped/
+npx 3d-tiles-tools ungzip -i ./specs/data/TilesetOfTilesets-gzipped/ -o ./output/TilesetOfTilesets-ungzipped/
 ```
 
 #### combine
 
-Combines all external tilesets into a single tileset.json file.
+Combines all external tilesets into a single tileset.
 ```
-npx ts-node ./src/main.ts combine -i ./specs/data/combineTilesets/input -o ./specs/data/combineTilesets/output
+npx 3d-tiles-tools combine -i ./specs/data/combineTilesets/input -o ./specs/data/combineTilesets/output
 ```
 
 #### merge
 
 Merge multiple tilesets into a single one that refers to the input tilesets as external tilesets.
 ```
-npx ts-node ./src/main.ts merge -i ./specs/data/mergeTilesets/TilesetA -i ./specs/data/mergeTilesets/sub/TilesetA -o ./specs/data/mergeTilesets/output
+npx 3d-tiles-tools merge -i ./specs/data/mergeTilesets/TilesetA -i ./specs/data/mergeTilesets/sub/TilesetA -o ./specs/data/mergeTilesets/output
 ```
 
 #### upgrade
 
 Upgrade a tileset to the latest 3D Tiles version.
 ```
-npx ts-node ./src/main.ts upgrade -i ./specs/data/TilesetOfTilesets/tileset.json -o ./output/upgraded
+npx 3d-tiles-tools upgrade -i ./specs/data/TilesetOfTilesets/tileset.json -o ./output/upgraded
 ```
 The exact behavior of the upgrade operation is not yet specified. But when B3DM- and I3DM tile content in the input tileset uses glTF 1.0 assets, then the upgrade step will try to upgrade these assets to glTF 2.0.
 
@@ -62,7 +74,7 @@ The exact behavior of the upgrade operation is not yet specified. But when B3DM-
 
 Convert between tilesets and tileset package formats. 
 ```
-npx ts-node ./src/main.ts upgrade -i ./specs/data/TilesetOfTilesets/tileset.json -o ./output/TilesetOfTilesets.3tz
+npx 3d-tiles-tools upgrade -i ./specs/data/TilesetOfTilesets/tileset.json -o ./output/TilesetOfTilesets.3tz
 ```
 
 The input- and output arguments for this command may be
@@ -89,21 +101,21 @@ Deprecated. This functionality is now offered via the `convert` command.
 
 Creates a b3dm from a glb with an empty batch table.
 ```
-npx ts-node ./src/main.ts glbToB3dm -i ./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb -o ./output/CesiumTexturedBox.b3dm
+npx 3d-tiles-tools glbToB3dm -i ./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb -o ./output/CesiumTexturedBox.b3dm
 ```
 
 #### glbToI3dm
 
 Creates a i3dm from a glb with a single instance at position `[0, 0, 0]` and an empty batch table. 
 ```
-npx ts-node ./src/main.ts glbToI3dm -i ./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb -o ./output/CesiumTexturedBox.i3dm
+npx 3d-tiles-tools glbToI3dm -i ./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb -o ./output/CesiumTexturedBox.i3dm
 ```
 
 #### b3dmToGlb
 
 Extracts the glb from a b3dm. 
 ```
-npx ts-node ./src/main.ts b3dmToGlb -i ./specs/data/batchedWithBatchTableBinary.b3dm -o ./output/extracted.glb
+npx 3d-tiles-tools b3dmToGlb -i ./specs/data/batchedWithBatchTableBinary.b3dm -o ./output/extracted.glb
 ```
 
 #### i3dmToGlb
@@ -111,7 +123,7 @@ npx ts-node ./src/main.ts b3dmToGlb -i ./specs/data/batchedWithBatchTableBinary.
 Extracts the glb from a i3dm. 
 
 ```
-npx ts-node ./src/main.ts b3dmToGlb -i ./specs/data/instancedWithBatchTableBinary.i3dm -o ./output/extracted.glb
+npx 3d-tiles-tools b3dmToGlb -i ./specs/data/instancedWithBatchTableBinary.i3dm -o ./output/extracted.glb
 ```
 
 #### cmptToGlb
@@ -119,7 +131,7 @@ npx ts-node ./src/main.ts b3dmToGlb -i ./specs/data/instancedWithBatchTableBinar
 Extracts the glb models from a cmpt tile. If multiple models are found a number will be appended to the output file name.
 
 ```
-npx ts-node ./src/main.ts b3dmToGlb -i ./specs/data/composite.cmpt -o ./output/extracted.glb
+npx 3d-tiles-tools b3dmToGlb -i ./specs/data/composite.cmpt -o ./output/extracted.glb
 ```
 
 #### optimizeB3dm
@@ -127,7 +139,7 @@ npx ts-node ./src/main.ts b3dmToGlb -i ./specs/data/composite.cmpt -o ./output/e
 Optimize a b3dm using [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md). 
 
 ```
-npx ts-node ./src/main.ts optimizeB3dm -i ./specs/data/batchedWithBatchTableBinary.b3dm -o ./output/optimized.b3dm
+npx 3d-tiles-tools optimizeB3dm -i ./specs/data/batchedWithBatchTableBinary.b3dm -o ./output/optimized.b3dm
 ```
 
 Additional command line options:
@@ -140,12 +152,12 @@ Additional command line options:
 
 Quantize floating-point attributes and oct-encode normals:
 ```
-npx ts-node ./src/main.ts optimizeB3dm -i ./specs/data/batchedWithBatchTableBinary.b3dm -o ./output/optimized.b3dm --options -q -n
+npx 3d-tiles-tools optimizeB3dm -i ./specs/data/batchedWithBatchTableBinary.b3dm -o ./output/optimized.b3dm --options -q -n
 ```
 
 To use Draco compression, pass the [`draco` flags](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md#command-line-flags)
 ```
-npx ts-node ./src/main.ts optimizeB3dm -i ./specs/data/Textured/batchedTextured.b3dm -o ./output/optimized.b3dm --options --draco.compressMeshes --draco.compressionLevel=9
+npx 3d-tiles-tools optimizeB3dm -i ./specs/data/Textured/batchedTextured.b3dm -o ./output/optimized.b3dm --options --draco.compressMeshes --draco.compressionLevel=9
 ```
 This example optimizes the b3dm and compresses the meshes using Draco, with a high compression level.
 
@@ -154,7 +166,7 @@ This example optimizes the b3dm and compresses the meshes using Draco, with a hi
 
 Optimize a i3dm using [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md).
 ```
-npx ts-node ./src/main.ts optimizeI3dm -i ./specs/data/instancedWithBatchTableBinary.i3dm -o ./output/optimized.i3dm
+npx 3d-tiles-tools optimizeI3dm -i ./specs/data/instancedWithBatchTableBinary.i3dm -o ./output/optimized.i3dm
 ```
 See [optimizeB3dm](#optimizeb3dm) for further examples.
 
@@ -226,65 +238,28 @@ The known content stages are:
 An example of a pipeline that combines a sequence of multiple operations is shown in [`examplePipeline.json`](./specs/data/pipelines/examplePipeline.json).
 
 
+## Developer Setup
 
----
+When the tools are not installed as a package from NPM, but supposed to be used directly in a cloned repository, then the command line usage is as follows:
 
-## Demos
+- Clone the repository into the current directory:
+  ```
+  git clone https://github.com/CesiumGS/3d-tiles-tools
+  ```
+- Change into the directory of the cloned repository:
+  ```
+  cd 3d-tiles-tools
+  ```
+- Install the tools and all dependencies:
+  ```
+  npm install
+  ```
 
-The `demos` folder contains some examples of how the functionality of the tools may be used as a library. This is intended as a preview. The functionality is not yet exposed as a public API.
-
-### General tool functions
-
-Basic functions for reading tile data:
+After this, `ts-node` can be used to directly execute the tools, using the same command line options as described above - for example:
 ```
-npx ts-node ./demos/TileFormatsDemoBasic.ts
-```
-
-Basic functions for converting tile data:
-```
-npx ts-node ./demos/TileFormatsDemoConversions.ts
-```
-
-Demos for content data type detection:
-```
-npx ts-node ./demos/ContentDataTypeRegistryDemo.ts
+npx ts-node src/main.ts gzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-gzipped/
 ```
 
-Demos for tileset processing (upgrade, combine, merge)
-```
-npx ts-node ./demos/TilesetProcessingDemos.ts
-```
-
-### Archive/Package functions 
-
-Basic examples of creating and reading packages:
-```
-npx ts-node ./demos/PackagesDemo.ts
-```
-
-Package conversion:
-```
-npx ts-node ./demos/PackageConversion.ts -i ./specs/data/Tileset -o ./output/example.3tz
-```
-(Input may be 3TZ, 3DTILES, ZIP, or directory. Output may be 3TZ, 3DTILES, or directory)
-
-**Very** simple draft of a package server:
-```
-npx ts-node ./demos/PackageServer.ts -s ./specs/data/Tileset
-```
-to be opened with the `PackageSandcastle.js`.
-
----
-
-Basic benchmark for creating 3DTILES/3TZ packages with artifical data:
-```
-npx ts-node ./demos/benchmarks/PackageCreationBenchmark.ts
-```
-
-Basic benchmark for reading the 3DTILES/3TZ that have been created with the previous benchmark:
-```
-npx ts-node ./demos/benchmarks/PackageReadingBenchmark.ts
-```
-
+See the [implementation notes](IMPLEMENTATION.md) for details about the project structure.
 
 
