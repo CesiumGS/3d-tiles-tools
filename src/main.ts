@@ -63,7 +63,8 @@ const outputStringDefinition: any = {
  */
 function parseToolArgs(a: string[]) {
   const args = yargs(a)
-    .usage("Usage: $0 <command> [options]")
+    .usage("Usage: npx 3d-tiles-tools <command> [options]")
+    .scriptName("") // Only print the commands (not the script name)
     .help("h")
     .alias("h", "help")
     .options({
@@ -75,15 +76,6 @@ function parseToolArgs(a: string[]) {
         type: "boolean",
       },
     })
-    .command("tilesetToDatabase", "Create a sqlite database for a tileset.", {
-      i: inputStringDefinition,
-      o: outputStringDefinition,
-    })
-    .command(
-      "databaseToTileset",
-      "Unpack a tileset database to a tileset folder.",
-      { i: inputStringDefinition, o: outputStringDefinition }
-    )
     .command(
       "convert",
       "Convert between tilesets and tileset package formats. " +
@@ -191,6 +183,19 @@ function parseToolArgs(a: string[]) {
         "1.0 and for glTF 2.0), and write files into the output directory that " +
         "contain the feature table, batch table, layout information, the GLB, " +
         "and the JSON of the GLB",
+      { i: inputStringDefinition, o: outputStringDefinition }
+    )
+    .command(
+      "tilesetToDatabase",
+      "Create a sqlite database for a tileset. (Deprecated - use 'convert' instead)",
+      {
+        i: inputStringDefinition,
+        o: outputStringDefinition,
+      }
+    )
+    .command(
+      "databaseToTileset",
+      "Unpack a tileset database to a tileset folder. (Deprecated - use 'convert' instead)",
       { i: inputStringDefinition, o: outputStringDefinition }
     )
     .demandCommand(1)
