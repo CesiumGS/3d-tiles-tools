@@ -171,6 +171,17 @@ npx 3d-tiles-tools optimizeI3dm -i ./specs/data/instancedWithBatchTableBinary.i3
 See [optimizeB3dm](#optimizeb3dm) for further examples.
 
 
+
+#### analyze
+
+Analyze the input file, and write the results to the output directory.
+```
+npx 3d-tiles-tools analyze -i ./specs/data/batchedWithBatchTableBinary.b3dm -o ./output/analyzed/
+```
+This will accept B3DM, I3DM, PNTS, CMPT, and GLB files (both for glTF 1.0 and for glTF 2.0), and write files into the output directory that contain the feature table, batch table, layout information, the GLB, and the JSON of the GLB. This is primarily intended for debugging and analyzing tile data. Therefore, the exact naming and content of the generated output files are not specified.
+
+
+
 ### Pipeline 
 
 Execute a sequence of operations that are described in a JSON file.
