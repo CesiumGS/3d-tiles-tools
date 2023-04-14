@@ -74,7 +74,7 @@ The exact behavior of the upgrade operation is not yet specified. But when B3DM-
 
 Convert between tilesets and tileset package formats. 
 ```
-npx 3d-tiles-tools upgrade -i ./specs/data/TilesetOfTilesets/tileset.json -o ./output/TilesetOfTilesets.3tz
+npx 3d-tiles-tools convert -i ./specs/data/TilesetOfTilesets/tileset.json -o ./output/TilesetOfTilesets.3tz
 ```
 
 The input- and output arguments for this command may be
