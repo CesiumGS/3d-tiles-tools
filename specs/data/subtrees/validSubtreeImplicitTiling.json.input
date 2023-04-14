@@ -1,0 +1,8 @@
+{
+  "subdivisionScheme": "QUADTREE",
+  "subtreeLevels": 3,
+  "availableLevels": 6,
+  "subtrees": {
+    "uri": "subtrees/{level}.{x}.{y}.subtree"
+  }
+}

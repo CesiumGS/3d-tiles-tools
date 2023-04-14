@@ -1,66 +1,74 @@
 [
   {
-    "name": "bluebird",
+    "name": "@types/better-sqlite3",
     "license": [
       "MIT"
     ],
-    "version": "3.7.2",
-    "url": "https://www.npmjs.com/package/bluebird"
+    "version": "7.6.3",
+    "url": "https://www.npmjs.com/package/@types/better-sqlite3"
+  },
+  {
+    "name": "archiver",
+    "license": [
+      "MIT"
+    ],
+    "version": "5.3.1",
+    "url": "https://www.npmjs.com/package/archiver"
+  },
+  {
+    "name": "better-sqlite3",
+    "license": [
+      "MIT"
+    ],
+    "version": "7.6.2",
+    "url": "https://www.npmjs.com/package/better-sqlite3"
   },
   {
     "name": "cesium",
     "license": [
       "Apache-2.0"
     ],
-    "version": "1.98.1",
+    "version": "1.103.0",
     "url": "https://www.npmjs.com/package/cesium"
-  },
-  {
-    "name": "fs-extra",
-    "license": [
-      "MIT"
-    ],
-    "version": "7.0.1",
-    "url": "https://www.npmjs.com/package/fs-extra"
   },
   {
     "name": "gltf-pipeline",
     "license": [
       "Apache-2.0"
     ],
-    "version": "1.0.7",
+    "version": "4.0.2",
     "url": "https://www.npmjs.com/package/gltf-pipeline"
   },
   {
-    "name": "klaw",
+    "name": "minimist",
     "license": [
       "MIT"
     ],
-    "version": "3.0.0",
-    "url": "https://www.npmjs.com/package/klaw"
+    "version": "1.2.8",
+    "url": "https://www.npmjs.com/package/minimist"
   },
   {
-    "name": "sqlite3",
-    "license": [
-      "BSD-3-Clause"
-    ],
-    "version": "5.1.2",
-    "url": "https://www.npmjs.com/package/sqlite3"
-  },
-  {
-    "name": "uuid",
+    "name": "node-stream-zip",
     "license": [
       "MIT"
     ],
-    "version": "3.4.0",
-    "url": "https://www.npmjs.com/package/uuid"
+    "version": "1.15.0",
+    "url": "https://www.npmjs.com/package/node-stream-zip"
+  },
+  {
+    "name": "seedrandom",
+    "license": [
+      "MIT"
+    ],
+    "version": "3.0.5",
+    "url": "https://www.npmjs.com/package/seedrandom"
   },
   {
     "name": "yargs",
     "license": [
       "MIT"
     ],
-    "version": "13.3.2",
+    "version": "17.6.2",
     "url": "https://www.npmjs.com/package/yargs"
   }
 ]

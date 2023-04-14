@@ -1,3 +1,6 @@
-node_modules/**
-coverage/**
-doc/**
+build
+data
+node_modules
+dist
+etc
+generateThirdParty.js

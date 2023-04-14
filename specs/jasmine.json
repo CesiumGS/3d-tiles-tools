@@ -1,9 +1,6 @@
 {
   "spec_dir": "specs",
-  "spec_files": [
-    "**/*Spec.js"
-  ],
-  "helpers": [
-    "matchers/nodeHelper.js"
-  ]
+  "spec_files": ["**/*Spec.*s"],
+  "helpers": [],
+  "random": false
 }
