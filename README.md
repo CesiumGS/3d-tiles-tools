@@ -150,11 +150,6 @@ Additional command line options:
 
 **Examples**: 
 
-Quantize floating-point attributes and oct-encode normals:
-```
-npx 3d-tiles-tools optimizeB3dm -i ./specs/data/batchedWithBatchTableBinary.b3dm -o ./output/optimized.b3dm --options -q -n
-```
-
 To use Draco compression, pass the [`draco` flags](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md#command-line-flags)
 ```
 npx 3d-tiles-tools optimizeB3dm -i ./specs/data/Textured/batchedTextured.b3dm -o ./output/optimized.b3dm --options --draco.compressMeshes --draco.compressionLevel=9
