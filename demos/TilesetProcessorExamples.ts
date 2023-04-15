@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Content } from "../src/structure/Content";
 import { Schema } from "../src/structure/Metadata/Schema";
 import { Tile } from "../src/structure/Tile";
 import { Tileset } from "../src/structure/Tileset";
@@ -30,8 +28,9 @@ async function example() {
 
   // Apply a callback to each `TraversedTile`
   await tilesetProcessor.forEachTile(
-    async (traversedTile: TraversedTile): Promise<void> => {
+    async (traversedTile: TraversedTile): Promise<boolean> => {
       console.log("In forEachTile");
+      return true;
     }
   );
 
@@ -60,9 +59,9 @@ async function example() {
 
   // Apply a callback to the tileset and its schema
   await tilesetProcessor.forTileset(
-    async (tileset: Tileset, schema: Schema | undefined): Promise<void> => {
+    async (tileset: Tileset, schema: Schema | undefined): Promise<Tileset> => {
       console.log("In forTileset");
-      return;
+      return tileset;
     }
   );
 

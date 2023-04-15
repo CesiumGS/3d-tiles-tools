@@ -45,10 +45,10 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * @throws TilesetError When an error is thrown during processing
    */
   async forEachTile(
-    callback: (traversedTile: TraversedTile) => Promise<void>
+    callback: (traversedTile: TraversedTile) => Promise<boolean>
   ): Promise<void> {
     const context = this.getContext();
-    const tileset = context.tileset;
+    const tileset = context.sourceTileset;
     await this.forEachTileAt(tileset.root, callback);
   }
 
@@ -68,7 +68,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    */
   private async forEachTileAt(
     tile: Tile,
-    callback: (traversedTile: TraversedTile) => Promise<void>
+    callback: (traversedTile: TraversedTile) => Promise<boolean>
   ): Promise<void> {
     const context = this.getContext();
     const tilesetSource = context.tilesetSource;
@@ -85,14 +85,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
       depthFirst: false,
       traverseExternalTilesets: true,
     });
-    await tilesetTraverser.traverseWithSchemaAt(
-      tile,
-      schema,
-      async (traversedTile) => {
-        await callback(traversedTile);
-        return true;
-      }
-    );
+    await tilesetTraverser.traverseWithSchemaAt(tile, schema, callback);
   }
 
   /**
@@ -108,7 +101,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     callback: (tile: Tile) => Promise<void>
   ): Promise<void> {
     const context = this.getContext();
-    const tileset = context.tileset;
+    const tileset = context.sourceTileset;
     const root = tileset.root;
     await Tiles.traverseExplicit(root, async (tilePath: Tile[]) => {
       const tile = tilePath[tilePath.length - 1];
@@ -122,17 +115,20 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * schema.
    *
    * @param callback - The callback
-   * @returns A promise that resolves when the process is finished
+   * @returns A promise that resolves when the process is finished,
+   * and contains the tileset that should be written into the
+   * target. This may be identical to the given input tileset.
    * @throws DeveloperError If `begin` was not called yet
    * @throws TilesetError When an error is thrown during processing
    */
   async forTileset(
-    callback: (tileset: Tileset, schema: Schema | undefined) => Promise<void>
+    callback: (tileset: Tileset, schema: Schema | undefined) => Promise<Tileset>
   ) {
     const context = this.getContext();
-    const tileset = context.tileset;
+    const tileset = context.sourceTileset;
     const schema = context.schema;
-    await callback(tileset, schema);
+    const targetTileset = await callback(tileset, schema);
+    context.targetTileset = targetTileset;
   }
 
   /**
@@ -191,6 +187,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
             traversedTile,
             entryProcessor
           );
+          return true;
         });
 
         // After the traversal, update the content URIs of the

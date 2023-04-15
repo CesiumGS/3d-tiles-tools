@@ -26,7 +26,7 @@ export interface TilesetProcessorContext {
   /**
    * The tileset that was parsed from the input
    */
-  tileset: Tileset;
+  sourceTileset: Tileset;
 
   /**
    * Whether the tileset JSON was zipped (a legacy feature,
@@ -49,6 +49,13 @@ export interface TilesetProcessorContext {
    * data in the target (usually `tileset.json`)
    */
   tilesetTargetJsonFileName: string;
+
+  /**
+   * The tileset that should be written into the tileset JSON
+   * file of the target. This might be identical to the
+   * `sourceTileset`.
+   */
+  targetTileset: Tileset;
 
   /**
    * The set of keys (file names) that have already been processed.

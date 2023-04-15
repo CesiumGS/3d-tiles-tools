@@ -60,6 +60,7 @@ describe("BasicTilesetProcessor on explicit input", function () {
     await tilesetProcessor.forEachTile(async (traversedTile: TraversedTile) => {
       const contentUris = traversedTile.getFinalContents().map((c) => c.uri);
       actualContentUris.push(contentUris);
+      return true;
     });
     await tilesetProcessor.end();
 
