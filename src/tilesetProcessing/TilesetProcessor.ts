@@ -19,12 +19,12 @@ import { TilesetProcessing } from "./TilesetProcessing";
  * A base class for classes that can process tilesets.
  *
  * This class offers the infrastructure for opening a `TilesetSource`
- * and a `TilesetTarget`, parsing the `Tileset` object from the
- * source, and performing operations on `Tileset` and the
+ * and a `TilesetTarget`, and performing operations on the
  * `TilesetEntry` objects.
  *
- * Subclasses will offer predefined sets of operations that can
- * be performed on the `Tileset` and the `TilesetEntry` objects.
+ * Subclasses can access the `TilesetProcessorContext`, which
+ * contains the parsed tileset and its schema, and can offer
+ * predefined sets of more specialized operations.
  */
 export abstract class TilesetProcessor {
   /**
@@ -113,7 +113,7 @@ export abstract class TilesetProcessor {
         Tilesets.determineTilesetJsonFileName(tilesetTargetName);
 
       // Obtain the tileset object from the tileset JSON file
-      const parsedTileset = TilesetProcessing.parseSourceValue<Tileset>(
+      const sourceTileset = TilesetProcessing.parseSourceValue<Tileset>(
         tilesetSource,
         tilesetSourceJsonFileName
       );
@@ -122,7 +122,7 @@ export abstract class TilesetProcessor {
       // or the `tileset.schemaUri`
       const schema = TilesetProcessing.resolveSchema(
         tilesetSource,
-        parsedTileset.result
+        sourceTileset
       );
 
       // If nothing has thrown up to this point, then
@@ -131,12 +131,11 @@ export abstract class TilesetProcessor {
       this.context = {
         tilesetSource: tilesetSource,
         tilesetSourceJsonFileName: tilesetSourceJsonFileName,
-        sourceTileset: parsedTileset.result,
-        tilesetJsonWasZipped: parsedTileset.wasZipped,
+        sourceTileset: sourceTileset,
         schema: schema,
         tilesetTarget: tilesetTarget,
         tilesetTargetJsonFileName: tilesetTargetJsonFileName,
-        targetTileset: parsedTileset.result,
+        targetTileset: sourceTileset,
         processedKeys: {},
         targetKeys: {},
       };
@@ -172,43 +171,14 @@ export abstract class TilesetProcessor {
     const context = this.getContext();
     const tilesetSource = context.tilesetSource;
     const tilesetTarget = context.tilesetTarget;
-    const tilesetSourceJsonFileName = context.tilesetSourceJsonFileName;
 
     // Perform a no-op on all entries that have not yet
     // been marked as processed
-    const sourceKeys = tilesetSource.getKeys();
-    for (const sourceKey of sourceKeys) {
-      if (sourceKey !== tilesetSourceJsonFileName) {
-        await this.processEntry(
-          sourceKey,
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          async (sourceEntry: TilesetEntry, type: string | undefined) => {
-            return sourceEntry;
-          }
-        );
+    await this.processAllEntriesInternal(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      async (sourceEntry: TilesetEntry, type: string | undefined) => {
+        return sourceEntry;
       }
-    }
-
-    const entries = TilesetSources.getEntries(tilesetSource);
-    for (const entry of entries) {
-      const key = entry.key;
-      // The tileset JSON file will be added explicitly below
-      if (!this.isProcessed(key) && key !== tilesetSourceJsonFileName) {
-        this.markAsProcessed(key);
-        this.storeTargetEntries(entry);
-      }
-    }
-
-    const tilesetTargetJsonFileName = context.tilesetTargetJsonFileName;
-    const targetTileset = context.targetTileset;
-    const tilesetJsonWasZipped = context.tilesetJsonWasZipped;
-
-    // Store the resulting tileset as JSON
-    TilesetProcessing.storeTargetValue(
-      tilesetTarget,
-      tilesetTargetJsonFileName,
-      tilesetJsonWasZipped,
-      targetTileset
     );
 
     // Clean up by closing the source and the target
@@ -224,6 +194,26 @@ export abstract class TilesetProcessor {
       throw error;
     }
     await tilesetTarget.end();
+  }
+
+  /**
+   * Applies the given entry processor to each `TilesetEntry` that
+   * has not yet been processed
+   *
+   * @param entryProcessor - The entry processor
+   * @returns A promise that resolves when the process is finished
+   * @throws DeveloperError If `begin` was not called yet
+   * @throws TilesetError When the input could not be processed
+   */
+  protected async processAllEntriesInternal(
+    entryProcessor: TilesetEntryProcessor
+  ) {
+    const context = this.getContext();
+    const tilesetSource = context.tilesetSource;
+    const sourceKeys = tilesetSource.getKeys();
+    for (const sourceKey of sourceKeys) {
+      await this.processEntry(sourceKey, entryProcessor);
+    }
   }
 
   /**
@@ -247,7 +237,7 @@ export abstract class TilesetProcessor {
    * @throws DeveloperError When the source or target is not opened
    * @throws TilesetError When the input could not be processed
    */
-  protected async processEntry(
+  async processEntry(
     sourceKey: string,
     entryProcessor: TilesetEntryProcessor
   ): Promise<void> {

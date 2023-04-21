@@ -29,12 +29,6 @@ export interface TilesetProcessorContext {
   sourceTileset: Tileset;
 
   /**
-   * Whether the tileset JSON was zipped (a legacy feature,
-   * see `TilesetProcessor.parseSourceValue` for details)
-   */
-  tilesetJsonWasZipped: boolean;
-
-  /**
    * The optional metadata schema associated with the tileset
    */
   schema: Schema | undefined;
