@@ -1,6 +1,17 @@
 Change Log
 ==========
 
+### 0.2.1 - yyyy-mm-dd
+
+- Internal refactorings and bugfixes for tileset processing and pipelines: 
+  - The tileset JSON had been written in gzipped form if and only if it was read in gzipped form, to mimic the previous behavior of functions like `combineTilesets.js`. 
+  - This caused the tileset JSON to not be zipped even when the `gzip` command was applied ([#22](https://github.com/CesiumGS/3d-tiles-tools/issues/22)). 
+  - Now, the tileset JSON will always be written in unzipped form by default. 
+  - The `gzip` and `ungzip` commands are implemented as 'tileset stages' that do not apply any special handling to the tileset JSON. 
+  - The filters for included- and excluded content types have been mored from the 'content stage' to the 'tileset stage' accordingly, because the content stages already are specific for certain content types, and will check these types internally.
+  - The default handling of the case that the included content types are `undefined` has changed: Content types will be _included_ by default now. To not include anything, and empty array can be used.
+- Fixed a bug in the `analyze` command that caused a wrong payload length to be reported
+
 ### 0.2.0 - 2023-04-14
 
 * Rewrite
