@@ -186,15 +186,15 @@ export class SpecHelpers {
     nameB: string,
     tilesetSourceB: TilesetSource
   ): string | undefined {
-    const keysA = [...tilesetSourceA.getKeys()];
-    const keysB = [...tilesetSourceB.getKeys()];
+    const keysA = [...tilesetSourceA.getKeys()].sort();
+    const keysB = [...tilesetSourceB.getKeys()].sort();
 
     if (keysA.length != keysB.length) {
       return `There are ${keysA.length} keys in ${nameA} and ${keysB.length} keys in ${nameB}`;
     }
     for (let i = 0; i < keysA.length; i++) {
       if (keysA[i] != keysB[i]) {
-        return `Key ${i} is ${keysA[i]} in ${nameA} and ${keysA[i]} in ${nameB}`;
+        return `Key ${i} is ${keysA[i]} in ${nameA} and ${keysB[i]} in ${nameB}`;
       }
     }
     for (let i = 0; i < keysA.length; i++) {
