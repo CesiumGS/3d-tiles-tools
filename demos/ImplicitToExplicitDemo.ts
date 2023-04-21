@@ -108,9 +108,8 @@ async function runConversionDemo(
 
 async function runDemo() {
   const tilesetSourceName =
-    "../3d-tiles-samples/1.1/SparseImplicitQuadtree/tileset.json";
-  const tilesetTargetName =
-    "./output/SparseImplicitQuadtree-result/tileset.json";
+    "./specs/data/tilesetProcessing/implicitProcessing/tileset.json";
+  const tilesetTargetName = "./output/implicitToExplicit-result/tileset.json";
   await runConversionDemo(tilesetSourceName, tilesetTargetName);
 }
 
