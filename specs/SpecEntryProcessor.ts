@@ -12,7 +12,7 @@ import { TilesetEntry } from "../src/tilesetData/TilesetEntry";
  * the exact set of processed entries may be checked
  * in the tests.
  */
-export class SpecProcessor {
+export class SpecEntryProcessor {
   processedKeys: string[] = [];
 
   processUri = (uri: string) => {

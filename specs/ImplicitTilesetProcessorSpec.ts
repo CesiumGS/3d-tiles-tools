@@ -2,7 +2,7 @@
 import fs from "fs";
 
 import { SpecHelpers } from "./SpecHelpers";
-import { SpecProcessor } from "./SpecEntryProcessor";
+import { SpecEntryProcessor } from "./SpecEntryProcessor";
 
 import { BasicTilesetProcessor } from "../src/tilesetProcessing/BasicTilesetProcessor";
 
@@ -42,9 +42,6 @@ describe("BasicTilesetProcessor on implicit input", function () {
     });
     await tilesetProcessor.end();
 
-    // NOTE: The order is actually not specified.
-    // This should be sorted lexographically for
-    // the comparison...
     const expectedContentUris = [["content/content_{level}__{x}_{y}.glb"]];
     expect(actualContentUris).toEqual(expectedContentUris);
   });
@@ -70,33 +67,17 @@ describe("BasicTilesetProcessor on implicit input", function () {
     expect(actualContentUris.length).toEqual(22);
   });
 
-  it("processAllEntries processes all entries exactly once", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
-    await tilesetProcessor.begin(implicitInput, implicitOutput, overwrite);
-    const specProcessor = new SpecProcessor();
-    await tilesetProcessor.processAllEntries(specProcessor.processEntry);
-    await tilesetProcessor.end();
-
-    const actualProcessedKeys = specProcessor.processedKeys;
-    const actualOutputFiles =
-      SpecHelpers.collectRelativeFileNames(implicitOutput);
-
-    // Just check the number of processed entries: It should be the same
-    // as the number of output files, minus 1 for the 'tileset.json'
-    expect(actualProcessedKeys.length).toEqual(actualOutputFiles.length - 1);
-  });
-
   it("processTileContentEntries processes the tile content entries", async function () {
     const tilesetProcessor = new BasicTilesetProcessor(quiet);
     await tilesetProcessor.begin(implicitInput, implicitOutput, overwrite);
-    const specProcessor = new SpecProcessor();
+    const specEntryProcessor = new SpecEntryProcessor();
     await tilesetProcessor.processTileContentEntries(
-      specProcessor.processUri,
-      specProcessor.processEntry
+      specEntryProcessor.processUri,
+      specEntryProcessor.processEntry
     );
     await tilesetProcessor.end();
 
-    const actualProcessedKeys = specProcessor.processedKeys;
+    const actualProcessedKeys = specEntryProcessor.processedKeys;
 
     // Just check the number of processed entries: It should be the same
     // as the number of tiles in the input
@@ -110,10 +91,10 @@ describe("BasicTilesetProcessor on implicit input", function () {
   it("processTileContentEntries updates the content URIs", async function () {
     const tilesetProcessor = new BasicTilesetProcessor(quiet);
     await tilesetProcessor.begin(implicitInput, implicitOutput, overwrite);
-    const specProcessor = new SpecProcessor();
+    const specEntryProcessor = new SpecEntryProcessor();
     await tilesetProcessor.processTileContentEntries(
-      specProcessor.processUri,
-      specProcessor.processEntry
+      specEntryProcessor.processUri,
+      specEntryProcessor.processEntry
     );
     await tilesetProcessor.end();
 
