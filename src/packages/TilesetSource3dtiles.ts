@@ -62,7 +62,7 @@ export class TilesetSource3dtiles implements TilesetSource {
     }
     const selection = this.db.prepare("SELECT * FROM media");
     const iterator = selection.iterate();
-    return Iterables.map(iterator, (row) => row.key);
+    return Iterables.map(iterator, (row: any) => row.key);
   }
 
   /** {@inheritDoc TilesetSource.getValue} */
@@ -71,7 +71,7 @@ export class TilesetSource3dtiles implements TilesetSource {
       throw new Error("Source is not opened. Call 'open' first.");
     }
     const selection = this.db.prepare("SELECT * FROM media WHERE key = ?");
-    const row = selection.get(key);
+    const row = selection.get(key) as any;
     if (row) {
       return row.content;
     }
