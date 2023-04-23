@@ -6,6 +6,9 @@ import { Iterables } from "../base/Iterables";
 import { TilesetSource } from "../tilesetData/TilesetSource";
 import { TilesetError } from "../tilesetData/TilesetError";
 
+import { TableStructure } from "./TableStructureValidator";
+import { TableStructureValidator } from "./TableStructureValidator";
+
 /**
  * Implementation of a TilesetSource based on a 3DTILES (SQLITE3 database)
  * file.
@@ -31,6 +34,25 @@ export class TilesetSource3dtiles implements TilesetSource {
       throw new TilesetError("Database already opened");
     }
     this.db = new DatabaseConstructor(fullInputName);
+
+    const tableStructure: TableStructure = {
+      name: "media",
+      columns: [
+        {
+          name: "key",
+          type: "TEXT",
+        },
+        {
+          name: "content",
+          type: "BLOB",
+        },
+      ],
+    };
+    const message = TableStructureValidator.validate(this.db, tableStructure);
+    if (message) {
+      this.close();
+      throw new TilesetError(message);
+    }
   }
 
   /** {@inheritDoc TilesetSource.getKeys} */
