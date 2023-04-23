@@ -1,0 +1,34 @@
+name: CI
+
+on: [push, pull_request]
+
+env:
+  CI: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+
+    - name: Run npm install
+      run: |
+        npm install
+
+    - name: Run linting
+      run: |
+        npm run eslint
+
+    - name: Run formatting checks
+      run: |
+        npm run prettier-check
+
+    - name: Run tests
+      run: |
+        npm run test
+
+    - name: Run coverage
+      run: |
+        npm run coverage
+
