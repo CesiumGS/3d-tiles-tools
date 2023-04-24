@@ -275,13 +275,13 @@ export class SpecHelpers {
     }
 
     // The entries are not JSON. Just compare the buffer data.
-    if (valueA.length != valueB.length) {
-      return `Value ${key} has ${valueA.length} bytes in ${nameA} and ${valueB.length} bytes in ${nameB}`;
+    if (unzippedValueA.length != unzippedValueB.length) {
+      return `Value ${key} has ${unzippedValueA.length} bytes in ${nameA} and ${unzippedValueB.length} bytes in ${nameB}`;
     }
-    const n = valueA.length;
+    const n = unzippedValueA.length;
     for (let j = 0; j < n; j++) {
-      if (valueA[j] != valueB[j]) {
-        return `Value ${key} has ${valueA[j]} at index ${j} in ${nameA} but ${valueB[j]} in ${nameB}`;
+      if (unzippedValueA[j] != unzippedValueB[j]) {
+        return `Value ${key} has ${unzippedValueA[j]} at index ${j} in ${nameA} but ${unzippedValueB[j]} in ${nameB}`;
       }
     }
 
