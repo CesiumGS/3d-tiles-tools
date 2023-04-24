@@ -119,7 +119,7 @@ export class TileDataLayouts {
 
     const payloadStart = batchTableBinaryEnd;
     const payloadLength = byteLength - payloadStart;
-    const payloadEnd = payloadStart + byteLength;
+    const payloadEnd = payloadStart + payloadLength;
 
     return {
       magic: magic,

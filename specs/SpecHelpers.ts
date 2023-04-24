@@ -1,6 +1,7 @@
 import fs from "fs";
 
 import { Iterables } from "../src/base/Iterables";
+import { Buffers } from "../src/base/Buffers";
 import { Paths } from "../src/base/Paths";
 import { DeveloperError } from "../src/base/DeveloperError";
 
@@ -186,41 +187,159 @@ export class SpecHelpers {
     nameB: string,
     tilesetSourceB: TilesetSource
   ): string | undefined {
-    const keysA = [...tilesetSourceA.getKeys()];
-    const keysB = [...tilesetSourceB.getKeys()];
+    const keysA = [...tilesetSourceA.getKeys()].sort();
+    const keysB = [...tilesetSourceB.getKeys()].sort();
 
     if (keysA.length != keysB.length) {
       return `There are ${keysA.length} keys in ${nameA} and ${keysB.length} keys in ${nameB}`;
     }
     for (let i = 0; i < keysA.length; i++) {
       if (keysA[i] != keysB[i]) {
-        return `Key ${i} is ${keysA[i]} in ${nameA} and ${keysA[i]} in ${nameB}`;
+        return `Key ${i} is ${keysA[i]} in ${nameA} and ${keysB[i]} in ${nameB}`;
       }
     }
     for (let i = 0; i < keysA.length; i++) {
       const valueA = tilesetSourceA.getValue(keysA[i]);
       const valueB = tilesetSourceB.getValue(keysB[i]);
-      if (valueA && valueB) {
-        if (keysA[i].endsWith(".json")) {
-          const jsonA = JSON.parse(valueA.toString());
-          const jsonB = JSON.parse(valueB.toString());
-          const stringA = JSON.stringify(jsonA);
-          const stringB = JSON.stringify(jsonB);
-          if (stringA !== stringB) {
-            return `Value ${keysA[i]} has different JSON contents in ${nameA} and in ${nameB}`;
-          }
-        } else {
-          if (valueA?.length != valueB?.length) {
-            return `Value ${keysA[i]} has ${valueA?.length} bytes in ${nameA} and ${valueB?.length} bytes in ${nameB}`;
-          }
-          const n = valueA.length;
-          for (let j = 0; j < n; j++) {
-            if (valueA[i] != valueB[i]) {
-              return `Value ${keysA[i]} has ${valueA[i]} at index ${j} in ${nameA} but ${valueB[i]} in ${nameB}`;
-            }
-          }
-        }
+      const entryDifference = SpecHelpers.computeEntryDifference(
+        keysA[i],
+        nameA,
+        valueA,
+        nameB,
+        valueB
+      );
+      if (entryDifference !== undefined) {
+        return entryDifference;
       }
+    }
+  }
+
+  /**
+   * Computes the difference between two entries (with the same
+   * key) in different packages.
+   *
+   * This usually compares the contents of the value buffers.
+   * But for the case that the buffers contain (possibly zipped)
+   * JSON data, it will check whether the JSON in both buffers
+   * has the same structure, by parsing the JSON object and
+   * serializing it again in the same way.
+   *
+   * @param key - The key
+   * @param nameA - The name of the first package
+   * @param valueA - The value for the key in the first package
+   * @param nameB - The name of the second package
+   * @param valueB - The value for the key in the second package
+   * @returns A string describing the difference, or `undefined`
+   * if there is no difference.
+   */
+  private static computeEntryDifference(
+    key: string,
+    nameA: string,
+    valueA: Buffer | undefined,
+    nameB: string,
+    valueB: Buffer | undefined
+  ): string | undefined {
+    if (valueA && !valueB) {
+      return `Value ${key} is present in ${nameA} but not in ${nameB}`;
+    }
+    if (!valueA && valueB) {
+      return `Value ${key} is not present in ${nameA} but in ${nameB}`;
+    }
+    if (!valueA || !valueB) {
+      return undefined;
+    }
+
+    // See whether the entries represent JSON (or zipped JSON).
+    // If this is the case, extract the (normalized) string
+    // representation of that JSON data, and compare it.
+    const jsonStrings = SpecHelpers.extractJsonStrings(valueA, valueB);
+    if (jsonStrings) {
+      if (jsonStrings.jsonStringA !== jsonStrings.jsonStringB) {
+        return `Value ${key} has different JSON structures in ${nameA} and ${nameB}`;
+      }
+      return undefined;
+    }
+
+    // The entries are not JSON. Just compare the buffer data.
+    if (valueA.length != valueB.length) {
+      return `Value ${key} has ${valueA.length} bytes in ${nameA} and ${valueB.length} bytes in ${nameB}`;
+    }
+    const n = valueA.length;
+    for (let j = 0; j < n; j++) {
+      if (valueA[j] != valueB[j]) {
+        return `Value ${key} has ${valueA[j]} at index ${j} in ${nameA} but ${valueB[j]} in ${nameB}`;
+      }
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Tries to extract "normalized" JSON strings from the given
+   * buffers.
+   *
+   * If the buffers contain valid JSON data (that may optionally
+   * be zipped), then an object containing these JSON strings
+   * will be returned.
+   *
+   * If the buffers are not both zipped or non-zipped, then
+   * `undefined` will be returned. If either of the buffer
+   * contents cannot be parsed, then `undefined` will be
+   * returned.
+   *
+   * @param valueA - The first buffer
+   * @param valueB - The second buffer
+   * @returns The JSON strings
+   */
+  private static extractJsonStrings(
+    valueA: Buffer,
+    valueB: Buffer
+  ): { jsonStringA: string; jsonStringB: string } | undefined {
+    const isZippedA = Buffers.isGzipped(valueA);
+    const isZippedB = Buffers.isGzipped(valueB);
+    if (isZippedA !== isZippedB) {
+      return undefined;
+    }
+    let unzippedValueA = valueA;
+    if (isZippedA) {
+      unzippedValueA = Buffers.gunzip(valueA);
+    }
+    let unzippedValueB = valueB;
+    if (isZippedB) {
+      unzippedValueB = Buffers.gunzip(valueB);
+    }
+    const jsonStringA = SpecHelpers.createJsonString(unzippedValueA);
+    const jsonStringB = SpecHelpers.createJsonString(unzippedValueB);
+    if (jsonStringA !== undefined && jsonStringB !== undefined) {
+      return {
+        jsonStringA: jsonStringA,
+        jsonStringB: jsonStringB,
+      };
+    }
+    return undefined;
+  }
+
+  /**
+   * Create a JSON string from the given buffer, by parsing the
+   * contents of the given buffer and serializing the parsed
+   * result again.
+   *
+   * If the object cannot be parsed, then `undefined` is
+   * returned.
+   *
+   * This is intended as a "normalization", to ignore details
+   * like different indentations or line endings.
+   *
+   * @param buffer - The buffer
+   * @returns The parsed and serialized object
+   */
+  private static createJsonString(buffer: Buffer): string | undefined {
+    try {
+      const json = JSON.parse(buffer.toString());
+      const jsonString = JSON.stringify(json);
+      return jsonString;
+    } catch (e) {
+      return undefined;
     }
   }
 

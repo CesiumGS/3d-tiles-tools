@@ -272,7 +272,7 @@ export class ToolsMain {
         ContentDataTypes.CONTENT_TYPE_GLTF,
       ];
     }
-    const contentStageJson = {
+    const tilesetStageJson = {
       name: "gzip",
       includedContentTypes: includedContentTypes,
       excludedContentTypes: excludedContentTypes,
@@ -280,12 +280,7 @@ export class ToolsMain {
     const pipelineJson = {
       input: input,
       output: output,
-      tilesetStages: [
-        {
-          name: "gzip",
-          contentStages: [contentStageJson],
-        },
-      ],
+      tilesetStages: [tilesetStageJson],
     };
     return pipelineJson;
   }

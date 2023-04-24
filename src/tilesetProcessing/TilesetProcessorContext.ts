@@ -26,13 +26,7 @@ export interface TilesetProcessorContext {
   /**
    * The tileset that was parsed from the input
    */
-  tileset: Tileset;
-
-  /**
-   * Whether the tileset JSON was zipped (a legacy feature,
-   * see `TilesetProcessor.parseSourceValue` for details)
-   */
-  tilesetJsonWasZipped: boolean;
+  sourceTileset: Tileset;
 
   /**
    * The optional metadata schema associated with the tileset
@@ -49,6 +43,13 @@ export interface TilesetProcessorContext {
    * data in the target (usually `tileset.json`)
    */
   tilesetTargetJsonFileName: string;
+
+  /**
+   * The tileset that should be written into the tileset JSON
+   * file of the target. This might be identical to the
+   * `sourceTileset`.
+   */
+  targetTileset: Tileset;
 
   /**
    * The set of keys (file names) that have already been processed.

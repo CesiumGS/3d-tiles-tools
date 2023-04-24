@@ -1,10 +1,8 @@
-import { Buffers } from "../base/Buffers";
 import { DeveloperError } from "../base/DeveloperError";
 
 import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
 
 import { Tileset } from "../structure/Tileset";
-import { Schema } from "../structure/Metadata/Schema";
 
 import { TilesetError } from "../tilesetData/TilesetError";
 import { TilesetTargets } from "../tilesetData/TilesetTargets";
@@ -15,19 +13,18 @@ import { Tilesets } from "../tilesets/Tilesets";
 
 import { TilesetEntryProcessor } from "./TilesetEntryProcessor";
 import { TilesetProcessorContext } from "./TilesetProcessorContext";
-import { TilesetSource } from "../tilesetData/TilesetSource";
-import { TilesetTarget } from "../tilesetData/TilesetTarget";
+import { TilesetProcessing } from "./TilesetProcessing";
 
 /**
  * A base class for classes that can process tilesets.
  *
  * This class offers the infrastructure for opening a `TilesetSource`
- * and a `TilesetTarget`, parsing the `Tileset` object from the
- * source, and performing operations on `Tileset` and the
+ * and a `TilesetTarget`, and performing operations on the
  * `TilesetEntry` objects.
  *
- * Subclasses will offer predefined sets of operations that can
- * be performed on the `Tileset` and the `TilesetEntry` objects.
+ * Subclasses can access the `TilesetProcessorContext`, which
+ * contains the parsed tileset and its schema, and can offer
+ * predefined sets of more specialized operations.
  */
 export abstract class TilesetProcessor {
   /**
@@ -116,16 +113,16 @@ export abstract class TilesetProcessor {
         Tilesets.determineTilesetJsonFileName(tilesetTargetName);
 
       // Obtain the tileset object from the tileset JSON file
-      const parsedTileset = TilesetProcessor.parseSourceValue<Tileset>(
+      const sourceTileset = TilesetProcessing.parseSourceValue<Tileset>(
         tilesetSource,
         tilesetSourceJsonFileName
       );
 
       // Resolve the schema, either from the `tileset.schema`
       // or the `tileset.schemaUri`
-      const schema = TilesetProcessor.resolveSchema(
+      const schema = TilesetProcessing.resolveSchema(
         tilesetSource,
-        parsedTileset.result
+        sourceTileset
       );
 
       // If nothing has thrown up to this point, then
@@ -134,11 +131,11 @@ export abstract class TilesetProcessor {
       this.context = {
         tilesetSource: tilesetSource,
         tilesetSourceJsonFileName: tilesetSourceJsonFileName,
-        tileset: parsedTileset.result,
-        tilesetJsonWasZipped: parsedTileset.wasZipped,
+        sourceTileset: sourceTileset,
         schema: schema,
         tilesetTarget: tilesetTarget,
         tilesetTargetJsonFileName: tilesetTargetJsonFileName,
+        targetTileset: sourceTileset,
         processedKeys: {},
         targetKeys: {},
       };
@@ -174,43 +171,14 @@ export abstract class TilesetProcessor {
     const context = this.getContext();
     const tilesetSource = context.tilesetSource;
     const tilesetTarget = context.tilesetTarget;
-    const tilesetSourceJsonFileName = context.tilesetSourceJsonFileName;
 
     // Perform a no-op on all entries that have not yet
     // been marked as processed
-    const sourceKeys = tilesetSource.getKeys();
-    for (const sourceKey of sourceKeys) {
-      if (sourceKey !== tilesetSourceJsonFileName) {
-        await this.processEntry(
-          sourceKey,
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          async (sourceEntry: TilesetEntry, type: string | undefined) => {
-            return sourceEntry;
-          }
-        );
+    await this.processAllEntriesInternal(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      async (sourceEntry: TilesetEntry, type: string | undefined) => {
+        return sourceEntry;
       }
-    }
-
-    const entries = TilesetSources.getEntries(tilesetSource);
-    for (const entry of entries) {
-      const key = entry.key;
-      // The tileset JSON file will be added explicitly below
-      if (!this.isProcessed(key) && key !== tilesetSourceJsonFileName) {
-        this.markAsProcessed(key);
-        this.storeTargetEntries(entry);
-      }
-    }
-
-    const tilesetTargetJsonFileName = context.tilesetTargetJsonFileName;
-    const tileset = context.tileset;
-    const tilesetJsonWasZipped = context.tilesetJsonWasZipped;
-
-    // Store the resulting tileset as JSON
-    TilesetProcessor.storeTargetValue(
-      tilesetTarget,
-      tilesetTargetJsonFileName,
-      tilesetJsonWasZipped,
-      tileset
     );
 
     // Clean up by closing the source and the target
@@ -226,6 +194,26 @@ export abstract class TilesetProcessor {
       throw error;
     }
     await tilesetTarget.end();
+  }
+
+  /**
+   * Applies the given entry processor to each `TilesetEntry` that
+   * has not yet been processed
+   *
+   * @param entryProcessor - The entry processor
+   * @returns A promise that resolves when the process is finished
+   * @throws DeveloperError If `begin` was not called yet
+   * @throws TilesetError When the input could not be processed
+   */
+  protected async processAllEntriesInternal(
+    entryProcessor: TilesetEntryProcessor
+  ) {
+    const context = this.getContext();
+    const tilesetSource = context.tilesetSource;
+    const sourceKeys = tilesetSource.getKeys();
+    for (const sourceKey of sourceKeys) {
+      await this.processEntry(sourceKey, entryProcessor);
+    }
   }
 
   /**
@@ -249,7 +237,7 @@ export abstract class TilesetProcessor {
    * @throws DeveloperError When the source or target is not opened
    * @throws TilesetError When the input could not be processed
    */
-  protected async processEntry(
+  async processEntry(
     sourceKey: string,
     entryProcessor: TilesetEntryProcessor
   ): Promise<void> {
@@ -399,138 +387,5 @@ export abstract class TilesetProcessor {
   protected getTargetKey(sourceKey: string): string | undefined {
     const context = this.getContext();
     return context.targetKeys[sourceKey];
-  }
-
-  /**
-   * Parses the JSON from the value with the given key (file name),
-   * and returns the parsed result, AND information of whether the
-   * input was zipped.
-   *
-   * This is mainly a convenience function to emulate the behavior of the
-   * "legacy" tools in terms of handling the tileset JSON: When writing
-   * the tileset JSON data to the target, then it should zip that JSON
-   * data if and only if it was zipped in the input.
-   *
-   * See `storeTargetValue` for the counterpart of this method.
-   *
-   * In the future, there might be mechanisms for a more fine-grained
-   * control over whether certain files should be zipped or not...
-   *
-   * @param tilesetSource - The `TilesetSource`
-   * @param key - The key (file name)
-   * @returns A structure containing the `wasZipped` information, and
-   * the parsed result
-   * @throws TilesetError If the source is not opened, the specified
-   * entry cannot be found, or the entry data could not be unzipped,
-   * or its contents could not be parsed as JSON.
-   */
-  private static parseSourceValue<T>(
-    tilesetSource: TilesetSource,
-    key: string
-  ): { wasZipped: boolean; result: T } {
-    let value = TilesetProcessor.getSourceValue(tilesetSource, key);
-    let wasZipped = false;
-    if (Buffers.isGzipped(value)) {
-      wasZipped = true;
-      try {
-        value = Buffers.gunzip(value);
-      } catch (e) {
-        const message = `Could not unzip ${key}: ${e}`;
-        throw new TilesetError(message);
-      }
-    }
-    try {
-      const result = JSON.parse(value.toString()) as T;
-      return {
-        wasZipped: wasZipped,
-        result: result,
-      };
-    } catch (e) {
-      const message = `Could not parse ${key}: ${e}`;
-      throw new TilesetError(message);
-    }
-  }
-
-  /**
-   * Convert the given object into a JSON string, put it into a buffer,
-   * zip it (based on the `doZip` flag), and put the result into the
-   * tileset target.
-   *
-   * This is only intended for the "legacy" handling of the tileset
-   * JSON data, and is the counterpart of `parseSourceValue`. See
-   * `parseSourceValue` for details.
-   *
-   * @param tilesetTarget - The `TilesetTarget`
-   * @param key - The key (file name)
-   * @param doZip - Whether the output should be zipped
-   * @param object - The object for which the JSON should be stored
-   * @throws DeveloperError When the target is not opened
-   */
-  private static storeTargetValue(
-    tilesetTarget: TilesetTarget,
-    key: string,
-    doZip: boolean,
-    object: object
-  ) {
-    const jsonString = JSON.stringify(object, null, 2);
-    let jsonBuffer = Buffer.from(jsonString);
-    if (doZip) {
-      jsonBuffer = Buffers.gzip(jsonBuffer);
-    }
-    tilesetTarget.addEntry(key, jsonBuffer);
-  }
-
-  /**
-   * Obtains the value for the given key from the current tileset source,
-   * throwing an error if the source is not opened, or when the
-   * given key cannot be found.
-   *
-   * @param tilesetSource - The `TilesetSource`
-   * @param key - The key (file name)
-   * @returns The value (file contents)
-   * @throws DeveloperError When the source is not opened
-   * @throws TilesetError When the given key cannot be found
-   */
-  private static getSourceValue(
-    tilesetSource: TilesetSource,
-    key: string
-  ): Buffer {
-    const buffer = tilesetSource.getValue(key);
-    if (!buffer) {
-      const message = `No ${key} found in input`;
-      throw new TilesetError(message);
-    }
-    return buffer;
-  }
-
-  /**
-   * Resolve the `Schema` for the given tileset.
-   *
-   * This is either the `tileset.schema`, or the schema that is
-   * obtained from the `tileset.schemaUri`, or `undefined` if
-   * neither of them are present.
-   *
-   * @param tilesetSource - The `TilesetSource`
-   * @param tileset - The tileset
-   * @returns The `Schema`, or `undefined` if there is none
-   * @throws DeveloperError If the source is not opened
-   * @throws TilesetError If the schema from the `schemaUri`
-   * could not be resolved or parsed.
-   */
-  private static resolveSchema(
-    tilesetSource: TilesetSource,
-    tileset: Tileset
-  ): Schema | undefined {
-    if (tileset.schema) {
-      return tileset.schema;
-    }
-    if (tileset.schemaUri) {
-      const parsedSchema = TilesetProcessor.parseSourceValue<Schema>(
-        tilesetSource,
-        tileset.schemaUri
-      );
-      return parsedSchema.result;
-    }
-    return undefined;
   }
 }

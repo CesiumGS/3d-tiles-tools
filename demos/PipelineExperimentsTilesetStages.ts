@@ -6,7 +6,7 @@ import { ContentDataTypes } from "../src/contentTypes/ContentDataTypes";
 
 async function example() {
   const input = "./specs/data/TilesetOfTilesets";
-  const output = "./output/result.3tz";
+  const output = "./output/result";
   const overwrite = true;
   const optimizeGlbOptions = {
     dracoOptions: {
@@ -26,9 +26,7 @@ async function example() {
     TilesetStages.create("_separateGltf", "Separate glTF", [
       ContentStages.createSeparateGltf(),
     ]),
-    TilesetStages.create("_gzip", "Gzip (glTF only)", [
-      ContentStages.createGzip([ContentDataTypes.CONTENT_TYPE_GLTF]),
-    ]),
+    TilesetStages.createGzip([ContentDataTypes.CONTENT_TYPE_GLTF]),
   ];
 
   const pipeline: Pipeline = {

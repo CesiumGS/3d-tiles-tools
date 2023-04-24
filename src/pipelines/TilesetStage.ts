@@ -14,4 +14,26 @@ export interface TilesetStage extends Stage {
    * operations that should be applied to content.
    */
   contentStages?: ContentStage[];
+
+  /**
+   * An optional array of `ContentDataType` strings that
+   * indicates which content types this stage should be
+   * applied to.
+   *
+   * The stage will be applied to types that are contained
+   * in the `includedContentTypes`, but NOT contained in
+   * the `excludedContentTypes`
+   */
+  includedContentTypes?: string[];
+
+  /**
+   * An optional array of `ContentDataType` strings that
+   * indicates which content types this stage should be
+   * applied to.
+   *
+   * The stage will be applied to types that are contained
+   * in the `includedContentTypes`, but NOT contained in
+   * the `excludedContentTypes`
+   */
+  excludedContentTypes?: string[];
 }

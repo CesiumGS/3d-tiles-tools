@@ -8,16 +8,6 @@ import { ContentStage } from "./ContentStage";
  */
 export class ContentStages {
   /**
-   * The `name` that identifies the "gzip" content stage
-   */
-  public static readonly CONTENT_STAGE_GZIP = "gzip";
-
-  /**
-   * The `name` that identifies the "ungzip" content stage
-   */
-  public static readonly CONTENT_STAGE_UNGZIP = "ungzip";
-
-  /**
    * The `name` that identifies the "glbToB3dm" content stage
    */
   public static readonly CONTENT_STAGE_GLB_TO_B3DM = "glbToB3dm";
@@ -56,38 +46,6 @@ export class ContentStages {
    * The `name` that identifies the "separateGltf" content stage
    */
   public static readonly CONTENT_STAGE_SEPARATE_GLTF = "separateGltf";
-
-  /**
-   * Creates a content stage that performs the "gzip" operation
-   *
-   * @param - The array of `ContentDataType` strings that the operation
-   * should be applied to (or `undefined` if it should be applied to
-   * all data types)
-   * @returns The content stage
-   */
-  public static createGzip(
-    includedContentTypes: string[] | undefined
-  ): ContentStage {
-    const contentStage: ContentStage = {
-      name: ContentStages.CONTENT_STAGE_GZIP,
-      description: "Compresses each entry with GZIP",
-      includedContentTypes: includedContentTypes,
-    };
-    return contentStage;
-  }
-
-  /**
-   * Creates a content stage that performs the "ungzip" operation
-   *
-   * @returns The content stage
-   */
-  public static createUngzip(): ContentStage {
-    const contentStage: ContentStage = {
-      name: ContentStages.CONTENT_STAGE_UNGZIP,
-      description: "Uncompress each entry that was compressed with GZIP",
-    };
-    return contentStage;
-  }
 
   /**
    * Creates a content stage that performs the "glbToB3dm" operation

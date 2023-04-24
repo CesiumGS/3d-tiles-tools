@@ -11,13 +11,18 @@ export class ContentDataTypeChecks {
    * has a type that is contained in the given included types,
    * and NOT contained in the given excluded types.
    *
+   * If the `included` types are `undefined`, then each type
+   * will be included by default.
+   * If the `excluded` types are `undefined`, then each type
+   * will be NOT excluded by default.
+   *
    * @param includedContentDataTypes - The included types
    * @param excludedContentDataTypes - The excluded types
    * @returns The predicate
    */
   static createCheck(
-    includedContentDataTypes: string[] | undefined,
-    excludedContentDataTypes: string[] | undefined
+    includedContentDataTypes: (string | undefined)[] | undefined,
+    excludedContentDataTypes: (string | undefined)[] | undefined
   ): (contentData: ContentData) => Promise<boolean> {
     const typeCheck = ContentDataTypeChecks.createTypeCheck(
       includedContentDataTypes,
@@ -38,26 +43,28 @@ export class ContentDataTypeChecks {
    * contained in the given included types, and NOT
    * contained in the given excluded types.
    *
+   * If the `included` types are `undefined`, then each type
+   * will be included by default.
+   * If the `excluded` types are `undefined`, then each type
+   * will be NOT excluded by default.
+   *
    * @param includedContentDataTypes - The included types
    * @param excludedContentDataTypes - The excluded types
    * @returns The predicate
    */
   static createTypeCheck(
-    includedContentDataTypes: string[] | undefined,
-    excludedContentDataTypes: string[] | undefined
+    includedContentDataTypes: (string | undefined)[] | undefined,
+    excludedContentDataTypes: (string | undefined)[] | undefined
   ): (contentDataType: string | undefined) => boolean {
-    const localIncluded: string[] = [];
+    let localIncluded: (string | undefined)[] | undefined = undefined;
     if (includedContentDataTypes) {
-      localIncluded.push(...includedContentDataTypes);
+      localIncluded = includedContentDataTypes.slice();
     }
-    const localExcluded: string[] = [];
+    let localExcluded: (string | undefined)[] | undefined = undefined;
     if (excludedContentDataTypes) {
-      localExcluded.push(...excludedContentDataTypes);
+      localExcluded = excludedContentDataTypes.slice();
     }
     return (contentDataType: string | undefined) => {
-      if (!contentDataType) {
-        return false;
-      }
       return ContentDataTypeChecks.matches(
         localIncluded,
         localExcluded,
@@ -86,6 +93,11 @@ export class ContentDataTypeChecks {
    * This returns whether the given element is explicitly included,
    * and NOT explicitly excluded.
    *
+   * If the `included` elements are `undefined`, then the element
+   * will be included by default.
+   * If the `excluded` elements are `undefined`, then the element
+   * will be NOT excluded by default.
+   *
    * @param included - The included elements
    * @param excluded - The excluded elements
    * @param element - The element
@@ -96,7 +108,7 @@ export class ContentDataTypeChecks {
     excluded: T[] | undefined,
     element: T
   ): boolean {
-    let isIncluded = false;
+    let isIncluded = true;
     let isExcluded = false;
     if (included) {
       isIncluded = included.includes(element);

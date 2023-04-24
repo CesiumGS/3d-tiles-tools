@@ -1,7 +1,8 @@
 {
-    "input": "TilesetOfTilesets/",
-    "output": "TilesetOfTilesets-output/",
-    "stages": [
+    "input": "./specs/data/TilesetOfTilesets/",
+    "output": "./output/TilesetOfTilesets-output/",
+    "tilesetStages": [
+        "upgrade",
         "combine",
         {
             "name": "gzip",

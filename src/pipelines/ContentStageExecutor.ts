@@ -2,10 +2,8 @@ import path from "path";
 import GltfPipeline from "gltf-pipeline";
 
 import { Paths } from "../base/Paths";
-import { Buffers } from "../base/Buffers";
 
 import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
-import { ContentDataTypeChecks } from "../contentTypes/ContentDataTypeChecks";
 
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
 
@@ -26,7 +24,7 @@ export class ContentStageExecutor {
    * Execute the given `ContentStage`.
    *
    * @param contentStage - The `ContentStage` object
-   * @param tilesetProcessor The `BasicTilesetProcessor`
+   * @param tilesetProcessor - The `BasicTilesetProcessor`
    * @returns A promise that resolves when the process is finished
    * @throws PipelineError If one of the processing steps causes
    * an error.
@@ -49,7 +47,7 @@ export class ContentStageExecutor {
    * Execute the given `ContentStage`.
    *
    * @param contentStage - The `ContentStage` object
-   * @param tilesetProcessor The `BasicTilesetProcessor`
+   * @param tilesetProcessor - The `BasicTilesetProcessor`
    * @returns A promise that resolves when the process is finished
    * @throws Error If one of the processing steps causes
    * an error.
@@ -58,15 +56,7 @@ export class ContentStageExecutor {
     contentStage: ContentStage,
     tilesetProcessor: BasicTilesetProcessor
   ) {
-    if (contentStage.name === ContentStages.CONTENT_STAGE_GZIP) {
-      const condition = ContentDataTypeChecks.createTypeCheck(
-        contentStage.includedContentTypes,
-        contentStage.excludedContentTypes
-      );
-      await ContentStageExecutor.executeGzip(tilesetProcessor, condition);
-    } else if (contentStage.name === ContentStages.CONTENT_STAGE_UNGZIP) {
-      await ContentStageExecutor.executeGunzip(tilesetProcessor);
-    } else if (contentStage.name === ContentStages.CONTENT_STAGE_GLB_TO_B3DM) {
+    if (contentStage.name === ContentStages.CONTENT_STAGE_GLB_TO_B3DM) {
       await ContentStageExecutor.executeGlbToB3dm(tilesetProcessor);
     } else if (contentStage.name === ContentStages.CONTENT_STAGE_GLB_TO_I3DM) {
       await ContentStageExecutor.executeGlbToI3dm(tilesetProcessor);
@@ -95,83 +85,6 @@ export class ContentStageExecutor {
       const message = `    Unknown contentStage name: ${contentStage.name}`;
       console.log(message);
     }
-  }
-
-  /**
-   * Performs the 'gzip' content stage with the given processor.
-   *
-   * This will process all entries of the source tileset. The
-   * data of entries that match the given condition will be
-   * compressed with gzip. Other entries remain unaffected.
-   *
-   * @param tilesetProcessor - The `BasicTilesetProcessor`
-   * @param condition The condition that was created from
-   * the included- and excluded types that have been defined
-   * in the `ContentStage`
-   * @returns A promise that resolves when the process is finished
-   * @throws Error If one of the processing steps causes
-   * an error.
-   */
-  private static async executeGzip(
-    tilesetProcessor: BasicTilesetProcessor,
-    condition: ((type: string | undefined) => boolean) | undefined
-  ): Promise<void> {
-    // The entry processor receives the source entry, and
-    // returns a target entry where the `value` is zipped
-    // if the source entry matches the given condition.
-    const entryProcessor = async (
-      sourceEntry: TilesetEntry,
-      type: string | undefined
-    ) => {
-      let targetValue = sourceEntry.value;
-      if (condition) {
-        const shouldZip = condition(type);
-        if (shouldZip) {
-          targetValue = Buffers.gzip(sourceEntry.value);
-        }
-      }
-      const targetEntry = {
-        key: sourceEntry.key,
-        value: targetValue,
-      };
-      return targetEntry;
-    };
-
-    await tilesetProcessor.processAllEntries(entryProcessor);
-  }
-
-  /**
-   * Performs the 'gunzip' content stage with the given processor.
-   *
-   * This will process all entries of the source tileset. The
-   * data of entries that is compressed with gzip will be
-   * uncompressed. Other entries remain unaffected.
-   *
-   * @param tilesetProcessor - The `BasicTilesetProcessor`
-   * @returns A promise that resolves when the process is finished
-   * @throws Error If one of the processing steps causes
-   * an error.
-   */
-  private static async executeGunzip(
-    tilesetProcessor: BasicTilesetProcessor
-  ): Promise<void> {
-    // The entry processor receives the source entry, and
-    // returns a target entry where the `value` is unzipped
-    // (If the data was not zipped, then `Buffers.gunzip`
-    // returns an unmodified result)
-    const entryProcessor = async (
-      sourceEntry: TilesetEntry,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      type: string | undefined
-    ) => {
-      const targetEntry = {
-        key: sourceEntry.key,
-        value: Buffers.gunzip(sourceEntry.value),
-      };
-      return targetEntry;
-    };
-
-    await tilesetProcessor.processAllEntries(entryProcessor);
   }
 
   /**

@@ -188,9 +188,9 @@ Execute a sequence of operations that are described in a JSON file.
 - A pipeline has an `input` and `output`, which are the names of a tileset directory or package
 - A pipeline has an array of 'tileset stages'
 - A tileset stage has a `name` and a `description`
+- A tileset stage can carry information about the content types that it is applied to
 - A tileset stage has an array of 'content stages'
 - A content stage has a `name` and a `description`
-- A content stage can carry information about the content types that it is applied to
 
 A simple example pipline may therefore look like this:
 ```
@@ -220,14 +220,15 @@ The predefined operations largely correspond to the command-line functionality.
 
 The known tileset stages are:
 
-- `upgrade`: Upgrade the input tileset to the latest version. Details about what that means are omitted here.
-- `combine`: Combine all external tilesets of the input tileset, to create a single tileset
-
-The known content stages are:
-
+- Modification:
+  - `upgrade`: Upgrade the input tileset to the latest version. Details about what that means are omitted here.
+  - `combine`: Combine all external tilesets of the input tileset, to create a single tileset
 - Compression:
   - `gzip`: Apply GZIP compression to all files (with optional filters)
   - `ungzip`: Uncompress all files that are compressed with GZIP
+
+The known content stages are:
+
 - Conversion:
   - `glbToB3dm`: Convert all GLB tile contents into B3DM
   - `glbToI3dm`: Convert all GLB tile contents into I3DM (with the GLB being the only instance)

@@ -20,7 +20,8 @@ import { TilesetEntry } from "../tilesetData/TilesetEntry";
  * @param type - The type of the entry data (see `ContentDataTypes`),
  * or `undefined` if the type could not be determined.
  * @returns A promise that resolves when the process is finished,
- * containing the resulting entry
+ * containing the resulting entry, or `undefined` if the entry
+ * should be omitted in the target.
  * @throws TilesetError When the input could not be processed
  */
 export type TilesetEntryProcessor = (

@@ -46,16 +46,10 @@
       ]
     },
     {
-      "name": "_gzip",
-      "description": "Gzip (glTF only)",
-      "contentStages": [
-        {
-          "name": "gzip",
-          "description": "Compresses each entry with GZIP",
-          "includedContentTypes": [
-            "CONTENT_TYPE_GLTF"
-          ]
-        }
+      "name": "gzip",
+      "description": "Compresses each entry with GZIP",
+      "includedContentTypes": [
+        "CONTENT_TYPE_GLTF"
       ]
     }
   ]

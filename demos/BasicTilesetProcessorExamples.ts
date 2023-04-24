@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Content } from "../src/structure/Content";
 import { Schema } from "../src/structure/Metadata/Schema";
 import { Tile } from "../src/structure/Tile";
 import { Tileset } from "../src/structure/Tileset";
@@ -12,9 +11,8 @@ import { TraversedTile } from "../src/traversal/TraversedTile";
 
 async function example() {
   const tilesetSourceName =
-    "../3d-tiles-samples/1.1/SparseImplicitQuadtree/tileset.json";
-  const tilesetTargetName =
-    "./output/SparseImplicitQuadtree-result/tileset.json";
+    "./specs/data/tilesetProcessing/implicitProcessing/tileset.json";
+  const tilesetTargetName = "./output/tilesetProcessing-result/tileset.json";
   const overwrite = true;
 
   const tilesetProcessor = new BasicTilesetProcessor();
@@ -30,19 +28,9 @@ async function example() {
 
   // Apply a callback to each `TraversedTile`
   await tilesetProcessor.forEachTile(
-    async (traversedTile: TraversedTile): Promise<void> => {
+    async (traversedTile: TraversedTile): Promise<boolean> => {
       console.log("In forEachTile");
-    }
-  );
-
-  // Process all entries
-  await tilesetProcessor.processAllEntries(
-    async (
-      sourceEntry: TilesetEntry,
-      type: string | undefined
-    ): Promise<TilesetEntry> => {
-      console.log("In processAllEntries");
-      return sourceEntry;
+      return true;
     }
   );
 
@@ -60,9 +48,9 @@ async function example() {
 
   // Apply a callback to the tileset and its schema
   await tilesetProcessor.forTileset(
-    async (tileset: Tileset, schema: Schema | undefined): Promise<void> => {
+    async (tileset: Tileset, schema: Schema | undefined): Promise<Tileset> => {
       console.log("In forTileset");
-      return;
+      return tileset;
     }
   );
 
