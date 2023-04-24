@@ -132,7 +132,8 @@ export class TilesetStageExecutor {
     overwrite: boolean,
     condition: (type: string | undefined) => boolean
   ): Promise<void> {
-    const tilesetProcessor = new TilesetDataProcessor();
+    const quiet = true;
+    const tilesetProcessor = new TilesetDataProcessor(quiet);
     await tilesetProcessor.begin(currentInput, currentOutput, overwrite);
 
     // The entry processor receives the source entry, and
@@ -177,7 +178,8 @@ export class TilesetStageExecutor {
     currentOutput: string,
     overwrite: boolean
   ): Promise<void> {
-    const tilesetProcessor = new TilesetDataProcessor();
+    const quiet = true;
+    const tilesetProcessor = new TilesetDataProcessor(quiet);
     await tilesetProcessor.begin(currentInput, currentOutput, overwrite);
 
     // The entry processor receives the source entry, and
