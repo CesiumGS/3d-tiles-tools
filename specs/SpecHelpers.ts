@@ -249,12 +249,26 @@ export class SpecHelpers {
       return undefined;
     }
 
-    // See whether the entries represent JSON (or zipped JSON).
-    // If this is the case, extract the (normalized) string
+    // If the buffers contain zipped data, unzip it to get
+    // rid of possible differences due to the time stamp
+    // in the ZIP header
+    let unzippedValueA = valueA;
+    let unzippedValueB = valueB;
+    const isZippedA = Buffers.isGzipped(valueA);
+    const isZippedB = Buffers.isGzipped(valueB);
+    if (isZippedA && isZippedB) {
+      unzippedValueA = Buffers.gunzip(valueA);
+      unzippedValueB = Buffers.gunzip(valueB);
+    }
+
+    // If both entries represent JSON, extract the (normalized) string
     // representation of that JSON data, and compare it.
-    const jsonStrings = SpecHelpers.extractJsonStrings(valueA, valueB);
-    if (jsonStrings) {
-      if (jsonStrings.jsonStringA !== jsonStrings.jsonStringB) {
+    const isJsonA = Buffers.isProbablyJson(unzippedValueA);
+    const isJsonB = Buffers.isProbablyJson(unzippedValueB);
+    if (isJsonA && isJsonB) {
+      const jsonStringA = SpecHelpers.createJsonString(unzippedValueA);
+      const jsonStringB = SpecHelpers.createJsonString(unzippedValueB);
+      if (jsonStringA !== jsonStringB) {
         return `Value ${key} has different JSON structures in ${nameA} and ${nameB}`;
       }
       return undefined;
@@ -271,51 +285,6 @@ export class SpecHelpers {
       }
     }
 
-    return undefined;
-  }
-
-  /**
-   * Tries to extract "normalized" JSON strings from the given
-   * buffers.
-   *
-   * If the buffers contain valid JSON data (that may optionally
-   * be zipped), then an object containing these JSON strings
-   * will be returned.
-   *
-   * If the buffers are not both zipped or non-zipped, then
-   * `undefined` will be returned. If either of the buffer
-   * contents cannot be parsed, then `undefined` will be
-   * returned.
-   *
-   * @param valueA - The first buffer
-   * @param valueB - The second buffer
-   * @returns The JSON strings
-   */
-  private static extractJsonStrings(
-    valueA: Buffer,
-    valueB: Buffer
-  ): { jsonStringA: string; jsonStringB: string } | undefined {
-    const isZippedA = Buffers.isGzipped(valueA);
-    const isZippedB = Buffers.isGzipped(valueB);
-    if (isZippedA !== isZippedB) {
-      return undefined;
-    }
-    let unzippedValueA = valueA;
-    if (isZippedA) {
-      unzippedValueA = Buffers.gunzip(valueA);
-    }
-    let unzippedValueB = valueB;
-    if (isZippedB) {
-      unzippedValueB = Buffers.gunzip(valueB);
-    }
-    const jsonStringA = SpecHelpers.createJsonString(unzippedValueA);
-    const jsonStringB = SpecHelpers.createJsonString(unzippedValueB);
-    if (jsonStringA !== undefined && jsonStringB !== undefined) {
-      return {
-        jsonStringA: jsonStringA,
-        jsonStringB: jsonStringB,
-      };
-    }
     return undefined;
   }
 
