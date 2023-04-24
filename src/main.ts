@@ -290,7 +290,7 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   } else if (command === "combine") {
     await ToolsMain.combine(input, output, force);
   } else if (command === "upgrade") {
-    await ToolsMain.upgrade(input, output, force);
+    await ToolsMain.upgrade(input, output, force, parsedOptionArgs);
   } else if (command === "merge") {
     await ToolsMain.merge(inputs, output, force);
   } else if (command === "pipeline") {

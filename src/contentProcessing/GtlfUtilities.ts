@@ -20,10 +20,12 @@ export class GltfUtilities {
    * subset of glTF 1.0 binary data to glTF 2.0.
    *
    * @param glbBuffer - The buffer containing the GLB
+   * @param options - Options for the upgrade that are passed to
+   * `gltf-pipeline`
    * @returns A promise that resolves with the upgraded GLB.
    */
-  static async upgradeGlb(glbBuffer: Buffer): Promise<Buffer> {
-    const result = await GltfPipeline.processGlb(glbBuffer);
+  static async upgradeGlb(glbBuffer: Buffer, options: any): Promise<Buffer> {
+    const result = await GltfPipeline.processGlb(glbBuffer, options);
     return result.glb;
   }
 

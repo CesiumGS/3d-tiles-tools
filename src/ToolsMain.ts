@@ -43,7 +43,10 @@ export class ToolsMain {
     const inputBuffer = fs.readFileSync(input);
     const inputTileData = TileFormats.readTileData(inputBuffer);
     const outputBuffer = inputTileData.payload;
-    const upgradedOutputBuffer = await GltfUtilities.upgradeGlb(outputBuffer);
+    const upgradedOutputBuffer = await GltfUtilities.upgradeGlb(
+      outputBuffer,
+      undefined
+    );
     fs.writeFileSync(output, upgradedOutputBuffer);
   }
   static async i3dmToGlb(input: string, output: string, force: boolean) {
@@ -68,7 +71,10 @@ export class ToolsMain {
       const glbPath = glbPaths[i];
       ToolsMain.ensureCanWrite(glbPath, force);
       const glbBuffer = glbBuffers[i];
-      const upgradedOutputBuffer = await GltfUtilities.upgradeGlb(glbBuffer);
+      const upgradedOutputBuffer = await GltfUtilities.upgradeGlb(
+        glbBuffer,
+        undefined
+      );
       fs.writeFileSync(glbPath, upgradedOutputBuffer);
     }
   }
@@ -354,9 +360,14 @@ export class ToolsMain {
     await Tilesets.combine(input, output, force);
   }
 
-  static async upgrade(input: string, output: string, force: boolean) {
+  static async upgrade(
+    input: string,
+    output: string,
+    force: boolean,
+    gltfUpgradeOptions: any
+  ) {
     ToolsMain.ensureCanWrite(output, force);
-    await Tilesets.upgrade(input, output, force);
+    await Tilesets.upgrade(input, output, force, gltfUpgradeOptions);
   }
 
   static async merge(inputs: string[], output: string, force: boolean) {

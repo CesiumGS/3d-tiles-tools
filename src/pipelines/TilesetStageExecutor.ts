@@ -91,7 +91,8 @@ export class TilesetStageExecutor {
       );
     } else if (tilesetStage.name === TilesetStages.TILESET_STAGE_UPGRADE) {
       const quiet = false;
-      const tilesetUpgrader = new TilesetUpgrader(quiet);
+      const gltfUpgradeOptions = undefined;
+      const tilesetUpgrader = new TilesetUpgrader(quiet, gltfUpgradeOptions);
       await tilesetUpgrader.upgrade(currentInput, currentOutput, overwrite);
     } else if (tilesetStage.name === TilesetStages.TILESET_STAGE_COMBINE) {
       const externalTilesetDetector = ContentDataTypeChecks.createIncludedCheck(

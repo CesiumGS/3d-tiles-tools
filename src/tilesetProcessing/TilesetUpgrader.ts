@@ -68,17 +68,27 @@ export class TilesetUpgrader {
   private readonly upgradeOptions: UpgradeOptions;
 
   /**
+   * The options that may be passed to `gltf-pipeline` when
+   * GLB data in B3DM or I3DM is supposed to be upgraded.
+   */
+  private readonly gltfUpgradeOptions: UpgradeOptions;
+
+  /**
    * Creates a new instance
    *
    * @param quiet - Whether log messages should be omitted
+   * @param gltfUpgradeOptions - Options that may be passed
+   * to `gltf-pipeline` when GLB data in B3DM or I3DM is
+   * supposed to be upgraded.
    */
-  constructor(quiet?: boolean) {
+  constructor(quiet: boolean, gltfUpgradeOptions: any) {
     if (quiet !== true) {
       this.logCallback = (message: any) => console.log(message);
     } else {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
       this.logCallback = (message: any) => {};
     }
+    this.gltfUpgradeOptions = gltfUpgradeOptions;
 
     // By default, ALL options are enabled
     this.upgradeOptions = {
@@ -347,14 +357,20 @@ export class TilesetUpgrader {
     if (type === ContentDataTypes.CONTENT_TYPE_B3DM) {
       if (this.upgradeOptions.upgradeB3dmGltf1ToGltf2) {
         this.logCallback(`  Upgrading GLB in ${key}`);
-        value = await TilesetUpgrader.upgradeB3dmGltf1ToGltf2(value);
+        value = await TilesetUpgrader.upgradeB3dmGltf1ToGltf2(
+          value,
+          this.gltfUpgradeOptions
+        );
       } else {
         this.logCallback(`  Not upgrading GLB in ${key} (disabled via option)`);
       }
     } else if (type === ContentDataTypes.CONTENT_TYPE_I3DM) {
       if (this.upgradeOptions.upgradeI3dmGltf1ToGltf2) {
         this.logCallback(`  Upgrading GLB in ${key}`);
-        value = await TilesetUpgrader.upgradeI3dmGltf1ToGltf2(value);
+        value = await TilesetUpgrader.upgradeI3dmGltf1ToGltf2(
+          value,
+          this.gltfUpgradeOptions
+        );
       } else {
         this.logCallback(`  Not upgrading GLB in ${key} (disabled via option)`);
       }
@@ -379,14 +395,17 @@ export class TilesetUpgrader {
    * result, and return it.
    *
    * @param inputBuffer - The input buffer
+   * @param options - Options that will be passed to the
+   * `gltf-pipeline` when the GLB is processed.
    * @returns The upgraded buffer
    */
   private static async upgradeB3dmGltf1ToGltf2(
-    inputBuffer: Buffer
+    inputBuffer: Buffer,
+    options: any
   ): Promise<Buffer> {
     const inputTileData = TileFormats.readTileData(inputBuffer);
     const inputGlb = inputTileData.payload;
-    const outputGlb = await GltfUtilities.upgradeGlb(inputGlb);
+    const outputGlb = await GltfUtilities.upgradeGlb(inputGlb, options);
     const outputTileData = TileFormats.createB3dmTileDataFromGlb(
       outputGlb,
       inputTileData.featureTable.json,
@@ -404,14 +423,17 @@ export class TilesetUpgrader {
    * result, and return it.
    *
    * @param inputBuffer - The input buffer
+   * @param options - Options that will be passed to the
+   * `gltf-pipeline` when the GLB is processed.
    * @returns The upgraded buffer
    */
   private static async upgradeI3dmGltf1ToGltf2(
-    inputBuffer: Buffer
+    inputBuffer: Buffer,
+    options: any
   ): Promise<Buffer> {
     const inputTileData = TileFormats.readTileData(inputBuffer);
     const inputGlb = inputTileData.payload;
-    const outputGlb = await GltfUtilities.upgradeGlb(inputGlb);
+    const outputGlb = await GltfUtilities.upgradeGlb(inputGlb, options);
     const outputTileData = TileFormats.createI3dmTileDataFromGlb(
       outputGlb,
       inputTileData.featureTable.json,
