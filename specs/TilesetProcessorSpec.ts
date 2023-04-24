@@ -1,14 +1,9 @@
 import { TilesetDataProcessor } from "../src/tilesetProcessing/TilesetDataProcessor";
 
-import { SpecEntryProcessor } from "./SpecEntryProcessor";
 import { SpecHelpers } from "./SpecHelpers";
 
 const basicInput = "./specs/data/tilesetProcessing/basicProcessing";
 const basicOutput = "./specs/data/output/tilesetProcessing/basicProcessing";
-
-const implicitInput = "./specs/data/tilesetProcessing/implicitProcessing";
-const implicitOutput =
-  "./specs/data/output/tilesetProcessing/implicitProcessing";
 
 const quiet = true;
 const overwrite = true;
