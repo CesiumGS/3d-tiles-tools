@@ -8,6 +8,7 @@ import { Tileset } from "../src/structure/Tileset";
 // each modification (upgrade step) to the console.
 // This flag can be used to disable the log messages:
 const quiet = true;
+const gltfUpgradeOptions = undefined;
 
 // A unit bounding box, used for all tiles
 const unitBoundingBox = {
@@ -65,7 +66,7 @@ const inputTilesetJsonString = JSON.stringify(inputTilesetJsonRaw);
 
 describe("TilesetUpgrader", function () {
   it("upgrades the version number to 1.1", async function () {
-    const tilesetUpgrader = new TilesetUpgrader(quiet);
+    const tilesetUpgrader = new TilesetUpgrader(quiet, gltfUpgradeOptions);
 
     const tileset = JSON.parse(inputTilesetJsonString) as Tileset;
     await tilesetUpgrader.upgradeTileset(tileset);
@@ -73,7 +74,7 @@ describe("TilesetUpgrader", function () {
   });
 
   it("upgrades the content.url to content.uri", async function () {
-    const tilesetUpgrader = new TilesetUpgrader(quiet);
+    const tilesetUpgrader = new TilesetUpgrader(quiet, gltfUpgradeOptions);
 
     const tileset = JSON.parse(inputTilesetJsonString) as Tileset;
     await tilesetUpgrader.upgradeTileset(tileset);
@@ -84,7 +85,7 @@ describe("TilesetUpgrader", function () {
   });
 
   it("upgrades the refine values to be in uppercase", async function () {
-    const tilesetUpgrader = new TilesetUpgrader(quiet);
+    const tilesetUpgrader = new TilesetUpgrader(quiet, gltfUpgradeOptions);
 
     const tileset = JSON.parse(inputTilesetJsonString) as Tileset;
     await tilesetUpgrader.upgradeTileset(tileset);
@@ -95,7 +96,7 @@ describe("TilesetUpgrader", function () {
   });
 
   it("removes the unnecessary extension declaration for 3DTILES_content_gltf", async function () {
-    const tilesetUpgrader = new TilesetUpgrader(quiet);
+    const tilesetUpgrader = new TilesetUpgrader(quiet, gltfUpgradeOptions);
 
     const tileset = JSON.parse(inputTilesetJsonString) as Tileset;
     await tilesetUpgrader.upgradeTileset(tileset);
