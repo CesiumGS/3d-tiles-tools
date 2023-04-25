@@ -66,7 +66,23 @@ Upgrade a tileset to the latest 3D Tiles version.
 ```
 npx 3d-tiles-tools upgrade -i ./specs/data/TilesetOfTilesets/tileset.json -o ./output/upgraded
 ```
+
+Additional command line options:
+
+| Flag | Description | Required |
+| ---- | ----------- | -------- |
+|`--options`|All arguments past this flag are consumed by gltf-pipeline.| No |
+
 The exact behavior of the upgrade operation is not yet specified. But when B3DM- and I3DM tile content in the input tileset uses glTF 1.0 assets, then the upgrade step will try to upgrade these assets to glTF 2.0.
+
+> Implementation Note:
+>
+> The upgrade command also tries to upgrade glTF assets that are embedded into B3DM or I3DM tiles. Internally, this is achieved by processing the GLB data with [`gltf-pipeline`](https://github.com/CesiumGS/gltf-pipeline/). This upgrade will include the attempt to convert glTF 1.0 assets into glTF 2.0 assets. And it will include the attempt to convert materials that are given with the `KHR_technique_webgl` extension into PBR materials. Options that are given after the `--options` parameter are passed to `gltf-pipeline`. These options may include the names of uniform variables that should indicate whether a certain texture is used as the "base color" texture of a PRB material. For example, when a tileset contains B3DM or I3DM data that contains GLB with the `KHR_technique_webgl` extension where the uniform names `u_diff_tex` and `u_diffuse` indicate that a texture should be a base color texture, then the command line
+> ```
+> npx 3d-tiles-tools upgrade -i ./input/tileset.json -o ./output/tileset.json --options --baseColorTextureNames u_diff_tex --baseColorTextureNames u_diffuse
+> ```
+> can be used.
+
 
 #### convert
 
