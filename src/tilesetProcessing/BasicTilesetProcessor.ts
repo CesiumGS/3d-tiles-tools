@@ -373,6 +373,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
         tile.content = content;
         delete tile.contents;
       }
+      return;
     }
 
     const newContents: Content[] = [];
