@@ -12,21 +12,21 @@ export interface Tile extends RootProperty {
   /**
    * The bounding volume that encloses the tile.
    */
-  boundingVolume:BoundingVolume;
+  boundingVolume: BoundingVolume;
 
   /**
    * Optional bounding volume that defines the volume the viewer shall be
    * inside of before the tile's content will be requested and before the
    * tile will be refined based on geometricError.
    */
-  viewerRequestVolume?:BoundingVolume;
+  viewerRequestVolume?: BoundingVolume;
 
   /**
    * The error in meters introduced if this tile is rendered and its
    * children are not. At runtime the geometric error is used to compute
    * screen space error (SSE) i.e. the error measured in pixels.
    */
-  geometricError:number;
+  geometricError: number;
 
   /**
    * Specifies if additive or replacement refinement is used when
@@ -34,7 +34,7 @@ export interface Tile extends RootProperty {
    * the root tile of a tileset; it is optional for all other tiles. The
    * default is to inherit from the parent tile.
    */
-  refine?:string;
+  refine?: string;
 
   /**
    * A floating-point 4x4 affine transformation matrix stored in
@@ -47,30 +47,30 @@ export interface Tile extends RootProperty {
    * region defined in EPSG:4979 coordinates. `transform` scales the
    * `geometricError` by the maximum scaling factor from the matrix.
    */
-  transform?:number[];
+  transform?: number[];
 
   /**
    * Metadata about the tile's content and a link to the content. When this
    * is omitted the tile is just used for culling. When this is defined
    * then `contents` shall be undefined.
    */
-  content?:Content;
+  content?: Content;
 
   /**
    * An array of contents. When this is defined then `content` shall be
    * undefined.
    */
-  contents?:Content[];
+  contents?: Content[];
 
   /**
    * A metadata entity that is associated with this tile.
    */
-  metadata?:MetadataEntity;
+  metadata?: MetadataEntity;
 
   /**
    * An object that describes the implicit subdivision of this tile.
    */
-  implicitTiling?:TileImplicitTiling;
+  implicitTiling?: TileImplicitTiling;
 
   /**
    * An array of objects that define child tiles. Each child tile content
@@ -79,9 +79,5 @@ export interface Tile extends RootProperty {
    * leaf tiles the length of this array is zero and children may not be
    * defined.
    */
-  children?:Tile[];
-
+  children?: Tile[];
 }
-
-
-
