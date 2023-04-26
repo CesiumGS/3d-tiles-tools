@@ -1,5 +1,7 @@
 import { MetadataEntity } from "./MetadataEntity";
 
-/** @internal */
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+/**
+ * An object containing metadata about a group.
+ * @internal
+ */
 export interface Group extends MetadataEntity {}
