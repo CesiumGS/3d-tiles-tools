@@ -37,6 +37,7 @@ describe("TilesetDataProcessor", function () {
     ];
     const actualProcessedKeys = specEntryProcessor.processedKeys;
     actualProcessedKeys.sort();
+    expectedProcessedKeys.sort();
     expect(actualProcessedKeys).toEqual(expectedProcessedKeys);
 
     // Expect the names of ALL files to have been modified
@@ -50,6 +51,7 @@ describe("TilesetDataProcessor", function () {
     ];
     const actualOutputFiles = SpecHelpers.collectRelativeFileNames(basicOutput);
     actualOutputFiles.sort();
+    expectedOutputFiles.sort();
     expect(actualOutputFiles).toEqual(expectedOutputFiles);
   });
 

@@ -313,7 +313,7 @@ export class SpecHelpers {
   }
 
   /**
-   * Compares two arrays lexicographically.
+   * Compares two arrays of numbers lexicographically.
    *
    * When the arrays have different lengths, then the shorter
    * one will be "padded" with elements that are smaller than
@@ -323,7 +323,7 @@ export class SpecHelpers {
    * @param b - The second array
    * @returns The result of the comparison
    */
-  private static compareLexicographically(a: number[], b: number[]) {
+  private static compareNumbersLexicographically(a: number[], b: number[]) {
     const n = Math.min(a.length, b.length);
     for (let i = 0; i < n; i++) {
       const d = a[i] - b[i];
@@ -341,7 +341,7 @@ export class SpecHelpers {
   }
 
   /**
-   * Sorts a 2D array lexicographically, in place.
+   * Sorts a 2D array of numbers lexicographically, in place.
    *
    * When two elements have different lengths, then the shorter
    * one will be "padded" with elements that are smaller than
@@ -350,8 +350,51 @@ export class SpecHelpers {
    * @param array - The array
    * @returns The array
    */
-  static sortLexicographically(array: number[][]) {
-    array.sort(SpecHelpers.compareLexicographically);
+  static sortNumbersLexicographically(array: number[][]) {
+    array.sort(SpecHelpers.compareNumbersLexicographically);
+    return array;
+  }
+
+  /**
+   * Compares two arrays of strings lexicographically.
+   *
+   * When the arrays have different lengths, then the shorter
+   * one will be "padded" with elements that are smaller than
+   * all other elements in the other array.
+   *
+   * @param a - The first array
+   * @param b - The second array
+   * @returns The result of the comparison
+   */
+  private static compareStringsLexicographically(a: string[], b: string[]) {
+    const n = Math.min(a.length, b.length);
+    for (let i = 0; i < n; i++) {
+      const d = a[i].localeCompare(b[i]);
+      if (d !== 0) {
+        return d;
+      }
+    }
+    if (a.length < b.length) {
+      return -1;
+    }
+    if (a.length > b.length) {
+      return 1;
+    }
+    return 0;
+  }
+
+  /**
+   * Sorts a 2D array of strings lexicographically, in place.
+   *
+   * When two elements have different lengths, then the shorter
+   * one will be "padded" with elements that are smaller than
+   * all other elements in the other array.
+   *
+   * @param array - The array
+   * @returns The array
+   */
+  static sortStringsLexicographically(array: string[][]) {
+    array.sort(SpecHelpers.compareStringsLexicographically);
     return array;
   }
 }

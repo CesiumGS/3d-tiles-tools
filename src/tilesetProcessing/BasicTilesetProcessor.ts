@@ -356,7 +356,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * @param tile - The tile
    * @param contentUris - The content URIs
    */
-  private static updateTileContent(tile: Tile, contentUris: string[]) {
+  static updateTileContent(tile: Tile, contentUris: string[]) {
     if (contentUris.length === 0) {
       delete tile.content;
       delete tile.contents;
@@ -373,6 +373,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
         tile.content = content;
         delete tile.contents;
       }
+      return;
     }
 
     const newContents: Content[] = [];

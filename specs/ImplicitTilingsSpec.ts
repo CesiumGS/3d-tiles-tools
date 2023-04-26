@@ -36,7 +36,7 @@ describe("ImplicitTilings", function () {
       ImplicitTilings.createSubtreeCoordinatesIterator(implicitTiling);
     const actualCoordinates = [...iterator].map((c) => c.toArray());
 
-    SpecHelpers.sortLexicographically(actualCoordinates);
+    SpecHelpers.sortNumbersLexicographically(actualCoordinates);
     const expectedCoordinates = [
       [0, 0, 0],
       [1, 0, 0],
@@ -60,7 +60,7 @@ describe("ImplicitTilings", function () {
       [2, 2, 3],
       [2, 3, 3],
     ];
-    SpecHelpers.sortLexicographically(expectedCoordinates);
+    SpecHelpers.sortNumbersLexicographically(expectedCoordinates);
     expect(actualCoordinates).toEqual(expectedCoordinates);
   });
 
@@ -70,7 +70,7 @@ describe("ImplicitTilings", function () {
       ImplicitTilings.createSubtreeCoordinatesIterator(implicitTiling);
     const actualCoordinates = [...iterator].map((c) => c.toArray());
 
-    SpecHelpers.sortLexicographically(actualCoordinates);
+    SpecHelpers.sortNumbersLexicographically(actualCoordinates);
     const expectedCoordinates = [
       [0, 0, 0, 0],
       [1, 0, 0, 0],
@@ -146,7 +146,7 @@ describe("ImplicitTilings", function () {
       [2, 2, 3, 3],
       [2, 3, 3, 3],
     ];
-    SpecHelpers.sortLexicographically(expectedCoordinates);
+    SpecHelpers.sortNumbersLexicographically(expectedCoordinates);
     expect(actualCoordinates).toEqual(expectedCoordinates);
   });
 
