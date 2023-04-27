@@ -48,8 +48,8 @@ export interface ClassProperty extends RootProperty {
   /**
    * Specifies whether integer values are normalized. Only applicable to
    * `SCALAR` `VECN` and `MATN` types with integer component types. For
-   * unsigned integer component types values are normalized between `[0.0
-   * 1.0]`. For signed integer component types values are normalized
+   * unsigned integer component types values are normalized between
+   * `[0.0 1.0]`. For signed integer component types values are normalized
    * between `[-1.0 1.0]`. For all other component types this property
    * shall be false.
    */
