@@ -43,7 +43,12 @@ async function upgradeTileset(
   tilesetTargetName: string
 ) {
   const overwrite = true;
-  await Tilesets.upgrade(tilesetSourceName, tilesetTargetName, overwrite);
+  await Tilesets.upgrade(
+    tilesetSourceName,
+    tilesetTargetName,
+    overwrite,
+    undefined
+  );
 }
 
 async function tilesetUpgraderDemos() {

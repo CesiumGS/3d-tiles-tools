@@ -32,7 +32,10 @@ async function b3dmOrI3dmToGlb(inputFileName: string, outputFileName: string) {
 
   // Note: This will have to be configurable somehow...
   console.log("Upgrading GLB by default");
-  const upgradedOutputBuffer = await GltfUtilities.upgradeGlb(outputBuffer);
+  const upgradedOutputBuffer = await GltfUtilities.upgradeGlb(
+    outputBuffer,
+    undefined
+  );
 
   fs.writeFileSync(outputFileName, upgradedOutputBuffer);
 }
