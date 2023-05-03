@@ -1,5 +1,6 @@
 import { FeatureTable } from "./FeatureTable";
 import { BinaryBodyReference } from "./BinaryBodyReference";
+import { BinaryBodyOffset } from "./BinaryBodyOffset";
 
 /**
  * A set of Point Cloud semantics that contains values defining the

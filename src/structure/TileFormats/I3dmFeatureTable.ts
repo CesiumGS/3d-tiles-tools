@@ -1,5 +1,6 @@
 import { FeatureTable } from "./FeatureTable";
 import { BinaryBodyReference } from "./BinaryBodyReference";
+import { BinaryBodyOffset } from "./BinaryBodyOffset";
 
 /**
  * A set of Instanced 3D Model semantics that contains values defining
