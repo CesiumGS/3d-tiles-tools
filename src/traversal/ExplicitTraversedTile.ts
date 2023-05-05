@@ -12,6 +12,8 @@ import { Schema } from "../structure/Metadata/Schema";
 
 import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
 
+import { Tiles } from "../tilesets/Tiles";
+
 /**
  * An implementation of a `TraversedTile` that reflects a tile
  * that actually appears as a JSON representation in the tileset.
@@ -142,22 +144,19 @@ export class ExplicitTraversedTile implements TraversedTile {
   asFinalTile(): Tile {
     const tile = this._tile;
 
-    const contents = this.getFinalContents();
-
     const finalTile = {
       boundingVolume: tile.boundingVolume,
       viewerRequestVolume: tile.viewerRequestVolume,
       geometricError: tile.geometricError,
       refine: tile.refine,
       transform: tile.transform,
-      content: undefined,
-      contents: contents,
       children: tile.children,
       metadata: tile.metadata,
       implicitTiling: tile.implicitTiling,
       extensions: tile.extensions,
       extras: tile.extras,
     };
+    Tiles.setContents(finalTile, this.getFinalContents());
 
     const schema = this._schema;
     if (schema) {
