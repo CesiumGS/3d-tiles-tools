@@ -18,6 +18,8 @@ import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
 import { BoundingVolumeDerivation } from "./cesium/BoundingVolumeDerivation";
 import { MetadataSemanticOverrides } from "./MetadataSemanticOverrides";
 
+import { Tiles } from "../tilesets/Tiles";
+
 /**
  * An implementation of a `TraversedTile` that represents a tile
  * within an implicit tileset during its traversal.
@@ -126,29 +128,30 @@ export class ImplicitTraversedTile implements TraversedTile {
     const refine = rootTile.refine;
     const transform = undefined;
     const metadata = undefined;
-    const contents = this.getRawContents();
     const implicitTiling = undefined;
     const extensions = undefined;
     const extras = undefined;
 
-    return {
+    const tile = {
       boundingVolume: boundingVolume,
       viewerRequestVolume: viewerRequestVolume,
       geometricError: geometricError,
       refine: refine,
       transform: transform,
       metadata: metadata,
-      contents: contents,
       implicitTiling: implicitTiling,
       extensions: extensions,
       extras: extras,
     };
+    Tiles.setContents(tile, this.getRawContents());
+    return tile;
   }
 
   /** {@inheritDoc TraversedTile.asFinalTile} */
   asFinalTile(): Tile {
     const tile = this.asRawTile();
-    tile.contents = this.getFinalContents();
+    Tiles.setContents(tile, this.getFinalContents());
+
     const subtreeMetadataModel = this._subtreeModel.subtreeMetadataModel;
     if (subtreeMetadataModel) {
       const tileIndex = this._localCoordinate.toIndex();
