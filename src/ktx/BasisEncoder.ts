@@ -36,7 +36,7 @@ export class BasisEncoder {
   }
 
   /**
-   * Creates a new isntance of a basis encoder.
+   * Creates a new instance of a basis encoder.
    *
    * @returns The encoder object
    * @throws If the object can not be instantiated
