@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const BASIS = require("./external/basis_encoder_modified.cjs");
+const BASIS = require("./external/basis_encoder.js");
 
 import { DeveloperError } from "../base/DeveloperError";
 
@@ -59,7 +59,7 @@ export class BasisEncoder {
    * Private constructor. Instances are created by calling
    * the `create` function.
    *
-   * @param impl The implementation object
+   * @param impl - The implementation object
    */
   private constructor(impl: any) {
     this.impl = impl;
@@ -69,7 +69,7 @@ export class BasisEncoder {
    * Compresses the provided source slice(s) to an output .basis file.
    * At the minimum, you must provided at least 1 source slice by calling setSliceSourceImage() before calling this method.
    *
-   * @param dst_basis_file_js_val The argument
+   * @param dst_basis_file_js_val - The argument
    * @returns The result
    */
   encode(dst_basis_file_js_val: Uint8Array) {
@@ -84,11 +84,11 @@ export class BasisEncoder {
    * (R first at offset 0, A last at offset 3).
    * slice_index is the slice to change. Valid range is [0,BASISU_MAX_SLICES-1].
    *
-   * @param slice_index The slic index
-   * @param src_image_js_val The input image data
-   * @param width The width
-   * @param height The height
-   * @param src_image_is_png Whether the input is PNG, for whatever reason...
+   * @param slice_index - The slice index
+   * @param src_image_js_val - The input image data
+   * @param width - The width
+   * @param height - The height
+   * @param src_image_is_png - Whether the input is PNG, for whatever reason...
    * @returns The result
    */
   setSliceSourceImage(
@@ -110,7 +110,7 @@ export class BasisEncoder {
   /**
    * If true, the encoder will output a UASTC texture, otherwise a ETC1S texture.
    *
-   * @param uastc_flag The flag
+   * @param uastc_flag - The flag
    * @returns The result
    */
   setUASTC(uastc_flag: boolean) {
@@ -120,7 +120,7 @@ export class BasisEncoder {
   /**
    * If true the source images will be Y flipped before compression.
    *
-   * @param y_flip_flag The flag
+   * @param y_flip_flag - The flag
    * @returns The result
    */
   setYFlip(y_flip_flag: boolean) {
@@ -130,7 +130,7 @@ export class BasisEncoder {
   /**
    * Enables debug output to stdout
    *
-   * @param debug_flag The flag
+   * @param debug_flag - The flag
    * @returns The result
    */
   setDebug(debug_flag: boolean) {
@@ -141,7 +141,7 @@ export class BasisEncoder {
    * If true, the input is assumed to be in sRGB space. Be sure to set this correctly!
    * (Examples: True on photos, albedo/spec maps, and false on normal maps.)
    *
-   * @param perceptual_flag The flag
+   * @param perceptual_flag - The flag
    * @returns The result
    */
   setPerceptual(perceptual_flag: boolean) {
@@ -151,7 +151,7 @@ export class BasisEncoder {
   /**
    * Check source images for active/used alpha channels
    *
-   * @param check_for_alpha_flag The flag
+   * @param check_for_alpha_flag - The flag
    * @returns The result
    */
   setCheckForAlpha(check_for_alpha_flag: boolean) {
@@ -160,7 +160,7 @@ export class BasisEncoder {
 
   /**
    * Fource output .basis file to have an alpha channel
-   * @param force_alpha_flag The flag
+   * @param force_alpha_flag - The flag
    * @returns The result
    */
   setForceAlpha(force_alpha_flag: boolean) {
@@ -171,10 +171,10 @@ export class BasisEncoder {
    * Set source image component swizzle.
    * r,g,b,a - valid range is [0,3]
    *
-   * @param r Red
-   * @param g Green
-   * @param b Blue
-   * @param a Alpha
+   * @param r - Red
+   * @param g - Green
+   * @param b - Blue
+   * @param a - Alpha
    * @returns The result
    */
   setSwizzle(r: number, g: number, b: number, a: number) {
@@ -184,7 +184,7 @@ export class BasisEncoder {
   /**
    * If true, the input is assumed to be a normal map, and all source texels will be renormalized before encoding.
    *
-   * @param renormalize_flag The flag
+   * @param renormalize_flag - The flag
    * @returns The result
    */
   setRenormalize(renormalize_flag: boolean) {
@@ -195,7 +195,7 @@ export class BasisEncoder {
    * Sets the max # of endpoint clusters for ETC1S mode. Use instead of setQualityLevel.
    * Default is 512, range is [1,BASISU_MAX_ENDPOINT_CLUSTERS]
    *
-   * @param max_endpoint_clusters The value
+   * @param max_endpoint_clusters - The value
    * @returns The result
    */
   setMaxEndpointClusters(max_endpoint_clusters: number) {
@@ -206,7 +206,7 @@ export class BasisEncoder {
    * Sets the max # of selectors clusters for ETC1S mode. Use instead of setQualityLevel.
    * Default is 512, range is [1,BASISU_MAX_ENDPOINT_CLUSTERS]
    *
-   * @param max_selector_clusters The value
+   * @param max_selector_clusters - The value
    * @returns The result
    */
   setMaxSelectorClusters(max_selector_clusters: number) {
@@ -219,7 +219,7 @@ export class BasisEncoder {
    * instead to control the codebook sizes).
    * Range is [1,BASISU_QUALITY_MAX]
    *
-   * @param quality_level The value
+   * @param quality_level - The value
    * @returns The result
    */
   setQualityLevel(quality_level: number) {
@@ -231,7 +231,7 @@ export class BasisEncoder {
    * It does not directly control file size vs. quality - see quality_level().
    * Default is BASISU_DEFAULT_COMPRESSION_LEVEL, range is [0,BASISU_MAX_COMPRESSION_LEVEL]
    *
-   * @param comp_level The value
+   * @param comp_level - The value
    * @returns The result
    */
   setCompressionLevel(comp_level: number) {
@@ -252,7 +252,7 @@ export class BasisEncoder {
    * Sets selector RDO threshold
    * Default is BASISU_DEFAULT_SELECTOR_RDO_THRESH, range is [0,1e+10]
    *
-   * @param selector_rdo_thresh The value
+   * @param selector_rdo_thresh - The value
    * @returns The result
    */
   setSelectorRDOThresh(selector_rdo_thresh: number) {
@@ -263,7 +263,7 @@ export class BasisEncoder {
    * Sets endpoint RDO threshold
    * Default is BASISU_DEFAULT_ENDPOINT_RDO_THRESH, range is [0,1e+10]
    *
-   * @param endpoint_rdo_thresh The value
+   * @param endpoint_rdo_thresh - The value
    * @returns The result
    */
   setEndpointRDOThresh(endpoint_rdo_thresh: number) {
@@ -273,7 +273,7 @@ export class BasisEncoder {
   /**
    * Create .KTX2 files instead of .basis files. By default this is FALSE.
    *
-   * @param create_ktx2_file The flag
+   * @param create_ktx2_file - The flag
    * @returns The result
    */
   setCreateKTX2File(create_ktx2_file: boolean) {
@@ -283,7 +283,7 @@ export class BasisEncoder {
   /**
    * KTX2: Use UASTC Zstandard supercompression. Defaults to disabled or KTX2_SS_NONE.
    *
-   * @param use_zstandard The flag
+   * @param use_zstandard - The flag
    * @returns The result
    */
   setKTX2UASTCSupercompression(use_zstandard: boolean) {
@@ -293,7 +293,7 @@ export class BasisEncoder {
   /**
    * KTX2: Use sRGB transfer func in the file's DFD. Default is FALSE. This should very probably match the "perceptual" setting.
    *
-   * @param srgb_transfer_func The flag
+   * @param srgb_transfer_func - The flag
    * @returns The result
    */
   setKTX2SRGBTransferFunc(srgb_transfer_func: boolean) {
@@ -303,7 +303,7 @@ export class BasisEncoder {
   /**
    * If true mipmaps will be generated from the source images
    *
-   * @param mip_gen_flag The flag
+   * @param mip_gen_flag - The flag
    * @returns The result
    */
   setMipGen(mip_gen_flag: boolean) {
@@ -314,7 +314,7 @@ export class BasisEncoder {
    * Set mipmap filter's scale factor
    * default is 1, range is [.000125, 4.0]
    *
-   * @param mip_scale The value
+   * @param mip_scale - The value
    * @returns The result
    */
   setMipScale(mip_scale: number) {
@@ -326,7 +326,7 @@ export class BasisEncoder {
    * mip_filter must be < BASISU_MAX_RESAMPLER_FILTERS
    * See the end of basisu_resample_filters.cpp: g_resample_filters[]
    *
-   * @param mip_filter The value
+   * @param mip_filter - The value
    * @returns The result
    */
   setMipFilter(mip_filter: number) {
@@ -336,7 +336,7 @@ export class BasisEncoder {
   /**
    * If true mipmap filtering occurs in sRGB space - this generally should match the perceptual parameter.
    *
-   * @param mip_srgb_flag The flag
+   * @param mip_srgb_flag - The flag
    * @returns The result
    */
   setMipSRGB(mip_srgb_flag: boolean) {
@@ -346,7 +346,7 @@ export class BasisEncoder {
   /**
    * If true, the input is assumed to be a normal map, and the texels of each mipmap will be renormalized before encoding.
    *
-   * @param mip_renormalize_flag The flag
+   * @param mip_renormalize_flag - The flag
    * @returns The result
    */
   setMipRenormalize(mip_renormalize_flag: boolean) {
@@ -356,7 +356,7 @@ export class BasisEncoder {
   /**
    * If true the source texture will be sampled using wrap addressing during mipmap generation, otherwise clamp.
    *
-   * @param mip_wrapping_flag The flag
+   * @param mip_wrapping_flag - The flag
    * @returns The result
    */
   setMipWrapping(mip_wrapping_flag: boolean) {
@@ -367,7 +367,7 @@ export class BasisEncoder {
    * Sets the mipmap generator's smallest allowed dimension.
    * default is 1, range is [1,16384]
    *
-   * @param mip_smallest_dimension The value
+   * @param mip_smallest_dimension - The value
    * @returns The result
    */
   setMipSmallestDimension(mip_smallest_dimension: number) {
@@ -380,7 +380,7 @@ export class BasisEncoder {
    * tex_type is enum basis_texture_type
    * default is cBASISTexType2D
    *
-   * @param tex_type The value
+   * @param tex_type - The value
    * @returns The result
    */
   setTexType(tex_type: number) {
@@ -391,7 +391,7 @@ export class BasisEncoder {
    * Sets the UASTC encoding performance vs. quality tradeoff, and other lesser used UASTC encoder flags.
    * This is a combination of flags. See cPackUASTCLevelDefault, etc.
    *
-   * @param pack_uastc_flags The value
+   * @param pack_uastc_flags - The value
    * @returns The result
    */
   setPackUASTCFlags(pack_uastc_flags: number) {
@@ -401,7 +401,7 @@ export class BasisEncoder {
   /**
    * If true, the RDO post-processor will be applied to the encoded UASTC texture data.
    *
-   * @param rdo_uastc The flag
+   * @param rdo_uastc - The flag
    * @returns The result
    */
   setRDOUASTC(rdo_uastc: boolean) {
@@ -411,7 +411,7 @@ export class BasisEncoder {
   /**
    * Default is 1.0 range is [0.001, 10.0]
    *
-   * @param rdo_quality The value
+   * @param rdo_quality - The value
    * @returns The result
    */
   setRDOUASTCQualityScalar(rdo_quality: number) {
@@ -421,7 +421,7 @@ export class BasisEncoder {
   /**
    * Default is BASISU_RDO_UASTC_DICT_SIZE_DEFAULT, range is [BASISU_RDO_UASTC_DICT_SIZE_MIN, BASISU_RDO_UASTC_DICT_SIZE_MAX]
    *
-   * @param dict_size THe value
+   * @param dict_size - THe value
    * @returns The result
    */
   setRDOUASTCDictSize(dict_size: number) {
@@ -431,7 +431,7 @@ export class BasisEncoder {
   /**
    * Default is UASTC_RDO_DEFAULT_MAX_ALLOWED_RMS_INCREASE_RATIO, range is [01, 100.0]
    *
-   * @param rdo_uastc_max_allowed_rms_increase_ratio The value
+   * @param rdo_uastc_max_allowed_rms_increase_ratio - The value
    * @returns The result
    */
   setRDOUASTCMaxAllowedRMSIncreaseRatio(
@@ -445,7 +445,7 @@ export class BasisEncoder {
   /**
    * Default is UASTC_RDO_DEFAULT_SKIP_BLOCK_RMS_THRESH, range is [.01f, 100.0f]
    *
-   * @param rdo_uastc_skip_block_rms_thresh The value
+   * @param rdo_uastc_skip_block_rms_thresh - The value
    * @returns The result
    */
   setRDOUASTCSkipBlockRMSThresh(rdo_uastc_skip_block_rms_thresh: number) {
@@ -457,7 +457,7 @@ export class BasisEncoder {
   /**
    * Disables selector RDO
    *
-   * @param no_selector_rdo_flag The flag
+   * @param no_selector_rdo_flag - The flag
    * @returns The result
    */
   setNoSelectorRDO(no_selector_rdo_flag: boolean) {
@@ -467,7 +467,7 @@ export class BasisEncoder {
   /**
    * Disables endpoint RDO
    *
-   * @param no_endpoint_rdo_flag THe flag
+   * @param no_endpoint_rdo_flag - The flag
    * @returns The result
    */
   setNoEndpointRDO(no_endpoint_rdo_flag: boolean) {
@@ -477,20 +477,10 @@ export class BasisEncoder {
   /**
    * Display output PSNR statistics
    *
-   * @param compute_stats_flag The flag
+   * @param compute_stats_flag - The flag
    * @returns The result
    */
   setComputeStats(compute_stats_flag: boolean) {
     return this.impl.setComputeStats(compute_stats_flag);
-  }
-
-  /**
-   * Write output .PNG files for debugging
-   *
-   * @param debug_images_flag The flag
-   * @returns The result
-   */
-  setDebugImages(debug_images_flag: boolean) {
-    return this.impl.setDebugImages(debug_images_flag);
   }
 }

@@ -4,3 +4,4 @@ node_modules
 dist
 etc
 generateThirdParty.js
+src/ktx/external/basis_encoder.js
