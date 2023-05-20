@@ -2,18 +2,12 @@ import { DeveloperError } from "../base/DeveloperError";
 
 import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
 
-import { Tileset } from "../structure/Tileset";
-
 import { TilesetError } from "../tilesetData/TilesetError";
-import { TilesetTargets } from "../tilesetData/TilesetTargets";
-import { TilesetSources } from "../tilesetData/TilesetSources";
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
-
-import { Tilesets } from "../tilesets/Tilesets";
 
 import { TilesetEntryProcessor } from "./TilesetEntryProcessor";
 import { TilesetProcessorContext } from "./TilesetProcessorContext";
-import { TilesetProcessing } from "./TilesetProcessing";
+import { TilesetProcessorContexts } from "./TilesetProcessorContexts";
 
 /**
  * A base class for classes that can process tilesets.
@@ -97,66 +91,11 @@ export abstract class TilesetProcessor {
     if (this.context) {
       throw new TilesetError("Processing has already begun");
     }
-    let tilesetSource;
-    let tilesetTarget;
-    try {
-      tilesetSource = TilesetSources.createAndOpen(tilesetSourceName);
-      tilesetTarget = TilesetTargets.createAndBegin(
-        tilesetTargetName,
-        overwrite
-      );
-
-      const tilesetSourceJsonFileName =
-        Tilesets.determineTilesetJsonFileName(tilesetSourceName);
-
-      const tilesetTargetJsonFileName =
-        Tilesets.determineTilesetJsonFileName(tilesetTargetName);
-
-      // Obtain the tileset object from the tileset JSON file
-      const sourceTileset = TilesetProcessing.parseSourceValue<Tileset>(
-        tilesetSource,
-        tilesetSourceJsonFileName
-      );
-
-      // Resolve the schema, either from the `tileset.schema`
-      // or the `tileset.schemaUri`
-      const schema = TilesetProcessing.resolveSchema(
-        tilesetSource,
-        sourceTileset
-      );
-
-      // If nothing has thrown up to this point, then
-      // a `TilesetProcessorContext` with a valid
-      // state can be created:
-      this.context = {
-        tilesetSource: tilesetSource,
-        tilesetSourceJsonFileName: tilesetSourceJsonFileName,
-        sourceTileset: sourceTileset,
-        schema: schema,
-        tilesetTarget: tilesetTarget,
-        tilesetTargetJsonFileName: tilesetTargetJsonFileName,
-        targetTileset: sourceTileset,
-        processedKeys: {},
-        targetKeys: {},
-      };
-    } catch (error) {
-      if (tilesetSource) {
-        try {
-          tilesetSource.close();
-        } catch (e) {
-          // Error already about to be re-thrown
-        }
-      }
-      if (tilesetTarget) {
-        try {
-          await tilesetTarget.end();
-        } catch (e) {
-          // Error already about to be re-thrown
-        }
-      }
-      delete this.context;
-      throw error;
-    }
+    this.context = await TilesetProcessorContexts.create(
+      tilesetSourceName,
+      tilesetTargetName,
+      overwrite
+    );
   }
 
   /**
@@ -169,31 +108,34 @@ export abstract class TilesetProcessor {
    */
   async end() {
     const context = this.getContext();
-    const tilesetSource = context.tilesetSource;
-    const tilesetTarget = context.tilesetTarget;
 
-    // Perform a no-op on all entries that have not yet
-    // been marked as processed
-    await this.processAllEntriesInternal(
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      async (sourceEntry: TilesetEntry, type: string | undefined) => {
-        return sourceEntry;
-      }
-    );
-
-    // Clean up by closing the source and the target
-    delete this.context;
+    let pendingError = undefined;
     try {
-      tilesetSource.close();
+      // Perform a no-op on all entries that have not yet
+      // been marked as processed
+      await this.processAllEntriesInternal(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        async (sourceEntry: TilesetEntry, type: string | undefined) => {
+          return sourceEntry;
+        }
+      );
     } catch (error) {
-      try {
-        await tilesetTarget.end();
-      } catch (e) {
-        // Error already about to be re-thrown
-      }
-      throw error;
+      pendingError = error;
     }
-    await tilesetTarget.end();
+    // Always clean up by deleting the context
+    delete this.context;
+
+    // Try to close the context
+    try {
+      await TilesetProcessorContexts.close(context);
+    } catch (e) {
+      if (!pendingError) {
+        pendingError = e;
+      }
+    }
+    if (pendingError) {
+      throw pendingError;
+    }
   }
 
   /**
