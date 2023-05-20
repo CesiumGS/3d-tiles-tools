@@ -2,29 +2,25 @@ import { SpecHelpers } from "./SpecHelpers";
 
 import { BasicTilesetProcessor } from "../src/tilesetProcessing/BasicTilesetProcessor";
 
-const basicInput = "./specs/data/tilesetProcessing/basicProcessing";
-const basicInput3tz = "./specs/data/tilesetProcessing/basicProcessing.3tz";
-const basicInput3dtiles =
-  "./specs/data/tilesetProcessing/basicProcessing.3dtiles";
+const inputRoot = "./specs/data/tilesetProcessing/";
 
-const implicitInput = "./specs/data/tilesetProcessing/implicitProcessing";
-const implicitInput3tz =
-  "./specs/data/tilesetProcessing/implicitProcessing.3tz";
-const implicitInput3dtiles =
-  "./specs/data/tilesetProcessing/implicitProcessing.3dtiles";
+const basicInput = inputRoot + "basicProcessing";
+const basicInput3tz = inputRoot + "basicProcessing.3tz";
+const basicInput3dtiles = inputRoot + "basicProcessing.3dtiles";
 
-const basicOutput = "./specs/data/output/tilesetProcessing/basicProcessing";
-const basicOutput3tz =
-  "./specs/data/output/tilesetProcessing/basicProcessing.3tz";
-const basicOutput3dtiles =
-  "./specs/data/output/tilesetProcessing/basicProcessing.3dtiles";
+const implicitInput = inputRoot + "implicitProcessing";
+const implicitInput3tz = inputRoot + "implicitProcessing.3tz";
+const implicitInput3dtiles = inputRoot + "implicitProcessing.3dtiles";
 
-const implicitOutput =
-  "./specs/data/output/tilesetProcessing/implicitProcessing";
-const implicitOutput3tz =
-  "./specs/data/output/tilesetProcessing/implicitProcessing.3tz";
-const implicitOutput3dtiles =
-  "./specs/data/output/tilesetProcessing/implicitProcessing.3dtiles";
+const outputRoot = "./specs/data/output/tilesetProcessing/";
+
+const basicOutput = outputRoot + "basicProcessing";
+const basicOutput3tz = outputRoot + "basicProcessing.3tz";
+const basicOutput3dtiles = outputRoot + "basicProcessing.3dtiles";
+
+const implicitOutput = outputRoot + "implicitProcessing";
+const implicitOutput3tz = outputRoot + "implicitProcessing.3tz";
+const implicitOutput3dtiles = outputRoot + "implicitProcessing.3dtiles";
 
 const quiet = true;
 const overwrite = true;
@@ -35,8 +31,7 @@ const overwrite = true;
  */
 describe("BasicTilesetProcessor on packages", function () {
   afterEach(function () {
-    SpecHelpers.forceDeleteDirectory(basicOutput);
-    SpecHelpers.forceDeleteDirectory(implicitOutput);
+    SpecHelpers.forceDeleteDirectory(outputRoot);
   });
 
   it("writes basic from directories to 3TZ", async function () {
