@@ -26,13 +26,19 @@
     "3d-tiles-tools": "./build/main"
   },
   "dependencies": {
+    "@gltf-transform/core": "^3.2.1",
+    "@gltf-transform/extensions": "^3.2.1",
+    "@gltf-transform/functions": "^3.2.1",
     "archiver": "^5.3.1",
     "better-sqlite3": "^8.0.1",
     "cesium": "^1.103.0",
+    "draco3dgltf": "^1.5.6",
     "gltf-pipeline": "^4.1.0",
+    "gltfpack": "^0.19.1",
     "minimist": "^1.2.7",
     "node-stream-zip": "^1.15.0",
     "seedrandom": "^3.0.5",
+    "sharp": "^0.32.1",
     "yargs": "^17.5.1"
   },
   "devDependencies": {
@@ -40,6 +46,7 @@
     "@microsoft/api-extractor": "^7.33.6",
     "@types/archiver": "^5.3.1",
     "@types/better-sqlite3": "^7.6.2",
+    "@types/draco3dgltf": "^1.4.0",
     "@types/jasmine": "^4.0.3",
     "@types/minimist": "^1.2.2",
     "@types/seedrandom": "^3.0.2",
