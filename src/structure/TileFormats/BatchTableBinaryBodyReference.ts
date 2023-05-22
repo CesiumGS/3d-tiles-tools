@@ -6,7 +6,7 @@ import { RootProperty } from "../RootProperty";
  * directly in the JSON.
  * @internal
  */
-export interface BinaryBodyReference extends RootProperty {
+export interface BatchTableBinaryBodyReference extends RootProperty {
   /**
    * The offset into the buffer in bytes.
    */
