@@ -24,7 +24,7 @@ export class NumericBuffers {
     buffer: Buffer,
     index: number,
     componentType: string
-  ): any {
+  ): number | bigint {
     const byteSize =
       MetadataComponentTypes.byteSizeForComponentType(componentType);
     const byteOffset = index * byteSize;
@@ -69,7 +69,7 @@ export class NumericBuffers {
     index: number,
     arrayLength: number,
     componentType: string
-  ): any {
+  ): (number | bigint)[] {
     const typedArray = NumericBuffers.getTypedArrayFromBuffer(
       buffer,
       index,

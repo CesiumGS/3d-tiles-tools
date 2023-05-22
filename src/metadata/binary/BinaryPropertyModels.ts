@@ -288,9 +288,9 @@ export class BinaryPropertyModels {
       index + 1,
       offsetType
     );
-    const length = nextOffset - offset;
+    const length = Number(nextOffset) - Number(offset);
     return {
-      offset: offset,
+      offset: Number(offset),
       length: length,
     };
   }

@@ -27,7 +27,7 @@ export class BooleanArrayPropertyModel implements PropertyModel {
   }
 
   /** {@inheritDoc PropertyModel.getPropertyValue} */
-  getPropertyValue(index: number): any {
+  getPropertyValue(index: number): boolean[] {
     const valuesBuffer = this._valuesBuffer;
     const arrayOffsetsBuffer = this._arrayOffsetsBuffer;
     const arrayOffsetType = this._arrayOffsetType;

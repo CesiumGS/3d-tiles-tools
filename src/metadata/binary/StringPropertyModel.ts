@@ -26,7 +26,7 @@ export class StringPropertyModel implements PropertyModel {
   }
 
   /** {@inheritDoc PropertyModel.getPropertyValue} */
-  getPropertyValue(index: number): any {
+  getPropertyValue(index: number): string {
     const valuesBuffer = this._valuesBuffer;
     const stringOffsetsBuffer = this._stringOffsetsBuffer;
     const stringOffsetType = this._stringOffsetType;

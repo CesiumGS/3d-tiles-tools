@@ -41,7 +41,7 @@ export class StringArrayPropertyModel implements PropertyModel {
   }
 
   /** {@inheritDoc PropertyModel.getPropertyValue} */
-  getPropertyValue(index: number): any {
+  getPropertyValue(index: number): string[] {
     const valuesBuffer = this._valuesBuffer;
     const arrayOffsetsBuffer = this._arrayOffsetsBuffer;
     const arrayOffsetType = this._arrayOffsetType;

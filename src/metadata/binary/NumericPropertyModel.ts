@@ -24,7 +24,7 @@ export class NumericPropertyModel implements PropertyModel {
   }
 
   /** {@inheritDoc PropertyModel.getPropertyValue} */
-  getPropertyValue(index: number): any {
+  getPropertyValue(index: number): number | bigint | (number | bigint)[] {
     const valuesBuffer = this._valuesBuffer;
     const componentType = this._componentType;
     const type = this._type;
