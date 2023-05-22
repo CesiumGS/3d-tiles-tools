@@ -68,15 +68,20 @@ export class TilesetUpgrader {
     }
     this.gltfUpgradeOptions = gltfUpgradeOptions;
 
-    // By default, ALL options are enabled
+    // By default, ALL options are enabled...
     this.upgradeOptions = {
+      upgradeExternalTilesets: true,
+
       upgradeAssetVersionNumber: true,
       upgradeRefineCase: true,
       upgradeContentUrlToUri: true,
+      upgradeExtensionDeclarations: true,
+
       upgradeB3dmGltf1ToGltf2: true,
       upgradeI3dmGltf1ToGltf2: true,
-      upgradeExternalTilesets: true,
-      upgradeExtensionDeclarations: true,
+
+      // EXCEPT for the experimental ones...
+      upgradePntsToGlb: false,
     };
   }
 
