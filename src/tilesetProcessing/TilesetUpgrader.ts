@@ -16,8 +16,9 @@ import { TilesetSources } from "../tilesetData/TilesetSources";
 import { Tilesets } from "../tilesets/Tilesets";
 
 import { TilesetUpgradeOptions } from "./upgrade/TilesetUpgradeOptions";
-import { TilesetContentUpgrades } from "./upgrade/TilesetContentUpgrades";
 import { TilesetObjectUpgrader } from "./upgrade/TilesetObjectUpgrader";
+
+import { ContentUpgrades } from "../contentProcessing/ContentUpgrades";
 
 /**
  * A class for "upgrading" a tileset from a previous version to
@@ -238,7 +239,7 @@ export class TilesetUpgrader {
     if (type === ContentDataTypes.CONTENT_TYPE_B3DM) {
       if (this.upgradeOptions.upgradeB3dmGltf1ToGltf2) {
         this.logCallback(`  Upgrading GLB in ${key}`);
-        value = await TilesetContentUpgrades.upgradeB3dmGltf1ToGltf2(
+        value = await ContentUpgrades.upgradeB3dmGltf1ToGltf2(
           value,
           this.gltfUpgradeOptions
         );
@@ -248,7 +249,7 @@ export class TilesetUpgrader {
     } else if (type === ContentDataTypes.CONTENT_TYPE_I3DM) {
       if (this.upgradeOptions.upgradeI3dmGltf1ToGltf2) {
         this.logCallback(`  Upgrading GLB in ${key}`);
-        value = await TilesetContentUpgrades.upgradeI3dmGltf1ToGltf2(
+        value = await ContentUpgrades.upgradeI3dmGltf1ToGltf2(
           value,
           this.gltfUpgradeOptions
         );

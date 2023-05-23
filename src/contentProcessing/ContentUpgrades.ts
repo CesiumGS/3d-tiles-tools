@@ -1,6 +1,6 @@
-import { GltfUtilities } from "../../contentProcessing/GtlfUtilities";
+import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
 
-import { TileFormats } from "../../tileFormats/TileFormats";
+import { TileFormats } from "../tileFormats/TileFormats";
 
 /**
  * Internal class containing functions to upgrade tile content data.
@@ -10,7 +10,7 @@ import { TileFormats } from "../../tileFormats/TileFormats";
  * with `gltf-pipeline`. (Specifically: This does not change the
  * type of the data itself)
  */
-export class TilesetContentUpgrades {
+export class ContentUpgrades {
   /**
    * For the given B3DM data buffer, extract the GLB, upgrade it
    * with `GltfUtilities.upgradeGlb`, create a new B3DM from the
