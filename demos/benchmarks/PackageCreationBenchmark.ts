@@ -23,7 +23,7 @@ import { BenchmarkUtils } from "./BenchmarkUtils";
 async function fillTilesetTarget(
   tilesetTarget: TilesetTarget,
   fullOutputFileName: string,
-  entries: IterableIterator<TilesetEntry>,
+  entries: Iterable<TilesetEntry>,
   configString: string
 ) {
   const beforeMs = performance.now();

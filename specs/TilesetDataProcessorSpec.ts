@@ -3,20 +3,20 @@ import { TilesetDataProcessor } from "../src/tilesetProcessing/TilesetDataProces
 import { SpecEntryProcessor } from "./SpecEntryProcessor";
 import { SpecHelpers } from "./SpecHelpers";
 
+const outputRoot = "./specs/data/output/tilesetProcessing/";
+
 const basicInput = "./specs/data/tilesetProcessing/basicProcessing";
-const basicOutput = "./specs/data/output/tilesetProcessing/basicProcessing";
+const basicOutput = outputRoot + "basicProcessing";
 
 const implicitInput = "./specs/data/tilesetProcessing/implicitProcessing";
-const implicitOutput =
-  "./specs/data/output/tilesetProcessing/implicitProcessing";
+const implicitOutput = outputRoot + "implicitProcessing";
 
 const quiet = true;
 const overwrite = true;
 
 describe("TilesetDataProcessor", function () {
   afterEach(function () {
-    SpecHelpers.forceDeleteDirectory(basicOutput);
-    SpecHelpers.forceDeleteDirectory(implicitOutput);
+    SpecHelpers.forceDeleteDirectory(outputRoot);
   });
 
   it("processAllEntries processes all entries exactly once for explicit tilesets", async function () {

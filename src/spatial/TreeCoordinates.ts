@@ -25,7 +25,7 @@ export interface TreeCoordinates {
    *
    * @returns The child coordinates
    */
-  children(): IterableIterator<TreeCoordinates>;
+  children(): Iterable<TreeCoordinates>;
 
   /**
    * Returns a generator for all coordinates that are descendants
@@ -38,7 +38,7 @@ export interface TreeCoordinates {
   descendants(
     maxLevelInclusive: number,
     depthFirst: boolean
-  ): IterableIterator<TreeCoordinates>;
+  ): Iterable<TreeCoordinates>;
 
   /**
    * Preliminary:

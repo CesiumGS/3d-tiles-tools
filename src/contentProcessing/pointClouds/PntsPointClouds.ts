@@ -1,18 +1,52 @@
-import { Iterables } from "../base/Iterables";
-import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
-import { TileFormatError } from "../tileFormats/TileFormatError";
+import { Iterables } from "../../base/Iterables";
+import { PntsFeatureTable } from "../../structure/TileFormats/PntsFeatureTable";
+import { TileFormatError } from "../../tileFormats/TileFormatError";
 import { AttributeCompression } from "./AttributeCompression";
-import { TileTableData } from "./TileTableData";
+import { DefaultPointCloud } from "./DefaultPointCloud";
+import { PointCloudReader } from "./PointCloudReader";
+import { TileTableData } from "../TileTableData";
 
-export class PntsData {
-  static createPositions(
+export class PntsPointClouds {
+  static create(
     featureTable: PntsFeatureTable,
     binary: Buffer
-  ): IterableIterator<number[]> {
+  ): PointCloudReader {
+    const positions = PntsPointClouds.createPositions(featureTable, binary);
+    const normals = PntsPointClouds.createNormals(featureTable, binary);
+    const colors = PntsPointClouds.createColors(featureTable, binary);
+    const globalColor = PntsPointClouds.createGlobalColor(featureTable, binary);
+
+    const pointCloud = new DefaultPointCloud();
+    pointCloud.addPositions(positions);
+    if (normals) {
+      pointCloud.addNormals(normals);
+    }
+    if (colors) {
+      pointCloud.addColors(colors);
+    }
+    if (globalColor) {
+      pointCloud.setGlobalColor(
+        globalColor[0],
+        globalColor[1],
+        globalColor[2],
+        globalColor[3]
+      );
+    }
+    return pointCloud;
+  }
+
+  private static createPositions(
+    featureTable: PntsFeatureTable,
+    binary: Buffer
+  ): Iterable<number[]> {
     const numPoints = featureTable.POINTS_LENGTH;
     if (featureTable.POSITION) {
       const byteOffset = featureTable.POSITION.byteOffset;
-      return PntsData.createPositionsInternal(binary, byteOffset, numPoints);
+      return PntsPointClouds.createPositionsInternal(
+        binary,
+        byteOffset,
+        numPoints
+      );
     }
 
     if (featureTable.POSITION_QUANTIZED) {
@@ -32,22 +66,21 @@ export class PntsData {
         3,
         "FLOAT32"
       );
-      console.log("volumeOffset is " + volumeOffset);
       const volumeScale = TileTableData.obtainNumberArray(
         binary,
         featureTable.QUANTIZED_VOLUME_SCALE,
         3,
         "FLOAT32"
       );
-      console.log("volumeScale is " + volumeScale);
 
       const byteOffset = featureTable.POSITION_QUANTIZED.byteOffset;
-      const quantizedPositions = PntsData.createQuantizedPositionsInternal(
-        binary,
-        byteOffset,
-        numPoints
-      );
-      const dequantization = PntsData.createDequantization(
+      const quantizedPositions =
+        PntsPointClouds.createQuantizedPositionsInternal(
+          binary,
+          byteOffset,
+          numPoints
+        );
+      const dequantization = PntsPointClouds.createDequantization(
         volumeOffset,
         volumeScale
       );
@@ -59,19 +92,23 @@ export class PntsData {
     );
   }
 
-  static createNormals(
+  private static createNormals(
     featureTable: PntsFeatureTable,
     binary: Buffer
-  ): IterableIterator<number[]> | undefined {
+  ): Iterable<number[]> | undefined {
     const numPoints = featureTable.POINTS_LENGTH;
     if (featureTable.NORMAL) {
       const byteOffset = featureTable.NORMAL.byteOffset;
-      return PntsData.createNormalsInternal(binary, byteOffset, numPoints);
+      return PntsPointClouds.createNormalsInternal(
+        binary,
+        byteOffset,
+        numPoints
+      );
     }
 
     if (featureTable.NORMAL_OCT16P) {
       const byteOffset = featureTable.NORMAL_OCT16P.byteOffset;
-      const octEncodedNormals = PntsData.createOctEncodedNormalsInternal(
+      const octEncodedNormals = PntsPointClouds.createOctEncodedNormalsInternal(
         binary,
         byteOffset,
         numPoints
@@ -85,35 +122,35 @@ export class PntsData {
     return undefined;
   }
 
-  static createColors(
+  private static createColors(
     featureTable: PntsFeatureTable,
     binary: Buffer
-  ): IterableIterator<number[]> | undefined {
+  ): Iterable<number[]> | undefined {
     const numPoints = featureTable.POINTS_LENGTH;
     if (featureTable.RGB) {
       const byteOffset = featureTable.RGB.byteOffset;
-      const colorsRGB = PntsData.createColorsRgbInternal(
+      const colorsRGB = PntsPointClouds.createColorsRgbInternal(
         binary,
         byteOffset,
         numPoints
       );
-      const colorsRGBA = Iterables.map(colorsRGB, PntsData.rgbToRgba);
-      const colors = Iterables.map(colorsRGBA, PntsData.bytesToFloats);
+      const colorsRGBA = Iterables.map(colorsRGB, PntsPointClouds.rgbToRgba);
+      const colors = Iterables.map(colorsRGBA, PntsPointClouds.bytesToFloats);
       return colors;
     }
     if (featureTable.RGBA) {
       const byteOffset = featureTable.RGBA.byteOffset;
-      const colorsRGBA = PntsData.createColorsRgbaInternal(
+      const colorsRGBA = PntsPointClouds.createColorsRgbaInternal(
         binary,
         byteOffset,
         numPoints
       );
-      const colors = Iterables.map(colorsRGBA, PntsData.bytesToFloats);
+      const colors = Iterables.map(colorsRGBA, PntsPointClouds.bytesToFloats);
       return colors;
     }
     if (featureTable.RGB565) {
       const byteOffset = featureTable.RGB565.byteOffset;
-      const colorsRGB565 = PntsData.createColorsRgb656Internal(
+      const colorsRGB565 = PntsPointClouds.createColorsRgb656Internal(
         binary,
         byteOffset,
         numPoints
@@ -127,13 +164,30 @@ export class PntsData {
     return undefined;
   }
 
+  private static createGlobalColor(
+    featureTable: PntsFeatureTable,
+    binary: Buffer
+  ): [number, number, number, number] | undefined {
+    if (!featureTable.CONSTANT_RGBA) {
+      return undefined;
+    }
+    const constantRgba = TileTableData.obtainNumberArray(
+      binary,
+      featureTable.CONSTANT_RGBA,
+      4,
+      "UNSIGNED_BYTE"
+    );
+    const rgba = PntsPointClouds.bytesToFloats(constantRgba);
+    return [rgba[0], rgba[1], rgba[2], rgba[3]];
+  }
+
   private static createArrayIterableInternal(
     binary: Buffer,
     byteOffset: number,
     numPoints: number,
     legacyType: string,
     legacyComponentType: string
-  ): IterableIterator<number[]> {
+  ): Iterable<number[]> {
     const propertyModel = TileTableData.createPropertyModel(
       legacyType,
       legacyComponentType,
@@ -149,7 +203,7 @@ export class PntsData {
     numPoints: number,
     legacyType: string,
     legacyComponentType: string
-  ): IterableIterator<number> {
+  ): Iterable<number> {
     const propertyModel = TileTableData.createPropertyModel(
       legacyType,
       legacyComponentType,
@@ -163,10 +217,10 @@ export class PntsData {
     binary: Buffer,
     byteOffset: number,
     numPoints: number
-  ): IterableIterator<number[]> {
+  ): Iterable<number[]> {
     const legacyType = "VEC3";
     const legacyComponentType = "FLOAT";
-    return PntsData.createArrayIterableInternal(
+    return PntsPointClouds.createArrayIterableInternal(
       binary,
       byteOffset,
       numPoints,
@@ -178,10 +232,10 @@ export class PntsData {
     binary: Buffer,
     byteOffset: number,
     numPoints: number
-  ): IterableIterator<number[]> {
+  ): Iterable<number[]> {
     const legacyType = "VEC3";
     const legacyComponentType = "FLOAT";
-    return PntsData.createArrayIterableInternal(
+    return PntsPointClouds.createArrayIterableInternal(
       binary,
       byteOffset,
       numPoints,
@@ -194,10 +248,10 @@ export class PntsData {
     binary: Buffer,
     byteOffset: number,
     numPoints: number
-  ): IterableIterator<number[]> {
+  ): Iterable<number[]> {
     const legacyType = "VEC3";
     const legacyComponentType = "UNSIGNED_SHORT";
-    return PntsData.createArrayIterableInternal(
+    return PntsPointClouds.createArrayIterableInternal(
       binary,
       byteOffset,
       numPoints,
@@ -210,10 +264,10 @@ export class PntsData {
     binary: Buffer,
     byteOffset: number,
     numPoints: number
-  ): IterableIterator<number[]> {
+  ): Iterable<number[]> {
     const legacyType = "VEC2";
     const legacyComponentType = "UNSIGNED_SHORT";
-    return PntsData.createArrayIterableInternal(
+    return PntsPointClouds.createArrayIterableInternal(
       binary,
       byteOffset,
       numPoints,
@@ -226,10 +280,10 @@ export class PntsData {
     binary: Buffer,
     byteOffset: number,
     numPoints: number
-  ): IterableIterator<number[]> {
+  ): Iterable<number[]> {
     const legacyType = "VEC3";
     const legacyComponentType = "UNSIGNED_BYTE";
-    return PntsData.createArrayIterableInternal(
+    return PntsPointClouds.createArrayIterableInternal(
       binary,
       byteOffset,
       numPoints,
@@ -242,10 +296,10 @@ export class PntsData {
     binary: Buffer,
     byteOffset: number,
     numPoints: number
-  ): IterableIterator<number[]> {
-    const legacyType = "VEC3";
+  ): Iterable<number[]> {
+    const legacyType = "VEC4";
     const legacyComponentType = "UNSIGNED_BYTE";
-    return PntsData.createArrayIterableInternal(
+    return PntsPointClouds.createArrayIterableInternal(
       binary,
       byteOffset,
       numPoints,
@@ -258,10 +312,10 @@ export class PntsData {
     binary: Buffer,
     byteOffset: number,
     numPoints: number
-  ): IterableIterator<number> {
+  ): Iterable<number> {
     const legacyType = "SCALAR";
     const legacyComponentType = "UNSIGNED_SHORT";
-    return PntsData.createScalarIterableInternal(
+    return PntsPointClouds.createScalarIterableInternal(
       binary,
       byteOffset,
       numPoints,

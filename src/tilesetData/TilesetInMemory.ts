@@ -54,7 +54,7 @@ export class TilesetInMemory implements TilesetSource, TilesetTarget {
     if (!this.sourceIsOpen) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
-    return Object.keys(this.dataMap).values();
+    return Object.keys(this.dataMap);
   }
 
   /** {@inheritDoc TilesetSource.getValue} */

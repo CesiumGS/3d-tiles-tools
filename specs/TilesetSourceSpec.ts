@@ -73,6 +73,14 @@ for (const testCase of testCases) {
       expect(value).toBeDefined();
     });
 
+    it("allows iterating over the keys, multiple times, yielding the same results", function () {
+      tilesetSource.open(sourceName);
+      const keys = tilesetSource.getKeys();
+      const keysA = [...keys];
+      const keysB = [...keys];
+      expect(keysA).toEqual(keysB);
+    });
+
     it("throws when trying to access it after calling 'close'", function () {
       tilesetSource.open(sourceName);
       tilesetSource.close();

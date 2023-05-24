@@ -50,45 +50,51 @@ export class OctreeCoordinates implements TreeCoordinates {
   }
 
   /** {@inheritDoc TreeCoordinates.children} */
-  *children(): IterableIterator<OctreeCoordinates> {
+  children(): Iterable<OctreeCoordinates> {
     const nLevel = this._level + 1;
     const nX = this._x << 1;
     const nY = this._y << 1;
     const nZ = this._z << 1;
-    yield new OctreeCoordinates(nLevel, nX + 0, nY + 0, nZ + 0);
-    yield new OctreeCoordinates(nLevel, nX + 1, nY + 0, nZ + 0);
-    yield new OctreeCoordinates(nLevel, nX + 0, nY + 1, nZ + 0);
-    yield new OctreeCoordinates(nLevel, nX + 1, nY + 1, nZ + 0);
-    yield new OctreeCoordinates(nLevel, nX + 0, nY + 0, nZ + 1);
-    yield new OctreeCoordinates(nLevel, nX + 1, nY + 0, nZ + 1);
-    yield new OctreeCoordinates(nLevel, nX + 0, nY + 1, nZ + 1);
-    yield new OctreeCoordinates(nLevel, nX + 1, nY + 1, nZ + 1);
+    const iterable = {
+      [Symbol.iterator]: function* (): Iterator<OctreeCoordinates> {
+        yield new OctreeCoordinates(nLevel, nX + 0, nY + 0, nZ + 0);
+        yield new OctreeCoordinates(nLevel, nX + 1, nY + 0, nZ + 0);
+        yield new OctreeCoordinates(nLevel, nX + 0, nY + 1, nZ + 0);
+        yield new OctreeCoordinates(nLevel, nX + 1, nY + 1, nZ + 0);
+        yield new OctreeCoordinates(nLevel, nX + 0, nY + 0, nZ + 1);
+        yield new OctreeCoordinates(nLevel, nX + 1, nY + 0, nZ + 1);
+        yield new OctreeCoordinates(nLevel, nX + 0, nY + 1, nZ + 1);
+        yield new OctreeCoordinates(nLevel, nX + 1, nY + 1, nZ + 1);
+      },
+    };
+    return iterable;
   }
 
   /** {@inheritDoc TreeCoordinates.descendants} */
   descendants(
     maxLevelInclusive: number,
     depthFirst: boolean
-  ): IterableIterator<OctreeCoordinates> {
-    const queue: OctreeCoordinates[] = [this];
-    const result = {
-      [Symbol.iterator]() {
-        return this;
-      },
-      next(): IteratorResult<OctreeCoordinates, void> {
-        const element = depthFirst ? queue.pop() : queue.shift();
-        if (!element) {
-          return { value: undefined, done: true };
-        }
-        if (element.level < maxLevelInclusive) {
-          for (const c of element.children()) {
-            queue.push(c);
+  ): Iterable<OctreeCoordinates> {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const root = this;
+    const resultIterable = {
+      [Symbol.iterator]: function* (): Iterator<OctreeCoordinates> {
+        const queue: OctreeCoordinates[] = [root];
+        while (true) {
+          const element = depthFirst ? queue.pop() : queue.shift();
+          if (!element) {
+            break;
           }
+          if (element.level < maxLevelInclusive) {
+            for (const c of element.children()) {
+              queue.push(c);
+            }
+          }
+          yield element;
         }
-        return { value: element, done: false };
       },
     };
-    return result;
+    return resultIterable;
   }
 
   /** {@inheritDoc TreeCoordinates.toArray} */

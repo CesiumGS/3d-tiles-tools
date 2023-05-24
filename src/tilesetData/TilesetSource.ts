@@ -19,7 +19,7 @@ export interface TilesetSource {
    * @returns The iterable
    * @throws {@link TilesetError} If `open` was not called yet
    */
-  getKeys(): IterableIterator<string>;
+  getKeys(): Iterable<string>;
 
   /**
    * Returns the value that is identified by the given key.

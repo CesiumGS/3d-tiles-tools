@@ -19,21 +19,26 @@ export class Iterables {
    * be listed recursively
    * @returns The generator for path strings
    */
-  static *overFiles(
+  static overFiles(
     directory: string | PathLike,
     recurse: boolean
-  ): IterableIterator<string> {
-    const fileNames = fs.readdirSync(directory);
-    for (const fileName of fileNames) {
-      const rawPath = path.join(directory.toString(), fileName);
-      const fullPath = rawPath.replace(/\\/g, "/");
-      const isDirectory = fs.statSync(fullPath).isDirectory();
-      if (isDirectory && recurse) {
-        yield* Iterables.overFiles(fullPath, recurse);
-      } else if (!isDirectory) {
-        yield fullPath;
-      }
-    }
+  ): Iterable<string> {
+    const resultIterable = {
+      [Symbol.iterator]: function* (): Iterator<string> {
+        const fileNames = fs.readdirSync(directory);
+        for (const fileName of fileNames) {
+          const rawPath = path.join(directory.toString(), fileName);
+          const fullPath = rawPath.replace(/\\/g, "/");
+          const isDirectory = fs.statSync(fullPath).isDirectory();
+          if (isDirectory && recurse) {
+            yield* Iterables.overFiles(fullPath, recurse);
+          } else if (!isDirectory) {
+            yield fullPath;
+          }
+        }
+      },
+    };
+    return resultIterable;
   }
 
   /**
@@ -44,27 +49,20 @@ export class Iterables {
    * @returns The filtered iterable
    */
   static filter<T>(
-    iterable: IterableIterator<T>,
+    iterable: Iterable<T>,
     include: (element: T) => boolean
-  ) {
-    const iterator = iterable[Symbol.iterator]();
-    return {
-      [Symbol.iterator]() {
-        return this;
-      },
-      next(): IteratorResult<T, void> {
-        for (;;) {
-          const result = iterator.next();
-          if (result.done) {
-            return { value: undefined, done: true };
-          }
-          const included = include(result.value);
+  ): Iterable<T> {
+    const resultIterable = {
+      [Symbol.iterator]: function* (): Iterator<T> {
+        for (const element of iterable) {
+          const included = include(element);
           if (included) {
-            return { value: result.value, done: false };
+            yield element;
           }
         }
       },
     };
+    return resultIterable;
   }
 
   /**
@@ -76,22 +74,49 @@ export class Iterables {
    * @returns The mapped iterable
    */
   static map<S, T>(
-    iterable: IterableIterator<S>,
+    iterable: Iterable<S>,
     mapper: (element: S) => T
-  ): IterableIterator<T> {
-    const iterator = iterable[Symbol.iterator]();
-    return {
-      [Symbol.iterator]() {
-        return this;
-      },
-      next(): IteratorResult<T, void> {
-        const result = iterator.next();
-        if (result.done) {
-          return { value: undefined, done: true };
+  ): Iterable<T> {
+    const resultIterable = {
+      [Symbol.iterator]: function* (): Iterator<T> {
+        for (const element of iterable) {
+          yield mapper(element);
         }
-        const mappedValue = mapper(result.value);
-        return { value: mappedValue, done: false };
       },
     };
+    return resultIterable;
+  }
+
+  /**
+   * Creates an iterable from the given one, returning arrays
+   * that always contain `segmentSize` elements from the
+   * input.
+   *
+   * If the number of elements that are provided by the
+   * given iterable is not divisible by `segmentSize`,
+   * then the last (incomplete) arrays will be omitted.
+   *
+   * @param iterable - The iterable object
+   * @param segmentSize - The segment size
+   * @returns The segmentized iterable
+   */
+  static segmentize<T>(
+    iterable: Iterable<T>,
+    segmentSize: number
+  ): Iterable<T[]> {
+    const resultIterable = {
+      [Symbol.iterator]: function* (): Iterator<T[]> {
+        let current: T[] = [];
+        for (const element of iterable) {
+          current.push(element);
+          if (current.length === segmentSize) {
+            const result = current;
+            current = [];
+            yield result;
+          }
+        }
+      },
+    };
+    return resultIterable;
   }
 }

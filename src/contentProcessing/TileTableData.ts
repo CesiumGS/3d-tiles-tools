@@ -36,45 +36,31 @@ export class TileTableData {
   static createArrayIterable(
     propertyModel: PropertyModel,
     numElements: number
-  ): IterableIterator<number[]> {
-    let currentIndex = 0;
-    return {
-      [Symbol.iterator]() {
-        return this;
-      },
-      next(): IteratorResult<number[], void> {
-        for (;;) {
-          if (currentIndex >= numElements) {
-            return { value: undefined, done: true };
-          }
-          const value = propertyModel.getPropertyValue(currentIndex);
-          currentIndex++;
-          return { value: value, done: false };
+  ): Iterable<number[]> {
+    const iterable = {
+      [Symbol.iterator]: function* (): Iterator<number[]> {
+        for (let index = 0; index < numElements; index++) {
+          const value = propertyModel.getPropertyValue(index);
+          yield value;
         }
       },
     };
+    return iterable;
   }
 
   static createScalarIterable(
     propertyModel: PropertyModel,
     numElements: number
-  ): IterableIterator<number> {
-    let currentIndex = 0;
-    return {
-      [Symbol.iterator]() {
-        return this;
-      },
-      next(): IteratorResult<number, void> {
-        for (;;) {
-          if (currentIndex >= numElements) {
-            return { value: undefined, done: true };
-          }
-          const value = propertyModel.getPropertyValue(currentIndex);
-          currentIndex++;
-          return { value: value, done: false };
+  ): Iterable<number> {
+    const iterable = {
+      [Symbol.iterator]: function* (): Iterator<number> {
+        for (let index = 0; index < numElements; index++) {
+          const value = propertyModel.getPropertyValue(index);
+          yield value;
         }
       },
     };
+    return iterable;
   }
 
   static createPropertyModel(
