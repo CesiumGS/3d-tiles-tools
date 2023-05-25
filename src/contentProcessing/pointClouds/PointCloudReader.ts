@@ -6,7 +6,7 @@ export interface PointCloudReader {
   getGlobalColor(): [number, number, number, number] | undefined;
 
   getAttributes(): string[];
-  getAttribute(name: string): Iterable<any> | undefined;
+  getAttributeValues(name: string): Iterable<number> | undefined;
   getAttributeType(name: string): string | undefined;
   getAttributeComponentType(name: string): string | undefined;
 }

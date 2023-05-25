@@ -9,15 +9,20 @@ export class DefaultPointCloud implements PointCloudReader {
   private globalColor: [number, number, number, number] | undefined;
 
   addPositions(positions: Iterable<number[]>) {
-    this.addAttribute("POSITION", "VEC3", "FLOAT32", [...positions].flat());
+    this.addAttribute(
+      "POSITION",
+      "VEC3",
+      "FLOAT32",
+      Iterables.flatten(positions)
+    );
   }
 
   addNormals(normals: Iterable<number[]>) {
-    this.addAttribute("NORMAL", "VEC3", "FLOAT32", [...normals].flat());
+    this.addAttribute("NORMAL", "VEC3", "FLOAT32", Iterables.flatten(normals));
   }
 
   addColors(colors: Iterable<number[]>) {
-    this.addAttribute("COLOR_0", "VEC4", "FLOAT32", [...colors].flat());
+    this.addAttribute("COLOR_0", "VEC4", "FLOAT32", Iterables.flatten(colors));
   }
 
   addAttribute(
@@ -38,7 +43,7 @@ export class DefaultPointCloud implements PointCloudReader {
 
   /** {@inheritDoc PointCloudReader.getPositions} */
   getPositions(): Iterable<number[]> {
-    const values = this.attributeValues["POSITION"];
+    const values = this.getAttributeValues("POSITION");
     if (!values) {
       throw new TileFormatError("No POSITION values have been added");
     }
@@ -47,7 +52,7 @@ export class DefaultPointCloud implements PointCloudReader {
 
   /** {@inheritDoc PointCloudReader.getNormals} */
   getNormals(): Iterable<number[]> | undefined {
-    const values = this.attributeValues["NORMAL"];
+    const values = this.getAttributeValues("NORMAL");
     if (!values) {
       return undefined;
     }
@@ -56,7 +61,7 @@ export class DefaultPointCloud implements PointCloudReader {
 
   /** {@inheritDoc PointCloudReader.getColors} */
   getColors(): Iterable<number[]> | undefined {
-    const values = this.attributeValues["COLOR_0"];
+    const values = this.getAttributeValues("COLOR_0");
     if (!values) {
       return undefined;
     }
@@ -74,25 +79,12 @@ export class DefaultPointCloud implements PointCloudReader {
   getAttributes(): string[] {
     return Object.keys(this.attributeValues);
   }
-  getAttribute(name: string): Iterable<any> | undefined {
-    const array = this.attributeValues[name];
-    if (!array) {
+  getAttributeValues(name: string): Iterable<number> | undefined {
+    const values = this.attributeValues[name];
+    if (!values) {
       return undefined;
     }
-    const type = this.getAttributeType(name);
-    if (type === "SCALAR") {
-      return array;
-    }
-    if (type === "VEC2") {
-      return Iterables.segmentize(array, 2);
-    }
-    if (type === "VEC3") {
-      return Iterables.segmentize(array, 3);
-    }
-    if (type === "VEC4") {
-      return Iterables.segmentize(array, 4);
-    }
-    throw new TileFormatError("Invalid attribute type " + type);
+    return values;
   }
   getAttributeType(name: string): string | undefined {
     return this.attributeTypes[name];

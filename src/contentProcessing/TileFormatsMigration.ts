@@ -5,6 +5,8 @@ import { TileFormats } from "../tileFormats/TileFormats";
 
 import { PntsPointClouds } from "./pointClouds/PntsPointClouds";
 import { GltfPointClouds } from "./pointClouds/GltfPointClouds";
+import { TileFormatError } from "../tileFormats/TileFormatError";
+import { TileTableData } from "./TileTableData";
 
 export class TileFormatsMigration {
   static async convertPntsToGlb(
@@ -16,7 +18,7 @@ export class TileFormatsMigration {
     const featureTable = tileData.featureTable.json as PntsFeatureTable;
     const binary = tileData.featureTable.binary;
 
-    /*/
+    //*/
     console.log("Batch table");
     console.log(JSON.stringify(batchTable, null, 2));
 

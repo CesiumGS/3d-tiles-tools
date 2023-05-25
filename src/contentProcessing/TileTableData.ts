@@ -34,6 +34,37 @@ export class TileTableData {
   }
 
   static createArrayIterable(
+    binary: Buffer,
+    byteOffset: number,
+    numPoints: number,
+    legacyType: string,
+    legacyComponentType: string
+  ): Iterable<number[]> {
+    const propertyModel = TileTableData.createPropertyModel(
+      legacyType,
+      legacyComponentType,
+      byteOffset,
+      binary
+    );
+    return TileTableData.createArrayIterableInternal(propertyModel, numPoints);
+  }
+  static createScalarIterable(
+    binary: Buffer,
+    byteOffset: number,
+    numPoints: number,
+    legacyType: string,
+    legacyComponentType: string
+  ): Iterable<number> {
+    const propertyModel = TileTableData.createPropertyModel(
+      legacyType,
+      legacyComponentType,
+      byteOffset,
+      binary
+    );
+    return TileTableData.createScalarIterableInternal(propertyModel, numPoints);
+  }
+
+  private static createArrayIterableInternal(
     propertyModel: PropertyModel,
     numElements: number
   ): Iterable<number[]> {
@@ -48,7 +79,7 @@ export class TileTableData {
     return iterable;
   }
 
-  static createScalarIterable(
+  private static createScalarIterableInternal(
     propertyModel: PropertyModel,
     numElements: number
   ): Iterable<number> {
@@ -96,7 +127,7 @@ export class TileTableData {
     );
   }
 
-  private static convertLegacyComponentTypeToComponentType(
+  static convertLegacyComponentTypeToComponentType(
     legacyComponentType: string
   ) {
     switch (legacyComponentType) {

@@ -12,5 +12,5 @@ export interface FeatureTableBinaryBodyReference extends BinaryBodyOffset {
    * if the semantic allows for overriding the implicit component type.
    * These cases are specified in each tile format.
    */
-  componentType: string;
+  componentType?: string;
 }

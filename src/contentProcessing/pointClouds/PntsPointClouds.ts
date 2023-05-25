@@ -32,7 +32,38 @@ export class PntsPointClouds {
         globalColor[3]
       );
     }
+
+    PntsPointClouds.assignBatchIdsAsAttribute(featureTable, binary, pointCloud);
+
     return pointCloud;
+  }
+
+  private static assignBatchIdsAsAttribute(
+    featureTable: PntsFeatureTable,
+    binary: Buffer,
+    pointCloud: DefaultPointCloud
+  ) {
+    const batchId = featureTable.BATCH_ID;
+    if (!batchId) {
+      return;
+    }
+    const batchLength = featureTable.BATCH_LENGTH;
+    if (batchLength === undefined) {
+      throw new TileFormatError("Found BATCH_ID but no BATCH_LENGTH");
+    }
+    const legacyComponentType = batchId.componentType ?? "UNSIGNED_SHORT";
+    const componentType =
+      TileTableData.convertLegacyComponentTypeToComponentType(
+        legacyComponentType
+      );
+    const batchIds = TileTableData.createScalarIterable(
+      binary,
+      batchId.byteOffset,
+      featureTable.POINTS_LENGTH,
+      "SCALAR",
+      legacyComponentType
+    );
+    pointCloud.addAttribute("_FEATURE_ID_0", "SCALAR", componentType, batchIds);
   }
 
   private static createPositions(
@@ -181,38 +212,6 @@ export class PntsPointClouds {
     return [rgba[0], rgba[1], rgba[2], rgba[3]];
   }
 
-  private static createArrayIterableInternal(
-    binary: Buffer,
-    byteOffset: number,
-    numPoints: number,
-    legacyType: string,
-    legacyComponentType: string
-  ): Iterable<number[]> {
-    const propertyModel = TileTableData.createPropertyModel(
-      legacyType,
-      legacyComponentType,
-      byteOffset,
-      binary
-    );
-    return TileTableData.createArrayIterable(propertyModel, numPoints);
-  }
-
-  private static createScalarIterableInternal(
-    binary: Buffer,
-    byteOffset: number,
-    numPoints: number,
-    legacyType: string,
-    legacyComponentType: string
-  ): Iterable<number> {
-    const propertyModel = TileTableData.createPropertyModel(
-      legacyType,
-      legacyComponentType,
-      byteOffset,
-      binary
-    );
-    return TileTableData.createScalarIterable(propertyModel, numPoints);
-  }
-
   private static createPositionsInternal(
     binary: Buffer,
     byteOffset: number,
@@ -220,7 +219,7 @@ export class PntsPointClouds {
   ): Iterable<number[]> {
     const legacyType = "VEC3";
     const legacyComponentType = "FLOAT";
-    return PntsPointClouds.createArrayIterableInternal(
+    return TileTableData.createArrayIterable(
       binary,
       byteOffset,
       numPoints,
@@ -235,7 +234,7 @@ export class PntsPointClouds {
   ): Iterable<number[]> {
     const legacyType = "VEC3";
     const legacyComponentType = "FLOAT";
-    return PntsPointClouds.createArrayIterableInternal(
+    return TileTableData.createArrayIterable(
       binary,
       byteOffset,
       numPoints,
@@ -251,7 +250,7 @@ export class PntsPointClouds {
   ): Iterable<number[]> {
     const legacyType = "VEC3";
     const legacyComponentType = "UNSIGNED_SHORT";
-    return PntsPointClouds.createArrayIterableInternal(
+    return TileTableData.createArrayIterable(
       binary,
       byteOffset,
       numPoints,
@@ -267,7 +266,7 @@ export class PntsPointClouds {
   ): Iterable<number[]> {
     const legacyType = "VEC2";
     const legacyComponentType = "UNSIGNED_SHORT";
-    return PntsPointClouds.createArrayIterableInternal(
+    return TileTableData.createArrayIterable(
       binary,
       byteOffset,
       numPoints,
@@ -283,7 +282,7 @@ export class PntsPointClouds {
   ): Iterable<number[]> {
     const legacyType = "VEC3";
     const legacyComponentType = "UNSIGNED_BYTE";
-    return PntsPointClouds.createArrayIterableInternal(
+    return TileTableData.createArrayIterable(
       binary,
       byteOffset,
       numPoints,
@@ -299,7 +298,7 @@ export class PntsPointClouds {
   ): Iterable<number[]> {
     const legacyType = "VEC4";
     const legacyComponentType = "UNSIGNED_BYTE";
-    return PntsPointClouds.createArrayIterableInternal(
+    return TileTableData.createArrayIterable(
       binary,
       byteOffset,
       numPoints,
@@ -315,7 +314,7 @@ export class PntsPointClouds {
   ): Iterable<number> {
     const legacyType = "SCALAR";
     const legacyComponentType = "UNSIGNED_SHORT";
-    return PntsPointClouds.createScalarIterableInternal(
+    return TileTableData.createScalarIterable(
       binary,
       byteOffset,
       numPoints,
@@ -327,7 +326,7 @@ export class PntsPointClouds {
   private static createDequantization(
     volumeOffset: number[],
     volumeScale: number[]
-  ) {
+  ): (input: number[]) => number[] {
     // POSITION = POSITION_QUANTIZED * QUANTIZED_VOLUME_SCALE / 65535.0 + QUANTIZED_VOLUME_OFFSET
     const scaleX = volumeScale[0] / 65535.0;
     const scaleY = volumeScale[1] / 65535.0;

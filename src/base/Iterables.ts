@@ -3,6 +3,8 @@ import path from "path";
 
 import { PathLike } from "fs";
 
+import { DeveloperError } from "./DeveloperError";
+
 /**
  * Utility methods for iterable objects.
  *
@@ -99,11 +101,17 @@ export class Iterables {
    * @param iterable - The iterable object
    * @param segmentSize - The segment size
    * @returns The segmentized iterable
+   * @throws DeveloperError If the segment size is not positive
    */
   static segmentize<T>(
     iterable: Iterable<T>,
     segmentSize: number
   ): Iterable<T[]> {
+    if (segmentSize <= 0) {
+      throw new DeveloperError(
+        `The segment size must be positive, but is ${segmentSize}`
+      );
+    }
     const resultIterable = {
       [Symbol.iterator]: function* (): Iterator<T[]> {
         let current: T[] = [];
@@ -113,6 +121,26 @@ export class Iterables {
             const result = current;
             current = [];
             yield result;
+          }
+        }
+      },
+    };
+    return resultIterable;
+  }
+
+  /**
+   * Creates an iterable that is a flat view on the given
+   * iterable.
+   *
+   * @param iterable - The iterable object
+   * @returns The flat iterable
+   */
+  static flatten<T>(iterable: Iterable<T[]>): Iterable<T> {
+    const resultIterable = {
+      [Symbol.iterator]: function* (): Iterator<T> {
+        for (const element of iterable) {
+          for (const innerElement of element) {
+            yield innerElement;
           }
         }
       },
