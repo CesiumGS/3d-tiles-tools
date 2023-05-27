@@ -1,31 +1,41 @@
 import { Iterables } from "../../base/Iterables";
+
 import { PntsFeatureTable } from "../../structure/TileFormats/PntsFeatureTable";
+
 import { TileFormatError } from "../../tileFormats/TileFormatError";
+
 import { AttributeCompression } from "./AttributeCompression";
 import { DefaultPointCloud } from "./DefaultPointCloud";
-import { PointCloudReader } from "./PointCloudReader";
+import { ReadablePointCloud } from "./ReadablePointCloud";
 import { TileTableData } from "../TileTableData";
+import { Colors } from "./Colors";
 
 export class PntsPointClouds {
   static create(
     featureTable: PntsFeatureTable,
     binary: Buffer
-  ): PointCloudReader {
+  ): ReadablePointCloud {
     const positions = PntsPointClouds.createPositions(featureTable, binary);
     const normals = PntsPointClouds.createNormals(featureTable, binary);
-    const colors = PntsPointClouds.createColors(featureTable, binary);
-    const globalColor = PntsPointClouds.createGlobalColor(featureTable, binary);
+    const colors = PntsPointClouds.createNormalizedLinearColors(
+      featureTable,
+      binary
+    );
+    const globalColor = PntsPointClouds.createGlobalNormalizedLinearColor(
+      featureTable,
+      binary
+    );
 
     const pointCloud = new DefaultPointCloud();
-    pointCloud.addPositions(positions);
+    pointCloud.setPositions(positions);
     if (normals) {
-      pointCloud.addNormals(normals);
+      pointCloud.setNormals(normals);
     }
     if (colors) {
-      pointCloud.addColors(colors);
+      pointCloud.setNormalizedLinearColors(colors);
     }
     if (globalColor) {
-      pointCloud.setGlobalColor(
+      pointCloud.setNormalizedLinearGlobalColor(
         globalColor[0],
         globalColor[1],
         globalColor[2],
@@ -153,63 +163,76 @@ export class PntsPointClouds {
     return undefined;
   }
 
-  private static createColors(
+  private static createNormalizedLinearColors(
     featureTable: PntsFeatureTable,
     binary: Buffer
   ): Iterable<number[]> | undefined {
     const numPoints = featureTable.POINTS_LENGTH;
     if (featureTable.RGB) {
       const byteOffset = featureTable.RGB.byteOffset;
-      const colorsRGB = PntsPointClouds.createColorsRgbInternal(
+      const colorsStandardRGB = PntsPointClouds.createColorsStandardRGBInternal(
         binary,
         byteOffset,
         numPoints
       );
-      const colorsRGBA = Iterables.map(colorsRGB, PntsPointClouds.rgbToRgba);
-      const colors = Iterables.map(colorsRGBA, PntsPointClouds.bytesToFloats);
-      return colors;
+      const colorsNormalizedLinearRGBA = Iterables.map(
+        colorsStandardRGB,
+        Colors.standardRGBToNormalizedLinearRGBA
+      );
+      return colorsNormalizedLinearRGBA;
     }
     if (featureTable.RGBA) {
       const byteOffset = featureTable.RGBA.byteOffset;
-      const colorsRGBA = PntsPointClouds.createColorsRgbaInternal(
-        binary,
-        byteOffset,
-        numPoints
+      const colorsStandardRGBA =
+        PntsPointClouds.createColorsStandardRGBAInternal(
+          binary,
+          byteOffset,
+          numPoints
+        );
+      const colorsNormalizedLinearRGBA = Iterables.map(
+        colorsStandardRGBA,
+        Colors.standardRGBAToNormalizedLinearRGBA
       );
-      const colors = Iterables.map(colorsRGBA, PntsPointClouds.bytesToFloats);
-      return colors;
+      return colorsNormalizedLinearRGBA;
     }
     if (featureTable.RGB565) {
       const byteOffset = featureTable.RGB565.byteOffset;
-      const colorsRGB565 = PntsPointClouds.createColorsRgb656Internal(
-        binary,
-        byteOffset,
-        numPoints
+      const colorsStandardRGB565 =
+        PntsPointClouds.createColorsStandardRGB656Internal(
+          binary,
+          byteOffset,
+          numPoints
+        );
+      const colorsNormalizedLinearRGBA = Iterables.map(
+        colorsStandardRGB565,
+        Colors.standardRGB565ToNormalizedLinearRGBA
       );
-      const colors = Iterables.map(
-        colorsRGB565,
-        AttributeCompression.decodeRGB565ToRGBA
-      );
-      return colors;
+      return colorsNormalizedLinearRGBA;
     }
     return undefined;
   }
 
-  private static createGlobalColor(
+  private static createGlobalNormalizedLinearColor(
     featureTable: PntsFeatureTable,
     binary: Buffer
   ): [number, number, number, number] | undefined {
     if (!featureTable.CONSTANT_RGBA) {
       return undefined;
     }
-    const constantRgba = TileTableData.obtainNumberArray(
+    const constantRGBA = TileTableData.obtainNumberArray(
       binary,
       featureTable.CONSTANT_RGBA,
       4,
       "UNSIGNED_BYTE"
     );
-    const rgba = PntsPointClouds.bytesToFloats(constantRgba);
-    return [rgba[0], rgba[1], rgba[2], rgba[3]];
+    const normalizedLinearRGBA =
+      Colors.standardRGBAToNormalizedLinearRGBA(constantRGBA);
+    return [
+      normalizedLinearRGBA[0],
+      normalizedLinearRGBA[1],
+      normalizedLinearRGBA[2],
+      normalizedLinearRGBA[3],
+    ];
   }
 
   private static createPositionsInternal(
@@ -275,7 +298,7 @@ export class PntsPointClouds {
     );
   }
 
-  private static createColorsRgbInternal(
+  private static createColorsStandardRGBInternal(
     binary: Buffer,
     byteOffset: number,
     numPoints: number
@@ -291,7 +314,7 @@ export class PntsPointClouds {
     );
   }
 
-  private static createColorsRgbaInternal(
+  private static createColorsStandardRGBAInternal(
     binary: Buffer,
     byteOffset: number,
     numPoints: number
@@ -307,7 +330,7 @@ export class PntsPointClouds {
     );
   }
 
-  private static createColorsRgb656Internal(
+  private static createColorsStandardRGB656Internal(
     binary: Buffer,
     byteOffset: number,
     numPoints: number
@@ -342,15 +365,5 @@ export class PntsPointClouds {
       ];
       return output;
     };
-  }
-
-  static bytesToFloats(input: number[]): number[] {
-    return input.map((b) => b / 255.0);
-  }
-
-  private static rgbToRgba(input: number[]): number[] {
-    const result = input.slice();
-    result.push(255);
-    return result;
   }
 }

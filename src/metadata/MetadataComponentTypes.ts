@@ -1,4 +1,3 @@
-import { defined } from "../base/defined";
 import { MetadataError } from "./MetadataError";
 
 /**
@@ -8,20 +7,31 @@ import { MetadataError } from "./MetadataError";
  * @internal
  */
 export class MetadataComponentTypes {
+  public static readonly INT8 = "INT8";
+  public static readonly UINT8 = "UINT8";
+  public static readonly INT16 = "INT16";
+  public static readonly UINT16 = "UINT16";
+  public static readonly INT32 = "INT32";
+  public static readonly UINT32 = "UINT32";
+  public static readonly INT64 = "INT64";
+  public static readonly UINT64 = "UINT64";
+  public static readonly FLOAT32 = "FLOAT32";
+  public static readonly FLOAT64 = "FLOAT64";
+
   /**
    * The valid values for the `class.property.componentType` property
    */
   static allComponentTypes: string[] = [
-    "INT8",
-    "UINT8",
-    "INT16",
-    "UINT16",
-    "INT32",
-    "UINT32",
-    "INT64",
-    "UINT64",
-    "FLOAT32",
-    "FLOAT64",
+    MetadataComponentTypes.INT8,
+    MetadataComponentTypes.UINT8,
+    MetadataComponentTypes.INT16,
+    MetadataComponentTypes.UINT16,
+    MetadataComponentTypes.INT32,
+    MetadataComponentTypes.UINT32,
+    MetadataComponentTypes.INT64,
+    MetadataComponentTypes.UINT64,
+    MetadataComponentTypes.FLOAT32,
+    MetadataComponentTypes.FLOAT64,
   ];
 
   /**
@@ -30,24 +40,24 @@ export class MetadataComponentTypes {
    * and the valid values for the `enum.valueType` property
    */
   static integerComponentTypes: string[] = [
-    "INT8",
-    "UINT8",
-    "INT16",
-    "UINT16",
-    "INT32",
-    "UINT32",
-    "INT64",
-    "UINT64",
+    MetadataComponentTypes.INT8,
+    MetadataComponentTypes.UINT8,
+    MetadataComponentTypes.INT16,
+    MetadataComponentTypes.UINT16,
+    MetadataComponentTypes.INT32,
+    MetadataComponentTypes.UINT32,
+    MetadataComponentTypes.INT64,
+    MetadataComponentTypes.UINT64,
   ];
 
   /**
    * Unsigned component types.
    */
   static unsignedComponentTypes: string[] = [
-    "UINT8",
-    "UINT16",
-    "UINT32",
-    "UINT64",
+    MetadataComponentTypes.UINT8,
+    MetadataComponentTypes.UINT16,
+    MetadataComponentTypes.UINT32,
+    MetadataComponentTypes.UINT64,
   ];
 
   /**
@@ -58,7 +68,7 @@ export class MetadataComponentTypes {
    * @returns Whether the component type is an integer component type
    */
   static isIntegerComponentType(componentType: string | undefined) {
-    if (!defined(componentType)) {
+    if (componentType === undefined) {
       return false;
     }
     return MetadataComponentTypes.integerComponentTypes.includes(componentType);
@@ -72,7 +82,7 @@ export class MetadataComponentTypes {
    * @returns Whether the component type is an unsigned component type
    */
   static isUnsignedComponentType(componentType: string | undefined) {
-    if (!defined(componentType)) {
+    if (componentType === undefined) {
       return false;
     }
     return MetadataComponentTypes.unsignedComponentTypes.includes(
@@ -90,25 +100,25 @@ export class MetadataComponentTypes {
    */
   static byteSizeForComponentType(componentType: string): number {
     switch (componentType) {
-      case "INT8":
+      case MetadataComponentTypes.INT8:
         return 1;
-      case "UINT8":
+      case MetadataComponentTypes.UINT8:
         return 1;
-      case "INT16":
+      case MetadataComponentTypes.INT16:
         return 2;
-      case "UINT16":
+      case MetadataComponentTypes.UINT16:
         return 2;
-      case "INT32":
+      case MetadataComponentTypes.INT32:
         return 4;
-      case "UINT32":
+      case MetadataComponentTypes.UINT32:
         return 4;
-      case "INT64":
+      case MetadataComponentTypes.INT64:
         return 8;
-      case "UINT64":
+      case MetadataComponentTypes.UINT64:
         return 8;
-      case "FLOAT32":
+      case MetadataComponentTypes.FLOAT32:
         return 4;
-      case "FLOAT64":
+      case MetadataComponentTypes.FLOAT64:
         return 8;
     }
     throw new MetadataError(`Invalid component type: ${componentType}`);
@@ -131,25 +141,25 @@ export class MetadataComponentTypes {
     componentType: string | undefined
   ): number | bigint | undefined {
     switch (componentType) {
-      case "INT8":
+      case MetadataComponentTypes.INT8:
         return 127;
-      case "UINT8":
+      case MetadataComponentTypes.UINT8:
         return 255;
-      case "INT16":
+      case MetadataComponentTypes.INT16:
         return 32767;
-      case "UINT16":
+      case MetadataComponentTypes.UINT16:
         return 65535;
-      case "INT32":
+      case MetadataComponentTypes.INT32:
         return 2147483647;
-      case "UINT32":
+      case MetadataComponentTypes.UINT32:
         return 4294967295;
-      case "INT64":
+      case MetadataComponentTypes.INT64:
         return BigInt("9223372036854775807");
-      case "UINT64":
+      case MetadataComponentTypes.UINT64:
         return BigInt("18446744073709551615");
-      case "FLOAT32":
+      case MetadataComponentTypes.FLOAT32:
         return 340282346638528859811704183484516925440.0;
-      case "FLOAT64":
+      case MetadataComponentTypes.FLOAT64:
         return Number.MAX_VALUE;
     }
     throw new MetadataError(`Invalid component type: ${componentType}`);

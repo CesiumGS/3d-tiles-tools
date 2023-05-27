@@ -1,14 +1,16 @@
-import { TileFormatError } from "../../tileFormats/TileFormatError";
-import { PointCloudReader } from "./PointCloudReader";
 import { Iterables } from "../../base/Iterables";
 
-export class DefaultPointCloud implements PointCloudReader {
+import { TileFormatError } from "../../tileFormats/TileFormatError";
+
+import { ReadablePointCloud } from "./ReadablePointCloud";
+
+export class DefaultPointCloud implements ReadablePointCloud {
   private readonly attributeValues: { [key: string]: Iterable<number> } = {};
   private readonly attributeTypes: { [key: string]: string } = {};
   private readonly attributeComponentTypes: { [key: string]: string } = {};
   private globalColor: [number, number, number, number] | undefined;
 
-  addPositions(positions: Iterable<number[]>) {
+  setPositions(positions: Iterable<number[]>) {
     this.addAttribute(
       "POSITION",
       "VEC3",
@@ -17,11 +19,11 @@ export class DefaultPointCloud implements PointCloudReader {
     );
   }
 
-  addNormals(normals: Iterable<number[]>) {
+  setNormals(normals: Iterable<number[]>) {
     this.addAttribute("NORMAL", "VEC3", "FLOAT32", Iterables.flatten(normals));
   }
 
-  addColors(colors: Iterable<number[]>) {
+  setNormalizedLinearColors(colors: Iterable<number[]>) {
     this.addAttribute("COLOR_0", "VEC4", "FLOAT32", Iterables.flatten(colors));
   }
 
@@ -36,12 +38,12 @@ export class DefaultPointCloud implements PointCloudReader {
     this.attributeValues[name] = attribute;
   }
 
-  /** {@inheritDoc PointCloudWriter.setGlobalColor} */
-  setGlobalColor(r: number, g: number, b: number, a: number) {
+  /** {@inheritDoc WritablePointCloud.setNormalizedLinearGlobalColor} */
+  setNormalizedLinearGlobalColor(r: number, g: number, b: number, a: number) {
     this.globalColor = [r, g, b, a];
   }
 
-  /** {@inheritDoc PointCloudReader.getPositions} */
+  /** {@inheritDoc ReadablePointCloud.getPositions} */
   getPositions(): Iterable<number[]> {
     const values = this.getAttributeValues("POSITION");
     if (!values) {
@@ -50,7 +52,7 @@ export class DefaultPointCloud implements PointCloudReader {
     return Iterables.segmentize(values, 3);
   }
 
-  /** {@inheritDoc PointCloudReader.getNormals} */
+  /** {@inheritDoc ReadablePointCloud.getNormals} */
   getNormals(): Iterable<number[]> | undefined {
     const values = this.getAttributeValues("NORMAL");
     if (!values) {
@@ -59,8 +61,8 @@ export class DefaultPointCloud implements PointCloudReader {
     return Iterables.segmentize(values, 3);
   }
 
-  /** {@inheritDoc PointCloudReader.getColors} */
-  getColors(): Iterable<number[]> | undefined {
+  /** {@inheritDoc ReadablePointCloud.getNormalizedLinearColors} */
+  getNormalizedLinearColors(): Iterable<number[]> | undefined {
     const values = this.getAttributeValues("COLOR_0");
     if (!values) {
       return undefined;
@@ -68,8 +70,10 @@ export class DefaultPointCloud implements PointCloudReader {
     return Iterables.segmentize(values, 4);
   }
 
-  /** {@inheritDoc PointCloudReader.getGlobalColor} */
-  getGlobalColor(): [number, number, number, number] | undefined {
+  /** {@inheritDoc ReadablePointCloud.getNormalizedLinearGlobalColor} */
+  getNormalizedLinearGlobalColor():
+    | [number, number, number, number]
+    | undefined {
     if (this.globalColor) {
       return [...this.globalColor];
     }

@@ -1,10 +1,12 @@
-import { TileFormatError } from "../../tileFormats/TileFormatError";
-import { PointCloudReader } from "./PointCloudReader";
-import { PointCloudWriter } from "./PointCloudWriter";
 import { Iterables } from "../../base/Iterables";
 
+import { TileFormatError } from "../../tileFormats/TileFormatError";
+
+import { ReadablePointCloud } from "./ReadablePointCloud";
+import { WritablePointCloud } from "./WritablePointCloud";
+
 export class DefaultPointCloudBuilder
-  implements PointCloudReader, PointCloudWriter
+  implements ReadablePointCloud, WritablePointCloud
 {
   private readonly attributeValues: { [key: string]: number[] } = {};
   private readonly attributeTypes: { [key: string]: string } = {};
@@ -21,7 +23,7 @@ export class DefaultPointCloudBuilder
     }
   }
 
-  /** {@inheritDoc PointCloudWriter.addPosition} */
+  /** {@inheritDoc WritablePointCloud.addPosition} */
   addPosition(x: number, y: number, z: number) {
     this.ensureAttribute("POSITION", "VEC3", "FLOAT32");
     const attributeValues = this.attributeValues["POSITION"];
@@ -30,7 +32,7 @@ export class DefaultPointCloudBuilder
     attributeValues.push(z);
   }
 
-  /** {@inheritDoc PointCloudWriter.addNormal} */
+  /** {@inheritDoc WritablePointCloud.addNormal} */
   addNormal(x: number, y: number, z: number) {
     this.ensureAttribute("NORMAL", "VEC3", "FLOAT32");
     const attributeValues = this.attributeValues["NORMAL"];
@@ -39,8 +41,8 @@ export class DefaultPointCloudBuilder
     attributeValues.push(z);
   }
 
-  /** {@inheritDoc PointCloudWriter.addColor} */
-  addColor(r: number, g: number, b: number, a: number) {
+  /** {@inheritDoc WritablePointCloud.addNormalizedLinearColor} */
+  addNormalizedLinearColor(r: number, g: number, b: number, a: number) {
     this.ensureAttribute("COLOR_0", "VEC4", "FLOAT32");
     const attributeValues = this.attributeValues["COLOR_0"];
     attributeValues.push(r);
@@ -49,12 +51,12 @@ export class DefaultPointCloudBuilder
     attributeValues.push(a);
   }
 
-  /** {@inheritDoc PointCloudWriter.setGlobalColor} */
-  setGlobalColor(r: number, g: number, b: number, a: number) {
+  /** {@inheritDoc WritablePointCloud.setNormalizedLinearGlobalColor} */
+  setNormalizedLinearGlobalColor(r: number, g: number, b: number, a: number) {
     this.globalColor = [r, g, b, a];
   }
 
-  /** {@inheritDoc PointCloudReader.getPositions} */
+  /** {@inheritDoc ReadablePointCloud.getPositions} */
   getPositions(): Iterable<number[]> {
     const array = this.attributeValues["POSITION"];
     if (!array) {
@@ -63,7 +65,7 @@ export class DefaultPointCloudBuilder
     return Iterables.segmentize(array, 3);
   }
 
-  /** {@inheritDoc PointCloudReader.getNormals} */
+  /** {@inheritDoc ReadablePointCloud.getNormals} */
   getNormals(): Iterable<number[]> | undefined {
     const array = this.attributeValues["NORMAL"];
     if (!array) {
@@ -72,8 +74,8 @@ export class DefaultPointCloudBuilder
     return Iterables.segmentize(array, 3);
   }
 
-  /** {@inheritDoc PointCloudReader.getColors} */
-  getColors(): Iterable<number[]> | undefined {
+  /** {@inheritDoc ReadablePointCloud.getNormalizedLinearColors} */
+  getNormalizedLinearColors(): Iterable<number[]> | undefined {
     const array = this.attributeValues["COLOR_0"];
     if (!array) {
       return undefined;
@@ -81,8 +83,10 @@ export class DefaultPointCloudBuilder
     return Iterables.segmentize(array, 4);
   }
 
-  /** {@inheritDoc PointCloudReader.getGlobalColor} */
-  getGlobalColor(): [number, number, number, number] | undefined {
+  /** {@inheritDoc ReadablePointCloud.getNormalizedLinearGlobalColor} */
+  getNormalizedLinearGlobalColor():
+    | [number, number, number, number]
+    | undefined {
     if (this.globalColor) {
       return [...this.globalColor];
     }
@@ -92,25 +96,12 @@ export class DefaultPointCloudBuilder
   getAttributes(): string[] {
     return Object.keys(this.attributeValues);
   }
-  getAttribute(name: string): Iterable<any> | undefined {
+  getAttributeValues(name: string): Iterable<number> | undefined {
     const array = this.attributeValues[name];
     if (!array) {
       return undefined;
     }
-    const type = this.getAttributeType(name);
-    if (type === "SCALAR") {
-      return array;
-    }
-    if (type === "VEC2") {
-      return Iterables.segmentize(array, 2);
-    }
-    if (type === "VEC3") {
-      return Iterables.segmentize(array, 2);
-    }
-    if (type === "VEC4") {
-      return Iterables.segmentize(array, 2);
-    }
-    throw new TileFormatError("Invalid attribute type " + type);
+    return array;
   }
   getAttributeType(name: string): string | undefined {
     return this.attributeTypes[name];

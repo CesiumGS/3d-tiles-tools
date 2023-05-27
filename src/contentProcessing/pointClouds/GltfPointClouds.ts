@@ -2,13 +2,17 @@ import { Document } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
 import { Accessor } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
-import { PointCloudReader } from "./PointCloudReader";
-import { TileFormatError } from "../../tileFormats/TileFormatError";
+
+import { EXTMeshFeatures } from "../gltftransform/EXTMeshFeatures";
+
 import { Iterables } from "../../base/Iterables";
-import { MeshFeatures } from "../gltftransform/MeshFeatures";
+
+import { ReadablePointCloud } from "./ReadablePointCloud";
+
+import { TileFormatError } from "../../tileFormats/TileFormatError";
 
 export class GltfPointClouds {
-  static async build(pointCloudReader: PointCloudReader) {
+  static async build(readablePointCloud: ReadablePointCloud) {
     const document = new Document();
 
     const buffer = document.createBuffer();
@@ -17,7 +21,7 @@ export class GltfPointClouds {
     const primitive = document.createPrimitive();
     primitive.setMode(Primitive.Mode.POINTS);
 
-    const positions = pointCloudReader.getAttributeValues("POSITION");
+    const positions = readablePointCloud.getAttributeValues("POSITION");
     if (!positions) {
       throw new TileFormatError("No POSITION attribute found");
     }
@@ -27,7 +31,7 @@ export class GltfPointClouds {
     positionAccessor.setArray(new Float32Array([...positions]));
     primitive.setAttribute("POSITION", positionAccessor);
 
-    const normals = pointCloudReader.getAttributeValues("NORMAL");
+    const normals = readablePointCloud.getAttributeValues("NORMAL");
     if (normals) {
       const normalAccessor = document.createAccessor();
       normalAccessor.setBuffer(buffer);
@@ -36,7 +40,7 @@ export class GltfPointClouds {
       primitive.setAttribute("NORMAL", normalAccessor);
     }
 
-    const colors = pointCloudReader.getAttributeValues("COLOR_0");
+    const colors = readablePointCloud.getAttributeValues("COLOR_0");
     if (colors) {
       const colorAccessor = document.createAccessor();
       colorAccessor.setBuffer(buffer);
@@ -49,7 +53,7 @@ export class GltfPointClouds {
       primitive.setAttribute("COLOR_0", colorAccessor);
     }
 
-    const globalColor = pointCloudReader.getGlobalColor();
+    const globalColor = readablePointCloud.getNormalizedLinearGlobalColor();
     if (globalColor) {
       const material = document.createMaterial();
       material.setBaseColorFactor(globalColor);
@@ -60,7 +64,7 @@ export class GltfPointClouds {
 
     //===
     const featureIdValues =
-      pointCloudReader.getAttributeValues("_FEATURE_ID_0");
+      readablePointCloud.getAttributeValues("_FEATURE_ID_0");
     if (featureIdValues) {
       const featureIdValuesArray = [...featureIdValues];
       const featureIdAccessor = document.createAccessor();
@@ -90,7 +94,7 @@ export class GltfPointClouds {
     scene.addChild(node);
 
     const io = new NodeIO();
-    io.registerExtensions([MeshFeatures]);
+    io.registerExtensions([EXTMeshFeatures]);
     const glb = await io.writeBinary(document);
     return Buffer.from(glb);
   }
@@ -101,12 +105,12 @@ export class GltfPointClouds {
     attribute: number,
     featureCount: number
   ) {
-    const meshFeatures = document.createExtension(MeshFeatures);
-    const meshFeature = meshFeatures.createMeshFeature();
-    const featureId = meshFeatures.createFeatureId();
+    const extMeshFeatures = document.createExtension(EXTMeshFeatures);
+    const meshFeatures = extMeshFeatures.createMeshFeatures();
+    const featureId = extMeshFeatures.createFeatureId();
     featureId.setAttribute(attribute);
     featureId.setFeatureCount(featureCount);
-    meshFeature.addFeatureId(featureId);
-    primitive.setExtension("EXT_mesh_features", meshFeature);
+    meshFeatures.addFeatureId(featureId);
+    primitive.setExtension("EXT_mesh_features", meshFeatures);
   }
 }

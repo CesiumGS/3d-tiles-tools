@@ -1,11 +1,23 @@
 import { Cartesian3 } from "cesium";
 import { Math as CesiumMath } from "cesium";
 
-// Adapted from CesiumJS 'AttributeCompression' class:
+/**
+ * Adapted from CesiumJS 'AttributeCompression' class:
+ *
+ * Methods for decoding (point cloud) attribute values that are
+ * stored in compressed forms.
+ */
 export class AttributeCompression {
   private static readonly octDecodeInRangeInternalResultScratch =
     new Cartesian3();
 
+  /**
+   * Decodes two 16-bit values that represent an oct-encoded normal
+   * into a 3D (normalized) normal.
+   *
+   * @param input - The input values
+   * @returns The resulting normal
+   */
   static octDecode(input: number[]): number[] {
     const rangeMax = 65535;
     const result = AttributeCompression.octDecodeInRangeInternalResultScratch;
@@ -35,7 +47,14 @@ export class AttributeCompression {
     return Cartesian3.normalize(result, result);
   }
 
-  static decodeRGB565ToRGBA(value: number): number[] {
+  /**
+   * Decodes the given standard RGB656 value into normalized standard
+   * RGBA components (i.e. into four values in [0.0, 1.0]).
+   *
+   * @param value - The RGB656 value
+   * @returns The normalized standard RGB components
+   */
+  static decodeStandardRGB565ToNormalizedStandardRGBA(value: number): number[] {
     const mask5 = (1 << 5) - 1;
     const mask6 = (1 << 6) - 1;
     const normalize5 = 1.0 / 31.0;
