@@ -9,12 +9,29 @@ import { DefaultPointCloud } from "./DefaultPointCloud";
 import { ReadablePointCloud } from "./ReadablePointCloud";
 import { TileTableData } from "../TileTableData";
 import { Colors } from "./Colors";
+import { DracoDecoder } from "../draco/DracoDecoder";
 
 export class PntsPointClouds {
-  static create(
+  static async create(
     featureTable: PntsFeatureTable,
     binary: Buffer
-  ): ReadablePointCloud {
+  ): Promise<ReadablePointCloud> {
+    if (featureTable.extensions) {
+      const dracoPoints =
+        featureTable.extensions["3DTILES_draco_point_compression"];
+      console.log("Yep, that's compressed", dracoPoints);
+      const dracoDecoder = await DracoDecoder.create();
+      const buffer = binary.subarray(
+        dracoPoints.byteOffset,
+        dracoPoints.byteOffset + dracoPoints.byteLength
+      );
+      const decoded = dracoDecoder.decodePointCloud(
+        dracoPoints.properties,
+        buffer
+      );
+      console.log("Decoded ", decoded);
+    }
+
     const positions = PntsPointClouds.createPositions(featureTable, binary);
     const normals = PntsPointClouds.createNormals(featureTable, binary);
     const colors = PntsPointClouds.createNormalizedLinearColors(

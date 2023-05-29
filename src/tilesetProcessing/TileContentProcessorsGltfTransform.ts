@@ -1,4 +1,4 @@
-import draco3d from "draco3dgltf";
+import draco3d from "draco3d";
 
 import { NodeIO, Transform } from "@gltf-transform/core";
 import { KHRONOS_EXTENSIONS } from "@gltf-transform/extensions";

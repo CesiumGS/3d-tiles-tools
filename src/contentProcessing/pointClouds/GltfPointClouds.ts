@@ -2,6 +2,7 @@ import { Document } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
 import { Accessor } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
+import { Buffer as GltfBuffer } from "@gltf-transform/core";
 
 import { EXTMeshFeatures } from "../gltftransform/EXTMeshFeatures";
 
@@ -12,7 +13,10 @@ import { ReadablePointCloud } from "./ReadablePointCloud";
 import { TileFormatError } from "../../tileFormats/TileFormatError";
 
 export class GltfPointClouds {
-  static async build(readablePointCloud: ReadablePointCloud) {
+  static async build(
+    readablePointCloud: ReadablePointCloud,
+    globalPosition: [number, number, number] | undefined
+  ) {
     const document = new Document();
 
     const buffer = document.createBuffer();
@@ -62,33 +66,22 @@ export class GltfPointClouds {
       primitive.setMaterial(material);
     }
 
-    //===
-    const featureIdValues =
-      readablePointCloud.getAttributeValues("_FEATURE_ID_0");
-    if (featureIdValues) {
-      const featureIdValuesArray = [...featureIdValues];
-      const featureIdAccessor = document.createAccessor();
-      featureIdAccessor.setBuffer(buffer);
-      featureIdAccessor.setType(Accessor.Type.SCALAR);
-      featureIdAccessor.setArray(new Uint16Array(featureIdValuesArray));
-      primitive.setAttribute("_FEATURE_ID_0", featureIdAccessor);
-
-      const attribute = 0;
-      const featureCount = new Set(featureIdValuesArray).size;
-      GltfPointClouds.assignExtension(
-        document,
-        primitive,
-        attribute,
-        featureCount
-      );
-    }
-    //===
+    GltfPointClouds.assignFeatureIdAttributes(
+      readablePointCloud,
+      document,
+      buffer,
+      primitive
+    );
 
     const mesh = document.createMesh();
     mesh.addPrimitive(primitive);
 
     const node = document.createNode();
     node.setMesh(mesh);
+
+    if (globalPosition) {
+      node.setTranslation(globalPosition);
+    }
 
     const scene = document.createScene();
     scene.addChild(node);
@@ -99,18 +92,90 @@ export class GltfPointClouds {
     return Buffer.from(glb);
   }
 
-  private static assignExtension(
+  private static assignFeatureIdAttributes(
+    readablePointCloud: ReadablePointCloud,
     document: Document,
-    primitive: Primitive,
-    attribute: number,
-    featureCount: number
+    buffer: GltfBuffer,
+    primitive: Primitive
   ) {
-    const extMeshFeatures = document.createExtension(EXTMeshFeatures);
-    const meshFeatures = extMeshFeatures.createMeshFeatures();
-    const featureId = extMeshFeatures.createFeatureId();
-    featureId.setAttribute(attribute);
-    featureId.setFeatureCount(featureCount);
-    meshFeatures.addFeatureId(featureId);
-    primitive.setExtension("EXT_mesh_features", meshFeatures);
+    let extMeshFeatures;
+    let meshFeatures;
+
+    const attributes = readablePointCloud.getAttributes();
+    for (const attributeName of attributes) {
+      const featureIdRegex = /_FEATURE_ID_([0-9]+)/;
+      const match = attributeName.match(featureIdRegex);
+      if (!match) {
+        continue;
+      }
+      if (!extMeshFeatures) {
+        extMeshFeatures = document.createExtension(EXTMeshFeatures);
+      }
+
+      const attributeNumber = Number(match[1]);
+      const featureIdValues =
+        readablePointCloud.getAttributeValues(attributeName);
+      const componentType =
+        readablePointCloud.getAttributeComponentType(attributeName);
+
+      if (featureIdValues && componentType) {
+        const featureIdAccessor = document.createAccessor();
+        featureIdAccessor.setBuffer(buffer);
+        featureIdAccessor.setType(Accessor.Type.SCALAR);
+        featureIdAccessor.setArray(
+          GltfPointClouds.createFeatureIdVertexAttribute(
+            featureIdValues,
+            componentType
+          )
+        );
+        primitive.setAttribute(attributeName, featureIdAccessor);
+
+        const featureCount = new Set([...featureIdValues]).size;
+
+        const featureId = extMeshFeatures.createFeatureId();
+        featureId.setAttribute(attributeNumber);
+        featureId.setFeatureCount(featureCount);
+
+        if (!meshFeatures) {
+          meshFeatures = extMeshFeatures.createMeshFeatures();
+        }
+        meshFeatures.addFeatureId(featureId);
+      }
+    }
+
+    if (meshFeatures) {
+      primitive.setExtension("EXT_mesh_features", meshFeatures);
+    }
+  }
+
+  private static createFeatureIdVertexAttribute(
+    numbers: Iterable<number>,
+    componentType: string
+  ) {
+    const numbersArray = [...numbers];
+    switch (componentType) {
+      case "UINT8":
+        return new Uint8Array(numbersArray);
+      case "INT8":
+        return new Int8Array(numbersArray);
+
+      case "UINT16":
+        return new Uint16Array(numbersArray);
+      case "INT16":
+        return new Int16Array(numbersArray);
+
+      case "UINT32":
+      case "INT32":
+      case "UINT64":
+      case "INT64":
+      case "FLOAT64":
+        console.warn(
+          `Feature ID attribute has type ${componentType}, converting to 32 bit float`
+        );
+        return new Float32Array(numbersArray);
+      case "FLOAT32":
+        return new Float32Array(numbersArray);
+    }
+    throw new TileFormatError(`Unknown component type: ${componentType}`);
   }
 }

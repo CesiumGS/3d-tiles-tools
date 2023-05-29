@@ -26,8 +26,22 @@ export class TileFormatsMigration {
     console.log(JSON.stringify(featureTable, null, 2));
     //*/
 
-    const pntsPointCloud = PntsPointClouds.create(featureTable, binary);
-    const glbBuffer = await GltfPointClouds.build(pntsPointCloud);
+    let globalPosition: [number, number, number] | undefined = undefined;
+    const rtcCenter = featureTable.RTC_CENTER;
+    if (rtcCenter) {
+      const c = TileTableData.obtainNumberArray(
+        binary,
+        rtcCenter,
+        3,
+        "FLOAT32"
+      );
+      globalPosition = [c[0], c[1], c[2]];
+    }
+    const pntsPointCloud = await PntsPointClouds.create(featureTable, binary);
+    const glbBuffer = await GltfPointClouds.build(
+      pntsPointCloud,
+      globalPosition
+    );
     return glbBuffer;
   }
 }
