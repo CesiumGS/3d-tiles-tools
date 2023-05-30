@@ -12,11 +12,31 @@ import { ReadablePointCloud } from "./ReadablePointCloud";
 
 import { TileFormatError } from "../../tileFormats/TileFormatError";
 
+/**
+ * Methods to create glTF representations of point clouds
+ */
 export class GltfPointClouds {
+  /**
+   * Creates a binary glTF (GLB) for a point cloud that was
+   * created from the given `ReadablePointCloud` input.
+   *
+   * Many details about the result are intentionally not
+   * specified. It is supposed to be "just a point cloud".
+   *
+   *
+   * @param readablePointCloud - The `ReadablePointCloud`
+   * @param globalPosition The optional global position, to
+   * be set as the `translation` component of the root node.
+   * @returns The buffer containing the GLB data
+   *
+   * @throws TileFormatError If the input data does not
+   * at least contain a `POSITION` attribute.
+   */
   static async build(
     readablePointCloud: ReadablePointCloud,
     globalPosition: [number, number, number] | undefined
-  ) {
+  ): Promise<Buffer> {
+    // Prepare the glTF-Transform document and primitive
     const document = new Document();
 
     const buffer = document.createBuffer();
@@ -25,6 +45,7 @@ export class GltfPointClouds {
     const primitive = document.createPrimitive();
     primitive.setMode(Primitive.Mode.POINTS);
 
+    // Assign the POSITION attribute
     const positions = readablePointCloud.getAttributeValues("POSITION");
     if (!positions) {
       throw new TileFormatError("No POSITION attribute found");
@@ -35,6 +56,7 @@ export class GltfPointClouds {
     positionAccessor.setArray(new Float32Array([...positions]));
     primitive.setAttribute("POSITION", positionAccessor);
 
+    // Assign the NORMAL, if present
     const normals = readablePointCloud.getAttributeValues("NORMAL");
     if (normals) {
       const normalAccessor = document.createAccessor();
@@ -44,6 +66,7 @@ export class GltfPointClouds {
       primitive.setAttribute("NORMAL", normalAccessor);
     }
 
+    // Assign the COLOR_0, if present
     const colors = readablePointCloud.getAttributeValues("COLOR_0");
     if (colors) {
       const colorAccessor = document.createAccessor();
@@ -57,6 +80,7 @@ export class GltfPointClouds {
       primitive.setAttribute("COLOR_0", colorAccessor);
     }
 
+    // Assign the global color, if present
     const globalColor = readablePointCloud.getNormalizedLinearGlobalColor();
     if (globalColor) {
       const material = document.createMaterial();
@@ -66,6 +90,8 @@ export class GltfPointClouds {
       primitive.setMaterial(material);
     }
 
+    // If there are `_FEATURE_ID_n` attributes, assign them to
+    // the primitive as `EXT_mesh_features`
     GltfPointClouds.assignFeatureIdAttributes(
       readablePointCloud,
       document,
@@ -73,6 +99,7 @@ export class GltfPointClouds {
       primitive
     );
 
+    // Assemble the actual glTF scene
     const mesh = document.createMesh();
     mesh.addPrimitive(primitive);
 
@@ -86,12 +113,24 @@ export class GltfPointClouds {
     const scene = document.createScene();
     scene.addChild(node);
 
+    // Create the GLB buffer
     const io = new NodeIO();
     io.registerExtensions([EXTMeshFeatures]);
     const glb = await io.writeBinary(document);
     return Buffer.from(glb);
   }
 
+  /**
+   * If the given point cloud contains attributes that match
+   * the pattern `"_FEATURE_ID_<x>"` with `<x>` being a
+   * number, then these attributes will be stored in the
+   * mesh primitive using the `EXT_mesh_features` extension.
+   *
+   * @param readablePointCloud - The `ReadablePointCloud`
+   * @param document The glTF-Transform document
+   * @param buffer The glTF-Transform buffer
+   * @param primitive The glTF-Transform primitive
+   */
   private static assignFeatureIdAttributes(
     readablePointCloud: ReadablePointCloud,
     document: Document,
@@ -148,6 +187,23 @@ export class GltfPointClouds {
     }
   }
 
+  /**
+   * Creates a typed array from the given numbers, to be used
+   * as a glTF vertex attribute.
+   *
+   * This will convert the given numbers into a typed array,
+   * depending on the given `componentType`.
+   *
+   * Note that there are certain component types that are
+   * not valid for glTF vertex attribute data. If such a
+   * type is encountered, then a warning will be printed
+   * and the numbers will be stored as 32 bit floating
+   * point values.
+   *
+   * @param numbers - The numbers
+   * @param componentType - The component type
+   * @returns The typed array
+   */
   private static createFeatureIdVertexAttribute(
     numbers: Iterable<number>,
     componentType: string

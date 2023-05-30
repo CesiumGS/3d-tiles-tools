@@ -5,7 +5,7 @@ import { TileFormats } from "../tileFormats/TileFormats";
 
 import { PntsPointClouds } from "./pointClouds/PntsPointClouds";
 import { GltfPointClouds } from "./pointClouds/GltfPointClouds";
-import { TileFormatError } from "../tileFormats/TileFormatError";
+
 import { TileTableData } from "./TileTableData";
 
 export class TileFormatsMigration {
@@ -26,22 +26,28 @@ export class TileFormatsMigration {
     console.log(JSON.stringify(featureTable, null, 2));
     //*/
 
-    let globalPosition: [number, number, number] | undefined = undefined;
-    const rtcCenter = featureTable.RTC_CENTER;
-    if (rtcCenter) {
-      const c = TileTableData.obtainNumberArray(
-        binary,
-        rtcCenter,
-        3,
-        "FLOAT32"
+    const globalPosition =
+      TileFormatsMigration.obtainGlobalPositionFromRtcCenter(
+        featureTable,
+        binary
       );
-      globalPosition = [c[0], c[1], c[2]];
-    }
     const pntsPointCloud = await PntsPointClouds.create(featureTable, binary);
     const glbBuffer = await GltfPointClouds.build(
       pntsPointCloud,
       globalPosition
     );
     return glbBuffer;
+  }
+
+  private static obtainGlobalPositionFromRtcCenter(
+    featureTable: PntsFeatureTable,
+    binary: Buffer
+  ): [number, number, number] | undefined {
+    const rtcCenter = featureTable.RTC_CENTER;
+    if (!rtcCenter) {
+      return undefined;
+    }
+    const c = TileTableData.obtainNumberArray(binary, rtcCenter, 3, "FLOAT32");
+    return [c[0], c[1], c[2]];
   }
 }

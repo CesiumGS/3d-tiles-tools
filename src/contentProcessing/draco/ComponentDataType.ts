@@ -129,4 +129,35 @@ export class ComponentDatatype {
       "array must be an Int8Array, Uint8Array, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, or Float64Array."
     );
   }
+
+  /**
+   * Returns the string representation of the given data type.
+   *
+   * @param componentDatatype The component datatype
+   * @returns The string
+   *
+   * @throws DracoError when componentDatatype is not a valid value.
+   */
+  static toString(componentDatatype: number) {
+    switch (componentDatatype) {
+      case ComponentDatatype.BYTE:
+        return "BYTE";
+      case ComponentDatatype.UNSIGNED_BYTE:
+        return "UNSIGNED_BYTE";
+      case ComponentDatatype.SHORT:
+        return "SHORT";
+      case ComponentDatatype.UNSIGNED_SHORT:
+        return "UNSIGNED_SHORT";
+      case ComponentDatatype.INT:
+        return "INT";
+      case ComponentDatatype.UNSIGNED_INT:
+        return "UNSIGNED_INT";
+      case ComponentDatatype.FLOAT:
+        return "FLOAT";
+      case ComponentDatatype.DOUBLE:
+        return "DOUBLE";
+      default:
+        throw new DracoError("componentDatatype is not a valid value.");
+    }
+  }
 }

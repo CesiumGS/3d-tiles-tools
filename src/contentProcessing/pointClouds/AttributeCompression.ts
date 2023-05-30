@@ -46,27 +46,4 @@ export class AttributeCompression {
     }
     return Cartesian3.normalize(result, result);
   }
-
-  /**
-   * Decodes the given standard RGB656 value into normalized standard
-   * RGBA components (i.e. into four values in [0.0, 1.0]).
-   *
-   * @param value - The RGB656 value
-   * @returns The normalized standard RGB components
-   */
-  static decodeStandardRGB565ToNormalizedStandardRGBA(value: number): number[] {
-    const mask5 = (1 << 5) - 1;
-    const mask6 = (1 << 6) - 1;
-    const normalize5 = 1.0 / 31.0;
-    const normalize6 = 1.0 / 63.0;
-    const red = value >> 11;
-    const green = (value >> 5) & mask6;
-    const blue = value & mask5;
-    const result: number[] = Array(4);
-    result[0] = red * normalize5;
-    result[1] = green * normalize6;
-    result[2] = blue * normalize5;
-    result[3] = 1.0;
-    return result;
-  }
 }

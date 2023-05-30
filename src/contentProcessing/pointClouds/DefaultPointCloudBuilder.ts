@@ -93,9 +93,12 @@ export class DefaultPointCloudBuilder
     return undefined;
   }
 
+  /** {@inheritDoc ReadablePointCloud.getAttributes} */
   getAttributes(): string[] {
     return Object.keys(this.attributeValues);
   }
+
+  /** {@inheritDoc ReadablePointCloud.getAttributeValues} */
   getAttributeValues(name: string): Iterable<number> | undefined {
     const array = this.attributeValues[name];
     if (!array) {
@@ -103,9 +106,13 @@ export class DefaultPointCloudBuilder
     }
     return array;
   }
+
+  /** {@inheritDoc ReadablePointCloud.getAttributeType} */
   getAttributeType(name: string): string | undefined {
     return this.attributeTypes[name];
   }
+
+  /** {@inheritDoc ReadablePointCloud.getAttributeComponentType} */
   getAttributeComponentType(name: string): string | undefined {
     return this.attributeComponentTypes[name];
   }
