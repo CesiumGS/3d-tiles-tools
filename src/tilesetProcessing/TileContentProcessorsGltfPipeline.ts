@@ -24,7 +24,7 @@ export class TileContentProcessorsGltfPipeline {
     const tileContentProcessor = async (
       inputContentData: Buffer,
       type: string | undefined
-    ) => {
+    ): Promise<Buffer> => {
       if (type !== ContentDataTypes.CONTENT_TYPE_GLB) {
         return inputContentData;
       }
