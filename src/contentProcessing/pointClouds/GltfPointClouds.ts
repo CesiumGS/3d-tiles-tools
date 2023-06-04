@@ -1,5 +1,4 @@
 import { Document } from "@gltf-transform/core";
-import { NodeIO } from "@gltf-transform/core";
 import { Accessor } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 import { Buffer as GltfBuffer } from "@gltf-transform/core";
@@ -9,6 +8,7 @@ import { EXTMeshFeatures } from "../gltftransform/EXTMeshFeatures";
 import { Iterables } from "../../base/Iterables";
 
 import { ReadablePointCloud } from "./ReadablePointCloud";
+import { GltfTransform } from "../GltfTransform";
 
 import { TileFormatError } from "../../tileFormats/TileFormatError";
 
@@ -114,8 +114,7 @@ export class GltfPointClouds {
     scene.addChild(node);
 
     // Create the GLB buffer
-    const io = new NodeIO();
-    io.registerExtensions([EXTMeshFeatures]);
+    const io = await GltfTransform.getIO();
     const glb = await io.writeBinary(document);
     return Buffer.from(glb);
   }

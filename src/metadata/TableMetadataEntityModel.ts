@@ -1,17 +1,17 @@
-import { defined } from "../../base/defined";
+import { defined } from "../base/defined";
 
-import { MetadataEntityModel } from "../MetadataEntityModel";
-import { MetadataValues } from "../MetadataValues";
-import { MetadataError } from "../MetadataError";
-import { PropertyTableModel } from "../PropertyTableModel";
+import { MetadataEntityModel } from "./MetadataEntityModel";
+import { MetadataValues } from "./MetadataValues";
+import { MetadataError } from "./MetadataError";
+import { PropertyTableModel } from "./PropertyTableModel";
 
 /**
- * Implementation of a `MetadataEntityModel` that is backed by binary
- * data (specifically, by a `PropertyTableModel`)
+ * Implementation of a `MetadataEntityModel` that is backed by an
+ * arbitrary implementation of `PropertyTableModel`
  *
  * @internal
  */
-export class BinaryMetadataEntityModel implements MetadataEntityModel {
+export class TableMetadataEntityModel implements MetadataEntityModel {
   private readonly _propertyTableModel: PropertyTableModel;
   private readonly _entityIndex: number;
   private readonly _semanticToPropertyId: { [key: string]: string };

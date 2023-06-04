@@ -139,7 +139,7 @@ export class MetadataComponentTypes {
   // Partially adapted from CesiumJS
   private static maximumValue(
     componentType: string | undefined
-  ): number | bigint | undefined {
+  ): number | bigint {
     switch (componentType) {
       case MetadataComponentTypes.INT8:
         return 127;
@@ -161,6 +161,35 @@ export class MetadataComponentTypes {
         return 340282346638528859811704183484516925440.0;
       case MetadataComponentTypes.FLOAT64:
         return Number.MAX_VALUE;
+    }
+    throw new MetadataError(`Invalid component type: ${componentType}`);
+  }
+
+  // Partially adapted from CesiumJS
+  private static minimumValue(
+    componentType: string | undefined
+  ): number | bigint {
+    switch (componentType) {
+      case MetadataComponentTypes.INT8:
+        return -128;
+      case MetadataComponentTypes.UINT8:
+        return 0;
+      case MetadataComponentTypes.INT16:
+        return -32768;
+      case MetadataComponentTypes.UINT16:
+        return 0;
+      case MetadataComponentTypes.INT32:
+        return -2147483648;
+      case MetadataComponentTypes.UINT32:
+        return 0;
+      case MetadataComponentTypes.INT64:
+        return BigInt("-9223372036854775808");
+      case MetadataComponentTypes.UINT64:
+        return BigInt(0);
+      case MetadataComponentTypes.FLOAT32:
+        return -340282346638528859811704183484516925440.0;
+      case MetadataComponentTypes.FLOAT64:
+        return -Number.MAX_VALUE;
     }
     throw new MetadataError(`Invalid component type: ${componentType}`);
   }

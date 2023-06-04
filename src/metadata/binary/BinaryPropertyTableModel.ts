@@ -1,6 +1,6 @@
 import { BinaryPropertyModels } from "./BinaryPropertyModels";
 import { BinaryPropertyTable } from "./BinaryPropertyTable";
-import { BinaryMetadataEntityModel } from "./BinaryMetadataEntityModel";
+import { TableMetadataEntityModel } from "../TableMetadataEntityModel";
 
 import { MetadataEntityModel } from "../MetadataEntityModel";
 import { MetadataEntityModels } from "../MetadataEntityModels";
@@ -69,7 +69,7 @@ export class BinaryPropertyTableModel implements PropertyTableModel {
       throw new MetadataError(message);
     }
     const semanticToPropertyId = this._semanticToPropertyId;
-    const metadataEntityModel = new BinaryMetadataEntityModel(
+    const metadataEntityModel = new TableMetadataEntityModel(
       this,
       index,
       semanticToPropertyId

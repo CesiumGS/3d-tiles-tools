@@ -1,6 +1,7 @@
 import { PropertyModel } from "../metadata/PropertyModel";
 import { NumericBuffers } from "../metadata/binary/NumericBuffers";
 import { NumericPropertyModel } from "../metadata/binary/NumericPropertyModel";
+import { BatchTableBinaryBodyReference } from "../structure/TileFormats/BatchTableBinaryBodyReference";
 import { BinaryBodyOffset } from "../structure/TileFormats/BinaryBodyOffset";
 import { TileFormatError } from "../tileFormats/TileFormatError";
 
@@ -33,38 +34,55 @@ export class TileTableData {
     return (p as BinaryBodyOffset).byteOffset !== undefined;
   }
 
-  static createArrayIterable(
+  static isBatchTableBinaryBodyReference(
+    p: any
+  ): p is BatchTableBinaryBodyReference {
+    const r = p as BatchTableBinaryBodyReference;
+    return (
+      r.byteOffset !== undefined &&
+      r.componentType !== undefined &&
+      r.type !== undefined
+    );
+  }
+
+  static createNumericArrayIterable(
     binary: Buffer,
     byteOffset: number,
     numPoints: number,
     legacyType: string,
     legacyComponentType: string
   ): Iterable<number[]> {
-    const propertyModel = TileTableData.createPropertyModel(
+    const propertyModel = TileTableData.createNumericPropertyModel(
       legacyType,
       legacyComponentType,
       byteOffset,
       binary
     );
-    return TileTableData.createArrayIterableInternal(propertyModel, numPoints);
+    return TileTableData.createNumericArrayIterableInternal(
+      propertyModel,
+      numPoints
+    );
   }
-  static createScalarIterable(
+  static createNumericScalarIterable(
     binary: Buffer,
     byteOffset: number,
     numPoints: number,
     legacyType: string,
     legacyComponentType: string
   ): Iterable<number> {
-    const propertyModel = TileTableData.createPropertyModel(
+    const propertyModel = TileTableData.createNumericPropertyModel(
       legacyType,
       legacyComponentType,
       byteOffset,
       binary
     );
-    return TileTableData.createScalarIterableInternal(propertyModel, numPoints);
+    return TileTableData.createNumericScalarIterableInternal(
+      propertyModel,
+      numPoints
+    );
   }
 
-  private static createArrayIterableInternal(
+  private static createNumericArrayIterableInternal(
     propertyModel: PropertyModel,
     numElements: number
   ): Iterable<number[]> {
@@ -79,7 +97,7 @@ export class TileTableData {
     return iterable;
   }
 
-  private static createScalarIterableInternal(
+  private static createNumericScalarIterableInternal(
     propertyModel: PropertyModel,
     numElements: number
   ): Iterable<number> {
@@ -94,7 +112,7 @@ export class TileTableData {
     return iterable;
   }
 
-  static createPropertyModel(
+  static createNumericPropertyModel(
     legacyType: string,
     legacyComponentType: string,
     byteOffset: number,
@@ -114,7 +132,7 @@ export class TileTableData {
     return propertyModel;
   }
 
-  private static convertLegacyTypeToType(legacyType: string) {
+  static convertLegacyTypeToType(legacyType: string) {
     switch (legacyType) {
       case "SCALAR":
       case "VEC2":
