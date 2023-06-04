@@ -62,7 +62,8 @@ export class BatchTableClassProperties {
       }
     } else {
       throw new TileFormatError(
-        `Batch table JSON property ${batchTablePropertyName} was ` + `not a binary body reference and not an array`
+        `Batch table JSON property ${batchTablePropertyName} was ` +
+          `not a binary body reference and not an array`
       );
     }
 
