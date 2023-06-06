@@ -3,9 +3,9 @@
  */
 interface NumberTypeDescription {
   /**
-   * Whether the type must support negative numbers
+   * Whether the type must support signed numbers
    */
-  isNegative: boolean;
+  isSigned: boolean;
 
   /**
    * Whether the type is an integer type
@@ -57,7 +57,7 @@ export class NumberTypeDescriptions {
     if (!description.isIntegral) {
       return "FLOAT" + description.requiredBits;
     }
-    if (description.isNegative) {
+    if (description.isSigned) {
       return "INT" + description.requiredBits;
     }
     return "UINT" + description.requiredBits;
@@ -77,19 +77,19 @@ export class NumberTypeDescriptions {
    * @returns The number type description
    */
   private static computeSingle(value: number | bigint): NumberTypeDescription {
-    let isNegative = false;
+    let isSigned = false;
     let isIntegral = false;
     let requiredBits = 32;
 
     if (value < 0) {
-      isNegative = true;
+      isSigned = true;
     }
     if (typeof value === "bigint" || Number.isInteger(value)) {
       isIntegral = true;
       requiredBits = NumberTypeDescriptions.computeRequiredBits(BigInt(value));
     }
     const result: NumberTypeDescription = {
-      isNegative: isNegative,
+      isSigned: isSigned,
       isIntegral: isIntegral,
       requiredBits: requiredBits,
     };
@@ -132,7 +132,7 @@ export class NumberTypeDescriptions {
     values: number[] | bigint[] | number[][] | bigint[][]
   ): NumberTypeDescription {
     let result: NumberTypeDescription = {
-      isNegative: false,
+      isSigned: false,
       isIntegral: true,
       requiredBits: 8,
     };
@@ -153,7 +153,7 @@ export class NumberTypeDescriptions {
    *
    * This is the smallest description that covers both of the
    * given descriptions. It will therefore indicate...
-   * - 'negative' if either of the inputs indicates 'negative'
+   * - 'signed' if either of the inputs indicates 'signed'
    * - 'integral' if both inputs indicate 'integral'
    * - A number of bits that is the maximum (!) of both input bits
    *
@@ -163,7 +163,7 @@ export class NumberTypeDescriptions {
    */
   private static min(a: NumberTypeDescription, b: NumberTypeDescription) {
     const result: NumberTypeDescription = {
-      isNegative: a.isNegative || b.isNegative,
+      isSigned: a.isSigned || b.isSigned,
       isIntegral: a.isIntegral && b.isIntegral,
       requiredBits: Math.max(a.requiredBits, b.requiredBits),
     };
