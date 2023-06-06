@@ -160,7 +160,7 @@ export class TileTableData {
       case "INT":
         return "INT32";
       case "UNSIGNED_INT":
-        return "UINT21";
+        return "UINT32";
       case "FLOAT":
         return "FLOAT32";
       case "DOUBLE":
