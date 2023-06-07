@@ -31,7 +31,6 @@ import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
  * written into the target when `end()` is called.
  */
 export class BasicTilesetProcessor extends TilesetProcessor {
-
   /**
    * Creates a new instance
    *
