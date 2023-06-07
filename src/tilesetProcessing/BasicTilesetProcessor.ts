@@ -13,6 +13,7 @@ import { TilesetEntryProcessor } from "./TilesetEntryProcessor";
 import { TraversedTile } from "../traversal/TraversedTile";
 import { TilesetTraverser } from "../traversal/TilesetTraverser";
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
+import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 
 /**
  * Implementation of a `TilesetProcessor` that offers methods for
@@ -30,6 +31,7 @@ import { TilesetEntry } from "../tilesetData/TilesetEntry";
  * written into the target when `end()` is called.
  */
 export class BasicTilesetProcessor extends TilesetProcessor {
+
   /**
    * Creates a new instance
    *
@@ -222,13 +224,31 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
   ): Promise<void> {
-    // Traverse the (explicit) tiles of the input tileset
-    await this.forEachExplicitTile(async (tile: Tile): Promise<void> => {
+    const context = this.getContext();
+    const tileset = context.sourceTileset;
+    const root = tileset.root;
+    const tileCallback = this.createTileCallback(uriProcessor, entryProcessor);
+    await Tiles.traverseExplicit(root, async (tilePath: Tile[]) => {
+      const tile = tilePath[tilePath.length - 1];
+      await tileCallback(tile);
+      return true;
+    });
+  }
+
+  private createTileCallback(
+    uriProcessor: (uri: string) => string,
+    entryProcessor: TilesetEntryProcessor
+  ): (tile: Tile) => Promise<void> {
+    const tileCallback = async (tile: Tile): Promise<void> => {
       // When the tile is not an implicit tiling root,
       // then just update the entries that correspond
       // to the tile contents.
       if (!tile.implicitTiling) {
-        await this.processExplicitTileContentEntries(tile, entryProcessor);
+        await this.processExplicitTileContentEntries(
+          tile,
+          uriProcessor,
+          entryProcessor
+        );
       } else {
         // For implicit tiling roots, traverse the implicit tile hierarchy
         // that starts at this tile, and process each entry that corresponds
@@ -236,6 +256,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
         await this.forEachTileAt(tile, async (traversedTile: TraversedTile) => {
           await this.processTraversedTileContentEntries(
             traversedTile,
+            uriProcessor,
             entryProcessor
           );
           return true;
@@ -248,7 +269,8 @@ export class BasicTilesetProcessor extends TilesetProcessor {
           content.uri = uriProcessor(content.uri);
         }
       }
-    });
+    };
+    return tileCallback;
   }
 
   /**
@@ -264,11 +286,13 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    */
   private async processExplicitTileContentEntries(
     tile: Tile,
+    uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
   ): Promise<void> {
     const contents = BasicTilesetProcessor.getTileContents(tile);
     const targetContentUris = await this.processContentEntries(
       contents,
+      uriProcessor,
       entryProcessor
     );
     BasicTilesetProcessor.updateTileContent(tile, targetContentUris);
@@ -287,13 +311,14 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    */
   private async processTraversedTileContentEntries(
     traversedTile: TraversedTile,
+    uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
   ): Promise<void> {
     if (traversedTile.isImplicitTilesetRoot()) {
       return;
     }
     const contents = traversedTile.getFinalContents();
-    await this.processContentEntries(contents, entryProcessor);
+    await this.processContentEntries(contents, uriProcessor, entryProcessor);
   }
 
   /**
@@ -306,6 +331,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    */
   private async processContentEntries(
     contents: Content[],
+    uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
   ): Promise<string[]> {
     const targetContentUris: string[] = [];
@@ -315,7 +341,19 @@ export class BasicTilesetProcessor extends TilesetProcessor {
       if (this.isProcessed(sourceContentUri)) {
         targetContentUri = this.getTargetKey(sourceContentUri);
       } else {
-        await this.processEntry(sourceContentUri, entryProcessor);
+        await this.processEntry(
+          sourceContentUri,
+          async (sourceEntry: TilesetEntry, type: string | undefined) => {
+            if (type === ContentDataTypes.CONTENT_TYPE_TILESET) {
+              return this.processExternalTileset(
+                sourceEntry,
+                uriProcessor,
+                entryProcessor
+              );
+            }
+            return entryProcessor(sourceEntry, type);
+          }
+        );
         targetContentUri = this.getTargetKey(sourceContentUri);
       }
       if (targetContentUri) {
@@ -323,6 +361,39 @@ export class BasicTilesetProcessor extends TilesetProcessor {
       }
     }
     return targetContentUris;
+  }
+
+  private async processExternalTileset(
+    externalTilesetSourceEntry: TilesetEntry,
+    uriProcessor: (uri: string) => string,
+    entryProcessor: TilesetEntryProcessor
+  ): Promise<TilesetEntry | undefined> {
+    console.log(
+      "Processing external tileset " + externalTilesetSourceEntry.key
+    );
+
+    const externalTileset = JSON.parse(
+      externalTilesetSourceEntry.value.toString()
+    ) as Tileset;
+    const externalRoot = externalTileset.root;
+    const tileCallback = this.createTileCallback(uriProcessor, entryProcessor);
+    await Tiles.traverseExplicit(externalRoot, async (tilePath: Tile[]) => {
+      const tile = tilePath[tilePath.length - 1];
+      await tileCallback(tile);
+      return true;
+    });
+    const externalTilesetJsonString = JSON.stringify(externalTileset, null, 2);
+    const targetTilesetJsonBuffer = Buffer.from(externalTilesetJsonString);
+    const externalTilesetTargetEntry = {
+      key: externalTilesetSourceEntry.key,
+      value: targetTilesetJsonBuffer,
+    };
+
+    console.log(
+      "Processing external tileset " + externalTilesetSourceEntry.key + " DONE"
+    );
+
+    return externalTilesetTargetEntry;
   }
 
   /**
