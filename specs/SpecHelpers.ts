@@ -84,6 +84,22 @@ export class SpecHelpers {
   }
 
   /**
+   * Collect all content URIs that appear in the explicit tiles
+   * of the specified tileset, in unspecified order
+   *
+   * @param tilesetFileName - The tileset file name
+   * @returns A promise to all content URIs
+   */
+  static async collectExplicitContentUrisFromFile(tilesetFileName: string) {
+    const tilesetJsonBuffer = fs.readFileSync(tilesetFileName);
+    const tileset = JSON.parse(tilesetJsonBuffer.toString());
+    const contentUris = await SpecHelpers.collectExplicitContentUris(
+      tileset.root
+    );
+    return contentUris;
+  }
+
+  /**
    * Collect all content URIs (excluding possible template URIs in
    * implicit tiling roots) that appear in the given tileset, in
    * unspecified order.
