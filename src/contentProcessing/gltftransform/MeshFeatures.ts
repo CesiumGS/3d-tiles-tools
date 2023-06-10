@@ -21,6 +21,12 @@ const NAME = "EXT_mesh_features";
 // has an associated `TextureInfo`. This is used internally by glTF-Transform
 // for some deduplication magic or whatnot.
 //
+// More genenerally: The types of the properties in these interfaces
+// are the model classes themself, and NOT the interface. So it is
+//     featureIds: FeatureId[];
+// and not
+//     featureIds: IFeatureId[];
+//
 // These interfaces are NOT publicly visible. They only serve as the type
 // pararameter for the `ExtensionProperty` class, which is the base
 // for the actual "model" classes that are exposed to the user.
@@ -33,6 +39,7 @@ interface IFeatureId extends IProperty {
   label: string;
   attribute: FeatureIdAttribute;
   texture: FeatureIdTexture;
+  // TODO This should be a PropertyTable object, not an index!
   propertyTable: number;
 }
 type FeatureIdAttribute = number;
