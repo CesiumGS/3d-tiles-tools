@@ -1,4 +1,4 @@
-import { Extension } from "@gltf-transform/core";
+import { Extension, GLB_BUFFER } from "@gltf-transform/core";
 import { GLTF } from "@gltf-transform/core";
 import { ReaderContext } from "@gltf-transform/core";
 import { WriterContext } from "@gltf-transform/core";
@@ -524,25 +524,53 @@ export class EXTStructuralMetadata extends Extension {
     }
   }
 
+  private obtainBufferData(
+    context: ReaderContext,
+    bufferViewIndex: number
+  ): Uint8Array {
+    const jsonDoc = context.jsonDoc;
+    const bufferDefs = jsonDoc.json.buffers || [];
+    const bufferViewDefs = jsonDoc.json.bufferViews || [];
+    const bufferViewDef = bufferViewDefs[bufferViewIndex];
+    const bufferDef = bufferDefs[bufferViewDef.buffer];
+    const bufferData = bufferDef.uri
+      ? jsonDoc.resources[bufferDef.uri]
+      : jsonDoc.resources[GLB_BUFFER];
+    const byteOffset = bufferViewDef.byteOffset || 0;
+    const byteLength = bufferViewDef.byteLength;
+    const bufferViewData = bufferData.slice(
+      byteOffset,
+      byteOffset + byteLength
+    );
+    return bufferViewData;
+  }
+
   private readPropertyTableProperty(
     context: ReaderContext,
     propertyTableProperty: PropertyTableProperty,
     propertyTablePropertyDef: PropertyTablePropertyDef
   ) {
-    const valuesBufferViewIndex = propertyTablePropertyDef.values;
+    const valuesData = this.obtainBufferData(
+      context,
+      propertyTablePropertyDef.values
+    );
+    propertyTableProperty.setValues(valuesData);
 
-    /*/ TODO: Here, the data should be obtained 
-    const jsonDoc = context.jsonDoc;
-    const bufferDefs = jsonDoc.json.buffers || [];
-    const bufferViewDefs = jsonDoc.json.bufferViews || [];
-    const bufferViewDef = bufferViewDefs[valuesBufferViewIndex];
-    const bufferDef = bufferDefs[bufferViewDef.buffer];
-    const bufferData = bufferDef.uri ? jsonDoc.resources[bufferDef.uri] : jsonDoc.resources[GLB_BUFFER];
-    const byteOffset = bufferViewDef.byteOffset || 0;
-    const byteLength = bufferViewDef.byteLength;
-    const bufferViewData = bufferData.slice(byteOffset, byteOffset + byteLength);
-    //*/
-    propertyTableProperty.setValues(valuesBufferViewIndex);
+    if (propertyTablePropertyDef.arrayOffsets != undefined) {
+      const arrayOffsetsData = this.obtainBufferData(
+        context,
+        propertyTablePropertyDef.arrayOffsets
+      );
+      propertyTableProperty.setArrayOffsets(arrayOffsetsData);
+    }
+
+    if (propertyTablePropertyDef.stringOffsets != undefined) {
+      const stringOffsetsData = this.obtainBufferData(
+        context,
+        propertyTablePropertyDef.stringOffsets
+      );
+      propertyTableProperty.setStringOffsets(stringOffsetsData);
+    }
 
     // I'd REALLY like to boil these down to
     // setIfDefined(propertyTableProperty, propertyTablePropertyDef, "arrayOffsets");
@@ -552,16 +580,6 @@ export class EXTStructuralMetadata extends Extension {
     // assignAll(model, def);
     // ...
 
-    if (propertyTablePropertyDef.arrayOffsets !== undefined) {
-      propertyTableProperty.setArrayOffsets(
-        propertyTablePropertyDef.arrayOffsets
-      );
-    }
-    if (propertyTablePropertyDef.stringOffsets !== undefined) {
-      propertyTableProperty.setStringOffsets(
-        propertyTablePropertyDef.stringOffsets
-      );
-    }
     if (propertyTablePropertyDef.arrayOffsetType !== undefined) {
       propertyTableProperty.setArrayOffsetType(
         propertyTablePropertyDef.arrayOffsetType

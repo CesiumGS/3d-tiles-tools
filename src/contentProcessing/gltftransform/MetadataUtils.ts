@@ -3,10 +3,14 @@ import {
   Class,
   ClassProperty,
   MeshPrimitiveStructuralMetadata,
+  PropertyTable,
+  PropertyTableProperty,
   Schema,
   StructuralMetadata,
 } from "./StructuralMetadata";
 import { FeatureId, MeshFeatures } from "./MeshFeatures";
+import { NumericPropertyModel } from "../../metadata/binary/NumericPropertyModel";
+import { BinaryPropertyModels } from "../../metadata/binary/BinaryPropertyModels";
 
 class StringBuilder {
   private s: string;
@@ -40,14 +44,11 @@ export class MetadataUtils {
     const structuralMetadata = document
       .getRoot()
       .getExtension<StructuralMetadata>("EXT_structural_metadata");
-    console.log(structuralMetadata);
 
     const sb = new StringBuilder();
     if (structuralMetadata) {
       MetadataUtils.createStructuralMetadataString(sb, structuralMetadata);
-      console.log(sb.toString());
     }
-
     const meshes = document.getRoot().listMeshes();
     MetadataUtils.createMeshesString(sb, meshes);
     return sb.toString();
@@ -58,15 +59,152 @@ export class MetadataUtils {
     structuralMetadata: StructuralMetadata
   ) {
     sb.addLine("StructuralMetadata:");
+    sb.increaseIndent();
+
     const schema = structuralMetadata.getSchema();
     if (schema) {
-      sb.increaseIndent();
       sb.addLine("Schema:");
       sb.increaseIndent();
       MetadataUtils.createSchemaString(sb, schema);
       sb.decreaseIndent();
+    }
+
+    sb.addLine("Property tables:");
+    const propertyTables = structuralMetadata.listPropertyTables();
+    for (let i = 0; i < propertyTables.length; i++) {
+      const propertyTable = propertyTables[i];
+      sb.increaseIndent();
+      sb.addLine("Property table ", i, " of ", propertyTables.length);
+      sb.increaseIndent();
+      MetadataUtils.createPropertyTableString(sb, propertyTable, schema);
+      sb.decreaseIndent();
       sb.decreaseIndent();
     }
+    sb.decreaseIndent();
+  }
+
+  private static createPropertyTableString(
+    sb: StringBuilder,
+    propertyTable: PropertyTable,
+    schema: Schema | null
+  ) {
+    sb.addLine("name: ", propertyTable.getObjectName());
+    sb.addLine("class: ", propertyTable.getClass());
+    sb.addLine("count: ", propertyTable.getCount());
+    sb.addLine("properties:");
+    const propertyKeys = propertyTable.listPropertyKeys();
+    for (const propertyKey of propertyKeys) {
+      sb.increaseIndent();
+      sb.addLine(propertyKey, ":");
+      const propertyTableProperty = propertyTable.getProperty(propertyKey);
+      if (propertyTableProperty) {
+        sb.increaseIndent();
+        const className = propertyTable.getClass();
+        const rowCount = propertyTable.getCount();
+        MetadataUtils.createPropertyTablePropertyString(
+          sb,
+          propertyTableProperty
+        );
+        MetadataUtils.createPropertyTablePropertyValuesString(
+          sb,
+          propertyTableProperty,
+          schema,
+          className,
+          propertyKey,
+          rowCount
+        );
+        sb.decreaseIndent();
+      }
+      sb.decreaseIndent();
+    }
+  }
+
+  private static createPropertyTablePropertyValuesString(
+    sb: StringBuilder,
+    propertyTableProperty: PropertyTableProperty,
+    schema: Schema | null,
+    className: string,
+    propertyName: string,
+    rowCount: number
+  ) {
+    sb.addLine("decoded values:");
+    sb.increaseIndent();
+    if (!schema) {
+      sb.addLine("decoded values: (no schema");
+      return;
+    }
+    const classValue = schema.getClass(className);
+    if (!classValue) {
+      sb.addLine(`decoded values: (no class '${className}' in schema`);
+      return;
+    }
+    const classProperty = classValue.getProperty(propertyName);
+    if (!classProperty) {
+      sb.addLine(
+        `decoded values: (no property '${propertyName}' in class '${className}' in schema`
+      );
+      return;
+    }
+    const type = classProperty.getType();
+    const componentType = classProperty.getComponentType();
+    const isArray = classProperty.getArray();
+    const count = classProperty.getCount();
+    const valuesBufferViewData = Buffer.from(propertyTableProperty.getValues());
+    const arrayOffsetsBufferViewData = propertyTableProperty.getArrayOffsets()
+      ? Buffer.from(propertyTableProperty.getArrayOffsets())
+      : undefined;
+    const arrayOffsetType = propertyTableProperty.getArrayOffsetType();
+    const stringOffsetsBufferViewData = propertyTableProperty.getStringOffsets()
+      ? Buffer.from(propertyTableProperty.getStringOffsets())
+      : undefined;
+    const stringOffsetType = propertyTableProperty.getStringOffsetType();
+    const enumType = classProperty.getEnumType();
+    const enumValueType = "UINT16"; // XXX TODO Compute this!
+    const propertyModel = BinaryPropertyModels.createPropertyModelInternal(
+      propertyName,
+      type,
+      componentType,
+      isArray,
+      count,
+      valuesBufferViewData,
+      arrayOffsetsBufferViewData,
+      arrayOffsetType,
+      stringOffsetsBufferViewData,
+      stringOffsetType,
+      enumValueType
+    );
+    for (let r = 0; r < rowCount; r++) {
+      const v = propertyModel.getPropertyValue(r);
+      sb.addLine(v);
+    }
+    sb.decreaseIndent();
+  }
+
+  private static createPropertyTablePropertyString(
+    sb: StringBuilder,
+    propertyTableProperty: PropertyTableProperty
+  ) {
+    sb.addLine(
+      "values: ",
+      propertyTableProperty.getValues() ? "(present)" : "undefined"
+    );
+    sb.addLine(
+      "arrayOffsets: ",
+      propertyTableProperty.getArrayOffsets() ? "(present)" : "undefined"
+    );
+    sb.addLine(
+      "stringOffsets: ",
+      propertyTableProperty.getStringOffsets() ? "(present)" : "undefined"
+    );
+    sb.addLine("arrayOffsetType: ", propertyTableProperty.getArrayOffsetType());
+    sb.addLine(
+      "stringOffsetType: ",
+      propertyTableProperty.getStringOffsetType()
+    );
+    sb.addLine("offset: ", propertyTableProperty.getOffset());
+    sb.addLine("scale: ", propertyTableProperty.getScale());
+    sb.addLine("max: ", propertyTableProperty.getMax());
+    sb.addLine("min: ", propertyTableProperty.getMin());
   }
 
   private static createSchemaString(sb: StringBuilder, schema: Schema) {

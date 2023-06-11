@@ -120,6 +120,55 @@ export class BinaryPropertyModels {
     const componentType = classProperty.componentType;
     const count = classProperty.count;
     const isArray = classProperty.array === true;
+
+    const propertyModel = BinaryPropertyModels.createPropertyModelInternal(
+      propertyId,
+      type,
+      componentType,
+      isArray,
+      count,
+      valuesBufferViewData,
+      arrayOffsetsBufferViewData,
+      arrayOffsetType,
+      stringOffsetsBufferViewData,
+      stringOffsetType,
+      enumValueType
+    );
+    return propertyModel;
+  }
+
+  /**
+   * Internal method to create a `PropertyModel` based on all
+   * the raw data elements that have been obtained from the
+   * `BinaryPropertyTable` for a specific property.
+   *
+   * @param propertyId - The property ID
+   * @param type The type
+   * @param componentType The component type
+   * @param isArray Whether the property is an array
+   * @param count The count (array length)
+   * @param valuesBufferViewData The values data
+   * @param arrayOffsetsBufferViewData The array offsets data
+   * @param arrayOffsetType The array offsets type
+   * @param stringOffsetsBufferViewData The string offsets data
+   * @param stringOffsetType The string offsets type
+   * @param enumValueType The enum value type
+   * @returns The `PropertyModel`
+   * @throws MetadataError if the given data is inconsistent
+   */
+  static createPropertyModelInternal(
+    propertyId: string,
+    type: string,
+    componentType: string | undefined,
+    isArray: boolean,
+    count: number | undefined,
+    valuesBufferViewData: Buffer,
+    arrayOffsetsBufferViewData: Buffer | undefined,
+    arrayOffsetType: string,
+    stringOffsetsBufferViewData: Buffer | undefined,
+    stringOffsetType: string,
+    enumValueType: string | undefined
+  ): PropertyModel {
     if (isArray) {
       if (type === "STRING") {
         if (!stringOffsetsBufferViewData) {

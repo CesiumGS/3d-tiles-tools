@@ -91,11 +91,9 @@ interface IPropertyTable extends IProperty {
 }
 
 interface IPropertyTableProperty extends IProperty {
-  // TODO These (values, arrayOffsets, stringOffsets) should
-  // be buffer view data, NOT indices!
-  values: number;
-  arrayOffsets: number;
-  stringOffsets: number;
+  values: Uint8Array;
+  arrayOffsets: Uint8Array;
+  stringOffsets: Uint8Array;
   arrayOffsetType: string;
   stringOffsetType: string;
   offset: any;
@@ -616,24 +614,24 @@ export class PropertyTableProperty extends ExtensionProperty<IPropertyTablePrope
     });
   }
 
-  getValues(): number {
+  getValues(): Uint8Array {
     return this.get("values");
   }
-  setValues(values: number) {
+  setValues(values: Uint8Array) {
     return this.set("values", values);
   }
 
-  getArrayOffsets(): number {
+  getArrayOffsets(): Uint8Array {
     return this.get("arrayOffsets");
   }
-  setArrayOffsets(arrayOffsets: number) {
+  setArrayOffsets(arrayOffsets: Uint8Array) {
     return this.set("arrayOffsets", arrayOffsets);
   }
 
-  getStringOffsets(): number {
+  getStringOffsets(): Uint8Array {
     return this.get("stringOffsets");
   }
-  setStringOffsets(stringOffsets: number) {
+  setStringOffsets(stringOffsets: Uint8Array) {
     return this.set("stringOffsets", stringOffsets);
   }
 
