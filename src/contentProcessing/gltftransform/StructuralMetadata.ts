@@ -31,7 +31,7 @@ interface ISchema extends IProperty {
   description: string;
   version: string;
   classes: { [key: string]: Class };
-  enums: { [key: string]: IEnum };
+  enums: { [key: string]: Enum };
 }
 interface IClass extends IProperty {
   objectName: string;
@@ -267,8 +267,8 @@ export class Schema extends ExtensionProperty<ISchema> {
     return this.set("version", version);
   }
 
-  setClass(key: string, classValue: Class | null): this {
-    return this.setRefMap("classes", key, classValue);
+  setClass(key: string, value: Class | null): this {
+    return this.setRefMap("classes", key, value);
   }
   getClass(key: string): Class | null {
     return this.getRefMap("classes", key);
@@ -278,6 +278,19 @@ export class Schema extends ExtensionProperty<ISchema> {
   }
   listClassValues(): Class[] {
     return this.listRefMapValues("classes");
+  }
+
+  setEnum(key: string, value: Enum | null): this {
+    return this.setRefMap("enums", key, value);
+  }
+  getEnum(key: string): Enum | null {
+    return this.getRefMap("enums", key);
+  }
+  listEnumKeys(): string[] {
+    return this.listRefMapKeys("enums");
+  }
+  listEnumValues(): Enum[] {
+    return this.listRefMapValues("enums");
   }
 }
 
@@ -313,8 +326,8 @@ export class Class extends ExtensionProperty<IClass> {
     return this.set("description", description);
   }
 
-  setProperty(key: string, classProperty: ClassProperty | null): this {
-    return this.setRefMap("properties", key, classProperty);
+  setProperty(key: string, value: ClassProperty | null): this {
+    return this.setRefMap("properties", key, value);
   }
   getProperty(key: string): ClassProperty | null {
     return this.getRefMap("properties", key);
@@ -581,8 +594,8 @@ export class PropertyTable extends ExtensionProperty<IPropertyTable> {
     return this.set("count", count);
   }
 
-  setProperty(key: string, property: PropertyTableProperty | null): this {
-    return this.setRefMap("properties", key, property);
+  setProperty(key: string, value: PropertyTableProperty | null): this {
+    return this.setRefMap("properties", key, value);
   }
   getProperty(key: string): PropertyTableProperty | null {
     return this.getRefMap("properties", key);
@@ -621,14 +634,14 @@ export class PropertyTableProperty extends ExtensionProperty<IPropertyTablePrope
     return this.set("values", values);
   }
 
-  getArrayOffsets(): Uint8Array {
+  getArrayOffsets(): Uint8Array | null {
     return this.get("arrayOffsets");
   }
   setArrayOffsets(arrayOffsets: Uint8Array) {
     return this.set("arrayOffsets", arrayOffsets);
   }
 
-  getStringOffsets(): Uint8Array {
+  getStringOffsets(): Uint8Array | null {
     return this.get("stringOffsets");
   }
   setStringOffsets(stringOffsets: Uint8Array) {
@@ -710,8 +723,8 @@ export class PropertyTexture extends ExtensionProperty<IPropertyTexture> {
     return this.set("class", _class);
   }
 
-  setProperty(key: string, property: PropertyTextureProperty | null): this {
-    return this.setRefMap("properties", key, property);
+  setProperty(key: string, value: PropertyTextureProperty | null): this {
+    return this.setRefMap("properties", key, value);
   }
   getProperty(key: string): PropertyTextureProperty | null {
     return this.getRefMap("properties", key);
@@ -823,8 +836,8 @@ export class PropertyAttribute extends ExtensionProperty<IPropertyAttribute> {
     return this.set("class", _class);
   }
 
-  setProperty(key: string, property: PropertyAttributeProperty | null): this {
-    return this.setRefMap("properties", key, property);
+  setProperty(key: string, value: PropertyAttributeProperty | null): this {
+    return this.setRefMap("properties", key, value);
   }
   getProperty(key: string): PropertyAttributeProperty | null {
     return this.getRefMap("properties", key);

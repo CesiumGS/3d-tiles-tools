@@ -11,6 +11,8 @@ import {
 import { FeatureId, MeshFeatures } from "./MeshFeatures";
 import { NumericPropertyModel } from "../../metadata/binary/NumericPropertyModel";
 import { BinaryPropertyModels } from "../../metadata/binary/BinaryPropertyModels";
+import { MetadataUtilities } from "../../metadata/MetadataUtilities";
+import { Schema as MetadataSchema } from "../../structure/Metadata/Schema";
 
 class StringBuilder {
   private s: string;
@@ -127,21 +129,19 @@ export class MetadataUtils {
     propertyName: string,
     rowCount: number
   ) {
-    sb.addLine("decoded values:");
-    sb.increaseIndent();
     if (!schema) {
       sb.addLine("decoded values: (no schema");
       return;
     }
     const classValue = schema.getClass(className);
     if (!classValue) {
-      sb.addLine(`decoded values: (no class '${className}' in schema`);
+      sb.addLine(`decoded values: (no class '${className}' in schema)`);
       return;
     }
     const classProperty = classValue.getProperty(propertyName);
     if (!classProperty) {
       sb.addLine(
-        `decoded values: (no property '${propertyName}' in class '${className}' in schema`
+        `decoded values: (no property '${propertyName}' in class '${className}' in schema)`
       );
       return;
     }
@@ -150,16 +150,31 @@ export class MetadataUtils {
     const isArray = classProperty.getArray();
     const count = classProperty.getCount();
     const valuesBufferViewData = Buffer.from(propertyTableProperty.getValues());
-    const arrayOffsetsBufferViewData = propertyTableProperty.getArrayOffsets()
-      ? Buffer.from(propertyTableProperty.getArrayOffsets())
-      : undefined;
+
+    const arrayOffsets = propertyTableProperty.getArrayOffsets();
+    let arrayOffsetsBufferViewData: Buffer | undefined = undefined;
+    if (arrayOffsets) {
+      arrayOffsetsBufferViewData = Buffer.from(arrayOffsets);
+    }
     const arrayOffsetType = propertyTableProperty.getArrayOffsetType();
-    const stringOffsetsBufferViewData = propertyTableProperty.getStringOffsets()
-      ? Buffer.from(propertyTableProperty.getStringOffsets())
-      : undefined;
+
+    const stringOffsets = propertyTableProperty.getStringOffsets();
+    let stringOffsetsBufferViewData: Buffer | undefined;
+    if (stringOffsets) {
+      stringOffsetsBufferViewData = Buffer.from(stringOffsets);
+    }
     const stringOffsetType = propertyTableProperty.getStringOffsetType();
+
+    let enumValueType = undefined;
     const enumType = classProperty.getEnumType();
-    const enumValueType = "UINT16"; // XXX TODO Compute this!
+    if (enumType !== undefined) {
+      const enumObject = schema.getEnum(enumType);
+      if (!enumObject) {
+        sb.addLine(`decoded values: (no enum '${enumType}' in schema)`);
+        return;
+      }
+      enumValueType = enumObject.getValueType() ?? "UINT16";
+    }
     const propertyModel = BinaryPropertyModels.createPropertyModelInternal(
       propertyName,
       type,
@@ -173,6 +188,8 @@ export class MetadataUtils {
       stringOffsetType,
       enumValueType
     );
+    sb.addLine("decoded values: ");
+    sb.increaseIndent();
     for (let r = 0; r < rowCount; r++) {
       const v = propertyModel.getPropertyValue(r);
       sb.addLine(v);
