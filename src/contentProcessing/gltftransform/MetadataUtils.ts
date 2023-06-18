@@ -1,18 +1,23 @@
-import { Document, Mesh, Primitive } from "@gltf-transform/core";
-import {
-  Class,
-  ClassProperty,
-  MeshPrimitiveStructuralMetadata,
-  PropertyTable,
-  PropertyTableProperty,
-  Schema,
-  StructuralMetadata,
-} from "./StructuralMetadata";
-import { FeatureId, MeshFeatures } from "./MeshFeatures";
-import { NumericPropertyModel } from "../../metadata/binary/NumericPropertyModel";
+import { Document } from "@gltf-transform/core";
+import { Mesh } from "@gltf-transform/core";
+import { Primitive } from "@gltf-transform/core";
+
+import { Class } from "./StructuralMetadata";
+import { ClassProperty } from "./StructuralMetadata";
+import { MeshPrimitiveStructuralMetadata } from "./StructuralMetadata";
+import { PropertyAttribute } from "./StructuralMetadata";
+import { PropertyAttributeProperty } from "./StructuralMetadata";
+import { PropertyTable } from "./StructuralMetadata";
+import { PropertyTableProperty } from "./StructuralMetadata";
+import { PropertyTexture } from "./StructuralMetadata";
+import { PropertyTextureProperty } from "./StructuralMetadata";
+import { Schema } from "./StructuralMetadata";
+import { StructuralMetadata } from "./StructuralMetadata";
+
+import { FeatureId } from "./MeshFeatures";
+import { MeshFeatures } from "./MeshFeatures";
+
 import { BinaryPropertyModels } from "../../metadata/binary/BinaryPropertyModels";
-import { MetadataUtilities } from "../../metadata/MetadataUtilities";
-import { Schema as MetadataSchema } from "../../structure/Metadata/Schema";
 
 class StringBuilder {
   private s: string;
@@ -386,9 +391,9 @@ export class MetadataUtils {
     for (let t = 0; t < propertyTextures.length; t++) {
       sb.increaseIndent();
       sb.addLine("Property Texture ", t, " of ", propertyTextures.length);
-      const propertyTexture = propertyTextures[t];
       sb.increaseIndent();
-      sb.addLine("TODO");
+      const propertyTexture = propertyTextures[t];
+      MetadataUtils.createPropertyTextureString(sb, propertyTexture);
       sb.decreaseIndent();
       sb.decreaseIndent();
     }
@@ -401,12 +406,85 @@ export class MetadataUtils {
     for (let a = 0; a < propertyAttributes.length; a++) {
       sb.increaseIndent();
       sb.addLine("Property Attribute ", a, " of ", propertyAttributes.length);
-      const propertyAttribute = propertyAttributes[a];
       sb.increaseIndent();
-      sb.addLine("TODO");
+      const propertyAttribute = propertyAttributes[a];
+      MetadataUtils.createPropertyAttributeString(sb, propertyAttribute);
       sb.decreaseIndent();
       sb.decreaseIndent();
     }
     sb.decreaseIndent();
+  }
+
+  private static createPropertyTextureString(
+    sb: StringBuilder,
+    propertyTexture: PropertyTexture
+  ) {
+    sb.addLine("name: ", propertyTexture.getObjectName());
+    sb.addLine("class: ", propertyTexture.getClass());
+    sb.addLine("properties:");
+    const propertyKeys = propertyTexture.listPropertyKeys();
+    for (const propertyKey of propertyKeys) {
+      sb.increaseIndent();
+      sb.addLine(propertyKey, ":");
+      const propertyTextureProperty = propertyTexture.getProperty(propertyKey);
+      if (propertyTextureProperty) {
+        sb.increaseIndent();
+        MetadataUtils.createPropertyTexturePropertyString(
+          sb,
+          propertyTextureProperty
+        );
+        sb.decreaseIndent();
+      }
+      sb.decreaseIndent();
+    }
+  }
+
+  private static createPropertyTexturePropertyString(
+    sb: StringBuilder,
+    propertyTextureProperty: PropertyTextureProperty
+  ) {
+    sb.addLine("channels: ", propertyTextureProperty.getChannels());
+    sb.addLine("offset: ", propertyTextureProperty.getOffset());
+    sb.addLine("scale: ", propertyTextureProperty.getScale());
+    sb.addLine("max: ", propertyTextureProperty.getMax());
+    sb.addLine("min: ", propertyTextureProperty.getMin());
+    sb.addLine("texture ", propertyTextureProperty.getTexture());
+    sb.addLine("textureInfo ", propertyTextureProperty.getTextureInfo());
+  }
+
+  private static createPropertyAttributeString(
+    sb: StringBuilder,
+    propertyAttribute: PropertyAttribute
+  ) {
+    sb.addLine("name: ", propertyAttribute.getObjectName());
+    sb.addLine("class: ", propertyAttribute.getClass());
+    sb.addLine("properties:");
+    const propertyKeys = propertyAttribute.listPropertyKeys();
+    for (const propertyKey of propertyKeys) {
+      sb.increaseIndent();
+      sb.addLine(propertyKey, ":");
+      const propertyAttributeProperty =
+        propertyAttribute.getProperty(propertyKey);
+      if (propertyAttributeProperty) {
+        sb.increaseIndent();
+        MetadataUtils.createPropertyAttributePropertyString(
+          sb,
+          propertyAttributeProperty
+        );
+        sb.decreaseIndent();
+      }
+      sb.decreaseIndent();
+    }
+  }
+
+  private static createPropertyAttributePropertyString(
+    sb: StringBuilder,
+    propertyAttributeProperty: PropertyAttributeProperty
+  ) {
+    sb.addLine("attribute: ", propertyAttributeProperty.getAttribute());
+    sb.addLine("offset: ", propertyAttributeProperty.getOffset());
+    sb.addLine("scale: ", propertyAttributeProperty.getScale());
+    sb.addLine("max: ", propertyAttributeProperty.getMax());
+    sb.addLine("min: ", propertyAttributeProperty.getMin());
   }
 }

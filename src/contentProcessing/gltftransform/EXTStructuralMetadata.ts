@@ -1,10 +1,11 @@
+import { GLTF } from "@gltf-transform/core";
 import { Extension } from "@gltf-transform/core";
-import { GLB_BUFFER } from "@gltf-transform/core";
+import { Node } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 import { PropertyType } from "@gltf-transform/core";
-import { GLTF } from "@gltf-transform/core";
 import { ReaderContext } from "@gltf-transform/core";
 import { WriterContext } from "@gltf-transform/core";
+import { GLB_BUFFER } from "@gltf-transform/core";
 
 import { Class } from "./StructuralMetadata";
 import { ClassProperty } from "./StructuralMetadata";
@@ -251,6 +252,7 @@ export class EXTStructuralMetadata extends Extension {
 
     const jsonDoc = context.jsonDoc;
     const gltfDef = jsonDoc.json;
+
     const meshDefs = gltfDef.meshes || [];
     meshDefs.forEach((meshDef, meshIndex) => {
       const mesh = context.meshes[meshIndex];
@@ -258,8 +260,14 @@ export class EXTStructuralMetadata extends Extension {
       const primDefs = meshDef.primitives || [];
       primDefs.forEach((primDef, primIndex) => {
         const prim = primitives[primIndex];
-        this.readPrimitive(context, structuralMetadata, prim, primDef);
+        this.readPrimitive(structuralMetadata, prim, primDef);
       });
+    });
+
+    const nodeDefs = gltfDef.nodes || [];
+    nodeDefs.forEach((nodeDef, nodeIndex) => {
+      const node = context.nodes[nodeIndex];
+      this.readNode(structuralMetadata, node, nodeDef);
     });
     return this;
   }
@@ -299,7 +307,7 @@ export class EXTStructuralMetadata extends Extension {
     if (structuralMetadataDef.schema !== undefined) {
       const schemaDef = structuralMetadataDef.schema;
       const schema = this.createSchema();
-      this.readSchema(context, schema, schemaDef);
+      this.readSchema(schema, schemaDef);
       structuralMetadata.setSchema(schema);
     } else if (structuralMetadataDef.schemaUri !== undefined) {
       const schemaUri = structuralMetadataDef.schemaUri;
@@ -324,19 +332,11 @@ export class EXTStructuralMetadata extends Extension {
       structuralMetadataDef.propertyAttributes || [];
     for (const propertyAttributeDef of propertyAttributeDefs) {
       const propertyAttribute = this.createPropertyAttribute();
-      this.readPropertyAttribute(
-        context,
-        propertyAttribute,
-        propertyAttributeDef
-      );
+      this.readPropertyAttribute(propertyAttribute, propertyAttributeDef);
       structuralMetadata.addPropertyAttribute(propertyAttribute);
     }
   }
-  private readSchema(
-    context: ReaderContext,
-    schema: Schema,
-    schemaDef: SchemaDef
-  ) {
+  private readSchema(schema: Schema, schemaDef: SchemaDef) {
     if (schemaDef.id !== undefined) {
       schema.setId(schemaDef.id);
     }
@@ -353,16 +353,12 @@ export class EXTStructuralMetadata extends Extension {
     for (const classKey of Object.keys(classes)) {
       const classDef = classes[classKey];
       const classObject = this.createClass();
-      this.readClass(context, classObject, classDef);
+      this.readClass(classObject, classDef);
       schema.setClass(classKey, classObject);
     }
   }
 
-  private readClass(
-    context: ReaderContext,
-    classObject: Class,
-    classDef: ClassDef
-  ) {
+  private readClass(classObject: Class, classDef: ClassDef) {
     if (classDef.name !== undefined) {
       classObject.setObjectName(classDef.name);
     }
@@ -373,13 +369,12 @@ export class EXTStructuralMetadata extends Extension {
     for (const classPropertyKey of Object.keys(properties)) {
       const classPropertyDef = properties[classPropertyKey];
       const classProperty = this.createClassProperty();
-      this.readClassProperty(context, classProperty, classPropertyDef);
+      this.readClassProperty(classProperty, classPropertyDef);
       classObject.setProperty(classPropertyKey, classProperty);
     }
   }
 
   private readClassProperty(
-    context: ReaderContext,
     classProperty: ClassProperty,
     classPropertyDef: ClassPropertyDef
   ) {
@@ -571,7 +566,6 @@ export class EXTStructuralMetadata extends Extension {
   }
 
   private readPropertyAttribute(
-    context: ReaderContext,
     propertyAttribute: PropertyAttribute,
     propertyAttributeDef: PropertyAttributeDef
   ) {
@@ -584,7 +578,6 @@ export class EXTStructuralMetadata extends Extension {
       const propertyAttributePropertyDef = properties[propertyKey];
       const propertyAttributeProperty = this.createPropertyAttributeProperty();
       this.readPropertyAttributeProperty(
-        context,
         propertyAttributeProperty,
         propertyAttributePropertyDef
       );
@@ -593,7 +586,6 @@ export class EXTStructuralMetadata extends Extension {
   }
 
   private readPropertyAttributeProperty(
-    context: ReaderContext,
     propertyAttributeProperty: PropertyAttributeProperty,
     propertyAttributePropertyDef: PropertyAttributePropertyDef
   ) {
@@ -616,7 +608,6 @@ export class EXTStructuralMetadata extends Extension {
   }
 
   private readPrimitive(
-    context: ReaderContext,
     structuralMetadata: StructuralMetadata,
     prim: Primitive,
     primDef: GLTF.IMeshPrimitive
@@ -647,6 +638,37 @@ export class EXTStructuralMetadata extends Extension {
       meshPrimitiveStructuralMetadata.addPropertyAttribute(propertyAttribute);
     }
     prim.setExtension(NAME, meshPrimitiveStructuralMetadata);
+  }
+
+  private readNode(
+    structuralMetadata: StructuralMetadata,
+    node: Node,
+    nodeDef: GLTF.INode
+  ) {
+    if (!nodeDef.extensions || !nodeDef.extensions[NAME]) {
+      return;
+    }
+    const elementStructuralMetadata = this.createElementStructuralMetadata();
+
+    const extensionObject = nodeDef.extensions[NAME];
+    const elementStructuralMetadataDef =
+      extensionObject as ElementStructuralMetadataDef;
+
+    const propertyTables = structuralMetadata.listPropertyTables();
+    const propertyTableIndex = elementStructuralMetadataDef.propertyTable;
+    const index = elementStructuralMetadataDef.index;
+    if (propertyTableIndex === undefined) {
+      throw new Error(
+        `${NAME}: No property table index in structural metadata`
+      );
+    }
+    if (index === undefined) {
+      throw new Error(`${NAME}: No index in structural metadata`);
+    }
+    const propertyTable = propertyTables[propertyTableIndex];
+    elementStructuralMetadata.setPropertyTable(propertyTable);
+    elementStructuralMetadata.setIndex(index);
+    node.setExtension(NAME, elementStructuralMetadata);
   }
 
   /**
@@ -699,7 +721,121 @@ export class EXTStructuralMetadata extends Extension {
     gltfDef.extensions = gltfDef.extensions || {};
     gltfDef.extensions[NAME] = structuralMetadataDef;
 
+    const meshes = root.listMeshes();
+    const meshDefs = gltfDef.meshes;
+    if (meshDefs) {
+      for (const mesh of meshes) {
+        const meshIndex = context.meshIndexMap.get(mesh);
+        if (meshIndex === undefined) {
+          continue;
+        }
+        const meshDef = meshDefs[meshIndex];
+        mesh.listPrimitives().forEach((prim, primIndex) => {
+          const primDef = meshDef.primitives[primIndex];
+          this.writePrimitive(structuralMetadata, prim, primDef);
+        });
+      }
+    }
+
+    const nodes = root.listNodes();
+    const nodeDefs = gltfDef.nodes;
+    if (nodeDefs) {
+      for (const node of nodes) {
+        const nodeIndex = context.nodeIndexMap.get(node);
+        if (nodeIndex === undefined) {
+          continue;
+        }
+        const nodeDef = nodeDefs[nodeIndex];
+        this.writeNode(structuralMetadata, node, nodeDef);
+      }
+    }
     return this;
+  }
+
+  private writePrimitive(
+    structuralMetadata: StructuralMetadata,
+    prim: Primitive,
+    primDef: GLTF.IMeshPrimitive
+  ) {
+    const meshPrimitiveStructuralMetadata =
+      prim.getExtension<MeshPrimitiveStructuralMetadata>(NAME);
+    if (!meshPrimitiveStructuralMetadata) {
+      return;
+    }
+    const globalPropertyTextures = structuralMetadata.listPropertyTextures();
+    const globalPropertyAttributes =
+      structuralMetadata.listPropertyAttributes();
+
+    let propertyTextureDefs: number[] | undefined = undefined;
+    let propertyAttributeDefs: number[] | undefined = undefined;
+
+    const propertyTextures =
+      meshPrimitiveStructuralMetadata.listPropertyTextures();
+    if (propertyTextures.length > 0) {
+      propertyTextureDefs = [];
+      for (const propertyTexture of propertyTextures) {
+        const index = globalPropertyTextures.indexOf(propertyTexture);
+        if (index >= 0) {
+          propertyTextureDefs.push(index);
+        } else {
+          throw new Error(
+            `${NAME}: Invalid property texture in mesh primitive`
+          );
+        }
+      }
+    }
+    const propertyAttributes =
+      meshPrimitiveStructuralMetadata.listPropertyAttributes();
+    if (propertyAttributes.length > 0) {
+      propertyAttributeDefs = [];
+      for (const propertyAttribute of propertyAttributes) {
+        const index = globalPropertyAttributes.indexOf(propertyAttribute);
+        if (index >= 0) {
+          propertyAttributeDefs.push(index);
+        } else {
+          throw new Error(
+            `${NAME}: Invalid property attribute in mesh primitive`
+          );
+        }
+      }
+    }
+
+    const meshPrimitiveStructuralMetadataDef: MeshPrimitiveStructuralMetadataDef =
+      {
+        propertyTextures: propertyTextureDefs,
+        propertyAttributes: propertyTextureDefs,
+      };
+    primDef.extensions = primDef.extensions || {};
+    primDef.extensions[NAME] = meshPrimitiveStructuralMetadataDef;
+  }
+
+  private writeNode(
+    structuralMetadata: StructuralMetadata,
+    node: Node,
+    nodeDef: GLTF.INode
+  ) {
+    const elementStructuralMetadata =
+      node.getExtension<ElementStructuralMetadata>(NAME);
+    if (!elementStructuralMetadata) {
+      return;
+    }
+
+    const globalPropertyTables = structuralMetadata.listPropertyTables();
+
+    const propertyTable = elementStructuralMetadata.getPropertyTable();
+    if (propertyTable) {
+      const propertyTableIndex = globalPropertyTables.indexOf(propertyTable);
+      if (propertyTableIndex >= 0) {
+        const elementStructuralMetadataDef: ElementStructuralMetadataDef = {
+          propertyTable: propertyTableIndex,
+          index: elementStructuralMetadata.getIndex(),
+        };
+        nodeDef.extensions = nodeDef.extensions || {};
+        nodeDef.extensions[NAME] = elementStructuralMetadataDef;
+      } else {
+        throw new Error(`${NAME}: Invalid property tavle in node`);
+      }
+    }
   }
 
   private createStructuralMetadataDef(
@@ -710,7 +846,7 @@ export class EXTStructuralMetadata extends Extension {
 
     const schema = structuralMetadata.getSchema();
     if (schema) {
-      const schemaDef = this.createSchemaDef(context, schema);
+      const schemaDef = this.createSchemaDef(schema);
       structuralMetadataDef.schema = schemaDef;
     }
     const schemaUri = structuralMetadata.getSchemaUri();
@@ -730,14 +866,35 @@ export class EXTStructuralMetadata extends Extension {
       }
       structuralMetadataDef.propertyTables = propertyTableDefs;
     }
-    // TODO
-    //structuralMetadataDef.propertyTextures = propertyTextures;
-    //structuralMetadataDef.propertyAttributes = propertyAttributes;
+
+    const propertyTextures = structuralMetadata.listPropertyTextures();
+    if (propertyTextures.length > 0) {
+      const propertyTextureDefs = [];
+      for (const propertyTexture of propertyTextures) {
+        const propertyTextureDef = this.createPropertyTextureDef(
+          context,
+          propertyTexture
+        );
+        propertyTextureDefs.push(propertyTextureDef);
+      }
+      structuralMetadataDef.propertyTextures = propertyTextureDefs;
+    }
+
+    const propertyAttributes = structuralMetadata.listPropertyAttributes();
+    if (propertyAttributes.length > 0) {
+      const propertyAttributeDefs = [];
+      for (const propertyAttribute of propertyAttributes) {
+        const propertyAttributeDef =
+          this.createPropertyAttributeDef(propertyAttribute);
+        propertyAttributeDefs.push(propertyAttributeDef);
+      }
+      structuralMetadataDef.propertyAttributes = propertyAttributeDefs;
+    }
 
     return structuralMetadataDef;
   }
 
-  private createSchemaDef(context: WriterContext, schema: Schema): SchemaDef {
+  private createSchemaDef(schema: Schema): SchemaDef {
     let classes: { [key: string]: ClassDef } | undefined = undefined;
     let enums: { [key: string]: EnumDef } | undefined = undefined;
 
@@ -747,7 +904,7 @@ export class EXTStructuralMetadata extends Extension {
       for (const classKey of classKeys) {
         const classObject = schema.getClass(classKey);
         if (classObject) {
-          const classDef = this.createClassDef(context, classObject);
+          const classDef = this.createClassDef(classObject);
           classes[classKey] = classDef;
         }
       }
@@ -759,7 +916,7 @@ export class EXTStructuralMetadata extends Extension {
       for (const enumKey of enumKeys) {
         const enumObject = schema.getEnum(enumKey);
         if (enumObject) {
-          const enumDef = this.createEnumDef(context, enumObject);
+          const enumDef = this.createEnumDef(enumObject);
           enums[enumKey] = enumDef;
         }
       }
@@ -777,7 +934,7 @@ export class EXTStructuralMetadata extends Extension {
     return schemaDef;
   }
 
-  private createClassDef(context: WriterContext, classObject: Class): ClassDef {
+  private createClassDef(classObject: Class): ClassDef {
     let properties: { [key: string]: ClassPropertyDef } | undefined = undefined;
 
     const propertyKeys = classObject.listPropertyKeys();
@@ -786,10 +943,7 @@ export class EXTStructuralMetadata extends Extension {
       for (const propertyKey of propertyKeys) {
         const propertyObject = classObject.getProperty(propertyKey);
         if (propertyObject) {
-          const propertyDef = this.createClassPropertyDef(
-            context,
-            propertyObject
-          );
+          const propertyDef = this.createClassPropertyDef(propertyObject);
           properties[propertyKey] = propertyDef;
         }
       }
@@ -804,7 +958,6 @@ export class EXTStructuralMetadata extends Extension {
   }
 
   private createClassPropertyDef(
-    context: WriterContext,
     classProperty: ClassProperty
   ): ClassPropertyDef {
     const classPropertyDef: ClassPropertyDef = {
@@ -827,12 +980,12 @@ export class EXTStructuralMetadata extends Extension {
     return classPropertyDef;
   }
 
-  private createEnumDef(context: WriterContext, enumObject: Enum): EnumDef {
+  private createEnumDef(enumObject: Enum): EnumDef {
     const valueDefs: EnumValueDef[] = [];
 
     const values = enumObject.listValues();
     for (const value of values) {
-      const valueDef = this.createEnumValueDef(context, value);
+      const valueDef = this.createEnumValueDef(value);
       valueDefs.push(valueDef);
     }
 
@@ -845,10 +998,7 @@ export class EXTStructuralMetadata extends Extension {
     return enumDef;
   }
 
-  private createEnumValueDef(
-    context: WriterContext,
-    enumValue: EnumValue
-  ): EnumValueDef {
+  private createEnumValueDef(enumValue: EnumValue): EnumValueDef {
     const enumValueDef: EnumValueDef = {
       name: enumValue.getObjectName(),
       description: enumValue.getDescription(),
@@ -943,6 +1093,119 @@ export class EXTStructuralMetadata extends Extension {
     return propertyTablePropertyDef;
   }
 
+  private createPropertyTextureDef(
+    context: WriterContext,
+    propertyTexture: PropertyTexture
+  ): PropertyTextureDef {
+    let propertyDefs:
+      | { [key: string]: PropertyTexturePropertyDef }
+      | undefined = undefined;
+    const propertyKeys = propertyTexture.listPropertyKeys();
+    if (propertyKeys.length > 0) {
+      propertyDefs = {};
+      for (const propertyKey of propertyKeys) {
+        const propertyTextureProperty =
+          propertyTexture.getProperty(propertyKey);
+        if (propertyTextureProperty) {
+          const propertyTexturePropertyDef =
+            this.createPropertyTexturePropertyDef(
+              context,
+              propertyKey,
+              propertyTextureProperty
+            );
+          propertyDefs[propertyKey] = propertyTexturePropertyDef;
+        }
+      }
+    }
+
+    const propertyTextureDef: PropertyTextureDef = {
+      name: propertyTexture.getObjectName(),
+      class: propertyTexture.getClass(),
+      properties: propertyDefs,
+    };
+    return propertyTextureDef;
+  }
+
+  private createPropertyTexturePropertyDef(
+    context: WriterContext,
+    propertyName: string,
+    propertyTextureProperty: PropertyTextureProperty
+  ) {
+    const texture = propertyTextureProperty.getTexture();
+    const textureInfo = propertyTextureProperty.getTextureInfo();
+    if (!texture) {
+      throw new Error(
+        `${NAME}: No texture for property texture property ${propertyName}`
+      );
+    }
+    if (!textureInfo) {
+      throw new Error(
+        `${NAME}: No textureInfo for property texture property ${propertyName}`
+      );
+    }
+    const basicTextureDef = context.createTextureInfoDef(texture, textureInfo);
+    const propertyTexturePropertyDef: PropertyTexturePropertyDef = {
+      channels: propertyTextureProperty.getChannels(),
+      index: basicTextureDef.index,
+      texCoord: basicTextureDef.texCoord,
+      offset: propertyTextureProperty.getOffset(),
+      scale: propertyTextureProperty.getScale(),
+      max: propertyTextureProperty.getMax(),
+      min: propertyTextureProperty.getMin(),
+    };
+    return propertyTexturePropertyDef;
+  }
+
+  private createPropertyAttributeDef(
+    propertyAttribute: PropertyAttribute
+  ): PropertyAttributeDef {
+    let propertyDefs:
+      | { [key: string]: PropertyAttributePropertyDef }
+      | undefined = undefined;
+    const propertyKeys = propertyAttribute.listPropertyKeys();
+    if (propertyKeys.length > 0) {
+      propertyDefs = {};
+      for (const propertyKey of propertyKeys) {
+        const propertyAttributeProperty =
+          propertyAttribute.getProperty(propertyKey);
+        if (propertyAttributeProperty) {
+          const propertyAttributePropertyDef =
+            this.createPropertyAttributePropertyDef(propertyAttributeProperty);
+          propertyDefs[propertyKey] = propertyAttributePropertyDef;
+        }
+      }
+    }
+
+    const propertyAttributeDef: PropertyAttributeDef = {
+      name: propertyAttribute.getObjectName(),
+      class: propertyAttribute.getClass(),
+      properties: propertyDefs,
+    };
+    return propertyAttributeDef;
+  }
+
+  private createPropertyAttributePropertyDef(
+    propertyAttributeProperty: PropertyAttributeProperty
+  ) {
+    const propertyAttributePropertyDef: PropertyAttributePropertyDef = {
+      attribute: propertyAttributeProperty.getAttribute(),
+      offset: propertyAttributeProperty.getOffset(),
+      scale: propertyAttributeProperty.getScale(),
+      max: propertyAttributeProperty.getMax(),
+      min: propertyAttributeProperty.getMin(),
+    };
+    return propertyAttributePropertyDef;
+  }
+
+  /**
+   * Perform the operations that are required before writing
+   * a glTF document when it contains this extension.
+   *
+   * This extension defines `prewriteTypes = [PropertyType.BUFFER];`
+   * to prepare the buffer data that contains the buffer view data
+   * that otherwise is not referenced (because property tables are
+   * directly referring to buffer views, and not via accessors)
+   */
   public override prewrite(
     context: WriterContext,
     propertyType: PropertyType
@@ -953,9 +1216,19 @@ export class EXTStructuralMetadata extends Extension {
     return this;
   }
 
+  /**
+   * Prepares writing a document that contains  this extension.
+   *
+   * This will collect all buffer views that are referred to by the
+   * property tables, and store them as "otherBufferViews" of
+   * the writer context (for the main buffer), to make sure
+   * that they are part of the buffer when it is eventually
+   * writenn in Writer.ts.
+   *
+   * @param context - The writer context
+   * @returns The deep void of space
+   */
   private _prewriteBuffers(context: WriterContext): void {
-    console.log("Doing prewrite");
-
     const root = this.document.getRoot();
     const structuralMetadata = root.getExtension<StructuralMetadata>(NAME);
     if (!structuralMetadata) {
@@ -990,6 +1263,13 @@ export class EXTStructuralMetadata extends Extension {
     }
   }
 
+  /**
+   * Obtain the "otherBufferViews" for the main buffer from the given
+   * context, creating them if they did not exist yet.
+   *
+   * @param context - The writer context
+   * @returns The other buffer views
+   */
   private obtainOtherBufferViews(context: WriterContext): Uint8Array[] {
     const root = this.document.getRoot();
     const buffer = root.listBuffers()[0];

@@ -750,10 +750,13 @@ export class PropertyTextureProperty extends ExtensionProperty<IPropertyTextureP
   }
 
   protected override getDefaults() {
+    const defaultTextureInfo = new TextureInfo(this.graph, "textureInfo");
+    defaultTextureInfo.setMinFilter(TextureInfo.MagFilter.NEAREST);
+    defaultTextureInfo.setMagFilter(TextureInfo.MagFilter.NEAREST);
     return Object.assign(super.getDefaults(), {
       channels: [0],
       texture: null,
-      textureInfo: new TextureInfo(this.graph, "textureInfo"),
+      textureInfo: defaultTextureInfo,
     });
   }
 
