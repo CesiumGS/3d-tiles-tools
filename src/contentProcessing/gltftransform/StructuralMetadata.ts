@@ -502,7 +502,7 @@ export class Enum extends ExtensionProperty<IEnum> {
   getValueType(): string {
     return this.get("valueType");
   }
-  setEnumType(valueType: string) {
+  setValueType(valueType: string) {
     return this.set("valueType", valueType);
   }
 
@@ -583,8 +583,8 @@ export class PropertyTable extends ExtensionProperty<IPropertyTable> {
   getClass(): string {
     return this.get("class");
   }
-  setClass(_class: string) {
-    return this.set("class", _class);
+  setClass(className: string) {
+    return this.set("class", className);
   }
 
   getCount(): number {

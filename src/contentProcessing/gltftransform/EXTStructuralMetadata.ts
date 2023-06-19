@@ -171,7 +171,9 @@ export class EXTStructuralMetadata extends Extension {
   //
   // This class is large, and largely undocumented. But its implementation
   // is mostly purely mechanical, and the overall structure is:
-  // - There are 'create' methods for all model classes
+  // - There are 'create' methods for all model classes. This includes
+  //   some 'create...From' methods that directly translate JSON into
+  //   the model classes (for things that do not require the reader context)
   // - There are `read` methods that receive (the reader context and)
   //   the 'model' instance and the '...Def' instance (i.e. the plain
   //   JSON object). These 'read' methods fill the 'model' instance
@@ -244,6 +246,36 @@ export class EXTStructuralMetadata extends Extension {
     return new MeshPrimitiveStructuralMetadata(this.document.getGraph());
   }
 
+  createSchemaFrom(schemaDef: SchemaDef): Schema {
+    const schema = this.createSchema();
+    this.readSchema(schema, schemaDef);
+    return schema;
+  }
+
+  createClassFrom(classDef: ClassDef): Class {
+    const classObject = this.createClass();
+    this.readClass(classObject, classDef);
+    return classObject;
+  }
+
+  createClassPropertyFrom(classPropertyDef: ClassPropertyDef): ClassProperty {
+    const classProperty = this.createClassProperty();
+    this.readClassProperty(classProperty, classPropertyDef);
+    return classProperty;
+  }
+
+  createEnumFrom(enumDef: EnumDef): Enum {
+    const enumObject = this.createEnum();
+    this.readEnum(enumObject, enumDef);
+    return enumObject;
+  }
+
+  createEnumValueFrom(enumValueDef: EnumValueDef): EnumValue {
+    const enumValue = this.createEnumValue();
+    this.readEnumValue(enumValue, enumValueDef);
+    return enumValue;
+  }
+
   public override read(context: ReaderContext): this {
     const structuralMetadata = this.createTopLevelStructuralMetadata(context);
     if (!structuralMetadata) {
@@ -306,8 +338,7 @@ export class EXTStructuralMetadata extends Extension {
   ) {
     if (structuralMetadataDef.schema !== undefined) {
       const schemaDef = structuralMetadataDef.schema;
-      const schema = this.createSchema();
-      this.readSchema(schema, schemaDef);
+      const schema = this.createSchemaFrom(schemaDef);
       structuralMetadata.setSchema(schema);
     } else if (structuralMetadataDef.schemaUri !== undefined) {
       const schemaUri = structuralMetadataDef.schemaUri;
@@ -336,9 +367,12 @@ export class EXTStructuralMetadata extends Extension {
       structuralMetadata.addPropertyAttribute(propertyAttribute);
     }
   }
+
   private readSchema(schema: Schema, schemaDef: SchemaDef) {
     if (schemaDef.id !== undefined) {
       schema.setId(schemaDef.id);
+    } else {
+      throw new Error(`${NAME}: The schema.id is required`);
     }
     if (schemaDef.name !== undefined) {
       schema.setObjectName(schemaDef.name);
@@ -352,9 +386,14 @@ export class EXTStructuralMetadata extends Extension {
     const classes = schemaDef.classes || {};
     for (const classKey of Object.keys(classes)) {
       const classDef = classes[classKey];
-      const classObject = this.createClass();
-      this.readClass(classObject, classDef);
+      const classObject = this.createClassFrom(classDef);
       schema.setClass(classKey, classObject);
+    }
+    const enums = schemaDef.enums || {};
+    for (const enumKey of Object.keys(enums)) {
+      const enumDef = enums[enumKey];
+      const enumObject = this.createEnumFrom(enumDef);
+      schema.setEnum(enumKey, enumObject);
     }
   }
 
@@ -368,8 +407,7 @@ export class EXTStructuralMetadata extends Extension {
     const properties = classDef.properties || {};
     for (const classPropertyKey of Object.keys(properties)) {
       const classPropertyDef = properties[classPropertyKey];
-      const classProperty = this.createClassProperty();
-      this.readClassProperty(classProperty, classPropertyDef);
+      const classProperty = this.createClassPropertyFrom(classPropertyDef);
       classObject.setProperty(classPropertyKey, classProperty);
     }
   }
@@ -387,6 +425,7 @@ export class EXTStructuralMetadata extends Extension {
     // But ...
     // - this does not seem to be possible without the "evil eval"
     // - this would break down for 'name' and 'setObjectName'...
+    // - the error handling for required properties becomes tricky...
 
     if (classPropertyDef.name !== undefined) {
       classProperty.setObjectName(classPropertyDef.name);
@@ -397,7 +436,10 @@ export class EXTStructuralMetadata extends Extension {
 
     if (classPropertyDef.type !== undefined) {
       classProperty.setType(classPropertyDef.type);
+    } else {
+      throw new Error(`${NAME}: The classProperty.type is required`);
     }
+
     if (classPropertyDef.componentType !== undefined) {
       classProperty.setComponentType(classPropertyDef.componentType);
     }
@@ -433,6 +475,35 @@ export class EXTStructuralMetadata extends Extension {
     }
     if (classPropertyDef.default !== undefined) {
       classProperty.setDefault(classPropertyDef.default);
+    }
+  }
+
+  private readEnum(enumObject: Enum, enumDef: EnumDef) {
+    if (enumDef.name !== undefined) {
+      enumObject.setObjectName(enumDef.name);
+    }
+    if (enumDef.description !== undefined) {
+      enumObject.setDescription(enumDef.description);
+    }
+    if (enumDef.valueType !== undefined) {
+      enumObject.setValueType(enumDef.valueType);
+    }
+    const valueDefs = enumDef.values || {};
+    for (const valueDef of valueDefs) {
+      const enumValue = this.createEnumValueFrom(valueDef);
+      enumObject.addEnumValue(enumValue);
+    }
+  }
+
+  private readEnumValue(enumValue: EnumValue, enumValueDef: EnumValueDef) {
+    if (enumValueDef.name !== undefined) {
+      enumValue.setObjectName(enumValueDef.name);
+    }
+    if (enumValueDef.description !== undefined) {
+      enumValue.setDescription(enumValueDef.description);
+    }
+    if (enumValueDef.value !== undefined) {
+      enumValue.setValue(enumValueDef.value);
     }
   }
 
