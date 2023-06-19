@@ -6,7 +6,7 @@ import { savePixels } from "ndarray-pixels";
 import NdArray from "ndarray";
 
 import { EXTMeshFeatures } from "../src/contentProcessing/gltftransform/EXTMeshFeatures";
-import { MeshFeatures } from "../src/contentProcessing/gltftransform/MeshFeatures";
+import { GltfFeatures } from "../src/contentProcessing/gltftransform/GltfFeatures";
 
 async function createExampleDocument(): Promise<Document> {
   const document = new Document();
@@ -100,40 +100,10 @@ async function runReadingExample() {
   const glb = await io.writeBinary(inputDocument);
   const document = await io.readBinary(glb);
 
-  // Walk through all meshes and their primitives
-  const meshes = document.getRoot().listMeshes();
-  for (let m = 0; m < meshes.length; m++) {
-    console.log(`Mesh ${m} of ${meshes.length}`);
-
-    const mesh = meshes[m];
-    const primitives = mesh.listPrimitives();
-    for (let p = 0; p < primitives.length; p++) {
-      console.log(`  Primitive ${p} of ${primitives.length}`);
-
-      const primitive = primitives[p];
-      const meshFeatures =
-        primitive.getExtension<MeshFeatures>("EXT_mesh_features");
-      if (!meshFeatures) {
-        console.log("    No mesh features found");
-        continue;
-      }
-
-      const featureIds = meshFeatures.listFeatureIds();
-      for (let f = 0; f < featureIds.length; f++) {
-        console.log(`    Feature ID ${f} of ${featureIds.length}`);
-
-        const featureId = featureIds[f];
-        console.log(`      Feature ID attribute: ${featureId.getAttribute()}`);
-        const t = featureId.getTexture();
-        console.log(`      Feature ID texture: ${t}`);
-        if (t) {
-          console.log(`        channels   : ${t.getChannels()}`);
-          console.log(`        texture:   : ${t.getTexture()}`);
-          console.log(`        textureInfo: ${t.getTextureInfo()}`);
-        }
-      }
-    }
-  }
+  // Print information about the feature IDs in the document:
+  const s = GltfFeatures.createFeaturesInfoString(document);
+  console.log("Feature IDs:");
+  console.log(s);
 }
 
 runCreationExample();
