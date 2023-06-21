@@ -154,7 +154,7 @@ export class BinaryPropertyTables {
    * view buffers
    * @returns The `PropertyTableProperty`
    */
-  private static createPropertyTableProperty(
+  static createPropertyTableProperty(
     classProperty: ClassProperty,
     schema: Schema,
     values: any,
