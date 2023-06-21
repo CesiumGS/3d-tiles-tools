@@ -11,19 +11,15 @@ export class PropertyTableModels {
    * format of the returned string is not specified.
    *
    * @param propertyTableModel - The `PropertyTableModel`
-   * @param propertyNames The property names
-   * @param rows The number of rows
    * @returns The string
    */
-  public static createString(
-    propertyTableModel: PropertyTableModel,
-    propertyNames: string[],
-    rows: number
-  ): string {
+  public static createString(propertyTableModel: PropertyTableModel): string {
+    const propertyNames = propertyTableModel.getPropertyNames();
+    const count = propertyTableModel.getCount();
     const columnWidths = PropertyTableModels.computeColumnWidths(
       propertyTableModel,
       propertyNames,
-      rows
+      count
     );
 
     let result = "";
@@ -36,7 +32,7 @@ export class PropertyTableModels {
       result += PropertyTableModels.pad(n, columnWidth);
     }
     result += "\n";
-    for (let r = 0; r < rows; r++) {
+    for (let r = 0; r < count; r++) {
       const row = propertyTableModel.getMetadataEntityModel(r);
       for (let c = 0; c < propertyNames.length; c++) {
         const n = propertyNames[c];
