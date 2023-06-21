@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { TilesetUpgrader } from "../src/tilesetProcessing/TilesetUpgrader";
+import { TilesetUpgrader } from "../../src/tilesetProcessing/TilesetUpgrader";
 
-import { Tileset } from "../src/structure/Tileset";
+import { Tileset } from "../../src/structure/Tileset";
 
 // By default, the `TilesetUpgrader` will log messages for
 // each modification (upgrade step) to the console.

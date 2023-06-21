@@ -1,15 +1,15 @@
-import { SpecHelpers } from "./SpecHelpers";
+import { SpecHelpers } from "../SpecHelpers";
 import { SpecEntryProcessor } from "./SpecEntryProcessor";
 
-import { BasicTilesetProcessor } from "../src/tilesetProcessing/BasicTilesetProcessor";
+import { BasicTilesetProcessor } from "../../src/tilesetProcessing/BasicTilesetProcessor";
 
-import { Tiles } from "../src/tilesets/Tiles";
+import { Tiles } from "../../src/tilesets/Tiles";
 
-import { Tile } from "../src/structure/Tile";
+import { Tile } from "../../src/structure/Tile";
 
-import { TraversedTile } from "../src/traversal/TraversedTile";
+import { TraversedTile } from "../../src/traversal/TraversedTile";
 
-import { TilesetSources } from "../src/tilesetData/TilesetSources";
+import { TilesetSources } from "../../src/tilesetData/TilesetSources";
 
 const implicitInput = "./specs/data/tilesetProcessing/implicitProcessing";
 const implicitOutput =

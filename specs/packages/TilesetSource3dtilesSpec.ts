@@ -1,4 +1,4 @@
-import { TilesetSource3dtiles } from "../src/packages/TilesetSource3dtiles";
+import { TilesetSource3dtiles } from "../../src/packages/TilesetSource3dtiles";
 
 describe("TilesetSource3dtiles", function () {
   it("throws for invalidColumnName0", function () {

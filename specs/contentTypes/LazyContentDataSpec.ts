@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { LazyContentData } from "../src/contentTypes/LazyContentData";
-import { ResourceResolver } from "../src/io/ResourceResolver";
+import { LazyContentData } from "../../src/contentTypes/LazyContentData";
+import { ResourceResolver } from "../../src/io/ResourceResolver";
 
-import { TilesetSourceResourceResolver } from "../src/io/TilesetSourceResourceResolver";
-import { TilesetInMemory } from "../src/tilesetData/TilesetInMemory";
+import { TilesetSourceResourceResolver } from "../../src/io/TilesetSourceResourceResolver";
+import { TilesetInMemory } from "../../src/tilesetData/TilesetInMemory";
 
 function createTestResourceResolver(): ResourceResolver {
   const tilesetSource = new TilesetInMemory();

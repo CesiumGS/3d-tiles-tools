@@ -1,5 +1,5 @@
-import { OctreeCoordinates } from "../src/spatial/OctreeCoordinates";
-import { QuadtreeCoordinates } from "../src/spatial/QuadtreeCoordinates";
+import { OctreeCoordinates } from "../../src/spatial/OctreeCoordinates";
+import { QuadtreeCoordinates } from "../../src/spatial/QuadtreeCoordinates";
 
 describe("TreeCoordinates", function () {
   it("allows iterating over the quadtree children multiple times", function () {

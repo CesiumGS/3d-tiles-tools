@@ -1,10 +1,10 @@
 import fs from "fs";
 
-import { Paths } from "../src/base/Paths";
+import { Paths } from "../../src/base/Paths";
 
-import { Tilesets } from "../src/tilesets/Tilesets";
+import { Tilesets } from "../../src/tilesets/Tilesets";
 
-import { SpecHelpers } from "./SpecHelpers";
+import { SpecHelpers } from "../SpecHelpers";
 
 describe("TilesetCombiner", function () {
   it("combines external tilesets into a single tileset", async function () {

@@ -1,5 +1,5 @@
-import { Tile } from "../src/structure/Tile";
-import { Tiles } from "../src/tilesets/Tiles";
+import { Tile } from "../../src/structure/Tile";
+import { Tiles } from "../../src/tilesets/Tiles";
 
 //============================================================================
 // Test data definition

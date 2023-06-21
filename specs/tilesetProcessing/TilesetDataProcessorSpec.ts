@@ -1,7 +1,8 @@
-import { TilesetDataProcessor } from "../src/tilesetProcessing/TilesetDataProcessor";
+import { TilesetDataProcessor } from "../../src/tilesetProcessing/TilesetDataProcessor";
 
 import { SpecEntryProcessor } from "./SpecEntryProcessor";
-import { SpecHelpers } from "./SpecHelpers";
+
+import { SpecHelpers } from "../SpecHelpers";
 
 const outputRoot = "./specs/data/output/tilesetProcessing/";
 

@@ -1,9 +1,9 @@
-import { TilesetTarget } from "../src/tilesetData/TilesetTarget";
-import { TilesetTargetFs } from "../src/tilesetData/TilesetTargetFs";
-import { TilesetInMemory } from "../src/tilesetData/TilesetInMemory";
+import { TilesetTarget } from "../../src/tilesetData/TilesetTarget";
+import { TilesetTargetFs } from "../../src/tilesetData/TilesetTargetFs";
+import { TilesetInMemory } from "../../src/tilesetData/TilesetInMemory";
 
-import { TilesetTarget3tz } from "../src/packages/TilesetTarget3tz";
-import { TilesetTarget3dtiles } from "../src/packages/TilesetTarget3dtiles";
+import { TilesetTarget3tz } from "../../src/packages/TilesetTarget3tz";
+import { TilesetTarget3dtiles } from "../../src/packages/TilesetTarget3dtiles";
 
 // The basic contract that is established by the `TilesetTarget`
 // interface is checked for these implementations:

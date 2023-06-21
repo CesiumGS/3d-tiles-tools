@@ -1,4 +1,4 @@
-import { Iterables } from "../src/base/Iterables";
+import { Iterables } from "../../src/base/Iterables";
 
 // Note: These tests obtain iterable objects, most of them create
 // arrays from these iterable objects TWICE, to make sure that

@@ -1,8 +1,8 @@
 import fs from "fs";
-import { Buffers } from "../src/base/Buffers";
+import { Buffers } from "../../src/base/Buffers";
 
-import { TileFormats } from "../src/tileFormats/TileFormats";
-import { SpecHelpers } from "./SpecHelpers";
+import { TileFormats } from "../../src/tileFormats/TileFormats";
+import { SpecHelpers } from "../SpecHelpers";
 
 describe("TileFormats", function () {
   it("reads B3DM (deprecated 1) from a buffer", function () {

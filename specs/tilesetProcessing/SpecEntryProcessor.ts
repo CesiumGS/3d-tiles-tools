@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { TilesetEntry } from "../src/tilesetData/TilesetEntry";
+import { TilesetEntry } from "../../src/tilesetData/TilesetEntry";
 
 /**
  * Utility class for processing tileset entries for the specs.
