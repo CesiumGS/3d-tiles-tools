@@ -8,15 +8,15 @@ import { NumericBuffers } from "./NumericBuffers";
  * @internal
  */
 export class BooleanPropertyModel implements PropertyModel {
-  private readonly _valuesBuffer: Buffer;
+  private readonly valuesBuffer: Buffer;
 
   constructor(valuesBuffer: Buffer) {
-    this._valuesBuffer = valuesBuffer;
+    this.valuesBuffer = valuesBuffer;
   }
 
   /** {@inheritDoc PropertyModel.getPropertyValue} */
   getPropertyValue(index: number): boolean {
-    const valuesBuffer = this._valuesBuffer;
+    const valuesBuffer = this.valuesBuffer;
     const result = BooleanPropertyModel.getBooleanFromBuffer(
       valuesBuffer,
       index

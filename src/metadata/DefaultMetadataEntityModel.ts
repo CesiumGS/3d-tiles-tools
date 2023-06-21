@@ -16,23 +16,23 @@ import { MetadataClass } from "../structure/Metadata/MetadataClass";
  * @internal
  */
 export class DefaultMetadataEntityModel implements MetadataEntityModel {
-  private readonly _metadataClass: MetadataClass;
-  private readonly _json: any;
-  private readonly _semanticToPropertyId: { [key: string]: string };
+  private readonly metadataClass: MetadataClass;
+  private readonly json: any;
+  private readonly semanticToPropertyId: { [key: string]: string };
 
   constructor(
     metadataClass: MetadataClass,
     semanticToPropertyId: { [key: string]: string },
     json: any
   ) {
-    this._metadataClass = metadataClass;
-    this._semanticToPropertyId = semanticToPropertyId;
-    this._json = json;
+    this.metadataClass = metadataClass;
+    this.semanticToPropertyId = semanticToPropertyId;
+    this.json = json;
   }
 
   /** {@inheritDoc MetadataEntityModel.getPropertyValue} */
   getPropertyValue(propertyId: string): any {
-    const properties = this._metadataClass.properties;
+    const properties = this.metadataClass.properties;
     if (!properties) {
       throw new MetadataError(`Metadata class does not have any properties`);
     }
@@ -42,15 +42,15 @@ export class DefaultMetadataEntityModel implements MetadataEntityModel {
         `Metadata class does not have property ${propertyId}`
       );
     }
-    const value = this._json[propertyId];
-    const offset = this._json.offset;
-    const scale = this._json.scale;
+    const value = this.json[propertyId];
+    const offset = this.json.offset;
+    const scale = this.json.scale;
     return MetadataValues.processValue(property, offset, scale, value);
   }
 
   /** {@inheritDoc MetadataEntityModel.getPropertyValueBySemantic} */
   getPropertyValueBySemantic(semantic: string): any {
-    const propertyId = this._semanticToPropertyId[semantic];
+    const propertyId = this.semanticToPropertyId[semantic];
     if (!defined(propertyId)) {
       return undefined;
     }

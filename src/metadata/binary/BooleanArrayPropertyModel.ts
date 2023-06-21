@@ -9,10 +9,10 @@ import { BooleanPropertyModel } from "./BooleanPropertyModel";
  * @internal
  */
 export class BooleanArrayPropertyModel implements PropertyModel {
-  private readonly _valuesBuffer: Buffer;
-  private readonly _arrayOffsetsBuffer: Buffer | undefined;
-  private readonly _arrayOffsetType: string;
-  private readonly _count: number | undefined;
+  private readonly valuesBuffer: Buffer;
+  private readonly arrayOffsetsBuffer: Buffer | undefined;
+  private readonly arrayOffsetType: string;
+  private readonly count: number | undefined;
 
   constructor(
     valuesBuffer: Buffer,
@@ -20,18 +20,18 @@ export class BooleanArrayPropertyModel implements PropertyModel {
     arrayOffsetType: string,
     count: number | undefined
   ) {
-    this._valuesBuffer = valuesBuffer;
-    this._arrayOffsetsBuffer = arrayOffsetsBuffer;
-    this._arrayOffsetType = arrayOffsetType;
-    this._count = count;
+    this.valuesBuffer = valuesBuffer;
+    this.arrayOffsetsBuffer = arrayOffsetsBuffer;
+    this.arrayOffsetType = arrayOffsetType;
+    this.count = count;
   }
 
   /** {@inheritDoc PropertyModel.getPropertyValue} */
   getPropertyValue(index: number): boolean[] {
-    const valuesBuffer = this._valuesBuffer;
-    const arrayOffsetsBuffer = this._arrayOffsetsBuffer;
-    const arrayOffsetType = this._arrayOffsetType;
-    const count = this._count;
+    const valuesBuffer = this.valuesBuffer;
+    const arrayOffsetsBuffer = this.arrayOffsetsBuffer;
+    const arrayOffsetType = this.arrayOffsetType;
+    const count = this.count;
 
     const arraySlice = BinaryPropertyModels.computeSlice(
       index,

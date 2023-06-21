@@ -12,23 +12,23 @@ import { PropertyTableModel } from "./PropertyTableModel";
  * @internal
  */
 export class TableMetadataEntityModel implements MetadataEntityModel {
-  private readonly _propertyTableModel: PropertyTableModel;
-  private readonly _entityIndex: number;
-  private readonly _semanticToPropertyId: { [key: string]: string };
+  private readonly propertyTableModel: PropertyTableModel;
+  private readonly entityIndex: number;
+  private readonly semanticToPropertyId: { [key: string]: string };
 
   constructor(
     propertyTableModel: PropertyTableModel,
     entityIndex: number,
     semanticToPropertyId: { [key: string]: string }
   ) {
-    this._propertyTableModel = propertyTableModel;
-    this._entityIndex = entityIndex;
-    this._semanticToPropertyId = semanticToPropertyId;
+    this.propertyTableModel = propertyTableModel;
+    this.entityIndex = entityIndex;
+    this.semanticToPropertyId = semanticToPropertyId;
   }
 
   /** {@inheritDoc MetadataEntityModel.getPropertyValue} */
   getPropertyValue(propertyId: string): any {
-    const propertyTableModel = this._propertyTableModel;
+    const propertyTableModel = this.propertyTableModel;
     const classProperty = propertyTableModel.getClassProperty(propertyId);
     if (!defined(classProperty)) {
       const message = `The class does not define a property ${propertyId}`;
@@ -47,7 +47,7 @@ export class TableMetadataEntityModel implements MetadataEntityModel {
         `define a property model for ${propertyId}`;
       throw new MetadataError(message);
     }
-    const value = propertyModel.getPropertyValue(this._entityIndex);
+    const value = propertyModel.getPropertyValue(this.entityIndex);
     const offsetOverride = propertyTableProperty.offset;
     const scaleOverride = propertyTableProperty.scale;
     const processedValue = MetadataValues.processValue(
@@ -61,7 +61,7 @@ export class TableMetadataEntityModel implements MetadataEntityModel {
 
   /** {@inheritDoc MetadataEntityModel.getPropertyValueBySemantic} */
   getPropertyValueBySemantic(semantic: string): any {
-    const propertyId = this._semanticToPropertyId[semantic];
+    const propertyId = this.semanticToPropertyId[semantic];
     if (!defined(propertyId)) {
       return undefined;
     }

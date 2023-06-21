@@ -17,12 +17,12 @@ export class StringArrayPropertyModel implements PropertyModel {
 
   private static readonly decoder = new TextDecoder();
 
-  private readonly _valuesBuffer: Buffer;
-  private readonly _arrayOffsetsBuffer: Buffer | undefined;
-  private readonly _arrayOffsetType: string;
-  private readonly _stringOffsetsBuffer: Buffer;
-  private readonly _stringOffsetType: string;
-  private readonly _count: number | undefined;
+  private readonly valuesBuffer: Buffer;
+  private readonly arrayOffsetsBuffer: Buffer | undefined;
+  private readonly arrayOffsetType: string;
+  private readonly stringOffsetsBuffer: Buffer;
+  private readonly stringOffsetType: string;
+  private readonly count: number | undefined;
 
   constructor(
     valuesBuffer: Buffer,
@@ -32,22 +32,22 @@ export class StringArrayPropertyModel implements PropertyModel {
     stringOffsetType: string,
     count: number | undefined
   ) {
-    this._valuesBuffer = valuesBuffer;
-    this._arrayOffsetsBuffer = arrayOffsetsBuffer;
-    this._arrayOffsetType = arrayOffsetType;
-    this._stringOffsetsBuffer = stringOffsetsBuffer;
-    this._stringOffsetType = stringOffsetType;
-    this._count = count;
+    this.valuesBuffer = valuesBuffer;
+    this.arrayOffsetsBuffer = arrayOffsetsBuffer;
+    this.arrayOffsetType = arrayOffsetType;
+    this.stringOffsetsBuffer = stringOffsetsBuffer;
+    this.stringOffsetType = stringOffsetType;
+    this.count = count;
   }
 
   /** {@inheritDoc PropertyModel.getPropertyValue} */
   getPropertyValue(index: number): string[] {
-    const valuesBuffer = this._valuesBuffer;
-    const arrayOffsetsBuffer = this._arrayOffsetsBuffer;
-    const arrayOffsetType = this._arrayOffsetType;
-    const stringOffsetsBuffer = this._stringOffsetsBuffer;
-    const stringOffsetType = this._stringOffsetType;
-    const count = this._count;
+    const valuesBuffer = this.valuesBuffer;
+    const arrayOffsetsBuffer = this.arrayOffsetsBuffer;
+    const arrayOffsetType = this.arrayOffsetType;
+    const stringOffsetsBuffer = this.stringOffsetsBuffer;
+    const stringOffsetType = this.stringOffsetType;
+    const count = this.count;
 
     const arraySlice = BinaryPropertyModels.computeSlice(
       index,

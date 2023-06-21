@@ -14,12 +14,12 @@ import { BinaryPropertyModels } from "./BinaryPropertyModels";
  * @internal
  */
 export class NumericArrayPropertyModel implements PropertyModel {
-  private readonly _type: string;
-  private readonly _valuesBuffer: Buffer;
-  private readonly _componentType: string;
-  private readonly _arrayOffsetsBuffer: Buffer | undefined;
-  private readonly _arrayOffsetType: string;
-  private readonly _count: number | undefined;
+  private readonly type: string;
+  private readonly valuesBuffer: Buffer;
+  private readonly componentType: string;
+  private readonly arrayOffsetsBuffer: Buffer | undefined;
+  private readonly arrayOffsetType: string;
+  private readonly count: number | undefined;
 
   constructor(
     type: string,
@@ -29,22 +29,22 @@ export class NumericArrayPropertyModel implements PropertyModel {
     arrayOffsetType: string,
     count: number | undefined
   ) {
-    this._type = type;
-    this._valuesBuffer = valuesBuffer;
-    this._componentType = componentType;
-    this._arrayOffsetsBuffer = arrayOffsetsBuffer;
-    this._arrayOffsetType = arrayOffsetType;
-    this._count = count;
+    this.type = type;
+    this.valuesBuffer = valuesBuffer;
+    this.componentType = componentType;
+    this.arrayOffsetsBuffer = arrayOffsetsBuffer;
+    this.arrayOffsetType = arrayOffsetType;
+    this.count = count;
   }
 
   /** {@inheritDoc PropertyModel.getPropertyValue} */
   getPropertyValue(index: number): number[] | bigint[] | (number | bigint)[][] {
-    const type = this._type;
-    const valuesBuffer = this._valuesBuffer;
-    const componentType = this._componentType;
-    const arrayOffsetsBuffer = this._arrayOffsetsBuffer;
-    const arrayOffsetType = this._arrayOffsetType;
-    const count = this._count;
+    const type = this.type;
+    const valuesBuffer = this.valuesBuffer;
+    const componentType = this.componentType;
+    const arrayOffsetsBuffer = this.arrayOffsetsBuffer;
+    const arrayOffsetType = this.arrayOffsetType;
+    const count = this.count;
     const componentCount = MetadataTypes.componentCountForType(type);
 
     const arraySlice = BinaryPropertyModels.computeSlice(
