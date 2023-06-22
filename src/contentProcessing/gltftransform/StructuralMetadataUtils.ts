@@ -21,7 +21,7 @@ import { BinaryPropertyModels } from "../../metadata/binary/BinaryPropertyModels
 /**
  * Utilities related to the glTF `EXT_structural_metadata` extension.
  */
-export class GltfMetadata {
+export class StructuralMetadataUtils {
   /**
    * Creates an string representation of the `EXT_structural_metadata`
    * that is contained in the given glTF Transform document.
@@ -31,17 +31,20 @@ export class GltfMetadata {
    * @param document - The glTF Transform document
    * @returns The string
    */
-  static createMetadataInfoString(document: Document): string {
+  static createStructuralMetadataInfoString(document: Document): string {
     const structuralMetadata = document
       .getRoot()
       .getExtension<StructuralMetadata>("EXT_structural_metadata");
 
     const sb = new StringBuilder();
     if (structuralMetadata) {
-      GltfMetadata.createStructuralMetadataString(sb, structuralMetadata);
+      StructuralMetadataUtils.createStructuralMetadataString(
+        sb,
+        structuralMetadata
+      );
     }
     const meshes = document.getRoot().listMeshes();
-    GltfMetadata.createMeshesMetadataString(sb, meshes);
+    StructuralMetadataUtils.createMeshesMetadataString(sb, meshes);
     return sb.toString();
   }
 
@@ -56,7 +59,7 @@ export class GltfMetadata {
     if (schema) {
       sb.addLine("Schema:");
       sb.increaseIndent();
-      GltfMetadata.createSchemaString(sb, schema);
+      StructuralMetadataUtils.createSchemaString(sb, schema);
       sb.decreaseIndent();
     }
 
@@ -67,7 +70,11 @@ export class GltfMetadata {
       sb.increaseIndent();
       sb.addLine("Property table ", i, " of ", propertyTables.length);
       sb.increaseIndent();
-      GltfMetadata.createPropertyTableString(sb, propertyTable, schema);
+      StructuralMetadataUtils.createPropertyTableString(
+        sb,
+        propertyTable,
+        schema
+      );
       sb.decreaseIndent();
       sb.decreaseIndent();
     }
@@ -92,11 +99,11 @@ export class GltfMetadata {
         sb.increaseIndent();
         const className = propertyTable.getClass();
         const rowCount = propertyTable.getCount();
-        GltfMetadata.createPropertyTablePropertyString(
+        StructuralMetadataUtils.createPropertyTablePropertyString(
           sb,
           propertyTableProperty
         );
-        GltfMetadata.createPropertyTablePropertyValuesString(
+        StructuralMetadataUtils.createPropertyTablePropertyValuesString(
           sb,
           propertyTableProperty,
           schema,
@@ -226,7 +233,7 @@ export class GltfMetadata {
       const classObject = schema.getClass(classKey);
       if (classObject) {
         sb.increaseIndent();
-        GltfMetadata.createClassString(sb, classObject);
+        StructuralMetadataUtils.createClassString(sb, classObject);
         sb.decreaseIndent();
       }
       sb.increaseIndent();
@@ -244,7 +251,7 @@ export class GltfMetadata {
       const classProperty = classObject.getProperty(propertyKey);
       if (classProperty) {
         sb.increaseIndent();
-        GltfMetadata.createClassPropertyString(sb, classProperty);
+        StructuralMetadataUtils.createClassPropertyString(sb, classProperty);
         sb.decreaseIndent();
       }
       sb.decreaseIndent();
@@ -280,7 +287,7 @@ export class GltfMetadata {
       const mesh = meshes[m];
       const primitives = mesh.listPrimitives();
       sb.increaseIndent();
-      GltfMetadata.createPrimitivesMetadataString(sb, primitives);
+      StructuralMetadataUtils.createPrimitivesMetadataString(sb, primitives);
       sb.increaseIndent();
       sb.increaseIndent();
     }
@@ -300,7 +307,7 @@ export class GltfMetadata {
         primitive.getExtension<MeshPrimitiveStructuralMetadata>(
           "EXT_structural_metadata"
         );
-      GltfMetadata.createMeshPrimitiveMetadataString(
+      StructuralMetadataUtils.createMeshPrimitiveMetadataString(
         sb,
         meshPrimitiveStructuralMetadata
       );
@@ -328,7 +335,7 @@ export class GltfMetadata {
       sb.addLine("Property Texture ", t, " of ", propertyTextures.length);
       sb.increaseIndent();
       const propertyTexture = propertyTextures[t];
-      GltfMetadata.createPropertyTextureString(sb, propertyTexture);
+      StructuralMetadataUtils.createPropertyTextureString(sb, propertyTexture);
       sb.decreaseIndent();
       sb.decreaseIndent();
     }
@@ -343,7 +350,10 @@ export class GltfMetadata {
       sb.addLine("Property Attribute ", a, " of ", propertyAttributes.length);
       sb.increaseIndent();
       const propertyAttribute = propertyAttributes[a];
-      GltfMetadata.createPropertyAttributeString(sb, propertyAttribute);
+      StructuralMetadataUtils.createPropertyAttributeString(
+        sb,
+        propertyAttribute
+      );
       sb.decreaseIndent();
       sb.decreaseIndent();
     }
@@ -364,7 +374,7 @@ export class GltfMetadata {
       const propertyTextureProperty = propertyTexture.getProperty(propertyKey);
       if (propertyTextureProperty) {
         sb.increaseIndent();
-        GltfMetadata.createPropertyTexturePropertyString(
+        StructuralMetadataUtils.createPropertyTexturePropertyString(
           sb,
           propertyTextureProperty
         );
@@ -402,7 +412,7 @@ export class GltfMetadata {
         propertyAttribute.getProperty(propertyKey);
       if (propertyAttributeProperty) {
         sb.increaseIndent();
-        GltfMetadata.createPropertyAttributePropertyString(
+        StructuralMetadataUtils.createPropertyAttributePropertyString(
           sb,
           propertyAttributeProperty
         );

@@ -38,10 +38,11 @@ export class PropertyTableModels {
         const n = propertyNames[c];
         const columnWidth = columnWidths[n];
         const v = row.getPropertyValue(n);
+        const s = JSON.stringify(v);
         if (c > 0) {
           result += " | ";
         }
-        result += PropertyTableModels.pad(v, columnWidth);
+        result += PropertyTableModels.pad(s, columnWidth);
       }
       result += "\n";
     }
@@ -71,7 +72,7 @@ export class PropertyTableModels {
       for (let r = 0; r < rows; r++) {
         const row = propertyTableModel.getMetadataEntityModel(r);
         const v = row.getPropertyValue(n);
-        const s = `${v}`;
+        const s = JSON.stringify(v);
         columnWidth = Math.max(columnWidth, s.length);
       }
       columnWidths[n] = columnWidth;

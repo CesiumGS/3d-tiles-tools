@@ -6,7 +6,7 @@ import { savePixels } from "ndarray-pixels";
 import NdArray from "ndarray";
 
 import { EXTMeshFeatures } from "../src/contentProcessing/gltftransform/EXTMeshFeatures";
-import { GltfFeatures } from "../src/contentProcessing/gltftransform/GltfFeatures";
+import { MeshFeaturesUtils } from "../src/contentProcessing/gltftransform/MeshFeaturesUtils";
 
 async function createExampleDocument(): Promise<Document> {
   const document = new Document();
@@ -101,7 +101,7 @@ async function runReadingExample() {
   const document = await io.readBinary(glb);
 
   // Print information about the feature IDs in the document:
-  const s = GltfFeatures.createFeaturesInfoString(document);
+  const s = MeshFeaturesUtils.createMeshFeaturesInfoString(document);
   console.log("Feature IDs:");
   console.log(s);
 }

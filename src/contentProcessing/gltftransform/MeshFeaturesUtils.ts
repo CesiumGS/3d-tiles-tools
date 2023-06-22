@@ -10,7 +10,7 @@ import { StringBuilder } from "./StringBuilder";
 /**
  * Utilities related to the glTF `EXT_mesh_features` extension.
  */
-export class GltfFeatures {
+export class MeshFeaturesUtils {
   /**
    * Creates an string representation of the `EXT_mesh_features`
    * that is contained in the given glTF Transform document.
@@ -20,10 +20,10 @@ export class GltfFeatures {
    * @param document - The glTF Transform document
    * @returns The string
    */
-  static createFeaturesInfoString(document: Document): string {
+  static createMeshFeaturesInfoString(document: Document): string {
     const sb = new StringBuilder();
     const meshes = document.getRoot().listMeshes();
-    GltfFeatures.createMeshesFeaturesString(sb, meshes);
+    MeshFeaturesUtils.createMeshesFeaturesString(sb, meshes);
     return sb.toString();
   }
 
@@ -35,7 +35,7 @@ export class GltfFeatures {
       const mesh = meshes[m];
       const primitives = mesh.listPrimitives();
       sb.increaseIndent();
-      GltfFeatures.createPrimitivesFeaturesString(sb, primitives);
+      MeshFeaturesUtils.createPrimitivesFeaturesString(sb, primitives);
       sb.increaseIndent();
       sb.increaseIndent();
     }
@@ -54,7 +54,7 @@ export class GltfFeatures {
       sb.increaseIndent();
       const meshFeatures =
         primitive.getExtension<MeshFeatures>("EXT_mesh_features");
-      GltfFeatures.createMeshFeaturesString(sb, meshFeatures);
+      MeshFeaturesUtils.createMeshFeaturesString(sb, meshFeatures);
       sb.decreaseIndent();
 
       sb.decreaseIndent();
@@ -78,7 +78,7 @@ export class GltfFeatures {
       sb.addLine("Feature ID ", f, " of ", featureIds.length);
       const featureId = featureIds[f];
       sb.increaseIndent();
-      GltfFeatures.createFeatureIdString(sb, featureId);
+      MeshFeaturesUtils.createFeatureIdString(sb, featureId);
       sb.decreaseIndent();
       sb.decreaseIndent();
     }

@@ -1,9 +1,10 @@
-import { BinaryPropertyTableModelBuilder } from "../src/metadata/binary/BinaryPropertyTableModelBuilder";
+import { BinaryPropertyTableBuilder } from "../src/metadata/binary/BinaryPropertyTableBuilder";
 import { PropertyTableModels } from "../src/metadata/PropertyTableModels";
 
 import { Schema } from "../src/structure/Metadata/Schema";
 import { MetadataClass } from "../src/structure/Metadata/MetadataClass";
 import { MetadataEnum } from "../src/structure/Metadata/MetadataEnum";
+import { BinaryPropertyTableModel } from "../src/metadata/binary/BinaryPropertyTableModel";
 
 const exampleMetadataClass: MetadataClass = {
   name: "Example metadata class",
@@ -65,7 +66,7 @@ const exampleSchema: Schema = {
 };
 
 function runDemo() {
-  const builder = BinaryPropertyTableModelBuilder.create(
+  const builder = BinaryPropertyTableBuilder.create(
     exampleSchema,
     "exampleMetadataClass",
     "Example property table"
@@ -97,7 +98,8 @@ function runDemo() {
       ["ExampleEnumValueB", "ExampleEnumValueC"],
     ]);
 
-  const propertyTableModel = builder.build();
+  const binaryPropertyTable = builder.build();
+  const propertyTableModel = new BinaryPropertyTableModel(binaryPropertyTable);
 
   const s = PropertyTableModels.createString(propertyTableModel);
   console.log(s);

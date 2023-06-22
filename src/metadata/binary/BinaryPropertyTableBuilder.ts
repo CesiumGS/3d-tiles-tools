@@ -9,16 +9,14 @@ import { PropertyTableProperty } from "../../structure/PropertyTableProperty";
 import { MetadataError } from "../MetadataError";
 
 import { MetadataUtilities } from "../MetadataUtilities";
-import { PropertyTableModel } from "../PropertyTableModel";
 import { BinaryPropertyTable } from "./BinaryPropertyTable";
-import { BinaryPropertyTableModel } from "./BinaryPropertyTableModel";
 import { BinaryPropertyTables } from "./BinaryPropertyTables";
 
 /**
- * A class for building binary `PropertyTableModel` instances
+ * A class for building `BinaryPropertyModel` instances
  * from property values that are given as arrays.
  */
-export class BinaryPropertyTableModelBuilder {
+export class BinaryPropertyTableBuilder {
   /**
    * Creates a new instance.
    *
@@ -35,7 +33,7 @@ export class BinaryPropertyTableModelBuilder {
     propertyTableClass: string,
     propertyTableName: string
   ) {
-    return new BinaryPropertyTableModelBuilder(
+    return new BinaryPropertyTableBuilder(
       schema,
       propertyTableClass,
       propertyTableName
@@ -191,15 +189,15 @@ export class BinaryPropertyTableModelBuilder {
   }
 
   /**
-   * Build the `PropertyTableModel` from the data of all properties
+   * Build the `BinaryPropertyTable` from the data of all properties
    * that have been added.
    *
-   * @returns The `PropertyTableModel`
+   * @returns The `BinaryPropertyTable`
    * @throws MetadataError If no property values have been given
    * for any of the properties of the class that the table is
    * built for
    */
-  build(): PropertyTableModel {
+  build(): BinaryPropertyTable {
     if (this.count === undefined) {
       throw new MetadataError(`No properties have been added"`);
     }
@@ -240,10 +238,7 @@ export class BinaryPropertyTableModelBuilder {
       binaryBufferStructure: binaryBufferStructure,
       binaryBufferData: binaryBufferData,
     };
-    const propertyTableModel = new BinaryPropertyTableModel(
-      binaryPropertyTable
-    );
-    return propertyTableModel;
+    return binaryPropertyTable;
   }
 
   /**
