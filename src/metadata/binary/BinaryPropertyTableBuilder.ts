@@ -32,7 +32,7 @@ export class BinaryPropertyTableBuilder {
     schema: Schema,
     propertyTableClass: string,
     propertyTableName: string
-  ) {
+  ): BinaryPropertyTableBuilder {
     return new BinaryPropertyTableBuilder(
       schema,
       propertyTableClass,

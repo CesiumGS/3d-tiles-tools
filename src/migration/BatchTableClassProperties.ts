@@ -23,6 +23,8 @@ export class BatchTableClassProperties {
    * @param batchTablePropertyName - The property name
    * @param batchTablePropertyValue - The property value
    * @returns The `ClassProperty`
+   * @throws TileFormatError If the given value is neither
+   * a BatchTableBinaryBodyReference nor a numeric array
    */
   static createClassProperty(
     batchTablePropertyName: string,

@@ -16,7 +16,7 @@ export class NumericBuffers {
    *
    * @param buffer - The buffer
    * @param index - The index
-   * @param componentType - The component type
+   * @param componentType - The component type, e.g `FLOAT32` or `UINT16`
    * @returns The number or bigint
    * @throws MetadataError If the given `componentType` is not valid
    */
@@ -60,7 +60,7 @@ export class NumericBuffers {
    * @param buffer - The buffer
    * @param index - The index
    * @param arrayLength - The length of the array, in number of elements
-   * @param componentType - The component type
+   * @param componentType - The component type, e.g `FLOAT32` or `UINT16`
    * @returns The number or bigint array
    * @throws MetadataError If the given `componentType` is not valid
    */
@@ -87,7 +87,7 @@ export class NumericBuffers {
    * @param buffer - The buffer
    * @param index - The index
    * @param arrayLength - The length of the array, in number of elements
-   * @param componentType - The component type
+   * @param componentType - The component type, e.g `FLOAT32` or `UINT16`
    * @returns The number or bigint typed array
    * @throws MetadataError If the given `componentType` is not valid
    */
