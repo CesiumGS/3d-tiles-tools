@@ -874,7 +874,7 @@ export class EXTStructuralMetadata extends Extension {
     const meshPrimitiveStructuralMetadataDef: MeshPrimitiveStructuralMetadataDef =
       {
         propertyTextures: propertyTextureDefs,
-        propertyAttributes: propertyTextureDefs,
+        propertyAttributes: propertyAttributeDefs,
       };
     primDef.extensions = primDef.extensions || {};
     primDef.extensions[NAME] = meshPrimitiveStructuralMetadataDef;
