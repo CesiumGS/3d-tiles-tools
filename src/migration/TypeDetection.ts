@@ -120,7 +120,7 @@ export class TypeDetection {
       if (commonElementType === "boolean") {
         return "BOOLEAN";
       }
-      if (commonElementType === "number") {
+      if (commonElementType === "number" || commonElementType === "bigint") {
         return "SCALAR";
       }
     }

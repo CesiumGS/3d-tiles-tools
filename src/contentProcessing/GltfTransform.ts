@@ -5,6 +5,7 @@ import { NodeIO } from "@gltf-transform/core";
 import { KHRONOS_EXTENSIONS } from "@gltf-transform/extensions";
 
 import { EXTMeshFeatures } from "./gltftransform/EXTMeshFeatures";
+import { EXTStructuralMetadata } from "./gltftransform/EXTStructuralMetadata";
 
 /**
  * Utilities for using glTF-Transform in the 3D Tiles tools
@@ -35,6 +36,7 @@ export class GltfTransform {
       "draco3d.encoder": await draco3d.createEncoderModule(),
     });
     io.registerExtensions([EXTMeshFeatures]);
+    io.registerExtensions([EXTStructuralMetadata]);
     GltfTransform.io = io;
     return io;
   }

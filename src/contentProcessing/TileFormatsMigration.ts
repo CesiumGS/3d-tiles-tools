@@ -7,6 +7,13 @@ import { PntsPointClouds } from "./pointClouds/PntsPointClouds";
 import { GltfPointClouds } from "./pointClouds/GltfPointClouds";
 
 import { TileTableData } from "./TileTableData";
+import { TilePropertyTableModels } from "../migration/TilePropertyTableModels";
+import { PropertyTableModels } from "../metadata/PropertyTableModels";
+import { BatchTableClassProperties } from "../migration/BatchTableClassProperties";
+import { BatchTableSchemas } from "../migration/BatchTableSchemas";
+import { GltfTransformPointClouds } from "./pointClouds/GltTransformfPointClouds";
+import { GltfTransform } from "./GltfTransform";
+import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
 
 export class TileFormatsMigration {
   static async convertPntsToGlb(
@@ -15,8 +22,10 @@ export class TileFormatsMigration {
     const tileData = TileFormats.readTileData(pntsBuffer);
 
     const batchTable = tileData.batchTable.json as BatchTable;
+    const batchTableBinary = tileData.batchTable.binary;
+
     const featureTable = tileData.featureTable.json as PntsFeatureTable;
-    const binary = tileData.featureTable.binary;
+    const featureTableBinary = tileData.featureTable.binary;
 
     //*/
     console.log("Batch table");
@@ -27,19 +36,57 @@ export class TileFormatsMigration {
     //*/
 
     const globalPosition =
-      TileFormatsMigration.obtainGlobalPositionFromRtcCenter(
+      TileFormatsMigration.obtainGlobalPositionFromPntsRtcCenter(
         featureTable,
-        binary
+        featureTableBinary
       );
-    const pntsPointCloud = await PntsPointClouds.create(featureTable, binary);
-    const glbBuffer = await GltfPointClouds.build(
+    const pntsPointCloud = await PntsPointClouds.create(
+      featureTable,
+      featureTableBinary
+    );
+
+    const gltfTransformPointCloud = GltfTransformPointClouds.build(
       pntsPointCloud,
       globalPosition
     );
-    return glbBuffer;
+
+    const document = gltfTransformPointCloud.document;
+    const primitive = gltfTransformPointCloud.primitive;
+
+    const numRows = featureTable.POINTS_LENGTH;
+    TileTableDataToStructuralMetadata.assign(
+      document,
+      primitive,
+      batchTable,
+      batchTableBinary,
+      numRows
+    );
+
+    // Create the GLB buffer
+    const io = await GltfTransform.getIO();
+
+    //*/
+    {
+      console.log("JSON document");
+      const jsonDocument = await io.writeJSON(document);
+      console.log(JSON.stringify(jsonDocument.json, null, 2));
+    }
+    //*/
+
+    const glb = await io.writeBinary(document);
+    return Buffer.from(glb);
   }
 
-  private static obtainGlobalPositionFromRtcCenter(
+  /**
+   * Obtains the value of the `RTC_CENTER` property of the given
+   * feature table, or `undefined` if the feature table does not
+   * define this property.
+   *
+   * @param featureTable - The feature table
+   * @param binary - The binary blob of the feature table
+   * @returns The `RTC_CENTER` value, or `undefined`
+   */
+  private static obtainGlobalPositionFromPntsRtcCenter(
     featureTable: PntsFeatureTable,
     binary: Buffer
   ): [number, number, number] | undefined {

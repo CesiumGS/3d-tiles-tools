@@ -104,21 +104,13 @@ export class TilePropertyTableModel implements PropertyTableModel {
     this.propertyIdToModel[propertyId] = propertyModel;
   }
 
-  /**
-   * Returns the property names (column names) of this table
-   *
-   * @returns The property names
-   */
+  /** {@inheritDoc PropertyTableModel.getPropertyNames} */
   getPropertyNames() {
     return Object.keys(this.propertyIdToModel);
   }
 
-  /**
-   * Returns the number of rows that are stored in this table
-   *
-   * @returns The number of rows
-   */
-  getNumRows() {
+  /** {@inheritDoc PropertyTableModel.getCount} */
+  getCount() {
     return this.numRows;
   }
 

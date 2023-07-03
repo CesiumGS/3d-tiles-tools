@@ -7,93 +7,9 @@ import { Mesh } from "draco3d";
 import { DracoError } from "./DracoError";
 import { ComponentDatatype } from "./ComponentDataType";
 import { Buffers } from "../../base/Buffers";
-
-/**
- * The information that is included in an `AttributeInfo` for
- * the case that the Draco data was quantized
- */
-export type QuantizationInfo = {
-  /**
-   * The number of bits for the quantization
-   */
-  quantizationBits: number;
-
-  /**
-   * The minimal dequantized value for each component of the attribute.
-   *
-   * This is present when `octEncoded` is `false`.
-   */
-  minValues?: number[];
-
-  /**
-   * Bounds of the dequantized attribute.
-   *
-   * This is the maximum delta over all components.
-   * This is present when `octEncoded` is `false`.
-   */
-  range?: number;
-
-  /**
-   * Whether the attribute was oct-encoded.
-   *
-   * If this is `true`, then the attribute was quantized with an
-   * AttributeOctahedronTransform. Otherwise, the attribute was
-   * quantized with an AttributeQuantizationTransform.
-   */
-  octEncoded: boolean;
-};
-
-/**
- * Information about the structure of an attriubte, after it
- * was decoded from the Draco representation.
- *
- */
-export type AttributeInfo = {
-  /**
-   * The number of components (e.g. 1 for scalars, 3 for 3D
-   * vectors)
-   */
-  componentsPerAttribute: number;
-
-  /**
-   * The component data type, as the string representation of one
-   * of the (GL) constants, like "SHORT" or "UNSIGNED_BYTE"
-   */
-  componentDatatype: string;
-
-  /**
-   * The byte offset of the attribute data
-   */
-  byteOffset: number;
-
-  /**
-   * The byte stride between attributes (i.e. `componentsPerAttribute`
-   * times the size of the `componentDataType` in bytes)
-   */
-  byteStride: number;
-
-  /**
-   * Whether the attribute is normalized
-   */
-  normalized: boolean;
-
-  /**
-   * Optional quantization information for quantized attributes
-   */
-  quantization?: QuantizationInfo;
-};
-
-/**
- * The result from the draco decoder, mapping attribute names
- * to the decoded attribute data and information about the
- * attribute structure
- */
-export type DracoDecoderResult = {
-  [key: string]: {
-    attributeData: Buffer;
-    attributeInfo: AttributeInfo;
-  };
-};
+import { AttributeInfo } from "./AttributeInfo";
+import { QuantizationInfo } from "./QuantizationInfo";
+import { DracoDecoderResult } from "./DracoDecoderResult";
 
 /**
  * A thin wrapper around Draco, tailored for decompressing

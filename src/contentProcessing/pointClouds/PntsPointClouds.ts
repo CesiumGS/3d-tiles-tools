@@ -11,7 +11,7 @@ import { TileTableData } from "../TileTableData";
 import { Colors } from "./Colors";
 
 import { DracoDecoder } from "../draco/DracoDecoder";
-import { DracoDecoderResult } from "../draco/DracoDecoder";
+import { DracoDecoderResult } from "../draco/DracoDecoderResult";
 
 /**
  * Methods to create `ReadablePointCloud` instances from PNTS data
@@ -35,7 +35,7 @@ export class PntsPointClouds {
   static async create(
     featureTable: PntsFeatureTable,
     binary: Buffer
-  ): Promise<ReadablePointCloud> {
+  ): Promise<DefaultPointCloud> {
     const pointCloud = new DefaultPointCloud();
 
     // If the feature table contains the 3DTILES_draco_point_compression
