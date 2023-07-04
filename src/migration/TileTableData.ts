@@ -1,4 +1,5 @@
 import { PropertyModel } from "../metadata/PropertyModel";
+import { PropertyModels } from "../metadata/PropertyModels";
 import { NumericBuffers } from "../metadata/binary/NumericBuffers";
 import { NumericPropertyModel } from "../metadata/binary/NumericPropertyModel";
 
@@ -101,7 +102,7 @@ export class TileTableData {
       byteOffset,
       binary
     );
-    return TileTableData.createNumericArrayIterableInternal(
+    return PropertyModels.createNumericArrayIterable(
       propertyModel,
       numElements
     );
@@ -134,57 +135,12 @@ export class TileTableData {
       byteOffset,
       binary
     );
-    return TileTableData.createNumericScalarIterableInternal(
+    return PropertyModels.createNumericScalarIterable(
       propertyModel,
       numElements
     );
   }
 
-  /**
-   * Creates an iterable over the values of the given property
-   * model, assuming that they are numeric arrays
-   *
-   * @param propertyModel - The property model
-   * @param numElements - The number of elements
-   * @returns The iterable
-   */
-  static createNumericArrayIterableInternal(
-    propertyModel: PropertyModel,
-    numElements: number
-  ): Iterable<number[]> {
-    const iterable = {
-      [Symbol.iterator]: function* (): Iterator<number[]> {
-        for (let index = 0; index < numElements; index++) {
-          const value = propertyModel.getPropertyValue(index);
-          yield value;
-        }
-      },
-    };
-    return iterable;
-  }
-
-  /**
-   * Creates an iterable over the values of the given property
-   * model, assuming that they are numeric scalars
-   *
-   * @param propertyModel - The property model
-   * @param numElements - The number of elements
-   * @returns The iterable
-   */
-  static createNumericScalarIterableInternal(
-    propertyModel: PropertyModel,
-    numElements: number
-  ): Iterable<number> {
-    const iterable = {
-      [Symbol.iterator]: function* (): Iterator<number> {
-        for (let index = 0; index < numElements; index++) {
-          const value = propertyModel.getPropertyValue(index);
-          yield value;
-        }
-      },
-    };
-    return iterable;
-  }
 
   /**
    * Createa a `PropertyModel` instance that is backed by

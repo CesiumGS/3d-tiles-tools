@@ -6,21 +6,21 @@ import { GLTF } from "@gltf-transform/core";
 
 import { Iterables } from "../base/Iterables";
 
-import { EXTStructuralMetadata } from "./gltftransform/EXTStructuralMetadata";
-import { MeshPrimitiveStructuralMetadata } from "./gltftransform/StructuralMetadata";
-import { StructuralMetadata } from "./gltftransform/StructuralMetadata";
+import { EXTStructuralMetadata } from "../contentProcessing/gltftransform/EXTStructuralMetadata";
+import { MeshPrimitiveStructuralMetadata } from "../contentProcessing/gltftransform/StructuralMetadata";
+import { StructuralMetadata } from "../contentProcessing/gltftransform/StructuralMetadata";
 
 import { ClassProperty } from "../structure/Metadata/ClassProperty";
 import { BatchTable } from "../structure/TileFormats/BatchTable";
 
-import { BatchTableSchemas } from "../migration/BatchTableSchemas";
-import { TilePropertyTableModels } from "../migration/TilePropertyTableModels";
-
+import { BatchTableSchemas } from "./BatchTableSchemas";
+import { TilePropertyTableModels } from "./TilePropertyTableModels";
 import { TileTableData } from "./TileTableData";
 
 import { PropertyModel } from "../metadata/PropertyModel";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
+import { PropertyModels } from "../metadata/PropertyModels";
 
 export class TileTableDataToStructuralMetadata {
   static assign(
@@ -145,13 +145,13 @@ export class TileTableDataToStructuralMetadata {
       classProperty.type === "VEC3" ||
       classProperty.type === "VEC4"
     ) {
-      const iterable = TileTableData.createNumericArrayIterableInternal(
+      const iterable = PropertyModels.createNumericArrayIterable(
         propertyModel,
         numRows
       );
       valuesIterable = Iterables.flatten(iterable);
     } else {
-      valuesIterable = TileTableData.createNumericScalarIterableInternal(
+      valuesIterable = PropertyModels.createNumericScalarIterable(
         propertyModel,
         numRows
       );

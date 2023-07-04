@@ -7,7 +7,7 @@ import { TileFormatError } from "../../tileFormats/TileFormatError";
 import { AttributeCompression } from "./AttributeCompression";
 import { DefaultPointCloud } from "./DefaultPointCloud";
 import { ReadablePointCloud } from "./ReadablePointCloud";
-import { TileTableData } from "../TileTableData";
+import { TileTableData } from "../../migration/TileTableData";
 import { Colors } from "./Colors";
 
 import { DracoDecoder } from "../draco/DracoDecoder";

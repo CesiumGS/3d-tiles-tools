@@ -1,5 +1,3 @@
-import { TileTableData } from "../contentProcessing/TileTableData";
-
 import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
 import { MetadataEntityModel } from "../metadata/MetadataEntityModel";
 import { MetadataError } from "../metadata/MetadataError";
@@ -9,6 +7,8 @@ import { TableMetadataEntityModel } from "../metadata/TableMetadataEntityModel";
 
 import { PropertyTableProperty } from "../structure/PropertyTableProperty";
 import { ClassProperty } from "../structure/Metadata/ClassProperty";
+
+import { TileTableData } from "./TileTableData";
 
 /**
  * Implementation of a `PropertyTableModel` that is backed by

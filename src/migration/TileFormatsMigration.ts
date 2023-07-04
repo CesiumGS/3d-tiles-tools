@@ -3,16 +3,11 @@ import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 
-import { PntsPointClouds } from "./pointClouds/PntsPointClouds";
-import { GltfPointClouds } from "./pointClouds/GltfPointClouds";
+import { GltfTransform } from "../contentProcessing/GltfTransform";
+import { PntsPointClouds } from "../contentProcessing/pointClouds/PntsPointClouds";
+import { GltfTransformPointClouds } from "../contentProcessing/pointClouds/GltTransformfPointClouds";
 
 import { TileTableData } from "./TileTableData";
-import { TilePropertyTableModels } from "../migration/TilePropertyTableModels";
-import { PropertyTableModels } from "../metadata/PropertyTableModels";
-import { BatchTableClassProperties } from "../migration/BatchTableClassProperties";
-import { BatchTableSchemas } from "../migration/BatchTableSchemas";
-import { GltfTransformPointClouds } from "./pointClouds/GltTransformfPointClouds";
-import { GltfTransform } from "./GltfTransform";
 import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
 
 export class TileFormatsMigration {

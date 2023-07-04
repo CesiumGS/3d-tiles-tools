@@ -1,8 +1,8 @@
-import { MetadataError } from "../metadata/MetadataError";
-import { BinaryPropertyTable } from "../metadata/binary/BinaryPropertyTable";
+import { MetadataError } from "../../metadata/MetadataError";
+import { BinaryPropertyTable } from "../../metadata/binary/BinaryPropertyTable";
 
-import { EXTStructuralMetadata } from "./gltftransform/EXTStructuralMetadata";
-import { PropertyTable } from "./gltftransform/StructuralMetadata";
+import { EXTStructuralMetadata } from "./EXTStructuralMetadata";
+import { PropertyTable } from "./StructuralMetadata";
 
 /**
  * Methods for creating `PropertyTable` objects for the glTF-Transform

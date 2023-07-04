@@ -1,6 +1,9 @@
-import { TileTableData } from "../contentProcessing/TileTableData";
+import { TileTableData } from "./TileTableData";
 import { BatchTableClassProperties } from "./BatchTableClassProperties";
 import { TilePropertyTableModel } from "./TilePropertyTableModel";
+
+import { PropertyTableModel } from "../metadata/PropertyTableModel";
+import { TileFormatError } from "../tileFormats/TileFormatError";
 
 /**
  * Methods to create `PropertyTableModel` instances for batch- or
@@ -15,12 +18,14 @@ export class TilePropertyTableModels {
    * @param binary - The binary data
    * @param numRows - The number of rows (POINTS_LENGTH or BATCH_LENGTH)
    * @returns The property table model
+   * @throws TileFormatError If the table contained a property 
+   * that was neither a BatchTableBinaryBodyReference nor an array
    */
   static create(
     table: { [key: string]: any },
     binary: Buffer,
     numRows: number
-  ): TilePropertyTableModel {
+  ): PropertyTableModel {
     const propertyTableModel = new TilePropertyTableModel(binary, numRows);
     const properties = Object.keys(table);
     for (const propertyId of properties) {
@@ -47,7 +52,7 @@ export class TilePropertyTableModels {
       } else if (Array.isArray(propertyValue)) {
         propertyTableModel.addPropertyModelFromArray(propertyId, propertyValue);
       } else {
-        console.log(
+        throw new TileFormatError(
           `Property ${propertyId} was neither a binary body ` +
             `reference nor an array - skipping`
         );

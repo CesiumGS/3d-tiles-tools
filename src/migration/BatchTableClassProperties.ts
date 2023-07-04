@@ -1,9 +1,9 @@
-import { TileTableData } from "../contentProcessing/TileTableData";
 
 import { ClassProperty } from "../structure/Metadata/ClassProperty";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
 
+import { TileTableData } from "./TileTableData";
 import { TypeDetection } from "./TypeDetection";
 
 /**
