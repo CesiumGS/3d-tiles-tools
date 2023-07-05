@@ -15,7 +15,7 @@
         },
         "geometricError" : 1.0,
         "content": {
-          "uri": "tileA.b3dm"
+          "uri": "tile.b3dm"
         }
       }, {
         "boundingVolume" : {

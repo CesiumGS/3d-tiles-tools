@@ -17,6 +17,14 @@
         "content": {
           "uri": "tileC.b3dm"
         }
+      }, {
+        "boundingVolume" : {
+          "box" : [ 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5 ]
+        },
+        "geometricError" : 1.0,
+        "content": {
+          "uri": "../tileX.b3dm"
+        }
       }      
     ]
   }
