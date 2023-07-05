@@ -1,8 +1,6 @@
 import fs from "fs";
-import { Buffers } from "../src/base/Buffers";
 
 import { ContentOps } from "../src/contentProcessing/ContentOps";
-import { SpecHelpers } from "./SpecHelpers";
 
 describe("ContentOps", function () {
   it("extracts a single GLB buffers from B3DM", async function () {
