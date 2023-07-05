@@ -15,8 +15,7 @@ const overwrite = true;
 
 describe("TilesetDataProcessor", function () {
   afterEach(function () {
-    SpecHelpers.forceDeleteDirectory(basicOutput);
-    SpecHelpers.forceDeleteDirectory(implicitOutput);
+    SpecHelpers.forceDeleteDirectory("./specs/data/output/tilesetProcessing");
   });
 
   it("processAllEntries processes all entries exactly once for explicit tilesets", async function () {
@@ -43,7 +42,7 @@ describe("TilesetDataProcessor", function () {
     // Expect the names of ALL files to have been modified
     const expectedOutputFiles = [
       "PROCESSED_README.md",
-      "PROCESSED_sub/tileB.b3dm",
+      "sub/PROCESSED_tileB.b3dm",
       "PROCESSED_tileA.b3dm",
       "PROCESSED_tileB.b3dm",
       "PROCESSED_tileC.b3dm",

@@ -1,3 +1,5 @@
+import path from "path";
+
 import { Tile } from "../structure/Tile";
 import { Tileset } from "../structure/Tileset";
 import { Content } from "../structure/Content";
@@ -15,6 +17,7 @@ import { TilesetTraverser } from "../traversal/TilesetTraverser";
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
 import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 import { TraversalCallback } from "../traversal/TraversalCallback";
+import { Paths } from "../base/Paths";
 
 /**
  * Implementation of a `TilesetProcessor` that offers methods for
@@ -231,7 +234,9 @@ export class BasicTilesetProcessor extends TilesetProcessor {
   ): Promise<void> {
     const context = this.getContext();
     const tileset = context.sourceTileset;
+    const basePath = ".";
     await this.processTilesetTileContentEntries(
+      basePath,
       tileset,
       uriProcessor,
       entryProcessor
@@ -248,6 +253,12 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * as well as possible template URIs at the roots of implicit
    * tilesets.
    *
+   * @param basePath - The path that the (relative) content URIs of
+   * the given tileset are resolved against, in order to obtain the
+   * full path for the content data. For the root tileset, this is
+   * just the current directory, `"."`. For external tilesets, it
+   * will be the directory that contained the tileset JSON file of
+   * the external tileset.
    * @param tileset - The tileset
    * @param uriProcessor - The processor that updates keys and URIs
    * @param entryProcessor - The `TilesetEntryProcessor`
@@ -256,6 +267,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * an error.
    */
   private async processTilesetTileContentEntries(
+    basePath: string,
     tileset: Tileset,
     uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
@@ -268,6 +280,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
       // to the tile contents.
       if (!tile.implicitTiling) {
         await this.processExplicitTileContentEntries(
+          basePath,
           tile,
           uriProcessor,
           entryProcessor
@@ -278,6 +291,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
         // to the content of one of the implicit tiles.
         await this.forEachTileAt(tile, async (traversedTile: TraversedTile) => {
           await this.processTraversedTileContentEntries(
+            basePath,
             traversedTile,
             uriProcessor,
             entryProcessor
@@ -309,18 +323,21 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * will be updated to reflect possible changes of the keys (file
    * names) that are performed by the `entryProcessor`.
    *
+   * @param basePath - The base path (see processTilesetTileContentEntries)
    * @param tile - The tile
    * @param uriProcessor - The processor that updates keys and URIs
    * @param entryProcessor - The `TilesetEntryProcessor`
    * @returns A promise that resolves when the process is finished
    */
   private async processExplicitTileContentEntries(
+    basePath: string,
     tile: Tile,
     uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
   ): Promise<void> {
     const contents = BasicTilesetProcessor.getTileContents(tile);
     const targetContentUris = await this.processContentEntries(
+      basePath,
       contents,
       uriProcessor,
       entryProcessor
@@ -335,12 +352,14 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * content of the given tile, calls `processEntries` on them,
    * and stores the resulting entries.
    *
+   * @param basePath - The base path (see processTilesetTileContentEntries)
    * @param traversedTile - The traversed tile
    * @param uriProcessor - The processor that updates keys and URIs
    * @param entryProcessor - The `TilesetEntryProcessor`
    * @returns A promise that resolves when the process is finished
    */
   private async processTraversedTileContentEntries(
+    basePath: string,
     traversedTile: TraversedTile,
     uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
@@ -349,7 +368,12 @@ export class BasicTilesetProcessor extends TilesetProcessor {
       return;
     }
     const contents = traversedTile.getFinalContents();
-    await this.processContentEntries(contents, uriProcessor, entryProcessor);
+    await this.processContentEntries(
+      basePath,
+      contents,
+      uriProcessor,
+      entryProcessor
+    );
   }
 
   /**
@@ -366,6 +390,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * on this tileset, to recursively handle the content entries
    * of the external tileset.
    *
+   * @param basePath - The base path (see processTilesetTileContentEntries)
    * @param contents - The contents
    * @param uriProcessor - The processor that updates keys and URIs
    * @param entryProcessor - The `TilesetEntryProcessor`
@@ -373,16 +398,22 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * containing the new names that the entries have after processing
    */
   private async processContentEntries(
+    basePath: string,
     contents: Content[],
     uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
   ): Promise<string[]> {
     const targetContentUris: string[] = [];
     for (const content of contents) {
+      // Resolve the content URI against the base path, to
+      // obtain the full URI (which is still relative to
+      // the directory of the "root" tileset)
       const sourceContentUri = content.uri;
-      let targetContentUri;
-      if (this.isProcessed(sourceContentUri)) {
-        targetContentUri = this.getTargetKey(sourceContentUri);
+      const fullSourceContentUri = Paths.join(basePath, sourceContentUri);
+
+      let fullTargetContentUri;
+      if (this.isProcessed(fullSourceContentUri)) {
+        fullTargetContentUri = this.getTargetKey(fullSourceContentUri);
       } else {
         // By default, each content entry will be processed with
         // the given entryProcessor. But if external tilesets
@@ -397,7 +428,9 @@ export class BasicTilesetProcessor extends TilesetProcessor {
             type: string | undefined
           ) => {
             if (type === ContentDataTypes.CONTENT_TYPE_TILESET) {
+              const externalBasePath = path.dirname(sourceEntry.key);
               return this.processExternalTilesetContentEntries(
+                externalBasePath,
                 sourceEntry,
                 uriProcessor,
                 entryProcessor
@@ -407,12 +440,19 @@ export class BasicTilesetProcessor extends TilesetProcessor {
           };
         }
         await this.processEntry(
-          sourceContentUri,
+          fullSourceContentUri,
           externalHandlingEntryProcessor
         );
-        targetContentUri = this.getTargetKey(sourceContentUri);
+        fullTargetContentUri = this.getTargetKey(fullSourceContentUri);
       }
-      if (targetContentUri) {
+      if (fullTargetContentUri) {
+        // Remove the "basePath" from the (possibly modified)
+        // URI, to obtain the URI that will become the new
+        // content.uri in the tileset JSON.
+        const targetContentUri = Paths.relativize(
+          basePath,
+          fullTargetContentUri
+        );
         targetContentUris.push(targetContentUri);
       }
     }
@@ -430,6 +470,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * content URIs) will be returned as the new entry for the
    * external tileset.
    *
+   * @param basePath - The base path (see processTilesetTileContentEntries)
    * @param externalTilesetSourceEntry - The tileset entry that
    * contains the external tileset.
    * @param uriProcessor - The processor that updates keys and URIs
@@ -439,6 +480,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * @throws Error If processing the external tileset causes an error
    */
   private async processExternalTilesetContentEntries(
+    basePath: string,
     externalTilesetSourceEntry: TilesetEntry,
     uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
@@ -455,6 +497,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     // Process all content entries of the external tileset
     // (possibly updating the content URIs in this tileset)
     await this.processTilesetTileContentEntries(
+      basePath,
       externalTileset,
       uriProcessor,
       entryProcessor

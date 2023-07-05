@@ -6,19 +6,22 @@ import { Tilesets } from "../src/tilesets/Tilesets";
 
 import { SpecHelpers } from "./SpecHelpers";
 
-describe("TilesetCombiner", function () {
-  it("combines external tilesets into a single tileset", async function () {
-    const tilesetSourceName = "./specs/data/combineTilesets/nestedExternal";
-    const tilesetTargetName =
-      "./specs/data/output/combineTilesets/nestedExternal";
-    const overwrite = true;
+const basicInput = "./specs/data/combineTilesets/nestedExternal";
+const basicOutput = "./specs/data/output/combineTilesets/nestedExternal";
+const overwrite = true;
 
-    await Tilesets.combine(tilesetSourceName, tilesetTargetName, overwrite);
+describe("TilesetCombiner", function () {
+  afterEach(function () {
+    SpecHelpers.forceDeleteDirectory("./specs/data/output/combineTilesets");
+  });
+
+  it("combines external tilesets into a single tileset", async function () {
+    await Tilesets.combine(basicInput, basicOutput, overwrite);
 
     // Ensure that the output directory contains the expected files:
     // All files of the input, except for the external tileset JSON files
     const actualRelativeFiles =
-      SpecHelpers.collectRelativeFileNames(tilesetTargetName);
+      SpecHelpers.collectRelativeFileNames(basicOutput);
     actualRelativeFiles.sort();
     const expectedRelativeFiles = [
       "README.md",
@@ -35,7 +38,7 @@ describe("TilesetCombiner", function () {
     // Ensure that the single 'tileset.json' contains the
     // proper content URIs for the combined output
     const tilesetJsonBuffer = fs.readFileSync(
-      Paths.join(tilesetTargetName, "tileset.json")
+      Paths.join(basicOutput, "tileset.json")
     );
     const tileset = JSON.parse(tilesetJsonBuffer.toString());
     const actualContentUris = await SpecHelpers.collectExplicitContentUris(
