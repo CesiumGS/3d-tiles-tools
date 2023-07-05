@@ -200,52 +200,6 @@ export class TileFormats {
   }
 
   /**
-   * Convenience method to collect all GLB (binary glTF) buffers from
-   * the given tile data.
-   *
-   * This can be applied to B3DM and I3DM tile data, as well as CMPT
-   * tile data. (For PNTS, it will return an empty array). When the
-   * given tile data is a composite (CMPT) tile data, and recursively
-   * collect the buffer from its inner tiles.
-   *
-   * @param tileDataBuffer - The tile data buffer
-   * @returns The array of GLB buffers
-   */
-  static extractGlbBuffers(tileDataBuffer: Buffer): Buffer[] {
-    const glbBuffers: Buffer[] = [];
-    TileFormats.extractGlbBuffersInternal(tileDataBuffer, glbBuffers);
-    return glbBuffers;
-  }
-
-  /**
-   * Implementation for `extractGlbBuffers`, called recursively.
-   *
-   * @param tileDataBuffer - The tile data buffer
-   * @param glbBuffers The array of GLB buffers
-   */
-  private static extractGlbBuffersInternal(
-    tileDataBuffer: Buffer,
-    glbBuffers: Buffer[]
-  ): void {
-    const isComposite = TileFormats.isComposite(tileDataBuffer);
-    if (isComposite) {
-      const compositeTileData =
-        TileFormats.readCompositeTileData(tileDataBuffer);
-      for (const innerTileDataBuffer of compositeTileData.innerTileBuffers) {
-        TileFormats.extractGlbBuffersInternal(innerTileDataBuffer, glbBuffers);
-      }
-    } else {
-      const tileData = TileFormats.readTileData(tileDataBuffer);
-      if (
-        tileData.header.magic === "b3dm" ||
-        tileData.header.magic === "i3dm"
-      ) {
-        glbBuffers.push(tileData.payload);
-      }
-    }
-  }
-
-  /**
    * Creates a Batched 3D Model (B3DM) `TileData` instance from
    * a buffer that is assumed to contain valid binary glTF (GLB)
    * data.

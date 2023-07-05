@@ -1,6 +1,10 @@
+import GltfPipeline from "gltf-pipeline";
+
 import { GltfUtilities } from "./GtlfUtilities";
 
 import { TileFormats } from "../tileFormats/TileFormats";
+import { TileData } from "../tileFormats/TileData";
+import { Buffers } from "../base/Buffers";
 
 /**
  * Low-level operations on tile content.
@@ -21,9 +25,12 @@ export class ContentOps {
    * @param inputBuffer - The input buffer
    * @returns The resulting buffer
    */
-  static b3dmToGlbBuffer(inputBuffer: Buffer): Buffer {
+  static async b3dmToGlbBuffer(inputBuffer: Buffer): Promise<Buffer> {
     const inputTileData = TileFormats.readTileData(inputBuffer);
-    const outputBuffer = inputTileData.payload;
+    const outputBuffer = ContentOps.transferRtcCenter(
+      inputTileData,
+      inputTileData.payload
+    );
     return outputBuffer;
   }
 
@@ -33,24 +40,100 @@ export class ContentOps {
    * @param inputBuffer - The input buffer
    * @returns The resulting buffer
    */
-  static i3dmToGlbBuffer(inputBuffer: Buffer): Buffer {
+  static async i3dmToGlbBuffer(inputBuffer: Buffer): Promise<Buffer> {
     const inputTileData = TileFormats.readTileData(inputBuffer);
-    const outputBuffer = inputTileData.payload;
+    const outputBuffer = ContentOps.transferRtcCenter(
+      inputTileData,
+      inputTileData.payload
+    );
     return outputBuffer;
   }
 
   /**
-   * Extracts all GLB buffers from the given CMPT buffer.
+   * Transfer the RTC_CENTER from the feature table of the given tile data
+   * to the given glTF asset.
    *
-   * This will recursively resolve all inner tiles. If they
-   * are B3DM or I3DM tiles, then their GLBs will be added
-   * to the results array, in unspecified order.
+   * If the given tile data feature table has an `RTC_CENTER`, then
+   * new root nodes are inserted into the glTF that contain the
+   * translation for this RTC center.
+   * Otherwise, the given glTF buffer is returned directly.
    *
-   * @param inputBuffer - The input buffer
-   * @returns The resulting buffers
+   * @param tileData - The `TileData`
+   * @param glbBuffer - The GLB buffer
+   * @returns The resulting GLB buffer
    */
-  static cmptToGlbBuffers(inputBuffer: Buffer): Buffer[] {
-    return TileFormats.extractGlbBuffers(inputBuffer);
+  private static async transferRtcCenter(
+    tileData: TileData,
+    glbBuffer: Buffer
+  ) {
+    const featureTable = tileData.featureTable?.json;
+    const rtcCenter = featureTable?.RTC_CENTER;
+    if (!rtcCenter) {
+      return glbBuffer;
+    }
+    // The actual translation is transformed with an inverse of the y-up to z-up
+    // transform, to compensate for the y-up to z-up transform that is applied
+    // to the glTF content.
+    const translation = [rtcCenter[0], rtcCenter[2], -rtcCenter[1]];
+    const customStage = (gltf: any) => {
+      GltfUtilities.insertRootWithTranslation(gltf, translation);
+      return gltf;
+    };
+    const options = {
+      customStages: [customStage],
+    };
+    const result = await GltfPipeline.processGlb(glbBuffer, options);
+    return result.glb;
+  }
+
+  /**
+   * Convenience method to collect all GLB (binary glTF) buffers from
+   * the given tile data.
+   *
+   * This can be applied to B3DM and I3DM tile data, as well as CMPT
+   * tile data. (For PNTS, it will return an empty array). When the
+   * given tile data is a composite (CMPT) tile data, and recursively
+   * collect the buffer from its inner tiles.
+   *
+   * @param tileDataBuffer - The tile data buffer
+   * @returns The array of GLB buffers
+   */
+  static async extractGlbBuffers(tileDataBuffer: Buffer): Promise<Buffer[]> {
+    const glbBuffers: Buffer[] = [];
+    await ContentOps.extractGlbBuffersInternal(tileDataBuffer, glbBuffers);
+    return glbBuffers;
+  }
+
+  /**
+   * Implementation for `extractGlbBuffers`, called recursively.
+   *
+   * @param tileDataBuffer - The tile data buffer
+   * @param glbBuffers The array of GLB buffers
+   */
+  private static async extractGlbBuffersInternal(
+    tileDataBuffer: Buffer,
+    glbBuffers: Buffer[]
+  ): Promise<void> {
+    const isComposite = TileFormats.isComposite(tileDataBuffer);
+    if (isComposite) {
+      const compositeTileData =
+        TileFormats.readCompositeTileData(tileDataBuffer);
+      for (const innerTileDataBuffer of compositeTileData.innerTileBuffers) {
+        await ContentOps.extractGlbBuffersInternal(
+          innerTileDataBuffer,
+          glbBuffers
+        );
+      }
+    } else {
+      const magic = Buffers.getMagicString(tileDataBuffer);
+      if (magic === "b3dm") {
+        const glbBuffer = await ContentOps.b3dmToGlbBuffer(tileDataBuffer);
+        glbBuffers.push(glbBuffer);
+      } else if (magic === "i3dm") {
+        const glbBuffer = await ContentOps.i3dmToGlbBuffer(tileDataBuffer);
+        glbBuffers.push(glbBuffer);
+      }
+    }
   }
 
   /**

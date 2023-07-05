@@ -41,8 +41,7 @@ export class ToolsMain {
   static async b3dmToGlb(input: string, output: string, force: boolean) {
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
-    const inputTileData = TileFormats.readTileData(inputBuffer);
-    const outputBuffer = inputTileData.payload;
+    const outputBuffer = await ContentOps.b3dmToGlbBuffer(inputBuffer);
     const upgradedOutputBuffer = await GltfUtilities.upgradeGlb(
       outputBuffer,
       undefined
@@ -54,7 +53,7 @@ export class ToolsMain {
   }
   static async cmptToGlb(input: string, output: string, force: boolean) {
     const inputBuffer = fs.readFileSync(input);
-    const glbBuffers = TileFormats.extractGlbBuffers(inputBuffer);
+    const glbBuffers = await ContentOps.extractGlbBuffers(inputBuffer);
     const glbsLength = glbBuffers.length;
     const glbPaths = new Array(glbsLength);
     if (glbsLength === 0) {
@@ -81,17 +80,13 @@ export class ToolsMain {
   static async glbToB3dm(input: string, output: string, force: boolean) {
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
-    const outputTileData =
-      TileFormats.createDefaultB3dmTileDataFromGlb(inputBuffer);
-    const outputBuffer = TileFormats.createTileDataBuffer(outputTileData);
+    const outputBuffer = ContentOps.glbToB3dmBuffer(inputBuffer);
     fs.writeFileSync(output, outputBuffer);
   }
   static async glbToI3dm(input: string, output: string, force: boolean) {
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
-    const outputTileData =
-      TileFormats.createDefaultI3dmTileDataFromGlb(inputBuffer);
-    const outputBuffer = TileFormats.createTileDataBuffer(outputTileData);
+    const outputBuffer = ContentOps.glbToI3dmBuffer(inputBuffer);
     fs.writeFileSync(output, outputBuffer);
   }
   static async optimizeB3dm(

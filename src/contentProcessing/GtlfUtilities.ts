@@ -179,6 +179,22 @@ export class GltfUtilities {
       return;
     }
     const rtcTranslation = rtcExtension.center;
+    GltfUtilities.insertRootWithTranslation(gltf, rtcTranslation);
+    Extensions.removeExtensionUsed(gltf, "CESIUM_RTC");
+    Extensions.removeExtension(gltf, "CESIUM_RTC");
+  }
+
+  /**
+   * Inserts new root nodes into the given glTF, with the given translation.
+   *
+   * This will insert a new parent node above each node in the `scenes`
+   * array. The new nodes will be added at the end of the `nodes` array,
+   * so that the indices of existing nodes remain unchanged.
+   *
+   * @param gltf - The glTF JSON object
+   * @param translation The translation as a 3D array
+   */
+  static insertRootWithTranslation(gltf: any, translation: number[]) {
     const scenes = gltf.scenes;
     if (!scenes) {
       return;
@@ -189,7 +205,7 @@ export class GltfUtilities {
         for (let i = 0; i < sceneNodes.length; i++) {
           const nodeIndex = sceneNodes[i];
           const newParent = {
-            translation: rtcTranslation,
+            translation: translation,
             children: [nodeIndex],
           };
           const newParentIndex = gltf.nodes.length;
@@ -198,7 +214,5 @@ export class GltfUtilities {
         }
       }
     }
-    Extensions.removeExtensionUsed(gltf, "CESIUM_RTC");
-    Extensions.removeExtension(gltf, "CESIUM_RTC");
   }
 }

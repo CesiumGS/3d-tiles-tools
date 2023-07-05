@@ -115,30 +115,6 @@ describe("TileFormats", function () {
     expect(tileData.innerTileBuffers.length).toBe(2);
   });
 
-  it("extracts a single GLB buffers from B3DM", function () {
-    const p = "./specs/data/contentTypes/content.b3dm";
-    const tileDataBuffer = fs.readFileSync(p);
-
-    const glbBuffers = TileFormats.extractGlbBuffers(tileDataBuffer);
-    expect(glbBuffers.length).toBe(1);
-  });
-
-  it("extracts multiple GLB buffers from CMPT", function () {
-    const p = "./specs/data/contentTypes/content.cmpt";
-    const tileDataBuffer = fs.readFileSync(p);
-
-    const glbBuffers = TileFormats.extractGlbBuffers(tileDataBuffer);
-    expect(glbBuffers.length).toBe(2);
-  });
-
-  it("extracts no GLB buffers from PNTS", function () {
-    const p = "./specs/data/contentTypes/content.pnts";
-    const tileDataBuffer = fs.readFileSync(p);
-
-    const glbBuffers = TileFormats.extractGlbBuffers(tileDataBuffer);
-    expect(glbBuffers.length).toBe(0);
-  });
-
   it("throws an error when trying to read tile data from a buffer that does not contain B3DM, I3DM, or PNTS", function () {
     const p = "./specs/data/contentTypes/content.cmpt";
     const tileDataBuffer = fs.readFileSync(p);

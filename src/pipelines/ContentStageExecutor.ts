@@ -1,4 +1,5 @@
 import path from "path";
+
 import GltfPipeline from "gltf-pipeline";
 
 import { Paths } from "../base/Paths";
@@ -222,9 +223,11 @@ export class ContentStageExecutor {
       if (type !== ContentDataTypes.CONTENT_TYPE_B3DM) {
         return sourceEntry;
       }
+      const tileDataBufer = sourceEntry.value;
+      const glbBuffer = await ContentOps.b3dmToGlbBuffer(tileDataBufer);
       const targetEntry = {
         key: uriProcessor(sourceEntry.key),
-        value: ContentOps.b3dmToGlbBuffer(sourceEntry.value),
+        value: glbBuffer,
       };
       return targetEntry;
     };
@@ -271,9 +274,11 @@ export class ContentStageExecutor {
       if (type !== ContentDataTypes.CONTENT_TYPE_I3DM) {
         return sourceEntry;
       }
+      const tileDataBufer = sourceEntry.value;
+      const glbBuffer = await ContentOps.i3dmToGlbBuffer(tileDataBufer);
       const targetEntry = {
         key: uriProcessor(sourceEntry.key),
-        value: ContentOps.i3dmToGlbBuffer(sourceEntry.value),
+        value: glbBuffer,
       };
       return targetEntry;
     };
