@@ -35,8 +35,7 @@ const overwrite = true;
  */
 describe("BasicTilesetProcessor on packages", function () {
   afterEach(function () {
-    SpecHelpers.forceDeleteDirectory(basicOutput);
-    SpecHelpers.forceDeleteDirectory(implicitOutput);
+    SpecHelpers.forceDeleteDirectory("./specs/data/output/tilesetProcessing");
   });
 
   it("writes basic from directories to 3TZ", async function () {

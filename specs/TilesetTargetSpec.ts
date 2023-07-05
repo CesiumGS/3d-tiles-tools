@@ -5,23 +5,25 @@ import { TilesetInMemory } from "../src/tilesetData/TilesetInMemory";
 import { TilesetTarget3tz } from "../src/packages/TilesetTarget3tz";
 import { TilesetTarget3dtiles } from "../src/packages/TilesetTarget3dtiles";
 
+import { SpecHelpers } from "./SpecHelpers";
+
 // The basic contract that is established by the `TilesetTarget`
 // interface is checked for these implementations:
 const testCases = [
   {
     description: "TilesetTargetFs",
     creationFunction: () => new TilesetTargetFs(),
-    targetName: "./specs/data/output/Tileset/",
+    targetName: "./specs/data/output/target/Tileset/",
   },
   {
     description: "TilesetTarget3tz",
     creationFunction: () => new TilesetTarget3tz(),
-    targetName: "./specs/data/output/tileset.3tz",
+    targetName: "./specs/data/output/target/tileset.3tz",
   },
   {
     description: "TilesetTarget3dtiles",
     creationFunction: () => new TilesetTarget3dtiles(),
-    targetName: "./specs/data/output/tileset.3dtiles",
+    targetName: "./specs/data/output/target/tileset.3dtiles",
   },
   {
     description: "TilesetInMemory",
@@ -38,6 +40,10 @@ for (const testCase of testCases) {
     beforeEach(async function () {
       tilesetTarget = testCase.creationFunction();
       targetName = testCase.targetName;
+    });
+
+    afterEach(function () {
+      SpecHelpers.forceDeleteDirectory("./specs/data/output/target");
     });
 
     it("throws when trying to access it before calling 'begin'", function () {

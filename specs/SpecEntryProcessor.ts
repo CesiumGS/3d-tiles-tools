@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import path from "path";
 
 import { TilesetEntry } from "../src/tilesetData/TilesetEntry";
+import { Paths } from "../src/base/Paths";
 
 /**
  * Utility class for processing tileset entries for the specs.
@@ -16,7 +18,11 @@ export class SpecEntryProcessor {
   processedKeys: string[] = [];
 
   processUri = (uri: string) => {
-    return "PROCESSED_" + uri;
+    const dirname = path.dirname(uri);
+    const baseName = path.basename(uri);
+    const newBaseName = "PROCESSED_" + baseName;
+    const newUri = Paths.join(dirname, newBaseName);
+    return newUri;
   };
 
   processEntry = async (
