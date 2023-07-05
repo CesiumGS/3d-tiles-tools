@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+### x.x.x - yyyy-mm-dd
+
+- Certain operations on tilesets caused the output tileset to use a `tile.contents[]` array even when there only was a single content. This was fixed in [#38](https://github.com/CesiumGS/3d-tiles-tools/pull/38), to make sure that a single `tile.content` is used in these cases, and the `tile.contents[]` array only when there actually are multiple contents.
+- Operations that modified the content of tiles (for example, converting B3DM to GLB) only had been applied to the top-level input tileset. Now, these operations by default are also applied to the contents of _external_ tilesets that are referred to from the top-level tileset (via [#42](https://github.com/CesiumGS/3d-tiles-tools/pull/42) and [#48](https://github.com/CesiumGS/3d-tiles-tools/pull/42))
+
 ### 0.2.1 - 2023-04-27
 
 - Internal refactorings and bugfixes for tileset processing and pipelines: 
