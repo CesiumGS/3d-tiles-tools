@@ -11,15 +11,25 @@ export class PropertyTableModels {
    * format of the returned string is not specified.
    *
    * @param propertyTableModel - The `PropertyTableModel`
+   * @param maxRows - The maximum number of rows. If this is not a
+   * positive value, then all rows will be displayed
    * @returns The string
    */
-  public static createString(propertyTableModel: PropertyTableModel): string {
+  public static createString(
+    propertyTableModel: PropertyTableModel,
+    maxRows?: number
+  ): string {
     const propertyNames = propertyTableModel.getPropertyNames();
     const count = propertyTableModel.getCount();
+    let numRows = count;
+    if (maxRows !== undefined) {
+      numRows = Math.min(numRows, maxRows);
+    }
+
     const columnWidths = PropertyTableModels.computeColumnWidths(
       propertyTableModel,
       propertyNames,
-      count
+      numRows
     );
 
     let result = "";
@@ -32,7 +42,7 @@ export class PropertyTableModels {
       result += PropertyTableModels.pad(n, columnWidth);
     }
     result += "\n";
-    for (let r = 0; r < count; r++) {
+    for (let r = 0; r < numRows; r++) {
       const row = propertyTableModel.getMetadataEntityModel(r);
       for (let c = 0; c < propertyNames.length; c++) {
         const n = propertyNames[c];
@@ -45,6 +55,11 @@ export class PropertyTableModels {
         result += PropertyTableModels.pad(s, columnWidth);
       }
       result += "\n";
+    }
+    if (maxRows !== undefined) {
+      if (maxRows < count) {
+        result += `(${count - maxRows} rows omitted)`;
+      }
     }
 
     return result;

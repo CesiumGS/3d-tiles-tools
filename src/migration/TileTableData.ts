@@ -141,7 +141,6 @@ export class TileTableData {
     );
   }
 
-
   /**
    * Createa a `PropertyModel` instance that is backed by
    * the numeric data of a batch- or feature table

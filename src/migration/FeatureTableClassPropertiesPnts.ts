@@ -71,5 +71,3 @@ export class TileTablePropertiesPnts {
     return TileTablePropertiesPnts.perPointProperties[semantic];
   }
 }
-
-

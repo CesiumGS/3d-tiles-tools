@@ -1,4 +1,3 @@
-
 import { ClassProperty } from "../structure/Metadata/ClassProperty";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";

@@ -49,5 +49,4 @@ export class PropertyModels {
     };
     return iterable;
   }
-
 }

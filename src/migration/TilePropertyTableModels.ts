@@ -18,7 +18,7 @@ export class TilePropertyTableModels {
    * @param binary - The binary data
    * @param numRows - The number of rows (POINTS_LENGTH or BATCH_LENGTH)
    * @returns The property table model
-   * @throws TileFormatError If the table contained a property 
+   * @throws TileFormatError If the table contained a property
    * that was neither a BatchTableBinaryBodyReference nor an array
    */
   static create(
