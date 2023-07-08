@@ -19,7 +19,7 @@ export class AttributeCompression {
    * @returns The resulting normal
    */
   static octDecode(input: number[]): number[] {
-    const rangeMax = 65535;
+    const rangeMax = 255;
     const result = AttributeCompression.octDecodeInRangeInternalResultScratch;
     const x = input[0];
     const y = input[1];
