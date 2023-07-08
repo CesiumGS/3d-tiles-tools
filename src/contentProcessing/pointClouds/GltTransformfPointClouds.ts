@@ -11,6 +11,8 @@ import { ReadablePointCloud } from "./ReadablePointCloud";
 
 import { TileFormatError } from "../../tileFormats/TileFormatError";
 
+import { AccessorCreation } from "../../migration/AccessorCreation";
+
 /**
  * An internal interface representing a point cloud with
  * glTF-Transform structures.
@@ -39,7 +41,7 @@ export class GltfTransformPointClouds {
    * specified. It is supposed to be "just a point cloud".
    *
    * @param readablePointCloud - The `ReadablePointCloud`
-   * @param globalPosition The optional global position, to
+   * @param globalPosition - The optional global position, to
    * be set as the `translation` component of the root node.
    * @returns The GtlfTransformPointCloud
    * @throws TileFormatError If the input data does not
@@ -140,9 +142,11 @@ export class GltfTransformPointClouds {
    * mesh primitive using the `EXT_mesh_features` extension.
    *
    * @param readablePointCloud - The `ReadablePointCloud`
-   * @param document The glTF-Transform document
-   * @param buffer The glTF-Transform buffer
-   * @param primitive The glTF-Transform primitive
+   * @param document - The glTF-Transform document
+   * @param buffer - The glTF-Transform buffer
+   * @param primitive - The glTF-Transform primitive
+   * @param propertyTable - An optional property table
+   * to assign to the feature IDs
    */
   private static assignFeatureIdAttributes(
     readablePointCloud: ReadablePointCloud,
@@ -175,10 +179,7 @@ export class GltfTransformPointClouds {
         featureIdAccessor.setBuffer(buffer);
         featureIdAccessor.setType(Accessor.Type.SCALAR);
         featureIdAccessor.setArray(
-          GltfTransformPointClouds.createFeatureIdVertexAttribute(
-            featureIdValues,
-            componentType
-          )
+          AccessorCreation.createAccessorArray(componentType, featureIdValues)
         );
         primitive.setAttribute(attributeName, featureIdAccessor);
 
@@ -198,53 +199,5 @@ export class GltfTransformPointClouds {
     if (meshFeatures) {
       primitive.setExtension("EXT_mesh_features", meshFeatures);
     }
-  }
-
-  /**
-   * Creates a typed array from the given numbers, to be used
-   * as a glTF vertex attribute.
-   *
-   * This will convert the given numbers into a typed array,
-   * depending on the given `componentType`.
-   *
-   * Note that there are certain component types that are
-   * not valid for glTF vertex attribute data. If such a
-   * type is encountered, then a warning will be printed
-   * and the numbers will be stored as 32 bit floating
-   * point values.
-   *
-   * @param numbers - The numbers
-   * @param componentType - The component type
-   * @returns The typed array
-   */
-  private static createFeatureIdVertexAttribute(
-    numbers: Iterable<number>,
-    componentType: string
-  ) {
-    const numbersArray = [...numbers];
-    switch (componentType) {
-      case "UINT8":
-        return new Uint8Array(numbersArray);
-      case "INT8":
-        return new Int8Array(numbersArray);
-
-      case "UINT16":
-        return new Uint16Array(numbersArray);
-      case "INT16":
-        return new Int16Array(numbersArray);
-
-      case "UINT32":
-      case "INT32":
-      case "UINT64":
-      case "INT64":
-      case "FLOAT64":
-        console.warn(
-          `Feature ID attribute has type ${componentType}, converting to 32 bit float`
-        );
-        return new Float32Array(numbersArray);
-      case "FLOAT32":
-        return new Float32Array(numbersArray);
-    }
-    throw new TileFormatError(`Unknown component type: ${componentType}`);
   }
 }

@@ -98,8 +98,8 @@ export class TilePropertyTableModel implements PropertyTableModel {
     const propertyModel = TileTableData.createNumericPropertyModel(
       legacyType,
       legacyComponentType,
-      byteOffset,
-      this.binary
+      this.binary,
+      byteOffset
     );
     this.propertyIdToModel[propertyId] = propertyModel;
   }

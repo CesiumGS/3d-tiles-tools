@@ -12,6 +12,7 @@ import { TileTableData } from "../../migration/TileTableData";
 
 import { DracoDecoder } from "../draco/DracoDecoder";
 import { DracoDecoderResult } from "../draco/DracoDecoderResult";
+import { ReadablePointCloud } from "./ReadablePointCloud";
 
 /**
  * Methods to create `ReadablePointCloud` instances from PNTS data
@@ -35,7 +36,7 @@ export class PntsPointClouds {
   static async create(
     featureTable: PntsFeatureTable,
     binary: Buffer
-  ): Promise<DefaultPointCloud> {
+  ): Promise<ReadablePointCloud> {
     const pointCloud = new DefaultPointCloud();
 
     // If the feature table contains the 3DTILES_draco_point_compression
@@ -501,11 +502,11 @@ export class PntsPointClouds {
     const legacyType = "VEC3";
     const legacyComponentType = "FLOAT";
     return TileTableData.createNumericArrayIterable(
+      legacyType,
+      legacyComponentType,
       binary,
       byteOffset,
-      numPoints,
-      legacyType,
-      legacyComponentType
+      numPoints
     );
   }
 
@@ -525,11 +526,11 @@ export class PntsPointClouds {
     const legacyType = "VEC3";
     const legacyComponentType = "UNSIGNED_SHORT";
     return TileTableData.createNumericArrayIterable(
+      legacyType,
+      legacyComponentType,
       binary,
       byteOffset,
-      numPoints,
-      legacyType,
-      legacyComponentType
+      numPoints
     );
   }
 
@@ -549,11 +550,11 @@ export class PntsPointClouds {
     const legacyType = "VEC3";
     const legacyComponentType = "FLOAT";
     return TileTableData.createNumericArrayIterable(
+      legacyType,
+      legacyComponentType,
       binary,
       byteOffset,
-      numPoints,
-      legacyType,
-      legacyComponentType
+      numPoints
     );
   }
 
@@ -573,11 +574,11 @@ export class PntsPointClouds {
     const legacyType = "VEC2";
     const legacyComponentType = "UNSIGNED_SHORT";
     return TileTableData.createNumericArrayIterable(
+      legacyType,
+      legacyComponentType,
       binary,
       byteOffset,
-      numPoints,
-      legacyType,
-      legacyComponentType
+      numPoints
     );
   }
 
@@ -597,11 +598,11 @@ export class PntsPointClouds {
     const legacyType = "VEC3";
     const legacyComponentType = "UNSIGNED_BYTE";
     return TileTableData.createNumericArrayIterable(
+      legacyType,
+      legacyComponentType,
       binary,
       byteOffset,
-      numPoints,
-      legacyType,
-      legacyComponentType
+      numPoints
     );
   }
 
@@ -621,11 +622,11 @@ export class PntsPointClouds {
     const legacyType = "VEC4";
     const legacyComponentType = "UNSIGNED_BYTE";
     return TileTableData.createNumericArrayIterable(
+      legacyType,
+      legacyComponentType,
       binary,
       byteOffset,
-      numPoints,
-      legacyType,
-      legacyComponentType
+      numPoints
     );
   }
 
@@ -645,11 +646,11 @@ export class PntsPointClouds {
     const legacyType = "SCALAR";
     const legacyComponentType = "UNSIGNED_SHORT";
     return TileTableData.createNumericScalarIterable(
+      legacyType,
+      legacyComponentType,
       binary,
       byteOffset,
-      numPoints,
-      legacyType,
-      legacyComponentType
+      numPoints
     );
   }
 
@@ -668,13 +669,13 @@ export class PntsPointClouds {
     byteOffset: number,
     legacyComponentType: string,
     numPoints: number
-  ) {
+  ): Iterable<number> {
     const batchIds = TileTableData.createNumericScalarIterable(
+      "SCALAR",
+      legacyComponentType,
       binary,
       byteOffset,
-      numPoints,
-      "SCALAR",
-      legacyComponentType
+      numPoints
     );
     return batchIds;
   }

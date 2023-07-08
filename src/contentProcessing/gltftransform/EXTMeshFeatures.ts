@@ -5,6 +5,7 @@ import { WriterContext } from "@gltf-transform/core";
 import { FeatureId } from "./MeshFeatures";
 import { FeatureIdTexture } from "./MeshFeatures";
 import { MeshFeatures } from "./MeshFeatures";
+import { StructuralMetadata } from "./StructuralMetadata";
 
 const NAME = "EXT_mesh_features";
 
@@ -188,7 +189,19 @@ export class EXTMeshFeatures extends Extension {
     }
 
     if (featureIdDef.propertyTable !== undefined) {
-      featureId.setPropertyTable(featureIdDef.propertyTable);
+      const root = this.document.getRoot();
+      const structuralMetadata = root.getExtension<StructuralMetadata>(
+        "EXT_structural_metadata"
+      );
+      if (structuralMetadata) {
+        const propertyTables = structuralMetadata.listPropertyTables();
+        const propertyTable = propertyTables[featureIdDef.propertyTable];
+        featureId.setPropertyTable(propertyTable);
+      } else {
+        throw new Error(
+          `${NAME}: No EXT_structural_metadata definition for looking up property tables`
+        );
+      }
     }
   }
 
@@ -274,13 +287,31 @@ export class EXTMeshFeatures extends Extension {
         };
       }
     }
+
+    let propertyTableDef: number | undefined;
+    const propertyTable = featureId.getPropertyTable();
+    if (propertyTable !== null) {
+      const root = this.document.getRoot();
+      const structuralMetadata = root.getExtension<StructuralMetadata>(
+        "EXT_structural_metadata"
+      );
+      if (structuralMetadata) {
+        const propertyTables = structuralMetadata.listPropertyTables();
+        propertyTableDef = propertyTables.indexOf(propertyTable);
+      } else {
+        throw new Error(
+          `${NAME}: No EXT_structural_metadata definition for looking up property table index`
+        );
+      }
+    }
+
     const featureIdDef: FeatureIdDef = {
       featureCount: featureId.getFeatureCount(),
       nullFeatureId: featureId.getNullFeatureId(),
       label: featureId.getLabel(),
       attribute: featureId.getAttribute(),
       texture: textureDef,
-      propertyTable: featureId.getPropertyTable(),
+      propertyTable: propertyTableDef,
     };
     return featureIdDef;
   }

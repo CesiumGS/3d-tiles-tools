@@ -62,7 +62,7 @@ export class BatchTableSchemas {
     // a single class with all properties
     const classes: { [key: string]: MetadataClass } = {};
     const metadataClass: MetadataClass = {
-      name: "Generated from batch table " + id,
+      name: "Generated from " + id,
       properties: properties,
     };
     const className = "class_" + id;
@@ -71,7 +71,7 @@ export class BatchTableSchemas {
     // Generate the actual schema
     const schema: Schema = {
       id: "ID_" + id,
-      name: "Generated from batch table " + id,
+      name: "Generated from " + id,
       classes: classes,
     };
     return schema;

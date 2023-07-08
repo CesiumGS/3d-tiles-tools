@@ -3,6 +3,7 @@ import { Texture } from "@gltf-transform/core";
 import { TextureInfo } from "@gltf-transform/core";
 import { IProperty } from "@gltf-transform/core";
 import { PropertyType } from "@gltf-transform/core";
+import { PropertyTable } from "./StructuralMetadata";
 
 const NAME = "EXT_mesh_features";
 
@@ -39,8 +40,7 @@ interface IFeatureId extends IProperty {
   label: string;
   attribute: FeatureIdAttribute;
   texture: FeatureIdTexture;
-  // TODO This should be a PropertyTable object, not an index!
-  propertyTable: number;
+  propertyTable: PropertyTable;
 }
 type FeatureIdAttribute = number;
 interface IFeatureIdTexture extends IProperty {
@@ -163,11 +163,11 @@ export class FeatureId extends ExtensionProperty<IFeatureId> {
     return this.setRef("texture", texture);
   }
 
-  getPropertyTable(): number {
-    return this.get("propertyTable");
+  getPropertyTable(): PropertyTable | null {
+    return this.getRef("propertyTable");
   }
-  setPropertyTable(propertyTable: number) {
-    return this.set("propertyTable", propertyTable);
+  setPropertyTable(propertyTable: PropertyTable | null) {
+    return this.setRef("propertyTable", propertyTable);
   }
 }
 

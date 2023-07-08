@@ -25,7 +25,6 @@ export class PropertyTableModels {
     if (maxRows !== undefined) {
       numRows = Math.min(numRows, maxRows);
     }
-
     const columnWidths = PropertyTableModels.computeColumnWidths(
       propertyTableModel,
       propertyNames,
@@ -87,7 +86,7 @@ export class PropertyTableModels {
       for (let r = 0; r < rows; r++) {
         const row = propertyTableModel.getMetadataEntityModel(r);
         const v = row.getPropertyValue(n);
-        const s = JSON.stringify(v);
+        const s = v === undefined ? "undefined" : JSON.stringify(v);
         columnWidth = Math.max(columnWidth, s.length);
       }
       columnWidths[n] = columnWidth;

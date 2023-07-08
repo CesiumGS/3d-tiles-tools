@@ -8,6 +8,10 @@ import { BinaryBodyOffset } from "../structure/TileFormats/BinaryBodyOffset";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
 
+/**
+ * Method to access the data that is stored in batch- or feature tables
+ * of the legacy tile formats in a generic form.
+ */
 export class TileTableData {
   /**
    * Obtains the data from a batch- or feature table property,
@@ -30,7 +34,6 @@ export class TileTableData {
     length: number,
     componentType: string
   ): number[] {
-    let result: number[] | undefined = undefined;
     if (TileTableData.isBinaryBodyOffset(property)) {
       const byteOffset = property.byteOffset;
       const resultValues = NumericBuffers.getNumericArrayFromBuffer(
@@ -39,11 +42,9 @@ export class TileTableData {
         length,
         componentType
       );
-      result = resultValues.map((n) => Number(n));
-    } else {
-      result = property;
+      return resultValues.map((n) => Number(n));
     }
-    return result;
+    return property;
   }
 
   /**
@@ -80,27 +81,27 @@ export class TileTableData {
    * given batch- or feature table data, assuming that they are
    * numeric arrays
    *
+   * @param legacyType - The legacy type, e.g. `VEC2`
+   * @param legacyComponentType - The legacy component type,
+   * e.g. `UNSIGNED_SHORT`
    * @param binary - The binary blob of the table
    * @param byteOffset - The offset inside the binary blob
    * where the values start
    * @param numElements - The number of elements
-   * @param legacyType - The legacy type, e.g. `VEC2`
-   * @param legacyComponentType - The legacy component type,
-   * e.g. `UNSIGNED_SHORT`
    * @returns The iterable
    */
   static createNumericArrayIterable(
+    legacyType: string,
+    legacyComponentType: string,
     binary: Buffer,
     byteOffset: number,
-    numElements: number,
-    legacyType: string,
-    legacyComponentType: string
+    numElements: number
   ): Iterable<number[]> {
     const propertyModel = TileTableData.createNumericPropertyModel(
       legacyType,
       legacyComponentType,
-      byteOffset,
-      binary
+      binary,
+      byteOffset
     );
     return PropertyModels.createNumericArrayIterable(
       propertyModel,
@@ -113,27 +114,27 @@ export class TileTableData {
    * given batch- or feature table data, assuming that they are
    * numeric scalars
    *
+   * @param legacyType - The legacy type, e.g. `SCALAR`
+   * @param legacyComponentType - The legacy component type,
+   * e.g. `UNSIGNED_SHORT`
    * @param binary - The binary blob of the table
    * @param byteOffset - The offset inside the binary blob
    * where the values start
    * @param numElements - The number of elements
-   * @param legacyType - The legacy type, e.g. `SCALAR`
-   * @param legacyComponentType - The legacy component type,
-   * e.g. `UNSIGNED_SHORT`
    * @returns The iterable
    */
   static createNumericScalarIterable(
+    legacyType: string,
+    legacyComponentType: string,
     binary: Buffer,
     byteOffset: number,
-    numElements: number,
-    legacyType: string,
-    legacyComponentType: string
+    numElements: number
   ): Iterable<number> {
     const propertyModel = TileTableData.createNumericPropertyModel(
       legacyType,
       legacyComponentType,
-      byteOffset,
-      binary
+      binary,
+      byteOffset
     );
     return PropertyModels.createNumericScalarIterable(
       propertyModel,
@@ -148,15 +149,15 @@ export class TileTableData {
    * @param legacyType - The legacy type, e.g. `VEC2`
    * @param legacyComponentType - The legacy component type,
    * e.g. `UNSIGNED_SHORT`
-   * @param byteOffset - The byte offset
    * @param binary - The binary blob of the table
+   * @param byteOffset - The byte offset
    * @returns The property model
    */
   static createNumericPropertyModel(
     legacyType: string,
     legacyComponentType: string,
-    byteOffset: number,
-    binary: Buffer
+    binary: Buffer,
+    byteOffset: number
   ): PropertyModel {
     const type = TileTableData.convertLegacyTypeToType(legacyType);
     const componentType =

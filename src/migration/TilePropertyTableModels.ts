@@ -54,7 +54,7 @@ export class TilePropertyTableModels {
       } else {
         throw new TileFormatError(
           `Property ${propertyId} was neither a binary body ` +
-            `reference nor an array - skipping`
+            `reference nor an array`
         );
       }
     }
