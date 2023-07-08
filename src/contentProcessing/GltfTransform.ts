@@ -35,8 +35,12 @@ export class GltfTransform {
       "draco3d.decoder": await draco3d.createDecoderModule(),
       "draco3d.encoder": await draco3d.createEncoderModule(),
     });
-    io.registerExtensions([EXTMeshFeatures]);
+    // Note: The order of these calls matters. The EXTMeshFeatures depend
+    // on the EXTStructuralMetadata, because the EXTMeshFeatures may
+    // refer to PropertyTable objects via their FeatureId. So the
+    // EXTStructuralMetadata has to be read first.
     io.registerExtensions([EXTStructuralMetadata]);
+    io.registerExtensions([EXTMeshFeatures]);
     GltfTransform.io = io;
     return io;
   }
