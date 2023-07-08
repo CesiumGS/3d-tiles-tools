@@ -1,6 +1,6 @@
 import path from "path";
 
-import { SpecHelpers } from "./SpecHelpers";
+import { SpecHelpers } from "../SpecHelpers";
 import { SpecEntryProcessor } from "./SpecEntryProcessor";
 
 import { BasicTilesetProcessor } from "../../src/tilesetProcessing/BasicTilesetProcessor";
