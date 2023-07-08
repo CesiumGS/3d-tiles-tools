@@ -1,25 +1,17 @@
-import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
-import { MetadataEntityModel } from "../metadata/MetadataEntityModel";
-import { MetadataError } from "../metadata/MetadataError";
-import { PropertyModel } from "../metadata/PropertyModel";
-import { PropertyTableModel } from "../metadata/PropertyTableModel";
-import { TableMetadataEntityModel } from "../metadata/TableMetadataEntityModel";
+import { MetadataEntityModel } from "./MetadataEntityModel";
+import { MetadataError } from "./MetadataError";
+import { PropertyModel } from "./PropertyModel";
+import { PropertyTableModel } from "./PropertyTableModel";
+import { TableMetadataEntityModel } from "./TableMetadataEntityModel";
 
 import { PropertyTableProperty } from "../structure/PropertyTableProperty";
 import { ClassProperty } from "../structure/Metadata/ClassProperty";
 
-import { TileTableData } from "./TileTableData";
-
 /**
  * Implementation of a `PropertyTableModel` that is backed by
- * the data from a batch- or feature table.
+ * `PropertyModel` instances
  */
-export class TilePropertyTableModel implements PropertyTableModel {
-  /**
-   * The binary data of the batch- or feature table
-   */
-  private readonly binary: Buffer;
-
+export class DefaultPropertyTableModel implements PropertyTableModel {
   /**
    * The number of rows of the table
    */
@@ -43,14 +35,9 @@ export class TilePropertyTableModel implements PropertyTableModel {
   /**
    * Creates a new instance.
    *
-   * This is usually not called directly by clients, but only from
-   * the `TilePropertyTableModels` class.
-   *
-   * @param binary - The binary data
    * @param numRows - The number of rows
    */
-  constructor(binary: Buffer, numRows: number) {
-    this.binary = binary;
+  constructor(numRows: number) {
     this.numRows = numRows;
   }
 
@@ -66,41 +53,12 @@ export class TilePropertyTableModel implements PropertyTableModel {
   }
 
   /**
-   * Adds a property model (column) to this table, for the given
-   * property, backed by the values from the given array. This
-   * is used for the case of batch tables, where the property
-   * values have been given as untyped JSON.
-   *
-   * @param propertyId - The property ID/name
-   * @param propertyValues The property values
-   */
-  addPropertyModelFromArray(propertyId: string, propertyValues: any[]) {
-    const propertyModel = new DefaultPropertyModel(propertyValues);
-    this.propertyIdToModel[propertyId] = propertyModel;
-  }
-
-  /**
-   * Adds a property model (column) to this table, for the given
-   * property, backed by the values from the binary buffer that
-   * are extraced based on the given offset and type information.
+   * Adds a property model (column) to this table
    *
    * @param propertyId - The property ID
-   * @param byteOffset - The byte offset
-   * @param legacyType - The legacy type (e.g. "SCALAR" or "VEC2")
-   * @param legacyComponentType - The legacy component type (e.g. "UNSIGNED_INT")
+   * @param propertyModel - The property model
    */
-  addPropertyModelFromBinary(
-    propertyId: string,
-    byteOffset: number,
-    legacyType: string,
-    legacyComponentType: string
-  ) {
-    const propertyModel = TileTableData.createNumericPropertyModel(
-      legacyType,
-      legacyComponentType,
-      this.binary,
-      byteOffset
-    );
+  addPropertyModel(propertyId: string, propertyModel: PropertyModel) {
     this.propertyIdToModel[propertyId] = propertyModel;
   }
 

@@ -13,6 +13,9 @@ import { B3dmFeatureTable } from "../structure/TileFormats/B3dmFeatureTable";
 import { BinaryBodyOffset } from "../structure/TileFormats/BinaryBodyOffset";
 import { TileTableDataToMeshFeatures } from "./TileTableDataToMeshFeatures";
 import { MeshFeatures } from "../contentProcessing/gltftransform/MeshFeatures";
+import { PropertyModel } from "../metadata/PropertyModel";
+import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
+import { ReadablePointCloud } from "../contentProcessing/pointClouds/ReadablePointCloud";
 
 /**
  * Methods for converting "legacy" tile formats into glTF assets
@@ -20,6 +23,8 @@ import { MeshFeatures } from "../contentProcessing/gltftransform/MeshFeatures";
  * the legacy formats.
  */
 export class TileFormatsMigration {
+  static readonly DEBUG_LOG = false;
+
   /**
    * Convert the given PNTS data into a glTF asset
    *
@@ -38,18 +43,21 @@ export class TileFormatsMigration {
     const featureTableBinary = tileData.featureTable.binary;
 
     //*/
-    console.log("Batch table");
-    console.log(JSON.stringify(batchTable, null, 2));
+    if (TileFormatsMigration.DEBUG_LOG) {
+      console.log("Batch table");
+      console.log(JSON.stringify(batchTable, null, 2));
 
-    console.log("Feature table");
-    console.log(JSON.stringify(featureTable, null, 2));
+      console.log("Feature table");
+      console.log(JSON.stringify(featureTable, null, 2));
+    }
     //*/
 
     // Create a `ReadablePointCloud` that allows accessing
     // the PNTS data
     const pntsPointCloud = await PntsPointClouds.create(
       featureTable,
-      featureTableBinary
+      featureTableBinary,
+      batchTable
     );
 
     // Fetch the `RTC_CENTER` from the feature table, to be used
@@ -95,12 +103,17 @@ export class TileFormatsMigration {
     } else {
       // The point cloud is not batched. Assign any batch table
       // information as per-point properties
+      const externalProperties = TileFormatsMigration.computeExternalProperties(
+        pntsPointCloud,
+        batchTable
+      );
       const numRows = featureTable.POINTS_LENGTH;
       TileTableDataToStructuralMetadata.assignPerPointProperties(
         document,
         primitive,
         batchTable,
         batchTableBinary,
+        externalProperties,
         numRows
       );
     }
@@ -109,7 +122,7 @@ export class TileFormatsMigration {
     const io = await GltfTransform.getIO();
 
     //*/
-    {
+    if (TileFormatsMigration.DEBUG_LOG) {
       console.log("JSON document");
       const jsonDocument = await io.writeJSON(document);
       console.log(JSON.stringify(jsonDocument.json, null, 2));
@@ -118,6 +131,55 @@ export class TileFormatsMigration {
 
     const glb = await io.writeBinary(document);
     return Buffer.from(glb);
+  }
+
+  /**
+   * Computes a mapping from property names to `PropertyModel` objects
+   * for properties that are defined in the batch table, but not stored
+   * in the batch table binary.
+   *
+   * Yeah, I'm looking at you, 3DTILES_draco_point_compression...
+   *
+   * The properties of the batch table that are draco-compressed
+   * are actually read during the Draco decoding pass of the
+   * feature table. The decoded values are stored as plain
+   * attributes in the `ReadablePointCloud`. This method will
+   * create `PropertyModel` objects for these attributes, so that
+   * they can later be used for creating the accessors of the
+   * attributes in the `EXT_structural_metadata` extension.
+   *
+   * @param pntsPointCloud - The point cloud that contains the PNTS data
+   * @param batchTable The batch table
+   * @returns The mapping
+   */
+  private static computeExternalProperties(
+    pntsPointCloud: ReadablePointCloud,
+    batchTable: BatchTable
+  ): { [key: string]: PropertyModel } {
+    const externalProperties: { [key: string]: PropertyModel } = {};
+    if (batchTable.extensions) {
+      const batchTableExtension =
+        batchTable.extensions["3DTILES_draco_point_compression"];
+      if (batchTableExtension) {
+        const dracoProperties = batchTableExtension.properties;
+        for (const dracoProperty of Object.keys(dracoProperties)) {
+          const propertyValue = batchTable[dracoProperty];
+          if (propertyValue) {
+            if (TileTableData.isBatchTableBinaryBodyReference(propertyValue)) {
+              const attributeValues =
+                pntsPointCloud.getAttributeValues(dracoProperty);
+              if (attributeValues) {
+                const propertyModel = new DefaultPropertyModel([
+                  ...attributeValues,
+                ]);
+                externalProperties[dracoProperty] = propertyModel;
+              }
+            }
+          }
+        }
+      }
+    }
+    return externalProperties;
   }
 
   /**
@@ -138,11 +200,13 @@ export class TileFormatsMigration {
     const featureTableBinary = tileData.featureTable.binary;
 
     //*/
-    console.log("Batch table");
-    console.log(JSON.stringify(batchTable, null, 2));
+    if (TileFormatsMigration.DEBUG_LOG) {
+      console.log("Batch table");
+      console.log(JSON.stringify(batchTable, null, 2));
 
-    console.log("Feature table");
-    console.log(JSON.stringify(featureTable, null, 2));
+      console.log("Feature table");
+      console.log(JSON.stringify(featureTable, null, 2));
+    }
     //*/
 
     // Read the GLB data from the payload of the tile
@@ -166,8 +230,8 @@ export class TileFormatsMigration {
         for (const oldChild of oldChildren) {
           const rtcRoot = document.createNode();
           rtcRoot.setTranslation(globalPosition);
-          rtcRoot.addChild(oldChild);
           scene.removeChild(oldChild);
+          rtcRoot.addChild(oldChild);
           scene.addChild(rtcRoot);
         }
       }
@@ -206,7 +270,7 @@ export class TileFormatsMigration {
 
     // Create the GLB buffer
     //*/
-    {
+    if (TileFormatsMigration.DEBUG_LOG) {
       console.log("JSON document");
       const jsonDocument = await io.writeJSON(document);
       console.log(JSON.stringify(jsonDocument.json, null, 2));

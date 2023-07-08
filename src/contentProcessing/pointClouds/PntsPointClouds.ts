@@ -1,6 +1,7 @@
 import { Iterables } from "../../base/Iterables";
 
 import { PntsFeatureTable } from "../../structure/TileFormats/PntsFeatureTable";
+import { BatchTable } from "../../structure/TileFormats/BatchTable";
 
 import { TileFormatError } from "../../tileFormats/TileFormatError";
 
@@ -30,12 +31,14 @@ export class PntsPointClouds {
    * Draco compression, and return the plain, uncompressed data.
    *
    * @param featureTable - The PNTS feature table
-   * @param binary - The PNTS feature table binary
+   * @param featureTableBinary - The PNTS feature table binary
+   * @param batchTable - The PNTS batch table
    * @returns A promise to the `ReadablePointCloud`
    */
   static async create(
     featureTable: PntsFeatureTable,
-    binary: Buffer
+    featureTableBinary: Buffer,
+    batchTable: BatchTable
   ): Promise<ReadablePointCloud> {
     const pointCloud = new DefaultPointCloud();
 
@@ -43,13 +46,18 @@ export class PntsPointClouds {
     // extension, then uncompress the draco data and assign it as the
     // attributes to the point cloud
     const dracoDecoderResult =
-      await PntsPointClouds.obtainDracoDecodedAttributes(featureTable, binary);
+      await PntsPointClouds.obtainDracoDecodedAttributes(
+        featureTable,
+        featureTableBinary,
+        batchTable
+      );
     if (dracoDecoderResult) {
       const numPoints = featureTable.POINTS_LENGTH;
       PntsPointClouds.assignDracoDecodedAttributes(
         pointCloud,
         numPoints,
-        dracoDecoderResult
+        dracoDecoderResult,
+        batchTable
       );
     }
 
@@ -60,13 +68,19 @@ export class PntsPointClouds {
 
     // Assign the positions
     if (!pointCloud.getAttributeValues("POSITION")) {
-      const positions = PntsPointClouds.createPositions(featureTable, binary);
+      const positions = PntsPointClouds.createPositions(
+        featureTable,
+        featureTableBinary
+      );
       pointCloud.setPositions(positions);
     }
 
     // Assign the normals
     if (!pointCloud.getAttributeValues("NORMAL")) {
-      const normals = PntsPointClouds.createNormals(featureTable, binary);
+      const normals = PntsPointClouds.createNormals(
+        featureTable,
+        featureTableBinary
+      );
       if (normals) {
         pointCloud.setNormals(normals);
       }
@@ -76,7 +90,7 @@ export class PntsPointClouds {
     if (!pointCloud.getAttributeValues("COLOR_0")) {
       const colors = PntsPointClouds.createNormalizedLinearColors(
         featureTable,
-        binary
+        featureTableBinary
       );
       if (colors) {
         pointCloud.setNormalizedLinearColors(colors);
@@ -85,7 +99,10 @@ export class PntsPointClouds {
 
     // Assign the batch IDs as the "_FEATURE_ID_0" attribute
     if (!pointCloud.getAttributeValues("_FEATURE_ID_0")) {
-      const batchIds = PntsPointClouds.createBatchIds(featureTable, binary);
+      const batchIds = PntsPointClouds.createBatchIds(
+        featureTable,
+        featureTableBinary
+      );
       if (batchIds) {
         const componentType =
           PntsPointClouds.obtainBatchIdComponentType(featureTable);
@@ -103,7 +120,7 @@ export class PntsPointClouds {
     // Assign the global color (from CONSTANT_RGBA)
     const globalColor = PntsPointClouds.createGlobalNormalizedLinearColor(
       featureTable,
-      binary
+      featureTableBinary
     );
     if (globalColor) {
       pointCloud.setNormalizedLinearGlobalColor(
@@ -119,29 +136,50 @@ export class PntsPointClouds {
 
   /**
    * If the given feature table defines the 3DTILES_draco_point_compression
-   * extension, then decode that data and return it as a `DracoDecoderResult`
+   * extension, then decode that data and return it as a `DracoDecoderResult`.
+   *
+   * The decoded result will include possible draco-encoded properties from
+   * the batch table.
    *
    * @param featureTable - The PNTS feature table
-   * @param binary - The feature table binary
+   * @param featureTableBinary - The feature table binary
+   * @param batchTable - The batch table
    * @returns The `DracoDecoderResult`, or `undefined`
    */
   private static async obtainDracoDecodedAttributes(
     featureTable: PntsFeatureTable,
-    binary: Buffer
+    featureTableBinary: Buffer,
+    batchTable: BatchTable
   ): Promise<DracoDecoderResult | undefined> {
     if (!featureTable.extensions) {
       return undefined;
     }
-    const extension =
+    const featureTableExtension =
       featureTable.extensions["3DTILES_draco_point_compression"];
-    if (!extension) {
+    if (!featureTableExtension) {
       return undefined;
     }
+
+    // Collect information about all Draco-encoded properties:
+    // These are the properties that are listed in the
+    // 3DTILES_draco_point_compression extension of the
+    // feature table AND those listed in the extension
+    // in the batch table
+    const allProperties: { [key: string]: number } = {};
+    Object.assign(allProperties, featureTableExtension.properties);
+    if (batchTable.extensions) {
+      const batchTableExtension =
+        batchTable.extensions["3DTILES_draco_point_compression"];
+      if (batchTableExtension) {
+        Object.assign(allProperties, batchTableExtension.properties);
+      }
+    }
+
     const dracoDecoder = await DracoDecoder.create();
-    const arrayStart = extension.byteOffset;
-    const arrayEnd = arrayStart + extension.byteLength;
-    const buffer = binary.subarray(arrayStart, arrayEnd);
-    const decoded = dracoDecoder.decodePointCloud(extension.properties, buffer);
+    const arrayStart = featureTableExtension.byteOffset;
+    const arrayEnd = arrayStart + featureTableExtension.byteLength;
+    const buffer = featureTableBinary.subarray(arrayStart, arrayEnd);
+    const decoded = dracoDecoder.decodePointCloud(allProperties, buffer);
     return decoded;
   }
 
@@ -153,11 +191,13 @@ export class PntsPointClouds {
    * @param numPoints - The number of points
    * @param dracoDecoderResult - The `DracoDecoderResult` that contains the
    * decoded attributes
+   * @param batchTable - The batch table
    */
   private static assignDracoDecodedAttributes(
     pointCloud: DefaultPointCloud,
     numPoints: number,
-    dracoDecoderResult: DracoDecoderResult
+    dracoDecoderResult: DracoDecoderResult,
+    batchTable: BatchTable
   ) {
     // Assign the positions, if present
     const dracoPositions = dracoDecoderResult["POSITION"];
@@ -230,6 +270,48 @@ export class PntsPointClouds {
         componentType,
         batchIds
       );
+    }
+
+    // The batch table may contain a 3DTILES_draco_point_compression
+    // extension object that defines batch table properties that are
+    // draco-compressed. The decoded values of these properties will
+    // be part of the dracoDecoderResult, and put into the point
+    // cloud as generic attributes here.
+    if (batchTable.extensions) {
+      const batchTableExtension =
+        batchTable.extensions["3DTILES_draco_point_compression"];
+      if (batchTableExtension) {
+        const batchTableProperties = batchTableExtension.properties;
+        for (const property of Object.keys(batchTableProperties)) {
+          const dracoProperty = dracoDecoderResult[property];
+          if (dracoProperty) {
+            const propertyValue = batchTable[property];
+            if (TileTableData.isBatchTableBinaryBodyReference(propertyValue)) {
+              const legacyType = propertyValue.type;
+              const legacyComponentType =
+                dracoProperty.attributeInfo.componentDatatype;
+              const prpertyValues = TileTableData.createNumericScalarIterable(
+                legacyType,
+                legacyComponentType,
+                dracoProperty.attributeData,
+                dracoProperty.attributeInfo.byteOffset,
+                numPoints
+              );
+              const type = TileTableData.convertLegacyTypeToType(legacyType);
+              const componentType =
+                TileTableData.convertLegacyComponentTypeToComponentType(
+                  legacyComponentType
+                );
+              pointCloud.addAttribute(
+                property,
+                type,
+                componentType,
+                prpertyValues
+              );
+            }
+          }
+        }
+      }
     }
   }
 
@@ -572,7 +654,7 @@ export class PntsPointClouds {
     numPoints: number
   ): Iterable<number[]> {
     const legacyType = "VEC2";
-    const legacyComponentType = "UNSIGNED_SHORT";
+    const legacyComponentType = "UNSIGNED_BYTE";
     return TileTableData.createNumericArrayIterable(
       legacyType,
       legacyComponentType,
