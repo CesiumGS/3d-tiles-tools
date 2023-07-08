@@ -32,7 +32,7 @@ const overwrite = true;
  */
 describe("BasicTilesetProcessor on explicit input", function () {
   afterEach(function () {
-    SpecHelpers.forceDeleteDirectory(basicOutput);
+    SpecHelpers.forceDeleteDirectory("./specs/data/output/tilesetProcessing");
   });
 
   it("forEachExplicitTile covers all explicit tiles", async function () {
@@ -104,7 +104,7 @@ describe("BasicTilesetProcessor on explicit input", function () {
 
     // Expect the names of content files to have been modified
     const expectedOutputFiles = [
-      "PROCESSED_sub/tileB.b3dm",
+      "sub/PROCESSED_tileB.b3dm",
       "PROCESSED_tileA.b3dm",
       "PROCESSED_tileB.b3dm",
       "PROCESSED_tileC.b3dm",
@@ -128,7 +128,13 @@ describe("BasicTilesetProcessor on explicit input", function () {
     await tilesetProcessor.end();
 
     // Expect the content files to have been processed
-    const expectedProcessedKeys = ["tileA.b3dm", "tileB.b3dm", "tileC.b3dm"];
+    const expectedProcessedKeys = [
+      "tile.b3dm",
+      "tileA.b3dm",
+      "ExternalB/tileB.b3dm",
+      "ExternalC/tileC.b3dm",
+      "tileX.b3dm",
+    ];
     const actualProcessedKeys = specEntryProcessor.processedKeys;
     actualProcessedKeys.sort();
     expectedProcessedKeys.sort();
@@ -136,13 +142,16 @@ describe("BasicTilesetProcessor on explicit input", function () {
 
     // Expect the names of content files to have been modified
     const expectedOutputFiles = [
+      "PROCESSED_tile.b3dm",
       "PROCESSED_tileA.b3dm",
-      "PROCESSED_tileB.b3dm",
-      "PROCESSED_tileC.b3dm",
+      "ExternalB/PROCESSED_tileB.b3dm",
+      "ExternalC/PROCESSED_tileC.b3dm",
+      "PROCESSED_tileX.b3dm",
       "README.md",
       "tileset.json",
       "externalA.json",
-      "externalB.json",
+      "ExternalB/externalB.json",
+      "ExternalC/externalC.json",
     ];
     const actualOutputFiles =
       SpecHelpers.collectRelativeFileNames(externalOutput);
@@ -150,8 +159,21 @@ describe("BasicTilesetProcessor on explicit input", function () {
     expectedOutputFiles.sort();
     expect(actualOutputFiles).toEqual(expectedOutputFiles);
 
+    // Expect that the content URIs in the "tileset.json" have been modified
+    const expectedContentUris = ["PROCESSED_tile.b3dm", "externalA.json"];
+    const actualContentUris =
+      await SpecHelpers.collectExplicitContentUrisFromFile(
+        Paths.join(externalOutput, "tileset.json")
+      );
+    expectedContentUris.sort();
+    actualContentUris.sort();
+    expect(actualContentUris).toEqual(expectedContentUris);
+
     // Expect that the content URIs in the "externalA.json" have been modified
-    const expectedContentUrisA = ["externalB.json", "PROCESSED_tileB.b3dm"];
+    const expectedContentUrisA = [
+      "PROCESSED_tileA.b3dm",
+      "ExternalB/externalB.json",
+    ];
     const actualContentUrisA =
       await SpecHelpers.collectExplicitContentUrisFromFile(
         Paths.join(externalOutput, "externalA.json")
@@ -161,14 +183,31 @@ describe("BasicTilesetProcessor on explicit input", function () {
     expect(actualContentUrisA).toEqual(expectedContentUrisA);
 
     // Expect that the content URIs in the "externalB.json" have been modified
-    const expectedContentUrisB = ["PROCESSED_tileC.b3dm"];
+    const expectedContentUrisB = [
+      "PROCESSED_tileB.b3dm",
+      "../PROCESSED_tileX.b3dm",
+      "../ExternalC/externalC.json",
+    ];
     const actualContentUrisB =
       await SpecHelpers.collectExplicitContentUrisFromFile(
-        Paths.join(externalOutput, "externalB.json")
+        Paths.join(externalOutput, "ExternalB/externalB.json")
       );
     expectedContentUrisB.sort();
     actualContentUrisB.sort();
     expect(actualContentUrisB).toEqual(expectedContentUrisB);
+
+    // Expect that the content URIs in the "externalC.json" have been modified
+    const expectedContentUrisC = [
+      "PROCESSED_tileC.b3dm",
+      "../PROCESSED_tileX.b3dm",
+    ];
+    const actualContentUrisC =
+      await SpecHelpers.collectExplicitContentUrisFromFile(
+        Paths.join(externalOutput, "ExternalC/externalC.json")
+      );
+    expectedContentUrisC.sort();
+    actualContentUrisC.sort();
+    expect(actualContentUrisC).toEqual(expectedContentUrisC);
   });
 
   it("processTileContentEntries updates the content URIs", async function () {
@@ -189,7 +228,7 @@ describe("BasicTilesetProcessor on explicit input", function () {
       );
 
     const expectedContentUris = [
-      "PROCESSED_sub/tileB.b3dm",
+      "sub/PROCESSED_tileB.b3dm",
       "PROCESSED_tileA.b3dm",
       "PROCESSED_tileA.b3dm",
       "PROCESSED_tileB.b3dm",

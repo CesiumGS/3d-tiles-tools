@@ -44,7 +44,7 @@ describe("TilesetDataProcessor", function () {
     // Expect the names of ALL files to have been modified
     const expectedOutputFiles = [
       "PROCESSED_README.md",
-      "PROCESSED_sub/tileB.b3dm",
+      "sub/PROCESSED_tileB.b3dm",
       "PROCESSED_tileA.b3dm",
       "PROCESSED_tileB.b3dm",
       "PROCESSED_tileC.b3dm",

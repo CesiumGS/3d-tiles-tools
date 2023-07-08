@@ -15,7 +15,7 @@
         },
         "geometricError" : 1.0,
         "content": {
-          "uri": "tileA.b3dm"
+          "uri": "tileB.b3dm"
         }
       }, {
         "boundingVolume" : {
@@ -23,7 +23,15 @@
         },
         "geometricError" : 1.0,
         "content": {
-          "uri": "ExternalB/externalB.json"
+          "uri": "../tileX.b3dm"
+        }
+      }, {
+        "boundingVolume" : {
+          "box" : [ 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5 ]
+        },
+        "geometricError" : 1.0,
+        "content": {
+          "uri": "../ExternalC/externalC.json"
         }
       }      
     ]

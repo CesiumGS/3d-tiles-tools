@@ -6,23 +6,27 @@ import { Tilesets } from "../../src/tilesets/Tilesets";
 
 import { SpecHelpers } from "../SpecHelpers";
 
-describe("TilesetMerger", function () {
-  it("merges tilesets into a single tileset", async function () {
-    const tilesetSourceNames = [
-      "./specs/data/mergeTilesets/basicMerge/TilesetA/tileset.json",
-      "./specs/data/mergeTilesets/basicMerge/sub/TilesetA/tileset.json",
-    ];
-    const tilesetTargetName = "./specs/data/output/mergeTilesets/basicMerge";
-    const overwrite = true;
+const basicInputs = [
+  "./specs/data/mergeTilesets/basicMerge/TilesetA",
+  "./specs/data/mergeTilesets/basicMerge/sub/TilesetA",
+];
+const basicOutput = "./specs/data/output/mergeTilesets/basicMerge";
+const overwrite = true;
 
-    await Tilesets.merge(tilesetSourceNames, tilesetTargetName, overwrite);
+describe("TilesetMerger", function () {
+  afterEach(function () {
+    SpecHelpers.forceDeleteDirectory("./specs/data/output/mergeTilesets");
+  });
+
+  it("merges tilesets into a single tileset", async function () {
+    await Tilesets.merge(basicInputs, basicOutput, overwrite);
 
     // Ensure that the output directory contains the expected files:
     // All files of the input, disambiguated for the same base name
     // (i.e. "TilesetA" and "TilesetA-0" - this is not specified,
     // but has to be assumed here)
     const actualRelativeFiles =
-      SpecHelpers.collectRelativeFileNames(tilesetTargetName);
+      SpecHelpers.collectRelativeFileNames(basicOutput);
     actualRelativeFiles.sort();
     const expectedRelativeFiles = [
       "TilesetA-0/ll.b3dm",
@@ -44,7 +48,7 @@ describe("TilesetMerger", function () {
     // Ensure that the single 'tileset.json' contains the
     // proper content URIs for the external tilesets:
     const tilesetJsonBuffer = fs.readFileSync(
-      Paths.join(tilesetTargetName, "tileset.json")
+      Paths.join(basicOutput, "tileset.json")
     );
     const tileset = JSON.parse(tilesetJsonBuffer.toString());
     const actualContentUris = await SpecHelpers.collectExplicitContentUris(

@@ -1,4 +1,6 @@
-import { SpecHelpers } from "../SpecHelpers";
+import path from "path";
+
+import { SpecHelpers } from "./SpecHelpers";
 import { SpecEntryProcessor } from "./SpecEntryProcessor";
 
 import { BasicTilesetProcessor } from "../../src/tilesetProcessing/BasicTilesetProcessor";
@@ -24,7 +26,7 @@ const overwrite = true;
  */
 describe("BasicTilesetProcessor on implicit input", function () {
   afterEach(function () {
-    SpecHelpers.forceDeleteDirectory(implicitOutput);
+    SpecHelpers.forceDeleteDirectory("./specs/data/output/tilesetProcessing");
   });
 
   it("forEachExplicitTile covers all explicit tiles", async function () {
@@ -106,12 +108,12 @@ describe("BasicTilesetProcessor on implicit input", function () {
 
     // Ensure that all content URIs have been updated
     for (const contentUri of actualContentUris) {
-      expect(contentUri.startsWith("PROCESSED")).toBeTrue();
+      expect(path.basename(contentUri).startsWith("PROCESSED")).toBeTrue();
     }
 
     // Ensure that the template URI was updated
     const templateUri = outputTileset.root.content?.uri;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    expect(templateUri!.startsWith("PROCESSED")).toBeTrue();
+    expect(path.basename(templateUri!).startsWith("PROCESSED")).toBeTrue();
   });
 });

@@ -15,7 +15,7 @@ const overwrite = true;
  */
 describe("TilesetProcessor", function () {
   afterEach(function () {
-    SpecHelpers.forceDeleteDirectory(basicOutput);
+    SpecHelpers.forceDeleteDirectory("./specs/data/output/tilesetProcessing");
   });
 
   it("throws when trying to call 'begin' with invalid path", async function () {
