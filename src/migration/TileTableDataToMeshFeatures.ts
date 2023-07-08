@@ -28,11 +28,19 @@ export class TileTableDataToMeshFeatures {
     document: Document,
     primitive: Primitive
   ): FeatureId {
-    const batchIdAttribute = primitive.getAttribute("_BATCHID");
+    let batchIdAttribute = primitive.getAttribute("_BATCHID");
     if (!batchIdAttribute) {
-      throw new TileFormatError(
-        "The primitive did not contain a _BATCHID attribute"
-      );
+      batchIdAttribute = primitive.getAttribute("BATCHID");
+      if (batchIdAttribute) {
+        console.warn(
+          "Found legacy BATCHID attribute. The name " +
+            "should be _BATCHID, starting with an underscore"
+        );
+      } else {
+        throw new TileFormatError(
+          "The primitive did not contain a _BATCHID attribute"
+        );
+      }
     }
     const batchIdsArray = batchIdAttribute.getArray();
     if (!batchIdsArray) {
