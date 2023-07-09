@@ -16,6 +16,7 @@ import { MeshFeatures } from "../gltfMetadata/MeshFeatures";
 import { PropertyModel } from "../metadata/PropertyModel";
 import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
 import { ReadablePointCloud } from "../contentProcessing/pointClouds/ReadablePointCloud";
+import { BatchTables } from "./BatchTables";
 
 /**
  * Methods for converting "legacy" tile formats into glTF assets
@@ -157,24 +158,18 @@ export class TileFormatsMigration {
     batchTable: BatchTable
   ): { [key: string]: PropertyModel } {
     const externalProperties: { [key: string]: PropertyModel } = {};
-    if (batchTable.extensions) {
-      const batchTableExtension =
-        batchTable.extensions["3DTILES_draco_point_compression"];
-      if (batchTableExtension) {
-        const dracoProperties = batchTableExtension.properties;
-        for (const dracoProperty of Object.keys(dracoProperties)) {
-          const propertyValue = batchTable[dracoProperty];
-          if (propertyValue) {
-            if (TileTableData.isBatchTableBinaryBodyReference(propertyValue)) {
-              const attributeValues =
-                pntsPointCloud.getAttributeValues(dracoProperty);
-              if (attributeValues) {
-                const propertyModel = new DefaultPropertyModel([
-                  ...attributeValues,
-                ]);
-                externalProperties[dracoProperty] = propertyModel;
-              }
-            }
+    const dracoPropertyNames = BatchTables.obtainDracoPropertyNames(batchTable);
+    for (const propertyName of dracoPropertyNames) {
+      const propertyValue = batchTable[propertyName];
+      if (propertyValue) {
+        if (TileTableData.isBatchTableBinaryBodyReference(propertyValue)) {
+          const attributeValues =
+            pntsPointCloud.getAttributeValues(propertyName);
+          if (attributeValues) {
+            const propertyModel = new DefaultPropertyModel([
+              ...attributeValues,
+            ]);
+            externalProperties[propertyName] = propertyModel;
           }
         }
       }

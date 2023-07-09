@@ -14,6 +14,7 @@ import { TileTableData } from "../../migration/TileTableData";
 import { DracoDecoder } from "../draco/DracoDecoder";
 import { DracoDecoderResult } from "../draco/DracoDecoderResult";
 import { ReadablePointCloud } from "./ReadablePointCloud";
+import { BatchTables } from "../../migration/BatchTables";
 
 /**
  * Methods to create `ReadablePointCloud` instances from PNTS data
@@ -167,13 +168,10 @@ export class PntsPointClouds {
     // in the batch table
     const allProperties: { [key: string]: number } = {};
     Object.assign(allProperties, featureTableExtension.properties);
-    if (batchTable.extensions) {
-      const batchTableExtension =
-        batchTable.extensions["3DTILES_draco_point_compression"];
-      if (batchTableExtension) {
-        Object.assign(allProperties, batchTableExtension.properties);
-      }
-    }
+    Object.assign(
+      allProperties,
+      BatchTables.obtainDracoPropertyNames(batchTable)
+    );
 
     const dracoDecoder = await DracoDecoder.create();
     const arrayStart = featureTableExtension.byteOffset;
@@ -277,39 +275,33 @@ export class PntsPointClouds {
     // draco-compressed. The decoded values of these properties will
     // be part of the dracoDecoderResult, and put into the point
     // cloud as generic attributes here.
-    if (batchTable.extensions) {
-      const batchTableExtension =
-        batchTable.extensions["3DTILES_draco_point_compression"];
-      if (batchTableExtension) {
-        const batchTableProperties = batchTableExtension.properties;
-        for (const property of Object.keys(batchTableProperties)) {
-          const dracoProperty = dracoDecoderResult[property];
-          if (dracoProperty) {
-            const propertyValue = batchTable[property];
-            if (TileTableData.isBatchTableBinaryBodyReference(propertyValue)) {
-              const legacyType = propertyValue.type;
-              const legacyComponentType =
-                dracoProperty.attributeInfo.componentDatatype;
-              const prpertyValues = TileTableData.createNumericScalarIterable(
-                legacyType,
-                legacyComponentType,
-                dracoProperty.attributeData,
-                dracoProperty.attributeInfo.byteOffset,
-                numPoints
-              );
-              const type = TileTableData.convertLegacyTypeToType(legacyType);
-              const componentType =
-                TileTableData.convertLegacyComponentTypeToComponentType(
-                  legacyComponentType
-                );
-              pointCloud.addAttribute(
-                property,
-                type,
-                componentType,
-                prpertyValues
-              );
-            }
-          }
+    const dracoPropertyNames = BatchTables.obtainDracoPropertyNames(batchTable);
+    for (const propertyName of dracoPropertyNames) {
+      const dracoProperty = dracoDecoderResult[propertyName];
+      if (dracoProperty) {
+        const propertyValue = batchTable[propertyName];
+        if (TileTableData.isBatchTableBinaryBodyReference(propertyValue)) {
+          const legacyType = propertyValue.type;
+          const legacyComponentType =
+            dracoProperty.attributeInfo.componentDatatype;
+          const prpertyValues = TileTableData.createNumericScalarIterable(
+            legacyType,
+            legacyComponentType,
+            dracoProperty.attributeData,
+            dracoProperty.attributeInfo.byteOffset,
+            numPoints
+          );
+          const type = TileTableData.convertLegacyTypeToType(legacyType);
+          const componentType =
+            TileTableData.convertLegacyComponentTypeToComponentType(
+              legacyComponentType
+            );
+          pointCloud.addAttribute(
+            propertyName,
+            type,
+            componentType,
+            prpertyValues
+          );
         }
       }
     }
