@@ -260,7 +260,16 @@ export class TileTableDataToStructuralMetadata {
         continue;
       }
       const values = PropertyModels.createIterable(propertyModel, numRows);
-      b.addProperty(propertyName, [...values]);
+      const property = properties[propertyName];
+
+      // For STRING-typed properties, convert the values into a strings,
+      // depending on their actual structure, as described in 'processAny'
+      if (property.type === "STRING") {
+        const array = TileTableDataToStructuralMetadata.processAny(values);
+        b.addProperty(propertyName, array);
+      } else {
+        b.addProperty(propertyName, [...values]);
+      }
     }
 
     // Create a the binary property table, and convert it
@@ -284,5 +293,40 @@ export class TileTableDataToStructuralMetadata {
 
     structuralMetadata.addPropertyTable(structualMetadataPropertyTable);
     return structualMetadataPropertyTable;
+  }
+
+  /**
+   * Process values from an arbitrarily-typed property, so that the
+   * resulting values can be stored as a STRING-typed property in
+   * the binary representation of a property table.
+   *
+   * Any `null` and `undefined` elements will remain `null`
+   * or `undefined`, respectively.
+   * For array values, this method will be applied recursively to
+   * the elements.
+   * For object-typed values, the JSON representation of the
+   * elements will be returned.
+   * For other types, the string representation of the elements
+   * will be returned.
+   *
+   * @param values - The input values
+   * @returns The resulting values
+   */
+  private static processAny(values: Iterable<any>): any[] {
+    return [...values].map((v) => {
+      if (v === null) {
+        return null;
+      }
+      if (v === undefined) {
+        return undefined;
+      }
+      if (Array.isArray(v)) {
+        return TileTableDataToStructuralMetadata.processAny(v);
+      }
+      if (typeof v === "object") {
+        return JSON.stringify(v);
+      }
+      return `${v}`;
+    });
   }
 }
