@@ -1,5 +1,5 @@
-import { MetadataError } from "../../metadata/MetadataError";
-import { BinaryPropertyTable } from "../../metadata/binary/BinaryPropertyTable";
+import { MetadataError } from "../metadata/MetadataError";
+import { BinaryPropertyTable } from "../metadata/binary/BinaryPropertyTable";
 
 import { EXTStructuralMetadata } from "./EXTStructuralMetadata";
 import { PropertyTable } from "./StructuralMetadata";

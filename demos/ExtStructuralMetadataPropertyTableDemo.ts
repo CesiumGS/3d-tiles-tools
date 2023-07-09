@@ -1,9 +1,9 @@
 import { Document } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
 
-import { EXTStructuralMetadata } from "../src/contentProcessing/gltftransform/EXTStructuralMetadata";
+import { EXTStructuralMetadata } from "../src/gltfMetadata/EXTStructuralMetadata";
 import { StructuralMetadataPropertyTables } from "../src/contentProcessing/StructuralMetadataPropertyTables";
-import { StructuralMetadata } from "../src/contentProcessing/gltftransform/StructuralMetadata";
+import { StructuralMetadata } from "../src/gltfMetadata/StructuralMetadata";
 
 import { BinaryPropertyTableBuilder } from "../src/metadata/binary/BinaryPropertyTableBuilder";
 import { BinaryPropertyTableModel } from "../src/metadata/binary/BinaryPropertyTableModel";

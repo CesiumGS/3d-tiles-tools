@@ -12,7 +12,7 @@ import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMe
 import { B3dmFeatureTable } from "../structure/TileFormats/B3dmFeatureTable";
 import { BinaryBodyOffset } from "../structure/TileFormats/BinaryBodyOffset";
 import { TileTableDataToMeshFeatures } from "./TileTableDataToMeshFeatures";
-import { MeshFeatures } from "../contentProcessing/gltftransform/MeshFeatures";
+import { MeshFeatures } from "../gltfMetadata/MeshFeatures";
 import { PropertyModel } from "../metadata/PropertyModel";
 import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
 import { ReadablePointCloud } from "../contentProcessing/pointClouds/ReadablePointCloud";

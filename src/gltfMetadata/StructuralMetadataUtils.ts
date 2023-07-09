@@ -16,7 +16,7 @@ import { StructuralMetadata } from "./StructuralMetadata";
 
 import { StringBuilder } from "./StringBuilder";
 
-import { BinaryPropertyModels } from "../../metadata/binary/BinaryPropertyModels";
+import { BinaryPropertyModels } from "../metadata/binary/BinaryPropertyModels";
 
 /**
  * Utilities related to the glTF `EXT_structural_metadata` extension.

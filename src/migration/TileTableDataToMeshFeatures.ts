@@ -3,8 +3,8 @@ import { Primitive } from "@gltf-transform/core";
 import { Accessor } from "@gltf-transform/core";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
-import { EXTMeshFeatures } from "../contentProcessing/gltftransform/EXTMeshFeatures";
-import { FeatureId } from "../contentProcessing/gltftransform/MeshFeatures";
+import { EXTMeshFeatures } from "../gltfMetadata/EXTMeshFeatures";
+import { FeatureId } from "../gltfMetadata/MeshFeatures";
 
 /**
  * Methods related to the conversion of legacy tile table data

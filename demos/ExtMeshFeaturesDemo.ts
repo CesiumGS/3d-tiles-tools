@@ -5,8 +5,8 @@ import { NodeIO } from "@gltf-transform/core";
 import { savePixels } from "ndarray-pixels";
 import NdArray from "ndarray";
 
-import { EXTMeshFeatures } from "../src/contentProcessing/gltftransform/EXTMeshFeatures";
-import { MeshFeaturesUtils } from "../src/contentProcessing/gltftransform/MeshFeaturesUtils";
+import { EXTMeshFeatures } from "../src/gltfMetadata/EXTMeshFeatures";
+import { MeshFeaturesUtils } from "../src/gltfMetadata/MeshFeaturesUtils";
 
 async function createExampleDocument(): Promise<Document> {
   const document = new Document();

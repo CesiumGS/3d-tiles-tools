@@ -3,7 +3,7 @@ import { Accessor } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 import { Buffer as GltfBuffer } from "@gltf-transform/core";
 
-import { EXTMeshFeatures } from "../gltftransform/EXTMeshFeatures";
+import { EXTMeshFeatures } from "../../gltfMetadata/EXTMeshFeatures";
 
 import { Iterables } from "../../base/Iterables";
 

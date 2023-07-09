@@ -4,8 +4,8 @@ import { Transform } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
 import { KHRONOS_EXTENSIONS } from "@gltf-transform/extensions";
 
-import { EXTMeshFeatures } from "./gltftransform/EXTMeshFeatures";
-import { EXTStructuralMetadata } from "./gltftransform/EXTStructuralMetadata";
+import { EXTMeshFeatures } from "../gltfMetadata/EXTMeshFeatures";
+import { EXTStructuralMetadata } from "../gltfMetadata/EXTStructuralMetadata";
 
 /**
  * Utilities for using glTF-Transform in the 3D Tiles tools
