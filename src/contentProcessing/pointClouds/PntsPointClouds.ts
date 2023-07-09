@@ -168,10 +168,7 @@ export class PntsPointClouds {
     // in the batch table
     const allProperties: { [key: string]: number } = {};
     Object.assign(allProperties, featureTableExtension.properties);
-    Object.assign(
-      allProperties,
-      BatchTables.obtainDracoPropertyNames(batchTable)
-    );
+    Object.assign(allProperties, BatchTables.obtainDracoProperties(batchTable));
 
     const dracoDecoder = await DracoDecoder.create();
     const arrayStart = featureTableExtension.byteOffset;
