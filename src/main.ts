@@ -105,6 +105,24 @@ function parseToolArgs(a: string[]) {
       }
     )
     .command(
+      "convertB3dmToGlb",
+      "Convert a b3dm file into a glTF asset that uses glTF extensions to " +
+        "represent the batch- and feature table information",
+      {
+        i: inputStringDefinition,
+        o: outputStringDefinition,
+      }
+    )
+    .command(
+      "convertPntsToGlb",
+      "Convert a pnts file into a glTF asset that uses glTF extensions to " +
+        "represent the point properties and batch- and feature table information",
+      {
+        i: inputStringDefinition,
+        o: outputStringDefinition,
+      }
+    )
+    .command(
       "i3dmToGlb",
       "Extract the binary glTF asset from the input i3dm.",
       {
@@ -122,7 +140,8 @@ function parseToolArgs(a: string[]) {
     )
     .command(
       "optimizeB3dm",
-      "Pass the input b3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)",
+      "Pass the input b3dm through gltf-pipeline. To pass options to gltf-pipeline, " +
+        "place them after --options. (--options -h for gltf-pipeline help)",
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
@@ -134,7 +153,8 @@ function parseToolArgs(a: string[]) {
     )
     .command(
       "optimizeI3dm",
-      "Pass the input i3dm through gltf-pipeline. To pass options to gltf-pipeline, place them after --options. (--options -h for gltf-pipeline help)",
+      "Pass the input i3dm through gltf-pipeline. To pass options to gltf-pipeline, " +
+        "place them after --options. (--options -h for gltf-pipeline help)",
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
@@ -170,7 +190,8 @@ function parseToolArgs(a: string[]) {
     )
     .command(
       "upgrade",
-      "Upgrades the input tileset to the latest version of the 3D Tiles spec. Embedded glTF models will be upgraded to glTF 2.0.",
+      "Upgrades the input tileset to the latest version of the 3D Tiles spec. " +
+        "Embedded glTF models will be upgraded to glTF 2.0.",
       { i: inputStringDefinition, o: outputStringDefinition }
     )
     .command("pipeline", "Execute a pipeline that is provided as a JSON file", {
@@ -259,6 +280,10 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
 
   if (command === "b3dmToGlb") {
     await ToolsMain.b3dmToGlb(input, output, force);
+  } else if (command === "convertB3dmToGlb") {
+    await ToolsMain.convertB3dmToGlb(input, output, force);
+  } else if (command === "convertPntsToGlb") {
+    await ToolsMain.convertPntsToGlb(input, output, force);
   } else if (command === "i3dmToGlb") {
     await ToolsMain.i3dmToGlb(input, output, force);
   } else if (command === "cmptToGlb") {

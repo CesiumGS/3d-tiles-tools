@@ -23,6 +23,8 @@ import { ZipToPackage } from "./packages/ZipToPackage";
 import { TilesetSources } from "./tilesetData/TilesetSources";
 import { TilesetTargets } from "./tilesetData/TilesetTargets";
 
+import { TileFormatsMigration } from "./migration/TileFormatsMigration";
+
 /**
  * Functions that directly correspond to the command line functionality.
  *
@@ -48,6 +50,22 @@ export class ToolsMain {
       undefined
     );
     fs.writeFileSync(output, upgradedOutputBuffer);
+  }
+  static async convertB3dmToGlb(input: string, output: string, force: boolean) {
+    ToolsMain.ensureCanWrite(output, force);
+    const inputBuffer = fs.readFileSync(input);
+    const outputBuffer = await TileFormatsMigration.convertB3dmToGlb(
+      inputBuffer
+    );
+    fs.writeFileSync(output, outputBuffer);
+  }
+  static async convertPntsToGlb(input: string, output: string, force: boolean) {
+    ToolsMain.ensureCanWrite(output, force);
+    const inputBuffer = fs.readFileSync(input);
+    const outputBuffer = await TileFormatsMigration.convertPntsToGlb(
+      inputBuffer
+    );
+    fs.writeFileSync(output, outputBuffer);
   }
   static async i3dmToGlb(input: string, output: string, force: boolean) {
     return ToolsMain.b3dmToGlb(input, output, force);

@@ -32,9 +32,7 @@ export class TileFormatsMigration {
    * @param pntsBuffer - The PNTS buffer
    * @returns The GLB buffer
    */
-  static async convertPntsToGlb(
-    pntsBuffer: Buffer
-  ): Promise<Buffer | undefined> {
+  static async convertPntsToGlb(pntsBuffer: Buffer): Promise<Buffer> {
     const tileData = TileFormats.readTileData(pntsBuffer);
 
     const batchTable = tileData.batchTable.json as BatchTable;
@@ -183,9 +181,7 @@ export class TileFormatsMigration {
    * @param b3dmBuffer - The B3DM buffer
    * @returns The GLB buffer
    */
-  static async convertB3dmToGlb(
-    b3dmBuffer: Buffer
-  ): Promise<Buffer | undefined> {
+  static async convertB3dmToGlb(b3dmBuffer: Buffer): Promise<Buffer> {
     const tileData = TileFormats.readTileData(b3dmBuffer);
 
     const batchTable = tileData.batchTable.json as BatchTable;
