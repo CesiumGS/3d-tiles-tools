@@ -45,11 +45,7 @@ export class ToolsMain {
     const inputBuffer = fs.readFileSync(input);
     const inputTileData = TileFormats.readTileData(inputBuffer);
     const outputBuffer = inputTileData.payload;
-    const upgradedOutputBuffer = await GltfUtilities.upgradeGlb(
-      outputBuffer,
-      undefined
-    );
-    fs.writeFileSync(output, upgradedOutputBuffer);
+    fs.writeFileSync(output, outputBuffer);
   }
   static async convertB3dmToGlb(input: string, output: string, force: boolean) {
     ToolsMain.ensureCanWrite(output, force);
