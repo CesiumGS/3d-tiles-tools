@@ -23,6 +23,16 @@ export class ContentStages {
   public static readonly CONTENT_STAGE_B3DM_TO_GLB = "b3dmToGlb";
 
   /**
+   * The `name` that identifies the "convertB3dmToGlb" content stage
+   */
+  public static readonly CONTENT_STAGE_CONVERT_B3DM_TO_GLB = "convertB3dmToGlb";
+
+  /**
+   * The `name` that identifies the "convertB3dmToGlb" content stage
+   */
+  public static readonly CONTENT_STAGE_CONVERT_PNTS_TO_GLB = "convertPntsToGlb";
+
+  /**
    * The `name` that identifies the "i3dmToGlb" content stage
    */
   public static readonly CONTENT_STAGE_I3DM_TO_GLB = "i3dmToGlb";
@@ -81,7 +91,33 @@ export class ContentStages {
   public static createB3dmToGlb(): ContentStage {
     const contentStage: ContentStage = {
       name: ContentStages.CONTENT_STAGE_B3DM_TO_GLB,
+      description: "Extract the GLB payload from B3DM",
+    };
+    return contentStage;
+  }
+
+  /**
+   * Creates a content stage that performs the "convertB3dmToGlb" operation
+   *
+   * @returns The content stage
+   */
+  public static createConvertB3dmToGlb(): ContentStage {
+    const contentStage: ContentStage = {
+      name: ContentStages.CONTENT_STAGE_CONVERT_B3DM_TO_GLB,
       description: "Convert each B3DM content into GLB",
+    };
+    return contentStage;
+  }
+
+  /**
+   * Creates a content stage that performs the "convertB3dmToGlb" operation
+   *
+   * @returns The content stage
+   */
+  public static createConvertPntsToGlb(): ContentStage {
+    const contentStage: ContentStage = {
+      name: ContentStages.CONTENT_STAGE_CONVERT_PNTS_TO_GLB,
+      description: "Convert each PNTS content into GLB",
     };
     return contentStage;
   }
@@ -94,7 +130,7 @@ export class ContentStages {
   public static createI3dmToGlb(): ContentStage {
     const contentStage: ContentStage = {
       name: ContentStages.CONTENT_STAGE_I3DM_TO_GLB,
-      description: "Convert each I3DM content into GLB",
+      description: "Extract the GLB payload from I3DM",
     };
     return contentStage;
   }

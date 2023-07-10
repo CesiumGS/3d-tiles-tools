@@ -211,6 +211,8 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     const tileset = context.sourceTileset;
     const schema = context.schema;
     const targetTileset = await callback(tileset, schema);
+    // Use the processed tileset as the source of subsequent operations
+    context.sourceTileset = targetTileset;
     context.targetTileset = targetTileset;
   }
 
@@ -418,7 +420,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
         // By default, each content entry will be processed with
         // the given entryProcessor. But if external tilesets
         // should be processed, and the given entry is an
-        // external tileset, then it will be processed with
+        // external tileset, then it will also be processed with
         // the 'processExternalTilesetContentEntries' method, to
         // recursively handle the contents of the external tileset.
         let externalHandlingEntryProcessor = entryProcessor;
@@ -427,16 +429,22 @@ export class BasicTilesetProcessor extends TilesetProcessor {
             sourceEntry: TilesetEntry,
             type: string | undefined
           ) => {
-            if (type === ContentDataTypes.CONTENT_TYPE_TILESET) {
-              const externalBasePath = path.dirname(sourceEntry.key);
-              return this.processExternalTilesetContentEntries(
-                externalBasePath,
-                sourceEntry,
-                uriProcessor,
-                entryProcessor
-              );
+            const targetEntry = await entryProcessor(
+              sourceEntry,
+              type
+            );
+            if (targetEntry) {
+              if (type === ContentDataTypes.CONTENT_TYPE_TILESET) {
+                const externalBasePath = path.dirname(sourceEntry.key);
+                return this.processExternalTilesetContentEntries(
+                  externalBasePath,
+                  targetEntry,
+                  uriProcessor,
+                  entryProcessor
+                );
+              }
             }
-            return entryProcessor(sourceEntry, type);
+            return targetEntry;
           };
         }
         await this.processEntry(
@@ -484,7 +492,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     externalTilesetSourceEntry: TilesetEntry,
     uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
-  ): Promise<TilesetEntry | undefined> {
+  ): Promise<TilesetEntry> {
     console.log(
       "Processing external tileset " + externalTilesetSourceEntry.key
     );

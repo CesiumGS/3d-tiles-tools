@@ -131,7 +131,10 @@ describe("BasicTilesetProcessor on explicit input", function () {
     const expectedProcessedKeys = [
       "tile.b3dm",
       "tileA.b3dm",
+      "externalA.json",
+      "ExternalB/externalB.json",
       "ExternalB/tileB.b3dm",
+      "ExternalC/externalC.json",
       "ExternalC/tileC.b3dm",
       "tileX.b3dm",
     ];
@@ -149,9 +152,9 @@ describe("BasicTilesetProcessor on explicit input", function () {
       "PROCESSED_tileX.b3dm",
       "README.md",
       "tileset.json",
-      "externalA.json",
-      "ExternalB/externalB.json",
-      "ExternalC/externalC.json",
+      "PROCESSED_externalA.json",
+      "ExternalB/PROCESSED_externalB.json",
+      "ExternalC/PROCESSED_externalC.json",
     ];
     const actualOutputFiles =
       SpecHelpers.collectRelativeFileNames(externalOutput);
@@ -160,7 +163,10 @@ describe("BasicTilesetProcessor on explicit input", function () {
     expect(actualOutputFiles).toEqual(expectedOutputFiles);
 
     // Expect that the content URIs in the "tileset.json" have been modified
-    const expectedContentUris = ["PROCESSED_tile.b3dm", "externalA.json"];
+    const expectedContentUris = [
+      "PROCESSED_tile.b3dm",
+      "PROCESSED_externalA.json",
+    ];
     const actualContentUris =
       await SpecHelpers.collectExplicitContentUrisFromFile(
         Paths.join(externalOutput, "tileset.json")
@@ -172,11 +178,11 @@ describe("BasicTilesetProcessor on explicit input", function () {
     // Expect that the content URIs in the "externalA.json" have been modified
     const expectedContentUrisA = [
       "PROCESSED_tileA.b3dm",
-      "ExternalB/externalB.json",
+      "ExternalB/PROCESSED_externalB.json",
     ];
     const actualContentUrisA =
       await SpecHelpers.collectExplicitContentUrisFromFile(
-        Paths.join(externalOutput, "externalA.json")
+        Paths.join(externalOutput, "PROCESSED_externalA.json")
       );
     expectedContentUrisA.sort();
     actualContentUrisA.sort();
@@ -186,11 +192,11 @@ describe("BasicTilesetProcessor on explicit input", function () {
     const expectedContentUrisB = [
       "PROCESSED_tileB.b3dm",
       "../PROCESSED_tileX.b3dm",
-      "../ExternalC/externalC.json",
+      "../ExternalC/PROCESSED_externalC.json",
     ];
     const actualContentUrisB =
       await SpecHelpers.collectExplicitContentUrisFromFile(
-        Paths.join(externalOutput, "ExternalB/externalB.json")
+        Paths.join(externalOutput, "ExternalB/PROCESSED_externalB.json")
       );
     expectedContentUrisB.sort();
     actualContentUrisB.sort();
@@ -203,7 +209,7 @@ describe("BasicTilesetProcessor on explicit input", function () {
     ];
     const actualContentUrisC =
       await SpecHelpers.collectExplicitContentUrisFromFile(
-        Paths.join(externalOutput, "ExternalC/externalC.json")
+        Paths.join(externalOutput, "ExternalC/PROCESSED_externalC.json")
       );
     expectedContentUrisC.sort();
     actualContentUrisC.sort();

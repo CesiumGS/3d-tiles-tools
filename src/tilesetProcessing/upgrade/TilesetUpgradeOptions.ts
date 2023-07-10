@@ -21,4 +21,5 @@ export type TilesetUpgradeOptions = {
   upgradeI3dmGltf1ToGltf2: boolean;
 
   upgradePntsToGlb: boolean;
+  upgradeB3dmToGlb: boolean;
 };

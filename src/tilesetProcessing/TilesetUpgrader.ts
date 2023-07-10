@@ -1,24 +1,20 @@
-import { Buffers } from "../base/Buffers";
-import { DeveloperError } from "../base/DeveloperError";
+import { Paths } from "../base/Paths";
 
-import { BufferedContentData } from "../contentTypes/BufferedContentData";
-import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
 import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 
 import { Tileset } from "../structure/Tileset";
-
-import { TilesetError } from "../tilesetData/TilesetError";
-import { TilesetSource } from "../tilesetData/TilesetSource";
-import { TilesetTarget } from "../tilesetData/TilesetTarget";
-import { TilesetTargets } from "../tilesetData/TilesetTargets";
-import { TilesetSources } from "../tilesetData/TilesetSources";
-
-import { Tilesets } from "../tilesets/Tilesets";
+import { Schema } from "../structure/Metadata/Schema";
 
 import { TilesetUpgradeOptions } from "./upgrade/TilesetUpgradeOptions";
 import { TilesetObjectUpgrader } from "./upgrade/TilesetObjectUpgrader";
 
 import { ContentUpgrades } from "../contentProcessing/ContentUpgrades";
+
+import { BasicTilesetProcessor } from "./BasicTilesetProcessor";
+
+import { TilesetEntry } from "../tilesetData/TilesetEntry";
+
+import { TileFormatsMigration } from "../migration/TileFormatsMigration";
 
 /**
  * A class for "upgrading" a tileset from a previous version to
@@ -30,16 +26,6 @@ export class TilesetUpgrader {
    * A function that will receive log messages during the upgrade process
    */
   private readonly logCallback: (message: any) => void;
-
-  /**
-   * The tileset source for the input
-   */
-  private tilesetSource: TilesetSource | undefined;
-
-  /**
-   * The tileset target for the output.
-   */
-  private tilesetTarget: TilesetTarget | undefined;
 
   /**
    * The options for the upgrade.
@@ -83,6 +69,7 @@ export class TilesetUpgrader {
 
       // EXCEPT for the experimental ones...
       upgradePntsToGlb: false,
+      upgradeB3dmToGlb: false,
     };
   }
 
@@ -103,80 +90,26 @@ export class TilesetUpgrader {
     tilesetTargetName: string,
     overwrite: boolean
   ): Promise<void> {
-    const tilesetSource = TilesetSources.createAndOpen(tilesetSourceName);
-    const tilesetTarget = TilesetTargets.createAndBegin(
+    const quiet = true;
+    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    await tilesetProcessor.begin(
+      tilesetSourceName,
       tilesetTargetName,
       overwrite
     );
 
-    this.tilesetSource = tilesetSource;
-    this.tilesetTarget = tilesetTarget;
-
-    const tilesetSourceJsonFileName =
-      Tilesets.determineTilesetJsonFileName(tilesetSourceName);
-
-    const tilesetTargetJsonFileName =
-      Tilesets.determineTilesetJsonFileName(tilesetTargetName);
-
-    const upgradedTilesetJsonBuffer = await this.upgradeInternal(
-      tilesetSourceJsonFileName
+    // Perform the upgrade for the actual tileset object
+    tilesetProcessor.forTileset(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      async (tileset: Tileset, schema: Schema | undefined) => {
+        await this.upgradeTileset(tileset);
+        return tileset;
+      }
     );
-    this.tilesetTarget.addEntry(
-      tilesetTargetJsonFileName,
-      upgradedTilesetJsonBuffer
-    );
-    await this.upgradeResources(tilesetSourceJsonFileName);
 
-    tilesetSource.close();
-    await tilesetTarget.end();
-
-    this.tilesetSource = undefined;
-    this.tilesetTarget = undefined;
-  }
-
-  /**
-   * Internal method for the actual upgrade.
-   *
-   * It just obtains the tileset JSON data from the source, passes
-   * it to `upgradeTileset`, and returns the buffer containing the
-   * JSON data of the upgraded result.
-   *
-   * @param tilesetSourceJsonFileName - The name of the tileset JSON in the source
-   * @returns A promise that resolves when the process is finished
-   * @throws TilesetError When the input could not be processed
-   */
-  private async upgradeInternal(
-    tilesetSourceJsonFileName: string
-  ): Promise<Buffer> {
-    if (!this.tilesetSource || !this.tilesetTarget) {
-      throw new DeveloperError("The source and target must be defined");
-    }
-
-    // Obtain the tileset JSON buffer (unzip it if necessary)
-    // and parse the Tileset out of it
-    let tilesetJsonBuffer = this.tilesetSource.getValue(
-      tilesetSourceJsonFileName
-    );
-    if (!tilesetJsonBuffer) {
-      const message = `No ${tilesetSourceJsonFileName} found in input`;
-      throw new TilesetError(message);
-    }
-    let tilesetJsonBufferWasZipped = false;
-    if (Buffers.isGzipped(tilesetJsonBuffer)) {
-      tilesetJsonBufferWasZipped = true;
-      tilesetJsonBuffer = Buffers.gunzip(tilesetJsonBuffer);
-    }
-    const tileset = JSON.parse(tilesetJsonBuffer.toString()) as Tileset;
-    await this.upgradeTileset(tileset);
-
-    // Put the upgraded tileset JSON buffer into the target
-    // (zipping it, if the input was zipped)
-    const resultTilesetJsonString = JSON.stringify(tileset, null, 2);
-    let resultTilesetJsonBuffer = Buffer.from(resultTilesetJsonString);
-    if (tilesetJsonBufferWasZipped) {
-      resultTilesetJsonBuffer = Buffers.gzip(resultTilesetJsonBuffer);
-    }
-    return resultTilesetJsonBuffer;
+    // Perform the updates for the tile contents
+    await this.performContentUpgrades(tilesetProcessor);
+    await tilesetProcessor.end();
   }
 
   /**
@@ -193,81 +126,241 @@ export class TilesetUpgrader {
   }
 
   /**
-   * Upgrade all resources from the tileset source (except for the
-   * file with the given name) and put them into the tileset target.
+   * Perform the upgrades of the tile contents, by processing all
+   * content URIs with the `processContentUri`, and all content
+   * values (files) with `processEntry`
    *
-   * @param tilesetSourceJsonFileName - The name of the tileset JSON file
-   * in the source
-   * @returns A promise that resolves when the process is finished.
+   * @param tilesetProcessor - The `BasicTilesetProcessor` that
+   * will process the entries
    */
-  private async upgradeResources(
-    tilesetSourceJsonFileName: string
+  private async performContentUpgrades(
+    tilesetProcessor: BasicTilesetProcessor
   ): Promise<void> {
-    if (!this.tilesetSource || !this.tilesetTarget) {
-      throw new DeveloperError("The source and target must be defined");
-    }
-    const entries = TilesetSources.getEntries(this.tilesetSource);
-    for (const entry of entries) {
-      const key = entry.key;
-      if (key === tilesetSourceJsonFileName) {
-        continue;
-      }
-      const sourceValue = entry.value;
-      const contentData = new BufferedContentData(key, sourceValue);
-      const type = await ContentDataTypeRegistry.findContentDataType(
-        contentData
-      );
-      const targetValue = await this.processValue(key, sourceValue, type);
-      this.tilesetTarget.addEntry(key, targetValue);
-    }
+    await tilesetProcessor.processTileContentEntries(
+      this.processContentUri,
+      this.processEntry
+    );
   }
 
   /**
-   * Process the value of an entry (i.e. the data of one file), and return
-   * a possibly "upgraded" version of that value.
+   * Process the given content URI.
    *
-   * @param key - The key (file name)
-   * @param value - The value (file contents buffer)
-   * @param type - The type of the content. See `ContentDataTypes`.
-   * @returns A promise that resolves when the value is processed.
+   * The given URI may either be an actual content URI, or a
+   * template URI. Depending on the upgrade options, this
+   * may change the file extension in the URI.
+   *
+   * @param uri - The URI
+   * @returns The processed URI
    */
-  private async processValue(
-    key: string,
-    value: Buffer,
-    type: string | undefined
-  ): Promise<Buffer> {
-    if (type === ContentDataTypes.CONTENT_TYPE_B3DM) {
-      if (this.upgradeOptions.upgradeB3dmGltf1ToGltf2) {
-        this.logCallback(`  Upgrading GLB in ${key}`);
-        value = await ContentUpgrades.upgradeB3dmGltf1ToGltf2(
-          value,
-          this.gltfUpgradeOptions
-        );
-      } else {
-        this.logCallback(`  Not upgrading GLB in ${key} (disabled via option)`);
+  private processContentUri = (uri: string) => {
+    // Note: There is no way to establish a clear connection
+    // between a URI and the type of the tile contents that
+    // it refers to. A template URI that has NO extension
+    // could even refer to a mix of different content types.
+    // The following is a best-effort approach to change the
+    // file extensions, if present, depending on the update
+    // options that are enabled.
+
+    if (this.upgradeOptions.upgradePntsToGlb) {
+      if (Paths.hasExtension(uri, ".pnts")) {
+        return Paths.replaceExtension(uri, ".glb");
       }
-    } else if (type === ContentDataTypes.CONTENT_TYPE_I3DM) {
-      if (this.upgradeOptions.upgradeI3dmGltf1ToGltf2) {
-        this.logCallback(`  Upgrading GLB in ${key}`);
-        value = await ContentUpgrades.upgradeI3dmGltf1ToGltf2(
-          value,
-          this.gltfUpgradeOptions
-        );
-      } else {
-        this.logCallback(`  Not upgrading GLB in ${key} (disabled via option)`);
-      }
-    } else if (type == ContentDataTypes.CONTENT_TYPE_TILESET) {
-      if (this.upgradeOptions.upgradeExternalTilesets) {
-        this.logCallback(`  Upgrading external tileset in ${key}`);
-        value = await this.upgradeInternal(key);
-      } else {
-        this.logCallback(
-          `  Not upgrading external tileset in ${key} (disabled via option)`
-        );
-      }
-    } else {
-      this.logCallback(`  No upgrade operation to perform for ${key}`);
+      return uri;
     }
-    return value;
-  }
+    if (this.upgradeOptions.upgradeB3dmToGlb) {
+      if (Paths.hasExtension(uri, ".b3dm")) {
+        return Paths.replaceExtension(uri, ".glb");
+      }
+      return uri;
+    }
+    return uri;
+  };
+
+  /**
+   * Process the given tileset (content) entry, and return the result.
+   *
+   * @param sourceEntry - The source entry
+   * @param type The `ContentDataType` of the source entry
+   * @returns The processed entry
+   */
+  private processEntry = async (
+    sourceEntry: TilesetEntry,
+    type: string | undefined
+  ): Promise<TilesetEntry> => {
+    // Some of the more complex upgrade operations (like B3DM to
+    // glTF+Metadata) may fail for many reasons. Such a failure
+    // should not cause the whole process to fail. Therefore,
+    // this case is handled here by printing an error message
+    // and returning the source data, hopefully producing a
+    // tileset that is still valid:
+    try {
+      return await this.processEntryUnchecked(sourceEntry, type);
+    } catch (error) {
+      const sourceKey = sourceEntry.key;
+      this.logCallback(`Failed to upgrade ${sourceKey}: ${error}`);
+      this.logCallback(error);
+      const targetKey = this.processContentUri(sourceKey);
+      const targetEntry = {
+        key: targetKey,
+        value: sourceEntry.value,
+      };
+      return targetEntry;
+    }
+  };
+
+  /**
+   * Process the given tileset (content) entry, and return the result.
+   *
+   * @param sourceEntry - The source entry
+   * @param type The `ContentDataType` of the source entry
+   * @returns The processed entry
+   */
+  private processEntryUnchecked = async (
+    sourceEntry: TilesetEntry,
+    type: string | undefined
+  ): Promise<TilesetEntry> => {
+    if (type === ContentDataTypes.CONTENT_TYPE_PNTS) {
+      return this.processEntryPnts(sourceEntry);
+    }
+    if (type === ContentDataTypes.CONTENT_TYPE_B3DM) {
+      return this.processEntryB3dm(sourceEntry);
+    } else if (type === ContentDataTypes.CONTENT_TYPE_I3DM) {
+      return this.processEntryI3dm(sourceEntry);
+    } else if (type == ContentDataTypes.CONTENT_TYPE_TILESET) {
+      return this.processEntryTileset(sourceEntry);
+    }
+    this.logCallback(
+      `  No upgrade operation to perform for ${sourceEntry.key}`
+    );
+    return sourceEntry;
+  };
+
+  /**
+   * Process the given tileset (content) entry that contains PNTS,
+   * and return the result.
+   *
+   * @param sourceEntry - The source entry
+   * @returns The processed entry
+   */
+  private processEntryPnts = async (
+    sourceEntry: TilesetEntry
+  ): Promise<TilesetEntry> => {
+    const sourceKey = sourceEntry.key;
+    const sourceValue = sourceEntry.value;
+    let targetKey = sourceKey;
+    let targetValue = sourceValue;
+    if (this.upgradeOptions.upgradePntsToGlb) {
+      this.logCallback(`  Upgrading PNTS to GLB for ${sourceKey}`);
+
+      targetKey = this.processContentUri(sourceKey);
+      targetValue = await TileFormatsMigration.convertPntsToGlb(sourceValue);
+    } else {
+      this.logCallback(`  Not upgrading ${sourceKey} (disabled via option)`);
+    }
+    const targetEntry = {
+      key: targetKey,
+      value: targetValue,
+    };
+    return targetEntry;
+  };
+
+  /**
+   * Process the given tileset (content) entry that contains B3DM,
+   * and return the result.
+   *
+   * @param sourceEntry - The source entry
+   * @returns The processed entry
+   */
+  private processEntryB3dm = async (
+    sourceEntry: TilesetEntry
+  ): Promise<TilesetEntry> => {
+    const sourceKey = sourceEntry.key;
+    const sourceValue = sourceEntry.value;
+    let targetKey = sourceKey;
+    let targetValue = sourceValue;
+    if (this.upgradeOptions.upgradeB3dmToGlb) {
+      this.logCallback(`  Upgrading B3DM to GLB for ${sourceKey}`);
+
+      targetKey = this.processContentUri(sourceKey);
+      targetValue = await TileFormatsMigration.convertB3dmToGlb(sourceValue);
+    } else if (this.upgradeOptions.upgradeB3dmGltf1ToGltf2) {
+      this.logCallback(`  Upgrading GLB in ${sourceKey}`);
+      targetValue = await ContentUpgrades.upgradeB3dmGltf1ToGltf2(
+        sourceValue,
+        this.gltfUpgradeOptions
+      );
+    } else {
+      this.logCallback(`  Not upgrading ${sourceKey} (disabled via option)`);
+    }
+    const targetEntry = {
+      key: targetKey,
+      value: targetValue,
+    };
+    return targetEntry;
+  };
+
+  /**
+   * Process the given tileset (content) entry that contains I3DM,
+   * and return the result.
+   *
+   * @param sourceEntry - The source entry
+   * @returns The processed entry
+   */
+  private processEntryI3dm = async (
+    sourceEntry: TilesetEntry
+  ): Promise<TilesetEntry> => {
+    const sourceKey = sourceEntry.key;
+    const sourceValue = sourceEntry.value;
+    const targetKey = sourceKey;
+    let targetValue = sourceValue;
+    if (this.upgradeOptions.upgradeB3dmGltf1ToGltf2) {
+      this.logCallback(`  Upgrading GLB in ${sourceKey}`);
+      targetValue = await ContentUpgrades.upgradeI3dmGltf1ToGltf2(
+        sourceValue,
+        this.gltfUpgradeOptions
+      );
+    } else {
+      this.logCallback(`  Not upgrading ${sourceKey} (disabled via option)`);
+    }
+    const targetEntry = {
+      key: targetKey,
+      value: targetValue,
+    };
+    return targetEntry;
+  };
+
+  /**
+   * Process the given tileset (content) entry that contains the
+   * JSON of an external tileset, and return the result.
+   *
+   * @param sourceEntry - The source entry
+   * @returns The processed entry
+   */
+  private processEntryTileset = async (sourceEntry: TilesetEntry) => {
+    const sourceKey = sourceEntry.key;
+    const sourceValue = sourceEntry.value;
+    const targetKey = sourceKey;
+    let targetValue = sourceValue;
+    if (this.upgradeOptions.upgradeExternalTilesets) {
+      this.logCallback(`  Upgrading external tileset in ${sourceKey}`);
+      const externalTileset = JSON.parse(sourceValue.toString()) as Tileset;
+      this.upgradeTileset(externalTileset);
+      const externalTilesetJsonString = JSON.stringify(
+        externalTileset,
+        null,
+        2
+      );
+      const externalTilesetJsonBuffer = Buffer.from(externalTilesetJsonString);
+      targetValue = externalTilesetJsonBuffer;
+    } else {
+      this.logCallback(
+        `  Not upgrading external tileset in ${sourceKey} (disabled via option)`
+      );
+    }
+    const targetEntry = {
+      key: targetKey,
+      value: targetValue,
+    };
+    return targetEntry;
+  };
 }
