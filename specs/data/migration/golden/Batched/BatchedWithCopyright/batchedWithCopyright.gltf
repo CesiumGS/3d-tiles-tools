@@ -1,0 +1,231 @@
+{
+  "asset": {
+    "generator": "glTF-Transform v3.3.1",
+    "version": "2.0",
+    "copyright": "Sample Copyright"
+  },
+  "accessors": [
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 240,
+      "max": [
+        108.69153594970703,
+        74.8784408569336,
+        66.49319458007812
+      ],
+      "min": [
+        -90.89249420166016,
+        -86.16458892822266,
+        -78.88909149169922
+      ],
+      "bufferView": 0,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 240,
+      "bufferView": 0,
+      "byteOffset": 12
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5126,
+      "count": 240,
+      "bufferView": 0,
+      "byteOffset": 24
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5126,
+      "count": 240,
+      "bufferView": 1,
+      "byteOffset": 0
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 360,
+      "bufferView": 2,
+      "byteOffset": 0
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 6720,
+      "byteStride": 28,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 6720,
+      "byteLength": 960
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 7680,
+      "byteLength": 720,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 8400,
+      "byteLength": 10
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 8410,
+      "byteLength": 40
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 8450,
+      "byteLength": 40
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 8490,
+      "byteLength": 40
+    }
+  ],
+  "buffers": [
+    {
+      "name": "buffer",
+      "byteLength": 8530
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "metallicFactor": 0
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "_FEATURE_ID_0": 2
+          },
+          "mode": 4,
+          "material": 0,
+          "indices": 4,
+          "extensions": {
+            "EXT_mesh_features": {
+              "featureIds": [
+                {
+                  "featureCount": 10,
+                  "attribute": 0,
+                  "propertyTable": 0
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "rotation": [
+        -0.7071067811865475,
+        0,
+        0,
+        0.7071067811865476
+      ],
+      "mesh": 0
+    },
+    {
+      "translation": [
+        1215012.8988049095,
+        -4736313.0423059845,
+        4081604.3368623317
+      ],
+      "children": [
+        0
+      ]
+    }
+  ],
+  "scenes": [
+    {
+      "nodes": [
+        1
+      ]
+    }
+  ],
+  "scene": 0,
+  "extensionsUsed": [
+    "EXT_structural_metadata",
+    "EXT_mesh_features"
+  ],
+  "extensions": {
+    "EXT_structural_metadata": {
+      "schema": {
+        "id": "ID_batch_table",
+        "name": "Generated from batch_table",
+        "classes": {
+          "class_batch_table": {
+            "name": "Generated from batch_table",
+            "properties": {
+              "id": {
+                "name": "id",
+                "description": "Generated from id",
+                "type": "SCALAR",
+                "componentType": "UINT8",
+                "required": true
+              },
+              "Longitude": {
+                "name": "Longitude",
+                "description": "Generated from Longitude",
+                "type": "SCALAR",
+                "componentType": "FLOAT32",
+                "required": true
+              },
+              "Latitude": {
+                "name": "Latitude",
+                "description": "Generated from Latitude",
+                "type": "SCALAR",
+                "componentType": "FLOAT32",
+                "required": true
+              },
+              "Height": {
+                "name": "Height",
+                "description": "Generated from Height",
+                "type": "SCALAR",
+                "componentType": "FLOAT32",
+                "required": true
+              }
+            }
+          }
+        }
+      },
+      "propertyTables": [
+        {
+          "name": "Property Table",
+          "class": "class_batch_table",
+          "count": 10,
+          "properties": {
+            "id": {
+              "values": 3
+            },
+            "Longitude": {
+              "values": 4
+            },
+            "Latitude": {
+              "values": 5
+            },
+            "Height": {
+              "values": 6
+            }
+          }
+        }
+      ]
+    }
+  }
+}
