@@ -318,10 +318,10 @@ export class SpecHelpers {
    * @param buffer - The buffer
    * @returns The parsed and serialized object
    */
-  private static createJsonString(buffer: Buffer): string | undefined {
+  static createJsonString(buffer: Buffer): string | undefined {
     try {
       const json = JSON.parse(buffer.toString());
-      const jsonString = JSON.stringify(json);
+      const jsonString = JSON.stringify(json, null, 2);
       return jsonString;
     } catch (e) {
       return undefined;
