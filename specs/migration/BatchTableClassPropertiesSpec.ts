@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { readJsonUnchecked } from "../metadata/readJsonUnchecked";
-
-import { Tileset } from "../../src/structure/Tileset";
-
 import { BatchTableClassProperties } from "../../src/migration/BatchTableClassProperties";
 
 describe("BatchTableClassProperties", function () {
