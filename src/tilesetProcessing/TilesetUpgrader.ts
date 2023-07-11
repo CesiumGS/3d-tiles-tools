@@ -1,4 +1,5 @@
 import { Paths } from "../base/Paths";
+import { DeveloperError } from "../base/DeveloperError";
 
 import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 
@@ -42,11 +43,13 @@ export class TilesetUpgrader {
    * Creates a new instance
    *
    * @param quiet - Whether log messages should be omitted
+   * @param targetVersion - The target version - 1.0 or 1.1
    * @param gltfUpgradeOptions - Options that may be passed
    * to `gltf-pipeline` when GLB data in B3DM or I3DM is
    * supposed to be upgraded.
+   * @throws DeveloperError If the version is neither 1.0 nor 1.1
    */
-  constructor(quiet: boolean, gltfUpgradeOptions: any) {
+  constructor(quiet: boolean, targetVersion: string, gltfUpgradeOptions: any) {
     if (quiet !== true) {
       this.logCallback = (message: any) => console.log(message);
     } else {
@@ -54,23 +57,56 @@ export class TilesetUpgrader {
       this.logCallback = (message: any) => {};
     }
     this.gltfUpgradeOptions = gltfUpgradeOptions;
+    this.upgradeOptions = TilesetUpgrader.optionsFor(targetVersion);
+  }
 
-    // By default, ALL options are enabled...
-    this.upgradeOptions = {
-      upgradeExternalTilesets: true,
+  /**
+   * Creates pre-configured `TilesetUpgradeOptions` for the given
+   * target version.
+   *
+   * @param version - The target version - 1.0 or 1.1
+   * @returns The `TilesetUpgradeOptions`
+   */
+  private static optionsFor(version: string): TilesetUpgradeOptions {
+    if (version === "1.0") {
+      const options: TilesetUpgradeOptions = {
+        upgradeExternalTilesets: true,
 
-      upgradeAssetVersionNumber: true,
-      upgradeRefineCase: true,
-      upgradeContentUrlToUri: true,
-      upgradeExtensionDeclarations: true,
+        upgradedAssetVersionNumber: "1.0",
+        upgradeRefineCase: true,
+        upgradeContentUrlToUri: true,
 
-      upgradeB3dmGltf1ToGltf2: true,
-      upgradeI3dmGltf1ToGltf2: true,
+        upgradeContentGltfExtensionDeclarations: false,
 
-      // EXCEPT for the experimental ones...
-      upgradePntsToGlb: false,
-      upgradeB3dmToGlb: false,
-    };
+        upgradeB3dmGltf1ToGltf2: true,
+        upgradeI3dmGltf1ToGltf2: true,
+
+        upgradePntsToGlb: false,
+        upgradeB3dmToGlb: false,
+      };
+      return options;
+    }
+    if (version === "1.1") {
+      const options: TilesetUpgradeOptions = {
+        upgradeExternalTilesets: true,
+
+        upgradedAssetVersionNumber: "1.1",
+        upgradeRefineCase: true,
+        upgradeContentUrlToUri: true,
+        upgradeContentGltfExtensionDeclarations: true,
+
+        upgradeB3dmGltf1ToGltf2: false,
+        upgradeI3dmGltf1ToGltf2: false,
+
+        upgradePntsToGlb: true,
+        upgradeB3dmToGlb: true,
+      };
+      return options;
+    }
+    throw new DeveloperError(
+      `Invalid target version ${version} - ` +
+        `only '1.0' and '1.1' are allowed`
+    );
   }
 
   /**
@@ -91,7 +127,11 @@ export class TilesetUpgrader {
     overwrite: boolean
   ): Promise<void> {
     const quiet = true;
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const processExternalTilesets = this.upgradeOptions.upgradeExternalTilesets;
+    const tilesetProcessor = new BasicTilesetProcessor(
+      quiet,
+      processExternalTilesets
+    );
     await tilesetProcessor.begin(
       tilesetSourceName,
       tilesetTargetName,

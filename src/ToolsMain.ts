@@ -378,10 +378,17 @@ export class ToolsMain {
     input: string,
     output: string,
     force: boolean,
+    targetVersion: string,
     gltfUpgradeOptions: any
   ) {
     ToolsMain.ensureCanWrite(output, force);
-    await Tilesets.upgrade(input, output, force, gltfUpgradeOptions);
+    await Tilesets.upgrade(
+      input,
+      output,
+      force,
+      targetVersion,
+      gltfUpgradeOptions
+    );
   }
 
   static async merge(inputs: string[], output: string, force: boolean) {

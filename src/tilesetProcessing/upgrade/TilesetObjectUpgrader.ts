@@ -43,9 +43,12 @@ export class TilesetObjectUpgrader {
    * @param tileset - The parsed tileset
    */
   async upgradeTilesetObject(tileset: Tileset): Promise<void> {
-    if (this.upgradeOptions.upgradeAssetVersionNumber) {
+    if (this.upgradeOptions.upgradedAssetVersionNumber) {
       this.logCallback(`Upgrading asset version number`);
-      this.upgradeAssetVersionNumber(tileset);
+      this.upgradeAssetVersionNumber(
+        tileset,
+        this.upgradeOptions.upgradedAssetVersionNumber
+      );
     }
     if (this.upgradeOptions.upgradeRefineCase) {
       this.logCallback(`Upgrading refine to be in uppercase`);
@@ -55,7 +58,7 @@ export class TilesetObjectUpgrader {
       this.logCallback(`Upgrading content.url to content.uri`);
       await this.upgradeEachContentUrlToUri(tileset);
     }
-    if (this.upgradeOptions.upgradeExtensionDeclarations) {
+    if (this.upgradeOptions.upgradeContentGltfExtensionDeclarations) {
       this.logCallback(`Upgrading extension declarations`);
       Extensions.removeExtensionUsed(tileset, "3DTILES_content_gltf");
     }
@@ -63,16 +66,17 @@ export class TilesetObjectUpgrader {
 
   /**
    * Upgrade the `asset.version` number in the given tileset
-   * to be "1.1".
+   * to be the given target version
    *
    * @param tileset - The tileset
+   * @param targetVersion - The target version
    */
-  private upgradeAssetVersionNumber(tileset: Tileset) {
-    if (tileset.asset.version !== "1.1") {
+  private upgradeAssetVersionNumber(tileset: Tileset, targetVersion: string) {
+    if (tileset.asset.version !== targetVersion) {
       this.logCallback(
-        `  Upgrading asset version from ${tileset.asset.version} to 1.1`
+        `  Upgrading asset version from ${tileset.asset.version} to ${targetVersion}`
       );
-      tileset.asset.version = "1.1";
+      tileset.asset.version = targetVersion;
     }
   }
 

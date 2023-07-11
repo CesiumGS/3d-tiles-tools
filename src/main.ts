@@ -190,9 +190,30 @@ function parseToolArgs(a: string[]) {
     )
     .command(
       "upgrade",
-      "Upgrades the input tileset to the latest version of the 3D Tiles spec. " +
-        "Embedded glTF models will be upgraded to glTF 2.0.",
-      { i: inputStringDefinition, o: outputStringDefinition }
+      "Upgrades legacy tilests to comply to the 3D Tiles specification.\n\n" +
+        "By default, this will upgrade legacy tilesets to comply to 3D Tiles 1.0. " +
+        "These upgrades include:\n" +
+        "- The asset version will be set to '1.0'\n" +
+        "- Content that uses a 'url' will be upgraded to use 'uri'.\n" +
+        "- The 'refine' value will be converted to be in all-uppercase.\n" +
+        "- glTF 1.0 models in B3DM or I3DM will be upgraded to glTF 2.0.\n" +
+        "\n" +
+        "When specifying '-targetVersion 1.1', then the upgrades will include:\n" +
+        "- The asset version will be set to '1.1'\n" +
+        "- Content that uses a 'url' will be upgraded to use 'uri'.\n" +
+        "- The 'refine' value will be converted to be in all-uppercase.\n" +
+        "- The '3DTILES_content_gltf' extension declaration will be removed.\n" +
+        "- PNTS and B3DM content will be converted to glTF.\n" +
+        "\n",
+      {
+        i: inputStringDefinition,
+        o: outputStringDefinition,
+        targetVersion: {
+          default: "1.0",
+          description: "The target version for the upgrade",
+          type: "string",
+        },
+      }
     )
     .command("pipeline", "Execute a pipeline that is provided as a JSON file", {
       i: inputStringDefinition,
@@ -315,7 +336,13 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   } else if (command === "combine") {
     await ToolsMain.combine(input, output, force);
   } else if (command === "upgrade") {
-    await ToolsMain.upgrade(input, output, force, parsedOptionArgs);
+    await ToolsMain.upgrade(
+      input,
+      output,
+      force,
+      toolArgs.targetVersion,
+      parsedOptionArgs
+    );
   } else if (command === "merge") {
     await ToolsMain.merge(inputs, output, force);
   } else if (command === "pipeline") {

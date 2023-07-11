@@ -17,7 +17,7 @@ const unitBoundingBox = {
 
 // An input tileset for the upgrader, with the following
 // elements requiring an update:
-// - The `asset.version` should become 1.1
+// - The `asset.version` should become 1.1 (or 1.0)
 // - The `refine` value must be given in uppercase
 // - The `content.url` must be a `content.uri`
 //   (checked for both `content` and `contents`)
@@ -66,7 +66,12 @@ const inputTilesetJsonString = JSON.stringify(inputTilesetJsonRaw);
 
 describe("TilesetUpgrader", function () {
   it("upgrades the version number to 1.1", async function () {
-    const tilesetUpgrader = new TilesetUpgrader(quiet, gltfUpgradeOptions);
+    const targetVersion = "1.1";
+    const tilesetUpgrader = new TilesetUpgrader(
+      quiet,
+      targetVersion,
+      gltfUpgradeOptions
+    );
 
     const tileset = JSON.parse(inputTilesetJsonString) as Tileset;
     await tilesetUpgrader.upgradeTileset(tileset);
@@ -74,7 +79,12 @@ describe("TilesetUpgrader", function () {
   });
 
   it("upgrades the content.url to content.uri", async function () {
-    const tilesetUpgrader = new TilesetUpgrader(quiet, gltfUpgradeOptions);
+    const targetVersion = "1.0";
+    const tilesetUpgrader = new TilesetUpgrader(
+      quiet,
+      targetVersion,
+      gltfUpgradeOptions
+    );
 
     const tileset = JSON.parse(inputTilesetJsonString) as Tileset;
     await tilesetUpgrader.upgradeTileset(tileset);
@@ -85,7 +95,12 @@ describe("TilesetUpgrader", function () {
   });
 
   it("upgrades the refine values to be in uppercase", async function () {
-    const tilesetUpgrader = new TilesetUpgrader(quiet, gltfUpgradeOptions);
+    const targetVersion = "1.0";
+    const tilesetUpgrader = new TilesetUpgrader(
+      quiet,
+      targetVersion,
+      gltfUpgradeOptions
+    );
 
     const tileset = JSON.parse(inputTilesetJsonString) as Tileset;
     await tilesetUpgrader.upgradeTileset(tileset);
@@ -96,7 +111,12 @@ describe("TilesetUpgrader", function () {
   });
 
   it("removes the unnecessary extension declaration for 3DTILES_content_gltf", async function () {
-    const tilesetUpgrader = new TilesetUpgrader(quiet, gltfUpgradeOptions);
+    const targetVersion = "1.1";
+    const tilesetUpgrader = new TilesetUpgrader(
+      quiet,
+      targetVersion,
+      gltfUpgradeOptions
+    );
 
     const tileset = JSON.parse(inputTilesetJsonString) as Tileset;
     await tilesetUpgrader.upgradeTileset(tileset);

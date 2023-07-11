@@ -38,7 +38,9 @@ export class BasicTilesetProcessor extends TilesetProcessor {
   /**
    * Whether external tilesets should be processed transparently.
    *
-   * When this is 'true', then the methods
+   * When this is 'true', then the methods that process tile
+   * content will also be applied to the contents of external
+   * tilesets.
    */
   private readonly processExternalTilesets: boolean;
 
@@ -46,10 +48,16 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * Creates a new instance
    *
    * @param quiet - Whether log messages should be omitted
+   * @param processExternalTilesets - Whether external tilesets
+   * should be processed.
    */
-  constructor(quiet?: boolean) {
+  constructor(quiet?: boolean, processExternalTilesets?: boolean) {
     super(quiet);
-    this.processExternalTilesets = true;
+    if (processExternalTilesets === undefined) {
+      this.processExternalTilesets = true;
+    } else {
+      this.processExternalTilesets = processExternalTilesets;
+    }
   }
 
   /**
@@ -429,10 +437,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
             sourceEntry: TilesetEntry,
             type: string | undefined
           ) => {
-            const targetEntry = await entryProcessor(
-              sourceEntry,
-              type
-            );
+            const targetEntry = await entryProcessor(sourceEntry, type);
             if (targetEntry) {
               if (type === ContentDataTypes.CONTENT_TYPE_TILESET) {
                 const externalBasePath = path.dirname(sourceEntry.key);
