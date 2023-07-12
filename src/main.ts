@@ -198,7 +198,7 @@ function parseToolArgs(a: string[]) {
         "- The 'refine' value will be converted to be in all-uppercase.\n" +
         "- glTF 1.0 models in B3DM or I3DM will be upgraded to glTF 2.0.\n" +
         "\n" +
-        "When specifying '-targetVersion 1.1', then the upgrades will include:\n" +
+        "When specifying '--targetVersion 1.1', then the upgrades will include:\n" +
         "- The asset version will be set to '1.1'\n" +
         "- Content that uses a 'url' will be upgraded to use 'uri'.\n" +
         "- The 'refine' value will be converted to be in all-uppercase.\n" +
