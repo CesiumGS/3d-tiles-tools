@@ -205,13 +205,11 @@ export class TilesetUpgrader {
       if (Paths.hasExtension(uri, ".pnts")) {
         return Paths.replaceExtension(uri, ".glb");
       }
-      return uri;
     }
     if (this.upgradeOptions.upgradeB3dmToGlb) {
       if (Paths.hasExtension(uri, ".b3dm")) {
         return Paths.replaceExtension(uri, ".glb");
       }
-      return uri;
     }
     return uri;
   };
