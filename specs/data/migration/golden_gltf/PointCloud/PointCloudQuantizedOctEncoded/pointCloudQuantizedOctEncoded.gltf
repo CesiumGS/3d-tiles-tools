@@ -10,13 +10,13 @@
       "count": 1000,
       "max": [
         1215017.875,
-        4081610.25,
-        4736318
+        -4736308,
+        4081610.25
       ],
       "min": [
         1215007.875,
-        4081600.25,
-        4736308
+        -4736318,
+        4081600.25
       ],
       "bufferView": 0,
       "byteOffset": 0
@@ -51,6 +51,14 @@
       "byteLength": 28000
     }
   ],
+  "materials": [
+    {
+      "alphaMode": "BLEND",
+      "pbrMetallicRoughness": {
+        "metallicFactor": 0
+      }
+    }
+  ],
   "meshes": [
     {
       "primitives": [
@@ -60,13 +68,20 @@
             "NORMAL": 1,
             "COLOR_0": 2
           },
-          "mode": 0
+          "mode": 0,
+          "material": 0
         }
       ]
     }
   ],
   "nodes": [
     {
+      "rotation": [
+        -0.7071067811865475,
+        0,
+        0,
+        0.7071067811865476
+      ],
       "mesh": 0
     }
   ],

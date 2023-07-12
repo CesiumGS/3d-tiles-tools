@@ -72,6 +72,14 @@
       "byteLength": 48000
     }
   ],
+  "materials": [
+    {
+      "alphaMode": "BLEND",
+      "pbrMetallicRoughness": {
+        "metallicFactor": 0
+      }
+    }
+  ],
   "meshes": [
     {
       "primitives": [
@@ -85,6 +93,7 @@
             "_ID": 5
           },
           "mode": 0,
+          "material": 0,
           "extensions": {
             "EXT_structural_metadata": {
               "propertyAttributes": [
@@ -102,6 +111,12 @@
         1215012.8828876738,
         4081605.22126042,
         4736313.051199594
+      ],
+      "rotation": [
+        -0.7071067811865475,
+        0,
+        0,
+        0.7071067811865476
       ],
       "mesh": 0
     }

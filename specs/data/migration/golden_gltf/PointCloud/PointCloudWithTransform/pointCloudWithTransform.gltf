@@ -44,6 +44,14 @@
       "byteLength": 16000
     }
   ],
+  "materials": [
+    {
+      "alphaMode": "BLEND",
+      "pbrMetallicRoughness": {
+        "metallicFactor": 0
+      }
+    }
+  ],
   "meshes": [
     {
       "primitives": [
@@ -52,13 +60,20 @@
             "POSITION": 0,
             "COLOR_0": 1
           },
-          "mode": 0
+          "mode": 0,
+          "material": 0
         }
       ]
     }
   ],
   "nodes": [
     {
+      "rotation": [
+        -0.7071067811865475,
+        0,
+        0,
+        0.7071067811865476
+      ],
       "mesh": 0
     }
   ],
