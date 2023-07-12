@@ -96,14 +96,17 @@ export class GltfTransformPointClouds {
       primitive.setAttribute("COLOR_0", colorAccessor);
     }
 
+    // Assign a material to the primitive
+    const material = document.createMaterial();
+    material.setAlphaMode("BLEND");
+    material.setMetallicFactor(0.0);
+    material.setRoughnessFactor(1.0);
+    primitive.setMaterial(material);
+
     // Assign the global color, if present
     const globalColor = readablePointCloud.getNormalizedLinearGlobalColor();
     if (globalColor) {
-      const material = document.createMaterial();
       material.setBaseColorFactor(globalColor);
-      material.setMetallicFactor(0.0);
-      material.setRoughnessFactor(1.0);
-      primitive.setMaterial(material);
     }
 
     // If there are `_FEATURE_ID_n` attributes, assign them to
@@ -122,8 +125,15 @@ export class GltfTransformPointClouds {
     const node = document.createNode();
     node.setMesh(mesh);
 
+    // Assign the y-up-to-z-up transform, possibly including
+    // the global (RTC_CENTER) position
     if (globalPosition) {
-      node.setTranslation(globalPosition);
+      const tx = globalPosition[0];
+      const ty = globalPosition[2];
+      const tz = -globalPosition[1];
+      node.setMatrix([1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, tx, ty, tz, 1]);
+    } else {
+      node.setMatrix([1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
     }
 
     const scene = document.createScene();

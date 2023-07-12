@@ -7,7 +7,7 @@ import { TileFormats } from "../tileFormats/TileFormats";
 
 import { GltfTransform } from "../contentProcessing/GltfTransform";
 import { PntsPointClouds } from "../contentProcessing/pointClouds/PntsPointClouds";
-import { GltfTransformPointClouds } from "../contentProcessing/pointClouds/GltTransformfPointClouds";
+import { GltfTransformPointClouds } from "../contentProcessing/pointClouds/GltTransformPointClouds";
 import { ReadablePointCloud } from "../contentProcessing/pointClouds/ReadablePointCloud";
 
 import { TileTableData } from "./TileTableData";
@@ -65,11 +65,10 @@ export class TileFormatsMigration {
     // as the "global position" of the point cloud
     let globalPosition = undefined;
     if (featureTable.RTC_CENTER) {
-      globalPosition =
-        TileFormatsMigration.obtainGlobalPositionFromRtcCenterForGltf(
-          featureTable.RTC_CENTER,
-          featureTableBinary
-        );
+      globalPosition = TileFormatsMigration.obtainGlobalPositionFromRtcCenter(
+        featureTable.RTC_CENTER,
+        featureTableBinary
+      );
     }
 
     // Create a glTF-Transform document+primitive that represent
@@ -214,17 +213,21 @@ export class TileFormatsMigration {
     // RTC_CENTER as its translation
     if (featureTable.RTC_CENTER) {
       const globalPosition =
-        TileFormatsMigration.obtainGlobalPositionFromRtcCenterForGltf(
+        TileFormatsMigration.obtainGlobalPositionFromRtcCenter(
           featureTable.RTC_CENTER,
           featureTableBinary
         );
-
       const scenes = root.listScenes();
       for (const scene of scenes) {
         const oldChildren = scene.listChildren();
         for (const oldChild of oldChildren) {
           const rtcRoot = document.createNode();
-          rtcRoot.setTranslation(globalPosition);
+          // Assign the translation from the RTC_CENTER, taking
+          // the y-up-to-z-up transform into account
+          const tx = globalPosition[0];
+          const ty = globalPosition[2];
+          const tz = -globalPosition[1];
+          rtcRoot.setTranslation([tx, ty, tz]);
           scene.removeChild(oldChild);
           rtcRoot.addChild(oldChild);
           scene.addChild(rtcRoot);
@@ -281,19 +284,15 @@ export class TileFormatsMigration {
    * property of a feature table, or `undefined` if the input is
    * undefined.
    *
-   * The resulting translation will be transformed with the inverse
-   * of the y-up to z-up transform, to compensate for the y-up to z-up
-   * transform that is applied to the glTF content.
-   *
    * @param featureTable - The feature table
    * @param binary - The binary blob of the feature table
    * @returns The `RTC_CENTER` value, or `undefined`
    */
-  private static obtainGlobalPositionFromRtcCenterForGltf(
+  private static obtainGlobalPositionFromRtcCenter(
     rtcCenter: BinaryBodyOffset | number[],
     binary: Buffer
   ): [number, number, number] {
     const c = TileTableData.obtainNumberArray(binary, rtcCenter, 3, "FLOAT32");
-    return [c[0], c[2], -c[1]];
+    return [c[0], c[1], c[2]];
   }
 }

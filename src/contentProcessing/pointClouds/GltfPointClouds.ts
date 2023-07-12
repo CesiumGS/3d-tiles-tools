@@ -1,7 +1,7 @@
 import { GltfTransform } from "../GltfTransform";
 
 import { ReadablePointCloud } from "./ReadablePointCloud";
-import { GltfTransformPointClouds } from "./GltTransformfPointClouds";
+import { GltfTransformPointClouds } from "./GltTransformPointClouds";
 
 /**
  * Methods to create glTF representations of point clouds

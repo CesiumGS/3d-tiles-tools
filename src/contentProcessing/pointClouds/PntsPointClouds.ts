@@ -358,8 +358,7 @@ export class PntsPointClouds {
   }
 
   /**
-   * Create the position data from the given feature table data,
-   * in y-up orientation.
+   * Create the position data from the given feature table data.
    *
    * This will return the POSITION or POSITION_QUANTIZED data
    * as an iterable over 3D float arrays.
@@ -369,33 +368,6 @@ export class PntsPointClouds {
    * @returns The the iterable over the data
    */
   private static createPositions(
-    featureTable: PntsFeatureTable,
-    binary: Buffer
-  ): Iterable<number[]> {
-    const positionsZup = PntsPointClouds.createPositionsZup(
-      featureTable,
-      binary
-    );
-    const positions = Iterables.map(positionsZup, (p: number[]) => [
-      p[0],
-      p[2],
-      -p[1],
-    ]);
-    return positions;
-  }
-
-  /**
-   * Create the position data from the given feature table data,
-   * in their original (z-up) orientation.
-   *
-   * This will return the POSITION or POSITION_QUANTIZED data
-   * as an iterable over 3D float arrays.
-   *
-   * @param featureTable - The PNTS feature table
-   * @param binary - The feature table binary
-   * @returns The the iterable over the data
-   */
-  private static createPositionsZup(
     featureTable: PntsFeatureTable,
     binary: Buffer
   ): Iterable<number[]> {
