@@ -63,10 +63,11 @@ export class TileFormatsMigration {
     // as the "global position" of the point cloud
     let globalPosition = undefined;
     if (featureTable.RTC_CENTER) {
-      globalPosition = TileFormatsMigration.obtainGlobalPositionFromRtcCenter(
-        featureTable.RTC_CENTER,
-        featureTableBinary
-      );
+      globalPosition =
+        TileFormatsMigration.obtainGlobalPositionFromRtcCenterForGltf(
+          featureTable.RTC_CENTER,
+          featureTableBinary
+        );
     }
 
     // Create a glTF-Transform document+primitive that represent
@@ -210,7 +211,7 @@ export class TileFormatsMigration {
     // RTC_CENTER as its translation
     if (featureTable.RTC_CENTER) {
       const globalPosition =
-        TileFormatsMigration.obtainGlobalPositionFromRtcCenter(
+        TileFormatsMigration.obtainGlobalPositionFromRtcCenterForGltf(
           featureTable.RTC_CENTER,
           featureTableBinary
         );
@@ -273,18 +274,23 @@ export class TileFormatsMigration {
   }
 
   /**
-   * Obtains the value of the given `RTC_CENTER` property of a
-   * feature table, or `undefined` if the input is undefined
+   * Obtains the translation that is implied by the given `RTC_CENTER`
+   * property of a feature table, or `undefined` if the input is
+   * undefined.
+   *
+   * The resulting translation will be transformed with the inverse
+   * of the y-up to z-up transform, to compensate for the y-up to z-up
+   * transform that is applied to the glTF content.
    *
    * @param featureTable - The feature table
    * @param binary - The binary blob of the feature table
    * @returns The `RTC_CENTER` value, or `undefined`
    */
-  private static obtainGlobalPositionFromRtcCenter(
+  private static obtainGlobalPositionFromRtcCenterForGltf(
     rtcCenter: BinaryBodyOffset | number[],
     binary: Buffer
   ): [number, number, number] {
     const c = TileTableData.obtainNumberArray(binary, rtcCenter, 3, "FLOAT32");
-    return [c[0], c[1], c[2]];
+    return [c[0], c[2], -c[1]];
   }
 }
