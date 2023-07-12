@@ -1,22 +1,24 @@
 import { BatchTable } from "../structure/TileFormats/BatchTable";
 import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
+import { B3dmFeatureTable } from "../structure/TileFormats/B3dmFeatureTable";
+import { BinaryBodyOffset } from "../structure/TileFormats/BinaryBodyOffset";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 
 import { GltfTransform } from "../contentProcessing/GltfTransform";
 import { PntsPointClouds } from "../contentProcessing/pointClouds/PntsPointClouds";
 import { GltfTransformPointClouds } from "../contentProcessing/pointClouds/GltTransformfPointClouds";
+import { ReadablePointCloud } from "../contentProcessing/pointClouds/ReadablePointCloud";
 
 import { TileTableData } from "./TileTableData";
 import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
-import { B3dmFeatureTable } from "../structure/TileFormats/B3dmFeatureTable";
-import { BinaryBodyOffset } from "../structure/TileFormats/BinaryBodyOffset";
 import { TileTableDataToMeshFeatures } from "./TileTableDataToMeshFeatures";
+import { BatchTables } from "./BatchTables";
+
 import { MeshFeatures } from "../gltfMetadata/MeshFeatures";
+
 import { PropertyModel } from "../metadata/PropertyModel";
 import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
-import { ReadablePointCloud } from "../contentProcessing/pointClouds/ReadablePointCloud";
-import { BatchTables } from "./BatchTables";
 
 /**
  * Methods for converting "legacy" tile formats into glTF assets
@@ -205,6 +207,7 @@ export class TileFormatsMigration {
     const io = await GltfTransform.getIO();
     const document = await io.readBinary(tileData.payload);
     const root = document.getRoot();
+    root.getAsset().generator = "glTF-Transform";
 
     // If the feature table defines an `RTC_CENTER`, then insert
     // a new root node above each scene node, that carries the

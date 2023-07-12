@@ -53,6 +53,7 @@ export class GltfTransformPointClouds {
   ): GtlfTransformPointCloud {
     // Prepare the glTF-Transform document and primitive
     const document = new Document();
+    document.getRoot().getAsset().generator = "glTF-Transform";
 
     const buffer = document.createBuffer();
     buffer.setURI("buffer.bin");
