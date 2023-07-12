@@ -91,7 +91,11 @@ export class Tilesets {
       targetVersion,
       gltfUpgradeOptions
     );
-    tilesetUpgrader.upgrade(tilesetSourceName, tilesetTargetName, overwrite);
+    await tilesetUpgrader.upgrade(
+      tilesetSourceName,
+      tilesetTargetName,
+      overwrite
+    );
   }
 
   /**

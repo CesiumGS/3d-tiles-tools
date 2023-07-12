@@ -139,7 +139,7 @@ export class TilesetUpgrader {
     );
 
     // Perform the upgrade for the actual tileset object
-    tilesetProcessor.forTileset(
+    await tilesetProcessor.forTileset(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       async (tileset: Tileset, schema: Schema | undefined) => {
         await this.upgradeTileset(tileset);
