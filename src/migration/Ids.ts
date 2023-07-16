@@ -6,7 +6,7 @@ export class Ids {
    * Make sure that the given identifier matches the requirements
    * for an ID in the 3D Metadata specification.
    *
-   * This will replace any characters with `_` underscores if the
+   * This will replace any characters with `_` underscores if they
    * do not match the regex `"^[a-zA-Z_][a-zA-Z0-9_]*$"`.
    *
    * @param identifier - The identifier
