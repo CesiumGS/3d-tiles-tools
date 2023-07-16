@@ -68,6 +68,32 @@ export class Iterables {
   }
 
   /**
+   * Returns filtered view on the given iterable
+   *
+   * @param iterable - The iterable
+   * @param include - The include predicate
+   * @returns The filtered iterable
+   */
+  static filterWIthIndex<T>(
+    iterable: Iterable<T>,
+    include: (element: T, index: number) => boolean
+  ): Iterable<T> {
+    const resultIterable = {
+      [Symbol.iterator]: function* (): Iterator<T> {
+        let index = 0;
+        for (const element of iterable) {
+          const included = include(element, index);
+          if (included) {
+            yield element;
+          }
+          index++;
+        }
+      },
+    };
+    return resultIterable;
+  }
+
+  /**
    * Creates an iterable from the given one, applying the
    * given function to each element.
    *

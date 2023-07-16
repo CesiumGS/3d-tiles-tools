@@ -71,11 +71,14 @@ export class TileFormatsMigration {
       );
     }
 
+    const mayRequireAlpha = PntsPointClouds.mayRequireAlpha(featureTable);
+
     // Create a glTF-Transform document+primitive that represent
     // the point cloud
     const gltfTransformPointCloud = GltfTransformPointClouds.build(
       pntsPointCloud,
-      globalPosition
+      globalPosition,
+      mayRequireAlpha
     );
     const document = gltfTransformPointCloud.document;
     const primitive = gltfTransformPointCloud.primitive;

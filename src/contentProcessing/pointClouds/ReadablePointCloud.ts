@@ -36,9 +36,10 @@ export interface ReadablePointCloud {
   getNormals(): Iterable<number[]> | undefined;
 
   /**
-   * Returns the positions
+   * Returns the colors, as 4D arrays containing the linear RGBA
+   * components, in the range [0.0, 1.0]
    *
-   * @returns The position
+   * @returns The colors
    */
   getNormalizedLinearColors(): Iterable<number[]> | undefined;
 

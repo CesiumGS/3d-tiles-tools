@@ -13,6 +13,20 @@ describe("Iterables", function () {
     expect(actualA).toEqual(expected);
     expect(actualB).toEqual(expected);
   });
+
+  it("filterWithIndex filters the right elements", function () {
+    const input = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const result = Iterables.filterWIthIndex(
+      input,
+      (v: number, i: number) => i % 3 != 2
+    );
+    const actualA = [...result];
+    const actualB = [...result];
+    const expected = [0, 1, 3, 4, 6, 7, 9];
+    expect(actualA).toEqual(expected);
+    expect(actualB).toEqual(expected);
+  });
+
   it("map applies a mapping", function () {
     const input = [0, 1, 2, 3, 4];
     const result = Iterables.map(input, (i: number) => i * 2);
@@ -30,6 +44,7 @@ describe("Iterables", function () {
       Iterables.segmentize(input, segmentSize);
     }).toThrowError();
   });
+
   it("segmentize segmentizes", function () {
     const input = [0, 1, 2, 3, 4];
     const segmentSize = 2;

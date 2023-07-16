@@ -118,21 +118,53 @@ export class PntsPointClouds {
       }
     }
 
-    // Assign the global color (from CONSTANT_RGBA)
-    const globalColor = PntsPointClouds.createGlobalNormalizedLinearColor(
-      featureTable,
-      featureTableBinary
-    );
-    if (globalColor) {
-      pointCloud.setNormalizedLinearGlobalColor(
-        globalColor[0],
-        globalColor[1],
-        globalColor[2],
-        globalColor[3]
+    // According to the specification, the global color is only considered
+    // when no other color information is present
+    if (!pointCloud.getAttributeValues("COLOR_0")) {
+      // Assign the global color (from CONSTANT_RGBA)
+      const globalColor = PntsPointClouds.createGlobalNormalizedLinearColor(
+        featureTable,
+        featureTableBinary
       );
+      if (globalColor) {
+        pointCloud.setNormalizedLinearGlobalColor(
+          globalColor[0],
+          globalColor[1],
+          globalColor[2],
+          globalColor[3]
+        );
+      }
     }
 
     return pointCloud;
+  }
+
+  /**
+   * Returns whether the color information of the point cloud with the
+   * given PNTS feature table MAY require an alpha component.
+   *
+   * This is true for RGBA or CONSTANT_RGBA point clouds, and
+   * false otherwise.
+   *
+   * @param featureTable - The PNTS feature table
+   * @returns Whether the point cloud may require an alpha component
+   */
+  static mayRequireAlpha(featureTable: PntsFeatureTable) {
+    // Check the color information presence in the order of prececenc:
+    // RGBA, RGB, RGB565, then CONSTANT_RGBA
+    if (featureTable.RGBA) {
+      return true;
+    }
+    if (featureTable.RGB) {
+      return false;
+    }
+    if (featureTable.RGB565) {
+      return false;
+    }
+    if (featureTable.CONSTANT_RGBA) {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -479,20 +511,10 @@ export class PntsPointClouds {
     featureTable: PntsFeatureTable,
     binary: Buffer
   ): Iterable<number[]> | undefined {
+    // According to the specification, the precedence for considering the
+    // color information is RGBA, RGB, RGB565 (and later: CONSTANT_RGBA)
+
     const numPoints = featureTable.POINTS_LENGTH;
-    if (featureTable.RGB) {
-      const byteOffset = featureTable.RGB.byteOffset;
-      const colorsStandardRGB = PntsPointClouds.createColorsStandardRGBInternal(
-        binary,
-        byteOffset,
-        numPoints
-      );
-      const colorsNormalizedLinearRGBA = Iterables.map(
-        colorsStandardRGB,
-        Colors.standardRGBToNormalizedLinearRGBA
-      );
-      return colorsNormalizedLinearRGBA;
-    }
     if (featureTable.RGBA) {
       const byteOffset = featureTable.RGBA.byteOffset;
       const colorsStandardRGBA =
@@ -504,6 +526,19 @@ export class PntsPointClouds {
       const colorsNormalizedLinearRGBA = Iterables.map(
         colorsStandardRGBA,
         Colors.standardRGBAToNormalizedLinearRGBA
+      );
+      return colorsNormalizedLinearRGBA;
+    }
+    if (featureTable.RGB) {
+      const byteOffset = featureTable.RGB.byteOffset;
+      const colorsStandardRGB = PntsPointClouds.createColorsStandardRGBInternal(
+        binary,
+        byteOffset,
+        numPoints
+      );
+      const colorsNormalizedLinearRGBA = Iterables.map(
+        colorsStandardRGB,
+        Colors.standardRGBToNormalizedLinearRGBA
       );
       return colorsNormalizedLinearRGBA;
     }

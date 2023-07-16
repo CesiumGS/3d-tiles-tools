@@ -12,6 +12,7 @@ import { ReadablePointCloud } from "./ReadablePointCloud";
 import { TileFormatError } from "../../tileFormats/TileFormatError";
 
 import { AccessorCreation } from "../../migration/AccessorCreation";
+import { Colors } from "./Colors";
 
 /**
  * An internal interface representing a point cloud with
@@ -43,13 +44,22 @@ export class GltfTransformPointClouds {
    * @param readablePointCloud - The `ReadablePointCloud`
    * @param globalPosition - The optional global position, to
    * be set as the `translation` component of the root node.
+   * @param mayRequireAlpha - Whether the point cloud may
+   * require an alpha component for its colors. If this is
+   * `false`, then a point cloud with RGB colors and an
+   * OPAQUE alpha mode material will be created. Otherwise,
+   * the implementation will still check thea ctual colors:
+   * If one of them has a non-1.0 alpha component, then it
+   * will create a point cloud with a BLEND alpha mode
+   * material and RGBA colors.
    * @returns The GtlfTransformPointCloud
    * @throws TileFormatError If the input data does not
    * at least contain a `POSITION` attribute.
    */
   static build(
     readablePointCloud: ReadablePointCloud,
-    globalPosition: [number, number, number] | undefined
+    globalPosition: [number, number, number] | undefined,
+    mayRequireAlpha: boolean
   ): GtlfTransformPointCloud {
     // Prepare the glTF-Transform document and primitive
     const document = new Document();
@@ -82,30 +92,52 @@ export class GltfTransformPointClouds {
       primitive.setAttribute("NORMAL", normalAccessor);
     }
 
+    // Assign a material to the primitive
+    const material = document.createMaterial();
+    material.setMetallicFactor(0.0);
+    material.setRoughnessFactor(1.0);
+    primitive.setMaterial(material);
+
     // Assign the COLOR_0, if present
     const colors = readablePointCloud.getAttributeValues("COLOR_0");
     if (colors) {
       const colorAccessor = document.createAccessor();
       colorAccessor.setBuffer(buffer);
-      colorAccessor.setType(Accessor.Type.VEC4);
-
       colorAccessor.setNormalized(true);
-      const colorsBytes = Iterables.map(colors, (c: number) => 255.0 * c);
 
-      colorAccessor.setArray(new Uint8Array([...colorsBytes]));
+      // If there may be an alpha component, then check if the colors
+      // do actually require an alpha component
+      let useAlpha = false;
+      if (mayRequireAlpha) {
+        useAlpha = GltfTransformPointClouds.doesRequireAlpha(colors);
+      }
+      // When the alpha component is used, then and assign BLEND
+      // alpha mode and RGBA colors. Otherwise, use OPAQUE alpha
+      // mode and RGB colors.
+      if (useAlpha) {
+        material.setAlphaMode("BLEND");
+        colorAccessor.setType(Accessor.Type.VEC4);
+        const colorsBytesRGBA = Iterables.map(colors, (c: number) => 255.0 * c);
+        colorAccessor.setArray(new Uint8Array([...colorsBytesRGBA]));
+      } else {
+        colorAccessor.setType(Accessor.Type.VEC3);
+        const colorsRGB = Iterables.filterWIthIndex(
+          colors,
+          (e: number, i: number) => i % 4 !== 3
+        );
+        const colorsBytesRGB = Iterables.map(
+          colorsRGB,
+          (c: number) => 255.0 * c
+        );
+        colorAccessor.setArray(new Uint8Array([...colorsBytesRGB]));
+      }
       primitive.setAttribute("COLOR_0", colorAccessor);
     }
-
-    // Assign a material to the primitive
-    const material = document.createMaterial();
-    material.setAlphaMode("BLEND");
-    material.setMetallicFactor(0.0);
-    material.setRoughnessFactor(1.0);
-    primitive.setMaterial(material);
 
     // Assign the global color, if present
     const globalColor = readablePointCloud.getNormalizedLinearGlobalColor();
     if (globalColor) {
+      material.setAlphaMode("BLEND");
       material.setBaseColorFactor(globalColor);
     }
 
@@ -144,6 +176,31 @@ export class GltfTransformPointClouds {
       primitive: primitive,
     };
     return result;
+  }
+
+  /**
+   * Returns whether the given colors require an alpha component.
+   *
+   * This takes normalized linear colors with RGBA components
+   * (given as a flat array), and returns whether the alpha
+   * component of any of these colors is not 1.0.
+   *
+   * @param normalizedColorsRGBA - The colors
+   * @returns Whether the colors require an alpha component
+   */
+  private static doesRequireAlpha(
+    normalizedColorsRGBA: Iterable<number>
+  ): boolean {
+    let index = 0;
+    for (const c of normalizedColorsRGBA) {
+      if (index % 4 === 3) {
+        if (c !== 1.0) {
+          return true;
+        }
+      }
+      index++;
+    }
+    return false;
   }
 
   /**
