@@ -38,9 +38,9 @@ export class TileTableDataToStructuralMetadata {
    * @param primitive - The glTF-Transform mesh primitive
    * @param batchTable - The `BatchTable`
    * @param batchTableBinary - The batch table binary
-   * @param externalProperties - External properties, i.e. property
+   * @param externalProperties - External properties. These are property
    * model instances for properties of the batch table that are not
-   * stored in the batch table binary.
+   * stored in the batch table binary, and accessed with the property ID.
    * @param numRows - The number of rows (POINTS_LENGTH) of the table
    */
   static assignPerPointProperties(

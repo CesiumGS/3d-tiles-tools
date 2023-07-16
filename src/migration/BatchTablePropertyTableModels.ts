@@ -1,12 +1,13 @@
 import { TileTableData } from "./TileTableData";
 import { BatchTableClassProperties } from "./BatchTableClassProperties";
-import { DefaultPropertyTableModel } from "../metadata/DefaultPropertyTableModel";
+import { Ids } from "./Ids";
 
 import { PropertyTableModel } from "../metadata/PropertyTableModel";
 import { PropertyModel } from "../metadata/PropertyModel";
+import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
+import { DefaultPropertyTableModel } from "../metadata/DefaultPropertyTableModel";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
-import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
 
 /**
  * Methods to create `PropertyTableModel` instances for batch table data
@@ -21,7 +22,8 @@ export class BatchTablePropertyTableModels {
    * instances for properties of the batch table that are not stored in
    * the batch table binary. This is only required for the properties that
    * are encoded with the `3DTILES_draco_point_compression` extension,
-   * where the actual data is stored in the feature table binary.
+   * where the actual data is stored in the feature table binary. These
+   * models are accessed with property IDs.
    * @param numRows - The number of rows of the table
    * @returns The property table model
    * @throws TileFormatError If the table contained a property
@@ -36,11 +38,12 @@ export class BatchTablePropertyTableModels {
   ): PropertyTableModel {
     const propertyTableModel = new DefaultPropertyTableModel(numRows);
     const properties = Object.keys(table);
-    for (const propertyId of properties) {
-      if (propertyId === "extensions" || propertyId === "extras") {
+    for (const propertyName of properties) {
+      if (propertyName === "extensions" || propertyName === "extras") {
         continue;
       }
-      const propertyValue = table[propertyId];
+      const propertyValue = table[propertyName];
+      const propertyId = Ids.sanitize(propertyName);
       const classProperty = BatchTableClassProperties.createClassProperty(
         propertyId,
         propertyValue

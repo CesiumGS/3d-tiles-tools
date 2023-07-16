@@ -39,18 +39,18 @@ export class BatchTableSchemas {
     // of property names to `ClassProperty` objects.
     // (sanitizing the property names if necessary)
     const properties: { [key: string]: ClassProperty } = {};
-    const propertyIds = Object.keys(batchTable);
-    for (const propertyId of propertyIds) {
-      if (propertyId === "extensions" || propertyId === "extras") {
+    const propertyNames = Object.keys(batchTable);
+    for (const propertyName of propertyNames) {
+      if (propertyName === "extensions" || propertyName === "extras") {
         continue;
       }
-      const propertyValue = batchTable[propertyId];
+      const propertyValue = batchTable[propertyName];
       const classProperty = BatchTableClassProperties.createClassProperty(
-        propertyId,
+        propertyName,
         propertyValue
       );
-      const schemaPropertyId = Ids.sanitize(propertyId);
-      properties[schemaPropertyId] = classProperty;
+      const propertyId = Ids.sanitize(propertyName);
+      properties[propertyId] = classProperty;
     }
 
     // Bail out if there are no properties

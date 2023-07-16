@@ -16,6 +16,7 @@ import { TileTableData } from "./TileTableData";
 import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
 import { TileTableDataToMeshFeatures } from "./TileTableDataToMeshFeatures";
 import { BatchTables } from "./BatchTables";
+import { Ids } from "./Ids";
 
 import { MeshFeatures } from "../gltfMetadata/MeshFeatures";
 
@@ -143,7 +144,7 @@ export class TileFormatsMigration {
   }
 
   /**
-   * Computes a mapping from property names to `PropertyModel` objects
+   * Computes a mapping from property IDs to `PropertyModel` objects
    * for properties that are defined in the batch table, but not stored
    * in the batch table binary.
    *
@@ -165,24 +166,24 @@ export class TileFormatsMigration {
     pntsPointCloud: ReadablePointCloud,
     batchTable: BatchTable
   ): { [key: string]: PropertyModel } {
-    const externalProperties: { [key: string]: PropertyModel } = {};
+    const externalPropertiesById: { [key: string]: PropertyModel } = {};
     const dracoPropertyNames = BatchTables.obtainDracoPropertyNames(batchTable);
     for (const propertyName of dracoPropertyNames) {
       const propertyValue = batchTable[propertyName];
       if (propertyValue) {
         if (TileTableData.isBatchTableBinaryBodyReference(propertyValue)) {
-          const attributeValues =
-            pntsPointCloud.getAttributeValues(propertyName);
+          const propertyId = Ids.sanitize(propertyName);
+          const attributeValues = pntsPointCloud.getAttributeValues(propertyId);
           if (attributeValues) {
             const propertyModel = new DefaultPropertyModel([
               ...attributeValues,
             ]);
-            externalProperties[propertyName] = propertyModel;
+            externalPropertiesById[propertyId] = propertyModel;
           }
         }
       }
     }
-    return externalProperties;
+    return externalPropertiesById;
   }
 
   /**
