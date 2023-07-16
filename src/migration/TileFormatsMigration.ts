@@ -1,3 +1,5 @@
+import { Document } from "@gltf-transform/core";
+
 import { BatchTable } from "../structure/TileFormats/BatchTable";
 import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
 import { B3dmFeatureTable } from "../structure/TileFormats/B3dmFeatureTable";
@@ -61,27 +63,30 @@ export class TileFormatsMigration {
       batchTable
     );
 
-    // Fetch the `RTC_CENTER` from the feature table, to be used
-    // as the "global position" of the point cloud
-    let globalPosition = undefined;
-    if (featureTable.RTC_CENTER) {
-      globalPosition = TileFormatsMigration.obtainGlobalPositionFromRtcCenter(
-        featureTable.RTC_CENTER,
-        featureTableBinary
-      );
-    }
-
+    // Check if the point cloud contains color information that may
+    // require an alpha component (i.e. RGBA or CONSTANT_RGBA)
     const mayRequireAlpha = PntsPointClouds.mayRequireAlpha(featureTable);
 
     // Create a glTF-Transform document+primitive that represent
     // the point cloud
     const gltfTransformPointCloud = GltfTransformPointClouds.build(
       pntsPointCloud,
-      globalPosition,
       mayRequireAlpha
     );
     const document = gltfTransformPointCloud.document;
     const primitive = gltfTransformPointCloud.primitive;
+
+    // Apply quantization to the point cloud, if the input positions
+    // had been quantized, or the normals had been oct-encoded
+    const hasQuantizedPositions =
+      PntsPointClouds.hasQuantizedPositions(featureTable);
+    const hasOctEncodedNormals =
+      PntsPointClouds.hasOctEncodedNormals(featureTable);
+    await GltfTransformPointClouds.applyQuantization(
+      document,
+      hasQuantizedPositions,
+      hasOctEncodedNormals
+    );
 
     // If the point cloud is batched, then convert any batch table
     // information into a property table
@@ -215,27 +220,11 @@ export class TileFormatsMigration {
     // a new root node above each scene node, that carries the
     // RTC_CENTER as its translation
     if (featureTable.RTC_CENTER) {
-      const globalPosition =
-        TileFormatsMigration.obtainGlobalPositionFromRtcCenter(
-          featureTable.RTC_CENTER,
-          featureTableBinary
-        );
-      const scenes = root.listScenes();
-      for (const scene of scenes) {
-        const oldChildren = scene.listChildren();
-        for (const oldChild of oldChildren) {
-          const rtcRoot = document.createNode();
-          // Assign the translation from the RTC_CENTER, taking
-          // the y-up-to-z-up transform into account
-          const tx = globalPosition[0];
-          const ty = globalPosition[2];
-          const tz = -globalPosition[1];
-          rtcRoot.setTranslation([tx, ty, tz]);
-          scene.removeChild(oldChild);
-          rtcRoot.addChild(oldChild);
-          scene.addChild(rtcRoot);
-        }
-      }
+      const rtcCenter = TileFormatsMigration.obtainRtcCenter(
+        featureTable.RTC_CENTER,
+        featureTableBinary
+      );
+      TileFormatsMigration.applyRtcCenter(document, rtcCenter);
     }
 
     // If there are batches, then convert the batch table into
@@ -283,6 +272,34 @@ export class TileFormatsMigration {
   }
 
   /**
+   * Apply the given RTC_CENTER to the given glTF-Transform document,
+   * by inserting a new root node that carries the given RTC_CENTER
+   * as its translation, taking into account the y-up-vs-z-up
+   * transform.
+   *
+   * @param document - The glTF-Transform document
+   * @param rtcCenter - The RTC_CENTER
+   */
+  private static applyRtcCenter(document: Document, rtcCenter: number[]) {
+    const root = document.getRoot();
+    const scenes = root.listScenes();
+    for (const scene of scenes) {
+      const oldChildren = scene.listChildren();
+      for (const oldChild of oldChildren) {
+        const rtcRoot = document.createNode();
+        // Take the y-up-to-z-up transform into account
+        const tx = rtcCenter[0];
+        const ty = rtcCenter[2];
+        const tz = -rtcCenter[1];
+        rtcRoot.setTranslation([tx, ty, tz]);
+        scene.removeChild(oldChild);
+        rtcRoot.addChild(oldChild);
+        scene.addChild(rtcRoot);
+      }
+    }
+  }
+
+  /**
    * Obtains the translation that is implied by the given `RTC_CENTER`
    * property of a feature table, or `undefined` if the input is
    * undefined.
@@ -291,7 +308,7 @@ export class TileFormatsMigration {
    * @param binary - The binary blob of the feature table
    * @returns The `RTC_CENTER` value, or `undefined`
    */
-  private static obtainGlobalPositionFromRtcCenter(
+  private static obtainRtcCenter(
     rtcCenter: BinaryBodyOffset | number[],
     binary: Buffer
   ): [number, number, number] {

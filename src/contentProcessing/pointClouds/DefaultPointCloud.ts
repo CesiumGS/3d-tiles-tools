@@ -32,6 +32,11 @@ export class DefaultPointCloud implements ReadablePointCloud {
   private globalColor: [number, number, number, number] | undefined;
 
   /**
+   * An optional position that the positions are relative to
+   */
+  private globalPosition: [number, number, number] | undefined;
+
+  /**
    * Set the given positions as the POSITION attribute
    *
    * @param positions - The positions, as 3D floating point values
@@ -82,11 +87,6 @@ export class DefaultPointCloud implements ReadablePointCloud {
     this.attributeValues[name] = attribute;
   }
 
-  /** {@inheritDoc WritablePointCloud.setNormalizedLinearGlobalColor} */
-  setNormalizedLinearGlobalColor(r: number, g: number, b: number, a: number) {
-    this.globalColor = [r, g, b, a];
-  }
-
   /** {@inheritDoc ReadablePointCloud.getPositions} */
   getPositions(): Iterable<number[]> {
     const values = this.getAttributeValues("POSITION");
@@ -94,6 +94,15 @@ export class DefaultPointCloud implements ReadablePointCloud {
       throw new TileFormatError("No POSITION values have been added");
     }
     return Iterables.segmentize(values, 3);
+  }
+
+  /** {@inheritDoc ReadablePointCloud.getGlobalPosition} */
+  getGlobalPosition(): [number, number, number] | undefined {
+    return this.globalPosition;
+  }
+
+  setGlobalPosition(globalPosition: [number, number, number] | undefined) {
+    this.globalPosition = globalPosition;
   }
 
   /** {@inheritDoc ReadablePointCloud.getNormals} */
@@ -112,6 +121,12 @@ export class DefaultPointCloud implements ReadablePointCloud {
       return undefined;
     }
     return Iterables.segmentize(values, 4);
+  }
+
+  setNormalizedLinearGlobalColor(
+    globalColor: [number, number, number, number] | undefined
+  ) {
+    this.globalColor = globalColor;
   }
 
   /** {@inheritDoc ReadablePointCloud.getNormalizedLinearGlobalColor} */

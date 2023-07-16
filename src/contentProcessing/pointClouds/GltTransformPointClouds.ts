@@ -3,6 +3,11 @@ import { Accessor } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 import { Buffer as GltfBuffer } from "@gltf-transform/core";
 
+import { quantize } from "@gltf-transform/functions";
+import { QuantizeOptions } from "@gltf-transform/functions";
+
+import { KHRMeshQuantization } from "@gltf-transform/extensions";
+
 import { EXTMeshFeatures } from "../../gltfMetadata/EXTMeshFeatures";
 
 import { Iterables } from "../../base/Iterables";
@@ -12,7 +17,6 @@ import { ReadablePointCloud } from "./ReadablePointCloud";
 import { TileFormatError } from "../../tileFormats/TileFormatError";
 
 import { AccessorCreation } from "../../migration/AccessorCreation";
-import { Colors } from "./Colors";
 
 /**
  * An internal interface representing a point cloud with
@@ -41,24 +45,23 @@ export class GltfTransformPointClouds {
    * Many details about the result are intentionally not
    * specified. It is supposed to be "just a point cloud".
    *
+   * However, some details depend on the given parameters:
+   *
+   * When `mayRequireAlpha` is `false`, then a point cloud with RGB colors
+   * and an OPAQUE alpha mode material will be created.
+   * Otherwise, the implementation will still check thea ctual colors: If
+   * any of them has a non-1.0 alpha component, then it will create a
+   * point cloud with a BLEND alpha mode material and RGBA colors.
+   *
    * @param readablePointCloud - The `ReadablePointCloud`
-   * @param globalPosition - The optional global position, to
-   * be set as the `translation` component of the root node.
    * @param mayRequireAlpha - Whether the point cloud may
-   * require an alpha component for its colors. If this is
-   * `false`, then a point cloud with RGB colors and an
-   * OPAQUE alpha mode material will be created. Otherwise,
-   * the implementation will still check thea ctual colors:
-   * If one of them has a non-1.0 alpha component, then it
-   * will create a point cloud with a BLEND alpha mode
-   * material and RGBA colors.
+   * require an alpha component for its colors.
    * @returns The GtlfTransformPointCloud
    * @throws TileFormatError If the input data does not
    * at least contain a `POSITION` attribute.
    */
   static build(
     readablePointCloud: ReadablePointCloud,
-    globalPosition: [number, number, number] | undefined,
     mayRequireAlpha: boolean
   ): GtlfTransformPointCloud {
     // Prepare the glTF-Transform document and primitive
@@ -121,6 +124,8 @@ export class GltfTransformPointClouds {
         colorAccessor.setArray(new Uint8Array([...colorsBytesRGBA]));
       } else {
         colorAccessor.setType(Accessor.Type.VEC3);
+
+        // Filter out the 'A' components from the RGBA values
         const colorsRGB = Iterables.filterWIthIndex(
           colors,
           (e: number, i: number) => i % 4 !== 3
@@ -154,19 +159,15 @@ export class GltfTransformPointClouds {
     const mesh = document.createMesh();
     mesh.addPrimitive(primitive);
 
+    // Create the node, with the the y-up-to-z-up transform
+    // and the "global position" of the point cloud
     const node = document.createNode();
-    node.setMesh(mesh);
-
-    // Assign the y-up-to-z-up transform, possibly including
-    // the global (RTC_CENTER) position
+    node.setMatrix([1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
+    const globalPosition = readablePointCloud.getGlobalPosition();
     if (globalPosition) {
-      const tx = globalPosition[0];
-      const ty = globalPosition[2];
-      const tz = -globalPosition[1];
-      node.setMatrix([1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, tx, ty, tz, 1]);
-    } else {
-      node.setMatrix([1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
+      node.setTranslation(globalPosition);
     }
+    node.setMesh(mesh);
 
     const scene = document.createScene();
     scene.addChild(node);
@@ -267,5 +268,39 @@ export class GltfTransformPointClouds {
     if (meshFeatures) {
       primitive.setExtension("EXT_mesh_features", meshFeatures);
     }
+  }
+
+  /**
+   * Applies the glTF-Transform `quantize` operation to the given
+   * document (if either argument is `true`).
+   *
+   * This will perform a quantization of the positions and normals,
+   * depending on the arguments, with an unspecified number of bits,
+   * and add the `KHR_mesh_quantization` extension as a required
+   * extension to the document.
+   *
+   * @param document - The document
+   * @param quantizePositions - Whether positions are quantized
+   * @param quantizeNormals - Whether normals are quantized
+   * @returns A promise that resolves when the operation is finished
+   */
+  static async applyQuantization(
+    document: Document,
+    quantizePositions: boolean,
+    quantizeNormals: boolean
+  ) {
+    if (!quantizePositions && !quantizeNormals) {
+      return;
+    }
+    const options: QuantizeOptions = {};
+    if (quantizePositions) {
+      options.quantizePosition = 16;
+    }
+    if (quantizeNormals) {
+      options.quantizeNormal = 16;
+    }
+    const khrMeshQuantization = document.createExtension(KHRMeshQuantization);
+    khrMeshQuantization.setRequired(true);
+    await document.transform(quantize(options));
   }
 }

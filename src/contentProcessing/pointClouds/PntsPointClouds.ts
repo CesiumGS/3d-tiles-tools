@@ -15,6 +15,7 @@ import { DracoDecoder } from "../draco/DracoDecoder";
 import { DracoDecoderResult } from "../draco/DracoDecoderResult";
 import { ReadablePointCloud } from "./ReadablePointCloud";
 import { BatchTables } from "../../migration/BatchTables";
+import { BinaryBodyOffset } from "../../structure/TileFormats/BinaryBodyOffset";
 
 /**
  * Methods to create `ReadablePointCloud` instances from PNTS data
@@ -126,15 +127,16 @@ export class PntsPointClouds {
         featureTable,
         featureTableBinary
       );
-      if (globalColor) {
-        pointCloud.setNormalizedLinearGlobalColor(
-          globalColor[0],
-          globalColor[1],
-          globalColor[2],
-          globalColor[3]
-        );
-      }
+      pointCloud.setNormalizedLinearGlobalColor(globalColor);
     }
+
+    // Compute the "global position", including the RTC_CENTER
+    // and the quantization offset, if present
+    const globalPosition = PntsPointClouds.obtainGlobalPosition(
+      featureTable,
+      featureTableBinary
+    );
+    pointCloud.setGlobalPosition(globalPosition);
 
     return pointCloud;
   }
@@ -165,6 +167,93 @@ export class PntsPointClouds {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Returns whether the point cloud has quantzized positions
+   *
+   * @param featureTable - The PNTS feature table
+   * @returns Whether the point cloud has quantized positions
+   */
+  static hasQuantizedPositions(featureTable: PntsFeatureTable): boolean {
+    if (featureTable.POSITION_QUANTIZED) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Returns whether the point cloud has oct-encoded normals
+   *
+   * @param featureTable - The PNTS feature table
+   * @returns Whether the point cloud normals are oct-encoded
+   */
+  static hasOctEncodedNormals(featureTable: PntsFeatureTable): boolean {
+    if (featureTable.NORMAL_OCT16P) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Obtain the quantization information from the given PNTS
+   * feature table.
+   *
+   * If the feature table does not contain QUANTIZED_VOLUME_OFFSET
+   * or QUANTIZED_VOLUME_SCALE, then `undefined` is returned.
+   * Otherwise, the offset and scale are returned.
+   *
+   * @param featureTable - The PNTS feature table
+   * @param featureTableBinary - The PNTS binary
+   * @returns The quantization information
+   */
+  private static obtainQuantizationOffsetScale(
+    featureTable: PntsFeatureTable,
+    featureTableBinary: Buffer
+  ):
+    | {
+        offset: number[];
+        scale: number[];
+      }
+    | undefined {
+    if (!featureTable.QUANTIZED_VOLUME_OFFSET) {
+      return undefined;
+    }
+    if (!featureTable.QUANTIZED_VOLUME_SCALE) {
+      return undefined;
+    }
+    const volumeOffset = TileTableData.obtainNumberArray(
+      featureTableBinary,
+      featureTable.QUANTIZED_VOLUME_OFFSET,
+      3,
+      "FLOAT32"
+    );
+    const volumeScale = TileTableData.obtainNumberArray(
+      featureTableBinary,
+      featureTable.QUANTIZED_VOLUME_SCALE,
+      3,
+      "FLOAT32"
+    );
+    return {
+      offset: volumeOffset,
+      scale: volumeScale,
+    };
+  }
+
+  /**
+   * Obtains the translation that is implied by the given `RTC_CENTER`
+   * property of a feature table
+   *
+   * @param featureTable - The feature table
+   * @param binary - The binary blob of the feature table
+   * @returns The `RTC_CENTER` value, or `undefined`
+   */
+  private static obtainRtcCenter(
+    rtcCenter: BinaryBodyOffset | number[],
+    binary: Buffer
+  ): [number, number, number] {
+    const c = TileTableData.obtainNumberArray(binary, rtcCenter, 3, "FLOAT32");
+    return [c[0], c[1], c[2]];
   }
 
   /**
@@ -393,7 +482,9 @@ export class PntsPointClouds {
    * Create the position data from the given feature table data.
    *
    * This will return the POSITION or POSITION_QUANTIZED data
-   * as an iterable over 3D float arrays.
+   * as an iterable over 3D float arrays. The actual positions
+   * of the points returned will be relative to the position
+   * that is returned by `obtainGlobalPosition`
    *
    * @param featureTable - The PNTS feature table
    * @param binary - The feature table binary
@@ -414,29 +505,17 @@ export class PntsPointClouds {
     }
 
     if (featureTable.POSITION_QUANTIZED) {
-      if (!featureTable.QUANTIZED_VOLUME_OFFSET) {
-        throw new TileFormatError(
-          "The feature table contains POSITION_QUANTIZED, but no QUANTIZED_VOLUME_OFFSET"
-        );
-      }
-      if (!featureTable.QUANTIZED_VOLUME_SCALE) {
-        throw new TileFormatError(
-          "The feature table contains POSITION_QUANTIZED, but no QUANTIZED_VOLUME_SCALE"
-        );
-      }
-      const volumeOffset = TileTableData.obtainNumberArray(
-        binary,
-        featureTable.QUANTIZED_VOLUME_OFFSET,
-        3,
-        "FLOAT32"
-      );
-      const volumeScale = TileTableData.obtainNumberArray(
-        binary,
-        featureTable.QUANTIZED_VOLUME_SCALE,
-        3,
-        "FLOAT32"
+      const quantization = PntsPointClouds.obtainQuantizationOffsetScale(
+        featureTable,
+        binary
       );
 
+      if (!quantization) {
+        throw new TileFormatError(
+          `The feature table contains POSITION_QUANTIZED, but not ` +
+            `QUANTIZED_VOLUME_OFFSET and QUANTIZED_VOLUME_OFFSET`
+        );
+      }
       const byteOffset = featureTable.POSITION_QUANTIZED.byteOffset;
       const quantizedPositions =
         PntsPointClouds.createQuantizedPositionsInternal(
@@ -444,9 +523,12 @@ export class PntsPointClouds {
           byteOffset,
           numPoints
         );
+      // The 'quantization.offset' will become part of the 'global position'
+      // of the point cloud, so use an offset of [0,0,0] here
+      const offset = [0, 0, 0];
       const dequantization = PntsPointClouds.createDequantization(
-        volumeOffset,
-        volumeScale
+        offset,
+        quantization.scale
       );
       return Iterables.map(quantizedPositions, dequantization);
     }
@@ -454,6 +536,55 @@ export class PntsPointClouds {
     throw new TileFormatError(
       "The feature table contains neither POSITION nor POSITION_QUANTIZED"
     );
+  }
+
+  /**
+   * Returns the "global position" of the point cloud.
+   *
+   * The position information of the point cloud will be _relative_ to this
+   * position. It will include the RTC_CENTER (if present) and the
+   * quantization offset (if present), and will be `undefined` if neither
+   * of them is present.
+   *
+   * @param featureTable - The feature table
+   * @param featureTableBinary - The feature tabel binary
+   * @returns The global position
+   */
+  private static obtainGlobalPosition(
+    featureTable: PntsFeatureTable,
+    featureTableBinary: Buffer
+  ): [number, number, number] | undefined {
+    // Compute the "global position" of the point cloud. This may
+    // include the RTC_CENTER and the quantization offset.
+    let globalPosition: [number, number, number] | undefined = undefined;
+
+    // Fetch the `RTC_CENTER` from the feature table, to be used
+    // as the "global position" of the point cloud
+    let rtcCenter = undefined;
+    if (featureTable.RTC_CENTER) {
+      rtcCenter = PntsPointClouds.obtainRtcCenter(
+        featureTable.RTC_CENTER,
+        featureTableBinary
+      );
+      // Take the y-up-vs-z-up transform into account:
+      globalPosition = [rtcCenter[0], rtcCenter[2], -rtcCenter[1]];
+    }
+
+    // Add the quantization offset to the global position
+    const quantization = PntsPointClouds.obtainQuantizationOffsetScale(
+      featureTable,
+      featureTableBinary
+    );
+    if (quantization) {
+      if (!globalPosition) {
+        globalPosition = [0, 0, 0];
+      }
+      // Take the y-up-vs-z-up transform into account:
+      globalPosition[0] += quantization.offset[0];
+      globalPosition[1] += quantization.offset[2];
+      globalPosition[2] += -quantization.offset[1];
+    }
+    return globalPosition;
   }
 
   /**

@@ -8,7 +8,8 @@
  * might be made explicit at some point, with proper type
  * information. But for now, the conventions are
  *
- * - Positions are 3D floating point values
+ * - Positions are 3D floating point values, and are relative
+ *   to the "global position" of the point cloud
  * - Normals are 3D floating point values
  * - Colors are 4D floating point values (linear RGBA, in [0.0, 1.0])
  *
@@ -22,16 +23,27 @@
  */
 export interface ReadablePointCloud {
   /**
-   * Returns the positions, as 3D floating point arrays
+   * Returns the positions, as 3D floating point arrays.
    *
-   * @returns The position
+   * These positions are _relative_ to the `getGlobalPosition`
+   *
+   * @returns The positions
    */
   getPositions(): Iterable<number[]>;
 
   /**
+   * Returns the "global" position. All positions that
+   * are returned by the `getPositions` functions are
+   * _relative_ to this position.
+   *
+   * @returns The global position
+   */
+  getGlobalPosition(): [number, number, number] | undefined;
+
+  /**
    * Returns the normals, as 3D floating point arrays
    *
-   * @returns The position
+   * @returns The normals
    */
   getNormals(): Iterable<number[]> | undefined;
 
