@@ -22,7 +22,7 @@
       "byteOffset": 0
     },
     {
-      "type": "VEC4",
+      "type": "VEC3",
       "componentType": 5121,
       "count": 1000,
       "normalized": true,
@@ -67,7 +67,6 @@
   ],
   "materials": [
     {
-      "alphaMode": "BLEND",
       "pbrMetallicRoughness": {
         "metallicFactor": 0
       }

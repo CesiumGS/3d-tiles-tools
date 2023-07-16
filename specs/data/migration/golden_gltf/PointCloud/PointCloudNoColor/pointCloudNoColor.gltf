@@ -38,7 +38,6 @@
   ],
   "materials": [
     {
-      "alphaMode": "BLEND",
       "pbrMetallicRoughness": {
         "metallicFactor": 0
       }
