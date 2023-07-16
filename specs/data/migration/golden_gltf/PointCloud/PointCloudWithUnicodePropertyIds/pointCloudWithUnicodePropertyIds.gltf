@@ -30,32 +30,39 @@
       "byteOffset": 12
     },
     {
-      "type": "VEC3",
+      "type": "SCALAR",
       "componentType": 5126,
       "count": 1000,
       "bufferView": 0,
       "byteOffset": 16
     },
     {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 1000,
+      "bufferView": 0,
+      "byteOffset": 20
+    },
+    {
       "type": "SCALAR",
       "componentType": 5123,
       "count": 1000,
       "bufferView": 0,
-      "byteOffset": 28
+      "byteOffset": 32
     }
   ],
   "bufferViews": [
     {
       "buffer": 0,
       "byteOffset": 0,
-      "byteLength": 32000,
-      "byteStride": 32,
+      "byteLength": 36000,
+      "byteStride": 36,
       "target": 34962
     }
   ],
   "buffers": [
     {
-      "byteLength": 32000
+      "byteLength": 36000
     }
   ],
   "materials": [
@@ -72,8 +79,9 @@
           "attributes": {
             "POSITION": 0,
             "COLOR_0": 1,
-            "_SECONDARYCOLOR": 2,
-            "_ID": 3
+            "_TEMPERATURE__": 2,
+            "_SECONDARYCOLOR": 3,
+            "_ID": 4
           },
           "mode": 0,
           "material": 0,
@@ -147,6 +155,9 @@
         {
           "class": "class_batch_table",
           "properties": {
+            "temperature__": {
+              "attribute": "_TEMPERATURE__"
+            },
             "secondaryColor": {
               "attribute": "_SECONDARYCOLOR"
             },
