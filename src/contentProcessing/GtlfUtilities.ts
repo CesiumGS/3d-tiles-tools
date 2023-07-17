@@ -196,7 +196,12 @@ export class GltfUtilities {
     if (!rtcExtension) {
       return;
     }
-    const rtcTranslation = rtcExtension.center;
+    // Compute the translation, taking the y-up-vs-z-up transform into account
+    const rtcTranslation = [
+      rtcExtension.center[0],
+      rtcExtension.center[2],
+      -rtcExtension.center[1],
+    ];
     const scenes = gltf.scenes;
     if (!scenes) {
       return;

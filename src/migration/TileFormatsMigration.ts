@@ -213,12 +213,14 @@ export class TileFormatsMigration {
     }
     //*/
 
-    // Id the B3DM contained glTF 1.0 data, try to upgrade it
+    // If the B3DM contained glTF 1.0 data, try to upgrade it
     // with the gltf-pipleine first
     let glbBuffer = tileData.payload;
     const gltfVersion = GltfUtilities.getGltfVersion(glbBuffer);
     if (gltfVersion < 2.0) {
+      console.log("Found glTF 1.0 - upgrading to glTF 2.0 with gltf-pipeline");
       glbBuffer = await GltfUtilities.upgradeGlb(glbBuffer, undefined);
+      glbBuffer = await GltfUtilities.replaceCesiumRtcExtension(glbBuffer);
     }
 
     // Read the GLB data from the payload of the tile
