@@ -22,6 +22,8 @@ import { MeshFeatures } from "../gltfMetadata/MeshFeatures";
 
 import { PropertyModel } from "../metadata/PropertyModel";
 import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
+import { GltfPipelineLegacy } from "../contentProcessing/GltfPipelineLegacy";
+import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
 
 /**
  * Methods for converting "legacy" tile formats into glTF assets
@@ -211,9 +213,17 @@ export class TileFormatsMigration {
     }
     //*/
 
+    // Id the B3DM contained glTF 1.0 data, try to upgrade it
+    // with the gltf-pipleine first
+    let glbBuffer = tileData.payload;
+    const gltfVersion = GltfUtilities.getGltfVersion(glbBuffer);
+    if (gltfVersion < 2.0) {
+      glbBuffer = await GltfUtilities.upgradeGlb(glbBuffer, undefined);
+    }
+
     // Read the GLB data from the payload of the tile
     const io = await GltfTransform.getIO();
-    const document = await io.readBinary(tileData.payload);
+    const document = await io.readBinary(glbBuffer);
     const root = document.getRoot();
     root.getAsset().generator = "glTF-Transform";
 
