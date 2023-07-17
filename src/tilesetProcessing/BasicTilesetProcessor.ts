@@ -14,9 +14,12 @@ import { TilesetEntryProcessor } from "./TilesetEntryProcessor";
 
 import { TraversedTile } from "../traversal/TraversedTile";
 import { TilesetTraverser } from "../traversal/TilesetTraverser";
-import { TilesetEntry } from "../tilesetData/TilesetEntry";
-import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 import { TraversalCallback } from "../traversal/TraversalCallback";
+
+import { TilesetEntry } from "../tilesetData/TilesetEntry";
+
+import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
+
 import { Paths } from "../base/Paths";
 
 /**

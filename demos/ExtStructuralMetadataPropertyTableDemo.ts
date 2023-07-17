@@ -2,7 +2,7 @@ import { Document } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
 
 import { EXTStructuralMetadata } from "../src/gltfMetadata/EXTStructuralMetadata";
-import { StructuralMetadataPropertyTables } from "../src/contentProcessing/StructuralMetadataPropertyTables";
+import { StructuralMetadataPropertyTables } from "../src/gltfMetadata/StructuralMetadataPropertyTables";
 import { StructuralMetadata } from "../src/gltfMetadata/StructuralMetadata";
 
 import { BinaryPropertyTableBuilder } from "../src/metadata/binary/BinaryPropertyTableBuilder";
