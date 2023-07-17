@@ -18,7 +18,8 @@ async function upgradeTilesetJson(
   console.log("Initial:");
   console.log(inputJsonString);
 
-  await Tilesets.upgradeTileset(tileset);
+  const targetVersion = "1.0";
+  await Tilesets.upgradeTileset(tileset, targetVersion);
 
   const resultJsonString = JSON.stringify(tileset, null, 2);
 
