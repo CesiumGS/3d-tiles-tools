@@ -1,9 +1,9 @@
+import path from "path";
+
 import { TilesetSources } from "../tilesetData/TilesetSources";
 import { TilesetTargets } from "../tilesetData/TilesetTargets";
 
 import { Tileset } from "../structure/Tileset";
-
-import { Tilesets } from "../tilesets/Tilesets";
 
 import { TilesetProcessing } from "./TilesetProcessing";
 import { TilesetProcessorContext } from "./TilesetProcessorContext";
@@ -48,10 +48,14 @@ export class TilesetProcessorContexts {
       );
 
       const tilesetSourceJsonFileName =
-        Tilesets.determineTilesetJsonFileName(tilesetSourceName);
+        TilesetProcessorContexts.determineTilesetJsonFileName(
+          tilesetSourceName
+        );
 
       const tilesetTargetJsonFileName =
-        Tilesets.determineTilesetJsonFileName(tilesetTargetName);
+        TilesetProcessorContexts.determineTilesetJsonFileName(
+          tilesetTargetName
+        );
 
       // Obtain the tileset object from the tileset JSON file
       const sourceTileset = TilesetProcessing.parseSourceValue<Tileset>(
@@ -119,5 +123,31 @@ export class TilesetProcessorContexts {
       throw error;
     }
     await context.tilesetTarget.end();
+  }
+
+  // Note: This is the same method as in `Tilesets`, but importing the
+  // `Tilesets` type will cause a circular dependency.
+  // Welcome to the 1990's.
+
+  /**
+   * Determine the name of the file that contains the tileset JSON data.
+   *
+   * If the given name ends with '.json' (case insensitively), then the
+   * name is the last path component of the given name.
+   *
+   * Otherwise (if the given name is a directory, or the name of a file
+   * that does not end with '.json'), then the default name 'tileset.json'
+   * is returned.
+   *
+   * @param tilesetSourceName - The tileset source name
+   * @returns The tileset file name
+   */
+  private static determineTilesetJsonFileName(
+    tilesetSourceName: string
+  ): string {
+    if (tilesetSourceName.toLowerCase().endsWith(".json")) {
+      return path.basename(tilesetSourceName);
+    }
+    return "tileset.json";
   }
 }
