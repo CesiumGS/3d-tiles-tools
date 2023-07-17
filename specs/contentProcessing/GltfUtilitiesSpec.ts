@@ -56,6 +56,13 @@ describe("GltfUtilities", function () {
       keepUnusedElements: true,
     };
 
+    // The translation, taking y-up-vs-z-up into account:
+    const translation = [
+      rtcTranslation[0],
+      rtcTranslation[2],
+      -rtcTranslation[1],
+    ];
+
     // Create a GLB from the input glTF
     const glbResults = await GltfPipeline.gltfToGlb(inputGltf, options);
     const inputGlb = glbResults.glb;
@@ -83,10 +90,10 @@ describe("GltfUtilities", function () {
     expect(outputGltf.nodes[9].children).toEqual([3]);
 
     // All new nodes have the RTC center as their translation
-    expect(outputGltf.nodes[8].translation).toEqual(rtcTranslation);
-    expect(outputGltf.nodes[9].translation).toEqual(rtcTranslation);
-    expect(outputGltf.nodes[6].translation).toEqual(rtcTranslation);
-    expect(outputGltf.nodes[7].translation).toEqual(rtcTranslation);
+    expect(outputGltf.nodes[8].translation).toEqual(translation);
+    expect(outputGltf.nodes[9].translation).toEqual(translation);
+    expect(outputGltf.nodes[6].translation).toEqual(translation);
+    expect(outputGltf.nodes[7].translation).toEqual(translation);
 
     // The extensions object and declarations have been removed
     expect(outputGltf.extensions).toBeUndefined();
