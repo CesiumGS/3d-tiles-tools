@@ -314,10 +314,9 @@ export class TileFormatsMigration {
 
   /**
    * Obtains the translation that is implied by the given `RTC_CENTER`
-   * property of a feature table, or `undefined` if the input is
-   * undefined.
+   * property of a feature table.
    *
-   * @param featureTable - The feature table
+   * @param rtcCenter - The `RTC_CENTER` property
    * @param binary - The binary blob of the feature table
    * @returns The `RTC_CENTER` value, or `undefined`
    */
