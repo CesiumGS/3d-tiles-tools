@@ -8,6 +8,8 @@ import { BinaryBodyOffset } from "../structure/TileFormats/BinaryBodyOffset";
 import { TileFormats } from "../tileFormats/TileFormats";
 
 import { GltfTransform } from "../contentProcessing/GltfTransform";
+import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
+
 import { PntsPointClouds } from "../contentProcessing/pointClouds/PntsPointClouds";
 import { GltfTransformPointClouds } from "../contentProcessing/pointClouds/GltTransformPointClouds";
 import { ReadablePointCloud } from "../contentProcessing/pointClouds/ReadablePointCloud";
@@ -22,8 +24,6 @@ import { MeshFeatures } from "../gltfMetadata/MeshFeatures";
 
 import { PropertyModel } from "../metadata/PropertyModel";
 import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
-import { GltfPipelineLegacy } from "../contentProcessing/GltfPipelineLegacy";
-import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
 
 /**
  * Methods for converting "legacy" tile formats into glTF assets
