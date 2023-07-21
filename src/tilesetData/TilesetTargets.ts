@@ -76,7 +76,7 @@ export class TilesetTargets {
    */
   static putEntries(
     tilesetTarget: TilesetTarget,
-    entries: IterableIterator<TilesetEntry>
+    entries: Iterable<TilesetEntry>
   ) {
     for (const entry of entries) {
       tilesetTarget.addEntry(entry.key, entry.value);

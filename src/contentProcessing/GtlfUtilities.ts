@@ -30,6 +30,24 @@ export class GltfUtilities {
   }
 
   /**
+   * Obtains the `version` field value from the header in the given GLB buffer.
+   *
+   * @param glbBuffer - The GLB buffer
+   * @returns The glTF version
+   * @throws TileFormatError If the buffer does not contain enough bytes
+   * for a glTF header
+   */
+  static getGltfVersion(glbBuffer: Buffer) {
+    if (glbBuffer.length < 12) {
+      throw new TileFormatError(
+        `Expected at least 12 bytes, but only got ${glbBuffer.length}`
+      );
+    }
+    const version = glbBuffer.readUInt32LE(4);
+    return version;
+  }
+
+  /**
    * Extract the JSON part from the given GLB buffer and return it
    * as a buffer.
    *
@@ -178,7 +196,12 @@ export class GltfUtilities {
     if (!rtcExtension) {
       return;
     }
-    const rtcTranslation = rtcExtension.center;
+    // Compute the translation, taking the y-up-vs-z-up transform into account
+    const rtcTranslation = [
+      rtcExtension.center[0],
+      rtcExtension.center[2],
+      -rtcExtension.center[1],
+    ];
     const scenes = gltf.scenes;
     if (!scenes) {
       return;

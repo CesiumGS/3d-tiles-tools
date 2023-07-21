@@ -70,6 +70,7 @@ export class Tilesets {
    * @param tilesetTargetName - The tileset target name
    * @param overwrite Whether the target should be overwritten if
    * it already exists
+   * @param targetVersion - The target version - 1.0 or 1.1
    * @param gltfUpgradeOptions - Options that may be passed
    * to `gltf-pipeline` when GLB data in B3DM or I3DM is
    * supposed to be upgraded.
@@ -81,23 +82,38 @@ export class Tilesets {
     tilesetSourceName: string,
     tilesetTargetName: string,
     overwrite: boolean,
+    targetVersion: string,
     gltfUpgradeOptions: any
   ) {
     const quiet = false;
-    const tilesetUpgrader = new TilesetUpgrader(quiet, gltfUpgradeOptions);
-    tilesetUpgrader.upgrade(tilesetSourceName, tilesetTargetName, overwrite);
+    const tilesetUpgrader = new TilesetUpgrader(
+      quiet,
+      targetVersion,
+      gltfUpgradeOptions
+    );
+    await tilesetUpgrader.upgrade(
+      tilesetSourceName,
+      tilesetTargetName,
+      overwrite
+    );
   }
 
   /**
    * Performs the `upgrade` operation directly on a tileset
    *
+   * @param tileset - The tileset
+   * @param targetVersion - The target version - 1.0 or 1.1
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError When the input could not be processed
    */
-  static async upgradeTileset(tileset: Tileset) {
+  static async upgradeTileset(tileset: Tileset, targetVersion: string) {
     const quiet = false;
     const gltfUpgradeOptions = undefined;
-    const tilesetUpgrader = new TilesetUpgrader(quiet, gltfUpgradeOptions);
+    const tilesetUpgrader = new TilesetUpgrader(
+      quiet,
+      targetVersion,
+      gltfUpgradeOptions
+    );
     await tilesetUpgrader.upgradeTileset(tileset);
   }
 

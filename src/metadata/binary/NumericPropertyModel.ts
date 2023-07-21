@@ -13,21 +13,21 @@ import { MetadataTypes } from "../MetadataTypes";
  * @internal
  */
 export class NumericPropertyModel implements PropertyModel {
-  private readonly _type: string;
-  private readonly _valuesBuffer: Buffer;
-  private readonly _componentType: string;
+  private readonly type: string;
+  private readonly valuesBuffer: Buffer;
+  private readonly componentType: string;
 
   constructor(type: string, valuesBuffer: Buffer, componentType: string) {
-    this._type = type;
-    this._valuesBuffer = valuesBuffer;
-    this._componentType = componentType;
+    this.type = type;
+    this.valuesBuffer = valuesBuffer;
+    this.componentType = componentType;
   }
 
   /** {@inheritDoc PropertyModel.getPropertyValue} */
-  getPropertyValue(index: number): any {
-    const valuesBuffer = this._valuesBuffer;
-    const componentType = this._componentType;
-    const type = this._type;
+  getPropertyValue(index: number): number | bigint | (number | bigint)[] {
+    const valuesBuffer = this.valuesBuffer;
+    const componentType = this.componentType;
+    const type = this.type;
 
     if (type === "SCALAR" || type === "ENUM") {
       return NumericBuffers.getNumericFromBuffer(

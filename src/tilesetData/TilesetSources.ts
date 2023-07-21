@@ -75,9 +75,7 @@ export class TilesetSources {
    * @param tilesetSource - The `TilesetSource`
    * @returns The iterator over the entries
    */
-  static getEntries(
-    tilesetSource: TilesetSource
-  ): IterableIterator<TilesetEntry> {
+  static getEntries(tilesetSource: TilesetSource): Iterable<TilesetEntry> {
     const keys = tilesetSource.getKeys();
     const entries = Iterables.map(keys, (k) => {
       const v = tilesetSource.getValue(k);

@@ -43,7 +43,7 @@ export class ImplicitTilings {
    */
   static createSubtreeCoordinatesIterator(
     implicitTiling: TileImplicitTiling
-  ): IterableIterator<TreeCoordinates> {
+  ): Iterable<TreeCoordinates> {
     const levels = implicitTiling.subtreeLevels;
     if (levels < 1) {
       throw new ImplicitTilingError(

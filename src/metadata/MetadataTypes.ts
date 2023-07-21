@@ -7,20 +7,31 @@ import { MetadataError } from "./MetadataError";
  * @internal
  */
 export class MetadataTypes {
+  public static readonly SCALAR = "SCALAR";
+  public static readonly VEC2 = "VEC2";
+  public static readonly VEC3 = "VEC3";
+  public static readonly VEC4 = "VEC4";
+  public static readonly MAT2 = "MAT2";
+  public static readonly MAT3 = "MAT3";
+  public static readonly MAT4 = "MAT4";
+  public static readonly STRING = "STRING";
+  public static readonly BOOLEAN = "BOOLEAN";
+  public static readonly ENUM = "ENUM";
+
   /**
    * The valid values for the `class.property.type` property
    */
   static allTypes: string[] = [
-    "SCALAR",
-    "VEC2",
-    "VEC3",
-    "VEC4",
-    "MAT2",
-    "MAT3",
-    "MAT4",
-    "STRING",
-    "BOOLEAN",
-    "ENUM",
+    MetadataTypes.SCALAR,
+    MetadataTypes.VEC2,
+    MetadataTypes.VEC3,
+    MetadataTypes.VEC4,
+    MetadataTypes.MAT2,
+    MetadataTypes.MAT3,
+    MetadataTypes.MAT4,
+    MetadataTypes.STRING,
+    MetadataTypes.BOOLEAN,
+    MetadataTypes.ENUM,
   ];
 
   /**
@@ -29,13 +40,13 @@ export class MetadataTypes {
    * a `class.property.componentType` is given
    */
   static numericTypes: string[] = [
-    "SCALAR",
-    "VEC2",
-    "VEC3",
-    "VEC4",
-    "MAT2",
-    "MAT3",
-    "MAT4",
+    MetadataTypes.SCALAR,
+    MetadataTypes.VEC2,
+    MetadataTypes.VEC3,
+    MetadataTypes.VEC4,
+    MetadataTypes.MAT2,
+    MetadataTypes.MAT3,
+    MetadataTypes.MAT4,
   ];
 
   /**
@@ -59,22 +70,22 @@ export class MetadataTypes {
    */
   static componentCountForType(type: string): number {
     switch (type) {
-      case "SCALAR":
-      case "STRING":
-      case "ENUM":
-      case "BOOLEAN":
+      case MetadataTypes.SCALAR:
+      case MetadataTypes.STRING:
+      case MetadataTypes.ENUM:
+      case MetadataTypes.BOOLEAN:
         return 1;
-      case "VEC2":
+      case MetadataTypes.VEC2:
         return 2;
-      case "VEC3":
+      case MetadataTypes.VEC3:
         return 3;
-      case "VEC4":
+      case MetadataTypes.VEC4:
         return 4;
-      case "MAT2":
+      case MetadataTypes.MAT2:
         return 4;
-      case "MAT3":
+      case MetadataTypes.MAT3:
         return 9;
-      case "MAT4":
+      case MetadataTypes.MAT4:
         return 16;
     }
     throw new MetadataError(`Invalid type: ${type}`);

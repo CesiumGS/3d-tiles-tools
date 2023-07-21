@@ -1,5 +1,5 @@
 import { FeatureTable } from "./FeatureTable";
-import { BinaryBodyReference } from "./BinaryBodyReference";
+import { FeatureTableBinaryBodyReference } from "./FeatureTableBinaryBodyReference";
 import { BinaryBodyOffset } from "./BinaryBodyOffset";
 
 /**
@@ -13,56 +13,56 @@ export interface PntsFeatureTable extends FeatureTable {
    * the binary body where the property values are stored. Details about
    * this property are described in the 3D Tiles specification.
    */
-  POSITION?: BinaryBodyReference;
+  POSITION?: FeatureTableBinaryBodyReference;
 
   /**
    * A `BinaryBodyReference` object defining the reference to a section of
    * the binary body where the property values are stored. Details about
    * this property are described in the 3D Tiles specification.
    */
-  POSITION_QUANTIZED?: BinaryBodyReference;
+  POSITION_QUANTIZED?: FeatureTableBinaryBodyReference;
 
   /**
    * A `BinaryBodyReference` object defining the reference to a section of
    * the binary body where the property values are stored. Details about
    * this property are described in the 3D Tiles specification.
    */
-  RGBA?: BinaryBodyReference;
+  RGBA?: FeatureTableBinaryBodyReference;
 
   /**
    * A `BinaryBodyReference` object defining the reference to a section of
    * the binary body where the property values are stored. Details about
    * this property are described in the 3D Tiles specification.
    */
-  RGB?: BinaryBodyReference;
+  RGB?: FeatureTableBinaryBodyReference;
 
   /**
    * A `BinaryBodyReference` object defining the reference to a section of
    * the binary body where the property values are stored. Details about
    * this property are described in the 3D Tiles specification.
    */
-  RGB565?: BinaryBodyReference;
+  RGB565?: FeatureTableBinaryBodyReference;
 
   /**
    * A `BinaryBodyReference` object defining the reference to a section of
    * the binary body where the property values are stored. Details about
    * this property are described in the 3D Tiles specification.
    */
-  NORMAL?: BinaryBodyReference;
+  NORMAL?: FeatureTableBinaryBodyReference;
 
   /**
    * A `BinaryBodyReference` object defining the reference to a section of
    * the binary body where the property values are stored. Details about
    * this property are described in the 3D Tiles specification.
    */
-  NORMAL_OCT16P?: BinaryBodyReference;
+  NORMAL_OCT16P?: FeatureTableBinaryBodyReference;
 
   /**
    * A `BinaryBodyReference` object defining the reference to a section of
    * the binary body where the property values are stored. Details about
    * this property are described in the 3D Tiles specification.
    */
-  BATCH_ID?: BinaryBodyReference;
+  BATCH_ID?: FeatureTableBinaryBodyReference;
 
   /**
    * A `GlobalPropertyInteger` object defining an integer property for all

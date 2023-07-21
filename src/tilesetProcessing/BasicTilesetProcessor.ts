@@ -14,9 +14,12 @@ import { TilesetEntryProcessor } from "./TilesetEntryProcessor";
 
 import { TraversedTile } from "../traversal/TraversedTile";
 import { TilesetTraverser } from "../traversal/TilesetTraverser";
-import { TilesetEntry } from "../tilesetData/TilesetEntry";
-import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 import { TraversalCallback } from "../traversal/TraversalCallback";
+
+import { TilesetEntry } from "../tilesetData/TilesetEntry";
+
+import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
+
 import { Paths } from "../base/Paths";
 
 /**
@@ -38,7 +41,9 @@ export class BasicTilesetProcessor extends TilesetProcessor {
   /**
    * Whether external tilesets should be processed transparently.
    *
-   * When this is 'true', then the methods
+   * When this is 'true', then the methods that process tile
+   * content will also be applied to the contents of external
+   * tilesets.
    */
   private readonly processExternalTilesets: boolean;
 
@@ -46,10 +51,16 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * Creates a new instance
    *
    * @param quiet - Whether log messages should be omitted
+   * @param processExternalTilesets - Whether external tilesets
+   * should be processed.
    */
-  constructor(quiet?: boolean) {
+  constructor(quiet?: boolean, processExternalTilesets?: boolean) {
     super(quiet);
-    this.processExternalTilesets = true;
+    if (processExternalTilesets === undefined) {
+      this.processExternalTilesets = true;
+    } else {
+      this.processExternalTilesets = processExternalTilesets;
+    }
   }
 
   /**
@@ -211,6 +222,8 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     const tileset = context.sourceTileset;
     const schema = context.schema;
     const targetTileset = await callback(tileset, schema);
+    // Use the processed tileset as the source of subsequent operations
+    context.sourceTileset = targetTileset;
     context.targetTileset = targetTileset;
   }
 
@@ -418,7 +431,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
         // By default, each content entry will be processed with
         // the given entryProcessor. But if external tilesets
         // should be processed, and the given entry is an
-        // external tileset, then it will be processed with
+        // external tileset, then it will also be processed with
         // the 'processExternalTilesetContentEntries' method, to
         // recursively handle the contents of the external tileset.
         let externalHandlingEntryProcessor = entryProcessor;
@@ -427,16 +440,19 @@ export class BasicTilesetProcessor extends TilesetProcessor {
             sourceEntry: TilesetEntry,
             type: string | undefined
           ) => {
-            if (type === ContentDataTypes.CONTENT_TYPE_TILESET) {
-              const externalBasePath = path.dirname(sourceEntry.key);
-              return this.processExternalTilesetContentEntries(
-                externalBasePath,
-                sourceEntry,
-                uriProcessor,
-                entryProcessor
-              );
+            const targetEntry = await entryProcessor(sourceEntry, type);
+            if (targetEntry) {
+              if (type === ContentDataTypes.CONTENT_TYPE_TILESET) {
+                const externalBasePath = path.dirname(sourceEntry.key);
+                return this.processExternalTilesetContentEntries(
+                  externalBasePath,
+                  targetEntry,
+                  uriProcessor,
+                  entryProcessor
+                );
+              }
             }
-            return entryProcessor(sourceEntry, type);
+            return targetEntry;
           };
         }
         await this.processEntry(
@@ -484,7 +500,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     externalTilesetSourceEntry: TilesetEntry,
     uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
-  ): Promise<TilesetEntry | undefined> {
+  ): Promise<TilesetEntry> {
     console.log(
       "Processing external tileset " + externalTilesetSourceEntry.key
     );

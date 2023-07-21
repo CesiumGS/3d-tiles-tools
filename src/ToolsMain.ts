@@ -23,6 +23,8 @@ import { ZipToPackage } from "./packages/ZipToPackage";
 import { TilesetSources } from "./tilesetData/TilesetSources";
 import { TilesetTargets } from "./tilesetData/TilesetTargets";
 
+import { TileFormatsMigration } from "./migration/TileFormatsMigration";
+
 /**
  * Functions that directly correspond to the command line functionality.
  *
@@ -43,11 +45,23 @@ export class ToolsMain {
     const inputBuffer = fs.readFileSync(input);
     const inputTileData = TileFormats.readTileData(inputBuffer);
     const outputBuffer = inputTileData.payload;
-    const upgradedOutputBuffer = await GltfUtilities.upgradeGlb(
-      outputBuffer,
-      undefined
+    fs.writeFileSync(output, outputBuffer);
+  }
+  static async convertB3dmToGlb(input: string, output: string, force: boolean) {
+    ToolsMain.ensureCanWrite(output, force);
+    const inputBuffer = fs.readFileSync(input);
+    const outputBuffer = await TileFormatsMigration.convertB3dmToGlb(
+      inputBuffer
     );
-    fs.writeFileSync(output, upgradedOutputBuffer);
+    fs.writeFileSync(output, outputBuffer);
+  }
+  static async convertPntsToGlb(input: string, output: string, force: boolean) {
+    ToolsMain.ensureCanWrite(output, force);
+    const inputBuffer = fs.readFileSync(input);
+    const outputBuffer = await TileFormatsMigration.convertPntsToGlb(
+      inputBuffer
+    );
+    fs.writeFileSync(output, outputBuffer);
   }
   static async i3dmToGlb(input: string, output: string, force: boolean) {
     return ToolsMain.b3dmToGlb(input, output, force);
@@ -364,10 +378,17 @@ export class ToolsMain {
     input: string,
     output: string,
     force: boolean,
+    targetVersion: string,
     gltfUpgradeOptions: any
   ) {
     ToolsMain.ensureCanWrite(output, force);
-    await Tilesets.upgrade(input, output, force, gltfUpgradeOptions);
+    await Tilesets.upgrade(
+      input,
+      output,
+      force,
+      targetVersion,
+      gltfUpgradeOptions
+    );
   }
 
   static async merge(inputs: string[], output: string, force: boolean) {

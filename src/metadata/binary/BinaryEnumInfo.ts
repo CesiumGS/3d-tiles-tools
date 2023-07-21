@@ -17,7 +17,7 @@ export interface BinaryEnumInfo {
 
   /**
    * A mapping from enum type names (enum IDs) to
-   * dictionaries that map the `enum.values[i].value`
+   * dictionaries that map the `enum.values[i].name`
    * to the `enum.values[i].value`
    */
   enumValueNameValues: { [key: string]: { [key: string]: number } };

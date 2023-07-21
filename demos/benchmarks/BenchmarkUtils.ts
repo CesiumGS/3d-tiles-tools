@@ -97,7 +97,7 @@ export class BenchmarkUtils {
    */
   static createDummyEntriesIterable(
     config: BenchmarkConfig
-  ): IterableIterator<TilesetEntry> {
+  ): Iterable<TilesetEntry> {
     return BenchmarkUtils.createDummyEntriesIterableInternal(
       config.numEntries,
       config.minSize,
@@ -123,26 +123,29 @@ export class BenchmarkUtils {
    * @param seed The random seed. An arbitrary string.
    * @return The generator for entry objects
    */
-  static *createDummyEntriesIterableInternal(
+  static createDummyEntriesIterableInternal(
     numEntries: number,
     minSize: number,
     maxSize: number,
     seed: string
-  ): IterableIterator<TilesetEntry> {
-    const random = seedrandom(seed);
-    const templateBuffer = Buffer.alloc(maxSize);
-    let index = 0;
-    while (index < numEntries) {
-      const key = "example" + index + ".glb";
-      const r = random();
-      const size = Math.floor(minSize + r * (maxSize - minSize));
-      const buffer = templateBuffer.subarray(0, size);
-      const entry = {
-        key: key,
-        value: buffer,
-      };
-      index++;
-      yield entry;
-    }
+  ): Iterable<TilesetEntry> {
+    const iterable = {
+      [Symbol.iterator]: function* () {
+        const random = seedrandom(seed);
+        const templateBuffer = Buffer.alloc(maxSize);
+        for (let index = 0; index < numEntries; index++) {
+          const key = "example" + index + ".glb";
+          const r = random();
+          const size = Math.floor(minSize + r * (maxSize - minSize));
+          const buffer = templateBuffer.subarray(0, size);
+          const entry = {
+            key: key,
+            value: buffer,
+          };
+          yield entry;
+        }
+      },
+    };
+    return iterable;
   }
 }

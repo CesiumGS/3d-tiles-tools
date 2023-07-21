@@ -56,13 +56,17 @@ export class TilesetSource3dtiles implements TilesetSource {
   }
 
   /** {@inheritDoc TilesetSource.getKeys} */
-  getKeys(): IterableIterator<string> {
+  getKeys(): Iterable<string> {
     if (!this.db) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
     const selection = this.db.prepare("SELECT * FROM media");
-    const iterator = selection.iterate();
-    return Iterables.map(iterator, (row: any) => row.key);
+    const iterable = {
+      [Symbol.iterator]: function (): Iterator<any> {
+        return selection.iterate();
+      },
+    };
+    return Iterables.map(iterable, (row: any) => row.key);
   }
 
   /** {@inheritDoc TilesetSource.getValue} */
