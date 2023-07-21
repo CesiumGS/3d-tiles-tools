@@ -139,7 +139,7 @@ npx 3d-tiles-tools b3dmToGlb -i ./specs/data/batchedWithBatchTableBinary.b3dm -o
 Extracts the glb from a i3dm. 
 
 ```
-npx 3d-tiles-tools b3dmToGlb -i ./specs/data/instancedWithBatchTableBinary.i3dm -o ./output/extracted.glb
+npx 3d-tiles-tools i3dmToGlb -i ./specs/data/instancedWithBatchTableBinary.i3dm -o ./output/extracted.glb
 ```
 
 #### cmptToGlb
@@ -147,7 +147,7 @@ npx 3d-tiles-tools b3dmToGlb -i ./specs/data/instancedWithBatchTableBinary.i3dm 
 Extracts the glb models from a cmpt tile. If multiple models are found a number will be appended to the output file name.
 
 ```
-npx 3d-tiles-tools b3dmToGlb -i ./specs/data/composite.cmpt -o ./output/extracted.glb
+npx 3d-tiles-tools cmptToGlb -i ./specs/data/composite.cmpt -o ./output/extracted.glb
 ```
 
 #### optimizeB3dm
