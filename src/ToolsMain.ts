@@ -4,6 +4,7 @@ import path from "path";
 import { Paths } from "./base/Paths";
 import { DeveloperError } from "./base/DeveloperError";
 import { Buffers } from "./base/Buffers";
+import { Iterables } from "./base/Iterables";
 
 import { Tilesets } from "./tilesets/Tilesets";
 
@@ -24,6 +25,8 @@ import { TilesetSources } from "./tilesetData/TilesetSources";
 import { TilesetTargets } from "./tilesetData/TilesetTargets";
 
 import { TileFormatsMigration } from "./migration/TileFormatsMigration";
+
+import { TilesetJsonCreator } from "./tilesetProcessing/TilesetJsonCreator";
 
 /**
  * Functions that directly correspond to the command line functionality.
@@ -401,6 +404,37 @@ export class ToolsMain {
     const pipelineJson = JSON.parse(pipelineJsonBuffer.toString());
     const pipeline = Pipelines.createPipeline(pipelineJson);
     await PipelineExecutor.executePipeline(pipeline, force);
+  }
+
+  static async createTilesetJson(
+    inputName: string,
+    output: string,
+    force: boolean
+  ) {
+    ToolsMain.ensureCanWrite(output, force);
+    let baseDir = inputName;
+    let contentUris = [];
+    if (!Paths.isDirectory(inputName)) {
+      baseDir = path.dirname(inputName);
+      const contentUri = path.basename(inputName);
+      contentUris = [contentUri];
+    } else {
+      const recurse = true;
+      const allFiles = Iterables.overFiles(inputName, recurse);
+      const glbFiles = Iterables.filter(allFiles, (fileName: string) =>
+        Paths.hasExtension(fileName, ".glb")
+      );
+      contentUris = [...glbFiles].map((fileName: string) =>
+        Paths.relativize(inputName, fileName)
+      );
+    }
+    console.log("Creating tileset.json with content URIs: ", contentUris);
+    const tileset = await TilesetJsonCreator.createTilesetFromGlbs(
+      baseDir,
+      contentUris
+    );
+    const tilesetJsonString = JSON.stringify(tileset, null, 2);
+    fs.writeFileSync(output, Buffer.from(tilesetJsonString));
   }
 
   /**
