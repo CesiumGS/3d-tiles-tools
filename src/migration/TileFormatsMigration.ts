@@ -3,6 +3,7 @@ import { Document } from "@gltf-transform/core";
 import { BatchTable } from "../structure/TileFormats/BatchTable";
 import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
 import { B3dmFeatureTable } from "../structure/TileFormats/B3dmFeatureTable";
+import { I3dmFeatureTable } from "../structure/TileFormats/I3dmFeatureTable";
 import { BinaryBodyOffset } from "../structure/TileFormats/BinaryBodyOffset";
 
 import { TileFormats } from "../tileFormats/TileFormats";
@@ -24,6 +25,7 @@ import { MeshFeatures } from "../gltfMetadata/MeshFeatures";
 
 import { PropertyModel } from "../metadata/PropertyModel";
 import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
+import { TileFormatError } from "../tileFormats/TileFormatError";
 
 /**
  * Methods for converting "legacy" tile formats into glTF assets
@@ -233,7 +235,7 @@ export class TileFormatsMigration {
     // a new root node above each scene node, that carries the
     // RTC_CENTER as its translation
     if (featureTable.RTC_CENTER) {
-      const rtcCenter = TileFormatsMigration.obtainRtcCenter(
+      const rtcCenter = TileTableData.obtainRtcCenter(
         featureTable.RTC_CENTER,
         featureTableBinary
       );
@@ -283,6 +285,110 @@ export class TileFormatsMigration {
     const glb = await io.writeBinary(document);
     return Buffer.from(glb);
   }
+
+
+  /**
+   * Convert the given I3DM data into a glTF asset
+   *
+   * @param i3dmBuffer - The I3DM buffer
+   * @returns The GLB buffer
+   */
+  static async convertI3dmToGlb(i3dmBuffer: Buffer): Promise<Buffer> {
+    const tileData = TileFormats.readTileData(i3dmBuffer);
+
+    const batchTable = tileData.batchTable.json as BatchTable;
+    const batchTableBinary = tileData.batchTable.binary;
+
+    const featureTable = tileData.featureTable.json as I3dmFeatureTable;
+    const featureTableBinary = tileData.featureTable.binary;
+
+    //*/
+    if (TileFormatsMigration.DEBUG_LOG) {
+      console.log("Batch table");
+      console.log(JSON.stringify(batchTable, null, 2));
+
+      console.log("Feature table");
+      console.log(JSON.stringify(featureTable, null, 2));
+    }
+    //*/
+
+    if (tileData.header.gltfFormat !== 1) {
+      const gltfUri = tileData.payload;
+      // TODO Resolve external GLB buffer
+      throw new TileFormatError('External references in I3DM are not yet supported');
+    }
+    // If the I3DM contained glTF 1.0 data, try to upgrade it
+    // with the gltf-pipleine first
+    let glbBuffer = tileData.payload;
+    const gltfVersion = GltfUtilities.getGltfVersion(glbBuffer);
+    if (gltfVersion < 2.0) {
+      console.log("Found glTF 1.0 - upgrading to glTF 2.0 with gltf-pipeline");
+      glbBuffer = await GltfUtilities.upgradeGlb(glbBuffer, undefined);
+      glbBuffer = await GltfUtilities.replaceCesiumRtcExtension(glbBuffer);
+    }
+
+    // Read the GLB data from the payload of the tile
+    const io = await GltfTransform.getIO();
+    const document = await io.readBinary(glbBuffer);
+    const root = document.getRoot();
+    root.getAsset().generator = "glTF-Transform";
+
+    // If the feature table defines an `RTC_CENTER`, then insert
+    // a new root node above each scene node, that carries the
+    // RTC_CENTER as its translation
+    if (featureTable.RTC_CENTER) {
+      const rtcCenter = TileTableData.obtainRtcCenter(
+        featureTable.RTC_CENTER,
+        featureTableBinary
+      );
+      TileFormatsMigration.applyRtcCenter(document, rtcCenter);
+    }
+
+    /*
+    // If there are batches, then convert the batch table into
+    // an `EXT_structural_metadata` property table, and convert
+    // the `_BATCHID` attributes of the primitives into
+    // `_FEATURE_ID_0` attributes
+    const numRows = featureTable.BATCH_LENGTH;
+    if (numRows > 0) {
+      const propertyTable =
+        TileTableDataToStructuralMetadata.convertBatchTableToPropertyTable(
+          document,
+          batchTable,
+          batchTableBinary,
+          numRows
+        );
+      const meshes = root.listMeshes();
+      for (const mesh of meshes) {
+        const primitives = mesh.listPrimitives();
+        for (const primitive of primitives) {
+          // Convert the `_BATCHID` attribute into a `_FEATURE_ID_0`
+          // attribute using the `EXT_mesh_features` extension
+          const featureId =
+            TileTableDataToMeshFeatures.convertBatchIdToMeshFeatures(
+              document,
+              primitive
+            );
+          if (propertyTable) {
+            featureId.setPropertyTable(propertyTable);
+          }
+        }
+      }
+    }
+    */
+    // Create the GLB buffer
+    //*/
+    if (TileFormatsMigration.DEBUG_LOG) {
+      console.log("JSON document");
+      const jsonDocument = await io.writeJSON(document);
+      console.log(JSON.stringify(jsonDocument.json, null, 2));
+    }
+    //*/
+
+    const glb = await io.writeBinary(document);
+    return Buffer.from(glb);
+  }
+
 
   /**
    * Apply the given RTC_CENTER to the given glTF-Transform document,
