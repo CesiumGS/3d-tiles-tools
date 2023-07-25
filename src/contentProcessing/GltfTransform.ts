@@ -2,7 +2,7 @@ import draco3d from "draco3d";
 
 import { Transform } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
-import { KHRONOS_EXTENSIONS } from "@gltf-transform/extensions";
+import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
 
 import { EXTMeshFeatures } from "../gltfMetadata/EXTMeshFeatures";
 import { EXTStructuralMetadata } from "../gltfMetadata/EXTStructuralMetadata";
@@ -21,8 +21,9 @@ export class GltfTransform {
    * Returns the `gltf-transform` `NodeIO` instance, preconfigured
    * for the use in the 3D Tiles Tools.
    *
-   * (E.g. it will be configured to handle the Khronos extensions,
-   * EXT_mesh_features, and have a draco encoder/decoder)
+   * (E.g. it will be configured to handle the all extensions that
+   * are known in glTF-Transform, as well as EXT_mesh_features and
+   * EXT_structural_metadata, and have a draco encoder/decoder)
    *
    * @returns - The `NodeIO` instance
    */
@@ -31,7 +32,7 @@ export class GltfTransform {
       return GltfTransform.io;
     }
     const io = new NodeIO();
-    io.registerExtensions(KHRONOS_EXTENSIONS).registerDependencies({
+    io.registerExtensions(ALL_EXTENSIONS).registerDependencies({
       "draco3d.decoder": await draco3d.createDecoderModule(),
       "draco3d.encoder": await draco3d.createEncoderModule(),
     });
