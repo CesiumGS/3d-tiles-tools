@@ -1,10 +1,9 @@
-import { Document } from "@gltf-transform/core";
+import { Accessor, Document, Node } from "@gltf-transform/core";
 
 import { BatchTable } from "../structure/TileFormats/BatchTable";
 import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
 import { B3dmFeatureTable } from "../structure/TileFormats/B3dmFeatureTable";
 import { I3dmFeatureTable } from "../structure/TileFormats/I3dmFeatureTable";
-import { BinaryBodyOffset } from "../structure/TileFormats/BinaryBodyOffset";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 
@@ -26,6 +25,14 @@ import { MeshFeatures } from "../gltfMetadata/MeshFeatures";
 import { PropertyModel } from "../metadata/PropertyModel";
 import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
 import { TileFormatError } from "../tileFormats/TileFormatError";
+import { EXTMeshGPUInstancing } from "@gltf-transform/extensions";
+import { Iterables } from "../base/Iterables";
+import { VecMath } from "./VecMath";
+import { TileTableDataI3dm } from "./TileTableDataI3dm";
+import {
+  dedup,
+  prune,
+} from "@gltf-transform/functions";
 
 /**
  * Methods for converting "legacy" tile formats into glTF assets
@@ -33,7 +40,7 @@ import { TileFormatError } from "../tileFormats/TileFormatError";
  * the legacy formats.
  */
 export class TileFormatsMigration {
-  static readonly DEBUG_LOG = false;
+  static readonly DEBUG_LOG = true;
 
   /**
    * Convert the given PNTS data into a glTF asset
@@ -286,7 +293,6 @@ export class TileFormatsMigration {
     return Buffer.from(glb);
   }
 
-
   /**
    * Convert the given I3DM data into a glTF asset
    *
@@ -315,7 +321,9 @@ export class TileFormatsMigration {
     if (tileData.header.gltfFormat !== 1) {
       const gltfUri = tileData.payload;
       // TODO Resolve external GLB buffer
-      throw new TileFormatError('External references in I3DM are not yet supported');
+      throw new TileFormatError(
+        "External references in I3DM are not yet supported"
+      );
     }
     // If the I3DM contained glTF 1.0 data, try to upgrade it
     // with the gltf-pipleine first
@@ -344,38 +352,43 @@ export class TileFormatsMigration {
       TileFormatsMigration.applyRtcCenter(document, rtcCenter);
     }
 
-    /*
-    // If there are batches, then convert the batch table into
-    // an `EXT_structural_metadata` property table, and convert
-    // the `_BATCHID` attributes of the primitives into
-    // `_FEATURE_ID_0` attributes
-    const numRows = featureTable.BATCH_LENGTH;
-    if (numRows > 0) {
-      const propertyTable =
-        TileTableDataToStructuralMetadata.convertBatchTableToPropertyTable(
-          document,
-          batchTable,
-          batchTableBinary,
-          numRows
-        );
-      const meshes = root.listMeshes();
-      for (const mesh of meshes) {
-        const primitives = mesh.listPrimitives();
-        for (const primitive of primitives) {
-          // Convert the `_BATCHID` attribute into a `_FEATURE_ID_0`
-          // attribute using the `EXT_mesh_features` extension
-          const featureId =
-            TileTableDataToMeshFeatures.convertBatchIdToMeshFeatures(
-              document,
-              primitive
-            );
-          if (propertyTable) {
-            featureId.setPropertyTable(propertyTable);
-          }
-        }
+    const extMeshGPUInstancing = document.createExtension(EXTMeshGPUInstancing);
+    extMeshGPUInstancing.setRequired(true);
+
+    const numInstances = featureTable.INSTANCES_LENGTH;
+
+    const nodes = root.listNodes();
+    const nodesWithMesh = nodes.filter((n: Node) => n.getMesh() !== null);
+
+    for (const node of nodesWithMesh) {
+      const accessors = TileFormatsMigration.createInstancingAccessors(
+        document,
+        featureTable,
+        featureTableBinary,
+        numInstances,
+        node.getWorldMatrix()
+      );
+
+      console.log("Assigning extension to node");
+
+      const meshGpuInstancing = extMeshGPUInstancing.createInstancedMesh();
+      meshGpuInstancing.setAttribute(
+        "TRANSLATION",
+        accessors.positionsAccessor
+      );
+      if (accessors.rotationsAccessor) {
+        meshGpuInstancing.setAttribute("ROTATION", accessors.rotationsAccessor);
       }
+      if (accessors.scalesAccessor) {
+        meshGpuInstancing.setAttribute("SCALE", accessors.scalesAccessor);
+      }
+      node.setExtension("EXT_mesh_gpu_instancing", meshGpuInstancing);
     }
-    */
+
+    // TODO Remove these if possible
+    await document.transform(dedup());
+    await document.transform(prune());
+
     // Create the GLB buffer
     //*/
     if (TileFormatsMigration.DEBUG_LOG) {
@@ -389,6 +402,150 @@ export class TileFormatsMigration {
     return Buffer.from(glb);
   }
 
+  private static createInstancingAccessors(
+    document: Document,
+    featureTable: I3dmFeatureTable,
+    featureTableBinary: Buffer,
+    numInstances: number,
+    matrix4: number[]
+  ) {
+    const root = document.getRoot();
+    const buffer = root.listBuffers()[0];
+
+    const positionsLocal = TileTableData.createPositions(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    let positions = positionsLocal;
+    const quantization = TileTableData.obtainQuantizationOffsetScale(
+      featureTable,
+      featureTableBinary
+    );
+    if (quantization) {
+      positions = Iterables.map(positions, (p: number[]) => {
+        const px = p[0] + quantization.offset[0];
+        const py = p[1] + quantization.offset[1];
+        const pz = p[2] + quantization.offset[2];
+        return [px, py, pz];
+      });
+    }
+
+    const positionsGltf = Iterables.map(positions, (p: number[]) => {
+      let q = p;
+      q = VecMath.convertYupToZup(q);
+      return VecMath.inverseTransform(matrix4, q);
+    });
+
+    const positionsGltfFlat = Iterables.flatten(positionsGltf);
+    const positionsAccessor = document.createAccessor();
+    positionsAccessor.setArray(new Float32Array(positionsGltfFlat));
+    positionsAccessor.setType(Accessor.Type.VEC3);
+    positionsAccessor.setBuffer(buffer);
+
+    let rotationsAccessor: Accessor | undefined = undefined;
+    const normalsUp = TileTableDataI3dm.createNormalsUp(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    const normalsRight = TileTableDataI3dm.createNormalsRight(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    if (normalsUp && normalsRight) {
+      console.log("Create rotations from up and right");
+
+      const convertedNormalsUp = [...normalsUp].map((n: number[]) =>
+        VecMath.convertYupToZup(n)
+      );
+      const convertedNormalsRight = [...normalsRight].map((n: number[]) =>
+        VecMath.convertYupToZup(n)
+      );
+
+      const rotationQuaternions =
+        TileFormatsMigration.computeRotationQuaternions(
+          convertedNormalsUp,
+          convertedNormalsRight
+        );
+      const rotationQuaternionsFlat = Iterables.flatten(rotationQuaternions);
+      rotationsAccessor = document.createAccessor();
+      rotationsAccessor.setArray(new Float32Array(rotationQuaternionsFlat));
+      rotationsAccessor.setType(Accessor.Type.VEC4);
+      rotationsAccessor.setBuffer(buffer);
+    } else {
+      if (featureTable.EAST_NORTH_UP === true) {
+        console.log("Create rotations from eastNorthUp");
+        const rotationQuaternions = Iterables.map(
+          positionsGltf,
+          (p: number[]) => VecMath.computeEastNorthUpQuaternion(p)
+        );
+
+        console.log("rotationQuaternions");
+        for (const p of rotationQuaternions) {
+          console.log(p);
+        }
+
+        const rotationQuaternionsFlat = Iterables.flatten(rotationQuaternions);
+        rotationsAccessor = document.createAccessor();
+        rotationsAccessor.setArray(new Float32Array(rotationQuaternionsFlat));
+        rotationsAccessor.setType(Accessor.Type.VEC4);
+        rotationsAccessor.setBuffer(buffer);
+      }
+    }
+
+    let scalesAccessor: Accessor | undefined = undefined;
+    const scales = TileTableDataI3dm.createScale(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    if (scales) {
+      console.log("Create scales (uniform)");
+      const scales3D = Iterables.map(scales, (s: number) => [s, s, s]);
+      const scalesFlat = Iterables.flatten(scales3D);
+      scalesAccessor = document.createAccessor();
+      scalesAccessor.setArray(new Float32Array(scalesFlat));
+      scalesAccessor.setType(Accessor.Type.VEC3);
+      scalesAccessor.setBuffer(buffer);
+    } else {
+      const scalesNonUniform = TileTableDataI3dm.createNonUniformScale(
+        featureTable,
+        featureTableBinary,
+        numInstances
+      );
+      if (scalesNonUniform) {
+        console.log("Create scales (non-uniform)");
+        const scalesFlat = Iterables.flatten(scalesNonUniform);
+        scalesAccessor = document.createAccessor();
+        scalesAccessor.setArray(new Float32Array(scalesFlat));
+        scalesAccessor.setType(Accessor.Type.VEC3);
+        scalesAccessor.setBuffer(buffer);
+      }
+    }
+
+    return {
+      positionsAccessor: positionsAccessor,
+      rotationsAccessor: rotationsAccessor,
+      scalesAccessor: scalesAccessor,
+    };
+  }
+
+  private static computeRotationQuaternions(
+    upVectors: number[][],
+    rightVectors: number[][]
+  ) {
+    const n = upVectors.length;
+    const quaternions: number[][] = [];
+    for (let i = 0; i < n; i++) {
+      const up = upVectors[i];
+      const right = rightVectors[i];
+      const quaternion = VecMath.computeQuaternion(up, right);
+      quaternions.push(quaternion);
+    }
+    return quaternions;
+  }
 
   /**
    * Apply the given RTC_CENTER to the given glTF-Transform document,
@@ -416,21 +573,5 @@ export class TileFormatsMigration {
         scene.addChild(rtcRoot);
       }
     }
-  }
-
-  /**
-   * Obtains the translation that is implied by the given `RTC_CENTER`
-   * property of a feature table.
-   *
-   * @param rtcCenter - The `RTC_CENTER` property
-   * @param binary - The binary blob of the feature table
-   * @returns The `RTC_CENTER` value, or `undefined`
-   */
-  private static obtainRtcCenter(
-    rtcCenter: BinaryBodyOffset | number[],
-    binary: Buffer
-  ): [number, number, number] {
-    const c = TileTableData.obtainNumberArray(binary, rtcCenter, 3, "FLOAT32");
-    return [c[0], c[1], c[2]];
   }
 }

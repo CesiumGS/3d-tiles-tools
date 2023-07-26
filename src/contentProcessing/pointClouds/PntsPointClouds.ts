@@ -5,7 +5,6 @@ import { BatchTable } from "../../structure/TileFormats/BatchTable";
 
 import { TileFormatError } from "../../tileFormats/TileFormatError";
 
-import { AttributeCompression } from "./AttributeCompression";
 import { DefaultPointCloud } from "./DefaultPointCloud";
 import { Colors } from "./Colors";
 
@@ -15,6 +14,7 @@ import { DracoDecoder } from "../draco/DracoDecoder";
 import { DracoDecoderResult } from "../draco/DracoDecoderResult";
 import { ReadablePointCloud } from "./ReadablePointCloud";
 import { BatchTables } from "../../migration/BatchTables";
+import { TileTableDataPnts } from "../../migration/TileTableDataPnts";
 
 /**
  * Methods to create `ReadablePointCloud` instances from PNTS data
@@ -79,9 +79,10 @@ export class PntsPointClouds {
 
     // Assign the normals
     if (!pointCloud.getAttributeValues("NORMAL")) {
-      const normals = PntsPointClouds.createNormals(
+      const normals = TileTableDataPnts.createNormals(
         featureTable,
-        featureTableBinary
+        featureTableBinary,
+        numPoints
       );
       if (normals) {
         pointCloud.setNormals(normals);
@@ -90,9 +91,10 @@ export class PntsPointClouds {
 
     // Assign the colors
     if (!pointCloud.getAttributeValues("COLOR_0")) {
-      const colors = PntsPointClouds.createNormalizedLinearColors(
+      const colors = TileTableDataPnts.createNormalizedLinearColors(
         featureTable,
-        featureTableBinary
+        featureTableBinary,
+        numPoints
       );
       if (colors) {
         pointCloud.setNormalizedLinearColors(colors);
@@ -123,7 +125,7 @@ export class PntsPointClouds {
     // when no other color information is present
     if (!pointCloud.getAttributeValues("COLOR_0")) {
       // Assign the global color (from CONSTANT_RGBA)
-      const globalColor = PntsPointClouds.createGlobalNormalizedLinearColor(
+      const globalColor = TileTableDataPnts.createGlobalNormalizedLinearColor(
         featureTable,
         featureTableBinary
       );
@@ -194,7 +196,6 @@ export class PntsPointClouds {
     }
     return false;
   }
-
 
   /**
    * If the given feature table defines the 3DTILES_draco_point_compression
@@ -269,7 +270,7 @@ export class PntsPointClouds {
     // Assign the normals, if present
     const dracoNormals = dracoDecoderResult["NORMAL"];
     if (dracoNormals) {
-      const normals = PntsPointClouds.createNormalsFromBinary(
+      const normals = TileTableDataPnts.createNormalsFromBinary(
         dracoNormals.attributeData,
         dracoNormals.attributeInfo.byteOffset,
         numPoints
@@ -280,11 +281,12 @@ export class PntsPointClouds {
     // Assign the colors, from RGB or RGBA data, if present
     const dracoRGB = dracoDecoderResult["RGB"];
     if (dracoRGB) {
-      const colorsStandardRGB = PntsPointClouds.createColorsStandardRGBFromBinary(
-        dracoRGB.attributeData,
-        dracoRGB.attributeInfo.byteOffset,
-        numPoints
-      );
+      const colorsStandardRGB =
+        TileTableDataPnts.createColorsStandardRGBFromBinary(
+          dracoRGB.attributeData,
+          dracoRGB.attributeInfo.byteOffset,
+          numPoints
+        );
       const colorsNormalizedLinearRGBA = Iterables.map(
         colorsStandardRGB,
         Colors.standardRGBToNormalizedLinearRGBA
@@ -294,7 +296,7 @@ export class PntsPointClouds {
     const dracoRGBA = dracoDecoderResult["RGBA"];
     if (dracoRGBA) {
       const colorsStandardRGBA =
-        PntsPointClouds.createColorsStandardRGBAFromBinary(
+        TileTableDataPnts.createColorsStandardRGBAFromBinary(
           dracoRGBA.attributeData,
           dracoRGBA.attributeInfo.byteOffset,
           numPoints
@@ -310,7 +312,7 @@ export class PntsPointClouds {
     const dracoBatchId = dracoDecoderResult["BATCH_ID"];
     if (dracoBatchId) {
       const legacyComponentType = dracoBatchId.attributeInfo.componentDatatype;
-      const batchIds = PntsPointClouds.createBatchIdsFromBinary(
+      const batchIds = TileTableData.createBatchIdsFromBinary(
         dracoBatchId.attributeData,
         dracoBatchId.attributeInfo.byteOffset,
         legacyComponentType,
@@ -387,7 +389,7 @@ export class PntsPointClouds {
     }
     const numPoints = featureTable.POINTS_LENGTH;
     const legacyComponentType = batchId.componentType ?? "UNSIGNED_SHORT";
-    const batchIds = PntsPointClouds.createBatchIdsFromBinary(
+    const batchIds = TileTableData.createBatchIdsFromBinary(
       binary,
       batchId.byteOffset,
       legacyComponentType,
@@ -417,290 +419,4 @@ export class PntsPointClouds {
       );
     return componentType;
   }
-
-
-
-  /**
-   * Create the normal data from the given feature table data.
-   *
-   * This will return the NORMAL or NORMAL_OCT16P data
-   * as an iterable over 3D float arrays.
-   *
-   * @param featureTable - The PNTS feature table
-   * @param binary - The feature table binary
-   * @returns The the iterable over the data
-   */
-  private static createNormals(
-    featureTable: PntsFeatureTable,
-    binary: Buffer
-  ): Iterable<number[]> | undefined {
-    const numPoints = featureTable.POINTS_LENGTH;
-    if (featureTable.NORMAL) {
-      const byteOffset = featureTable.NORMAL.byteOffset;
-      return PntsPointClouds.createNormalsFromBinary(
-        binary,
-        byteOffset,
-        numPoints
-      );
-    }
-
-    if (featureTable.NORMAL_OCT16P) {
-      const byteOffset = featureTable.NORMAL_OCT16P.byteOffset;
-      const octEncodedNormals = PntsPointClouds.createOctEncodedNormalsFromBinary(
-        binary,
-        byteOffset,
-        numPoints
-      );
-      const normals = Iterables.map(
-        octEncodedNormals,
-        AttributeCompression.octDecode
-      );
-      return normals;
-    }
-    return undefined;
-  }
-
-  /**
-   * Create the color data from the given feature table data.
-   *
-   * This will return the RGB or RGBA or RGB565 data
-   * as an iterable over 4D float arrays, containing
-   * the linear RGBA colors with components in [0.0, 1.0].
-   *
-   * @param featureTable - The PNTS feature table
-   * @param binary - The feature table binary
-   * @returns The the iterable over the data
-   */
-  private static createNormalizedLinearColors(
-    featureTable: PntsFeatureTable,
-    binary: Buffer
-  ): Iterable<number[]> | undefined {
-    // According to the specification, the precedence for considering the
-    // color information is RGBA, RGB, RGB565 (and later: CONSTANT_RGBA)
-
-    const numPoints = featureTable.POINTS_LENGTH;
-    if (featureTable.RGBA) {
-      const byteOffset = featureTable.RGBA.byteOffset;
-      const colorsStandardRGBA =
-        PntsPointClouds.createColorsStandardRGBAFromBinary(
-          binary,
-          byteOffset,
-          numPoints
-        );
-      const colorsNormalizedLinearRGBA = Iterables.map(
-        colorsStandardRGBA,
-        Colors.standardRGBAToNormalizedLinearRGBA
-      );
-      return colorsNormalizedLinearRGBA;
-    }
-    if (featureTable.RGB) {
-      const byteOffset = featureTable.RGB.byteOffset;
-      const colorsStandardRGB = PntsPointClouds.createColorsStandardRGBFromBinary(
-        binary,
-        byteOffset,
-        numPoints
-      );
-      const colorsNormalizedLinearRGBA = Iterables.map(
-        colorsStandardRGB,
-        Colors.standardRGBToNormalizedLinearRGBA
-      );
-      return colorsNormalizedLinearRGBA;
-    }
-    if (featureTable.RGB565) {
-      const byteOffset = featureTable.RGB565.byteOffset;
-      const colorsStandardRGB565 =
-        PntsPointClouds.createColorsStandardRGB656FromBinary(
-          binary,
-          byteOffset,
-          numPoints
-        );
-      const colorsNormalizedLinearRGBA = Iterables.map(
-        colorsStandardRGB565,
-        Colors.standardRGB565ToNormalizedLinearRGBA
-      );
-      return colorsNormalizedLinearRGBA;
-    }
-    return undefined;
-  }
-
-  /**
-   * Obtain the global color data from the given feature table data.
-   *
-   * This will return the CONSTANT_RGBA value, as a 4D float array,
-   * containing the linear RGBA color with components in [0.0, 1.0].
-   *
-   * @param featureTable - The PNTS feature table
-   * @param binary - The feature table binary
-   * @returns The global color
-   */
-  private static createGlobalNormalizedLinearColor(
-    featureTable: PntsFeatureTable,
-    binary: Buffer
-  ): [number, number, number, number] | undefined {
-    if (!featureTable.CONSTANT_RGBA) {
-      return undefined;
-    }
-    const constantRGBA = TileTableData.obtainNumberArray(
-      binary,
-      featureTable.CONSTANT_RGBA,
-      4,
-      "UNSIGNED_BYTE"
-    );
-    const normalizedLinearRGBA =
-      Colors.standardRGBAToNormalizedLinearRGBA(constantRGBA);
-    return [
-      normalizedLinearRGBA[0],
-      normalizedLinearRGBA[1],
-      normalizedLinearRGBA[2],
-      normalizedLinearRGBA[3],
-    ];
-  }
-
-
-  /**
-   * Create the normal data from the given data
-   *
-   * @param binary - The feature table binary
-   * @param byteOffset - The byte offset
-   * @param numPoints - The number of points
-   * @returns The the iterable over the data
-   */
-  private static createNormalsFromBinary(
-    binary: Buffer,
-    byteOffset: number,
-    numPoints: number
-  ): Iterable<number[]> {
-    const legacyType = "VEC3";
-    const legacyComponentType = "FLOAT";
-    return TileTableData.createNumericArrayIterable(
-      legacyType,
-      legacyComponentType,
-      binary,
-      byteOffset,
-      numPoints
-    );
-  }
-
-  /**
-   * Create the oct-encoded normal data from the given data
-   *
-   * @param binary - The feature table binary
-   * @param byteOffset - The byte offset
-   * @param numPoints - The number of points
-   * @returns The the iterable over the data
-   */
-  private static createOctEncodedNormalsFromBinary(
-    binary: Buffer,
-    byteOffset: number,
-    numPoints: number
-  ): Iterable<number[]> {
-    const legacyType = "VEC2";
-    const legacyComponentType = "UNSIGNED_BYTE";
-    return TileTableData.createNumericArrayIterable(
-      legacyType,
-      legacyComponentType,
-      binary,
-      byteOffset,
-      numPoints
-    );
-  }
-
-  /**
-   * Create the RGB color data from the given data
-   *
-   * @param binary - The feature table binary
-   * @param byteOffset - The byte offset
-   * @param numPoints - The number of points
-   * @returns The the iterable over the data
-   */
-  private static createColorsStandardRGBFromBinary(
-    binary: Buffer,
-    byteOffset: number,
-    numPoints: number
-  ): Iterable<number[]> {
-    const legacyType = "VEC3";
-    const legacyComponentType = "UNSIGNED_BYTE";
-    return TileTableData.createNumericArrayIterable(
-      legacyType,
-      legacyComponentType,
-      binary,
-      byteOffset,
-      numPoints
-    );
-  }
-
-  /**
-   * Create the RGBA color data from the given data
-   *
-   * @param binary - The feature table binary
-   * @param byteOffset - The byte offset
-   * @param numPoints - The number of points
-   * @returns The the iterable over the data
-   */
-  private static createColorsStandardRGBAFromBinary(
-    binary: Buffer,
-    byteOffset: number,
-    numPoints: number
-  ): Iterable<number[]> {
-    const legacyType = "VEC4";
-    const legacyComponentType = "UNSIGNED_BYTE";
-    return TileTableData.createNumericArrayIterable(
-      legacyType,
-      legacyComponentType,
-      binary,
-      byteOffset,
-      numPoints
-    );
-  }
-
-  /**
-   * Create the RGB565 color data from the given data
-   *
-   * @param binary - The feature table binary
-   * @param byteOffset - The byte offset
-   * @param numPoints - The number of points
-   * @returns The the iterable over the data
-   */
-  private static createColorsStandardRGB656FromBinary(
-    binary: Buffer,
-    byteOffset: number,
-    numPoints: number
-  ): Iterable<number> {
-    const legacyType = "SCALAR";
-    const legacyComponentType = "UNSIGNED_SHORT";
-    return TileTableData.createNumericScalarIterable(
-      legacyType,
-      legacyComponentType,
-      binary,
-      byteOffset,
-      numPoints
-    );
-  }
-
-  /**
-   * Create the batch ID data from the given data
-   *
-   * @param binary - The feature table binary
-   * @param byteOffset - The byte offset
-   * @param legacyComponentType - The (legacy) component type
-   * (e.g. "UNSIGNED_BYTE" - not "UINT8")
-   * @param numPoints - The number of points
-   * @returns The iterable over the result values
-   */
-  private static createBatchIdsFromBinary(
-    binary: Buffer,
-    byteOffset: number,
-    legacyComponentType: string,
-    numPoints: number
-  ): Iterable<number> {
-    const batchIds = TileTableData.createNumericScalarIterable(
-      "SCALAR",
-      legacyComponentType,
-      binary,
-      byteOffset,
-      numPoints
-    );
-    return batchIds;
-  }
-
 }

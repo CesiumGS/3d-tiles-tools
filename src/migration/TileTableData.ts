@@ -12,11 +12,10 @@ import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
 import { TileFormatError } from "../tileFormats/TileFormatError";
 
 /**
- * Method to access the data that is stored in batch- or feature tables
+ * Methods to access the data that is stored in batch- or feature tables
  * of the legacy tile formats in a generic form.
  */
 export class TileTableData {
-
   /**
    * Create the position data from the given feature table data.
    *
@@ -25,10 +24,12 @@ export class TileTableData {
    * of the returned will be relative to the position
    * that is returned by `obtainGlobalPosition`
    *
-   * @param featureTable - The PNTS feature table
+   * @param featureTable - The feature table
    * @param binary - The feature table binary
    * @param numPositions - The number of positions
    * @returns The the iterable over the data
+   * @throws TileFormatError If the given feature table contains
+   * neither a POSITION nor a POSITION_QUANTIZED
    */
   static createPositions(
     featureTable: PntsFeatureTable | I3dmFeatureTable,
@@ -58,7 +59,7 @@ export class TileTableData {
       }
       const byteOffset = featureTable.POSITION_QUANTIZED.byteOffset;
       const quantizedPositions =
-      TileTableData.createQuantizedPositionsFromBinary(
+        TileTableData.createQuantizedPositionsFromBinary(
           binary,
           byteOffset,
           numPositions
@@ -127,7 +128,7 @@ export class TileTableData {
   }
 
   /**
-   * Obtain the quantization information from the given PNTS- 
+   * Obtain the quantization information from the given PNTS-
    * or I3DM feature table.
    *
    * If the feature table does not contain QUANTIZED_VOLUME_OFFSET
@@ -135,7 +136,7 @@ export class TileTableData {
    * Otherwise, the offset and scale are returned.
    *
    * @param featureTable - The feature table
-   * @param featureTableBinary - The PNTS binary
+   * @param featureTableBinary - The feature table binary
    * @returns The quantization information
    */
   static obtainQuantizationOffsetScale(
@@ -191,7 +192,7 @@ export class TileTableData {
    * Returns the "global position" that is implied by the given feature table.
    *
    * This position will include the RTC_CENTER (if present) and the
-   * quantization offset (if present), and will be `undefined` if 
+   * quantization offset (if present), and will be `undefined` if
    * neither of them is present.
    *
    * @param featureTable - The feature table
@@ -202,7 +203,7 @@ export class TileTableData {
     featureTable: PntsFeatureTable | I3dmFeatureTable,
     featureTableBinary: Buffer
   ): [number, number, number] | undefined {
-    // Compute the "global position", which may include 
+    // Compute the "global position", which may include
     // the RTC_CENTER and the quantization offset.
     let globalPosition: [number, number, number] | undefined = undefined;
 
@@ -235,6 +236,31 @@ export class TileTableData {
     return globalPosition;
   }
 
+  /**
+   * Create the batch ID data from the given data
+   *
+   * @param binary - The feature table binary
+   * @param byteOffset - The byte offset
+   * @param legacyComponentType - The (legacy) component type
+   * (e.g. "UNSIGNED_BYTE" - not "UINT8")
+   * @param numPoints - The number of points
+   * @returns The iterable over the result values
+   */
+  static createBatchIdsFromBinary(
+    binary: Buffer,
+    byteOffset: number,
+    legacyComponentType: string,
+    numPoints: number
+  ): Iterable<number> {
+    const batchIds = TileTableData.createNumericScalarIterable(
+      "SCALAR",
+      legacyComponentType,
+      binary,
+      byteOffset,
+      numPoints
+    );
+    return batchIds;
+  }
 
   /**
    * Obtains the data from a batch- or feature table property,

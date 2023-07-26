@@ -558,4 +558,220 @@ describe("TileFormatsMigration", function () {
     );
     expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
   });
+
+  it("converts InstancedAnimated to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedAnimated";
+    const fileNameWithoutExtension = "instancedAnimated";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedGltfExternal to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedGltfExternal";
+    const fileNameWithoutExtension = "instancedGltfExternal";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedOct32POrientation to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedOct32POrientation";
+    const fileNameWithoutExtension = "instancedOct32POrientation";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedOrientation to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedOrientation";
+    const fileNameWithoutExtension = "instancedOrientation";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedQuantized to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedQuantized";
+    const fileNameWithoutExtension = "instancedQuantized";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedQuantizedOct32POrientation to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedQuantizedOct32POrientation";
+    const fileNameWithoutExtension = "instancedQuantizedOct32POrientation";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedRedMaterial to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedRedMaterial";
+    const fileNameWithoutExtension = "instancedRedMaterial";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedRTC to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedRTC";
+    const fileNameWithoutExtension = "instancedRTC";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedScale to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedScale";
+    const fileNameWithoutExtension = "instancedScale";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedScaleNonUniform to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedScaleNonUniform";
+    const fileNameWithoutExtension = "instancedScaleNonUniform";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedTextured to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedTextured";
+    const fileNameWithoutExtension = "instancedTextured";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedWithBatchIds to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedWithBatchIds";
+    const fileNameWithoutExtension = "instancedWithBatchIds";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedWithBatchTable to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedWithBatchTable";
+    const fileNameWithoutExtension = "instancedWithBatchTable";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedWithBatchTableBinary to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedWithBatchTableBinary";
+    const fileNameWithoutExtension = "instancedWithBatchTableBinary";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedWithCopyright to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedWithCopyright";
+    const fileNameWithoutExtension = "instancedWithCopyright";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedWithoutBatchTable to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedWithoutBatchTable";
+    const fileNameWithoutExtension = "instancedWithoutBatchTable";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedWithoutNormals to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedWithoutNormals";
+    const fileNameWithoutExtension = "instancedWithoutNormals";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedWithTransform to the expected output", async function () {
+    const subDir = "Instanced/";
+    const name = "InstancedWithTransform";
+    const fileNameWithoutExtension = "instancedWithTransform";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
 });

@@ -1,7 +1,9 @@
-const viewer = new Cesium.Viewer("cesiumContainer");
+const viewer = new Cesium.Viewer("cesiumContainer", {
+  globe: false
+});
 
 let currentTileset;
-let currentTilesetName = "PointCloud/PointCloudBatched";
+let currentTilesetName = "Instanced/InstancedAnimated";
 let inputOrOutput = "input";
 
 // Remove any old tileset, and add a new tileset based on the
@@ -14,7 +16,7 @@ async function recreateTileset() {
   } else {
     doZoom = true;
   }
-    
+
   currentTileset = viewer.scene.primitives.add(
     await Cesium.Cesium3DTileset.fromUrl(
       `http://localhost:8003/${inputOrOutput}/${currentTilesetName}/tileset.json`, {
@@ -28,7 +30,7 @@ async function recreateTileset() {
     const offset = new Cesium.HeadingPitchRange(
       Cesium.Math.toRadians(-22.5),
       Cesium.Math.toRadians(-22.5),
-      25.0
+      500.0
     );
     viewer.zoomTo(currentTileset, offset);
   }
@@ -53,7 +55,7 @@ function createTooltip() {
     return tooltip;
   }
   const tooltip = createTooltip();
-  
+
   // Show the given HTML content in the tooltip
   // at the given screen position
   function showTooltip(screenX, screenY, htmlContent) {
@@ -62,7 +64,7 @@ function createTooltip() {
     tooltip.style.top = `${screenY}px`;
     tooltip.innerHTML = htmlContent;
   }
-  
+
   // Create an HTML string that contains information
   // about the given metadata, under the given title
   function createMetadataHtml(title, metadata) {
@@ -81,7 +83,7 @@ function createTooltip() {
     }
     return html;
   }
-  
+
   // Install the handler that will check the element that is
   // under the mouse cursor when the mouse is moved, and
   // add any metadata that it contains to the label.
@@ -89,30 +91,30 @@ function createTooltip() {
   handler.setInputAction(function (movement) {
     let tooltipText = "";
     const picked = viewer.scene.pick(movement.endPosition);
-    
+
     if (picked) {
         if (picked instanceof Cesium.Cesium3DTileFeature) {
             tooltipText += createMetadataHtml("Batch table", picked);
         }
     }
-  
+
     const tilesetMetadata = picked?.content?.tileset?.metadata;
     tooltipText += createMetadataHtml("Tileset metadata", tilesetMetadata);
-  
+
     const tileMetadata = picked?.content?.tile?.metadata;
     tooltipText += createMetadataHtml("Tile metadata", tileMetadata);
-  
+
     const groupMetadata = picked?.content?.group?.metadata;
     tooltipText += createMetadataHtml("Group metadata", groupMetadata);
-  
+
     const contentMetadata = picked?.content?.metadata;
     tooltipText += createMetadataHtml("Content metadata", contentMetadata);
-  
+
     const screenX = movement.endPosition.x;
     const screenY = movement.endPosition.y;
     showTooltip(screenX, screenY, tooltipText);
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-  
+
 
 
 //============================================================================
@@ -130,6 +132,27 @@ function createOption(name) {
 
 function createOptions() {
   const options = [
+
+    createOption("Instanced/InstancedAnimated"),
+    createOption("Instanced/InstancedGltfExternal"),
+    createOption("Instanced/InstancedOct32POrientation"),
+    createOption("Instanced/InstancedOrientation"),
+    createOption("Instanced/InstancedQuantized"),
+    createOption("Instanced/InstancedQuantizedOct32POrientation"),
+    createOption("Instanced/InstancedRedMaterial"),
+    createOption("Instanced/InstancedRTC"),
+    createOption("Instanced/InstancedScale"),
+    createOption("Instanced/InstancedScaleNonUniform"),
+    createOption("Instanced/InstancedTextured"),
+    createOption("Instanced/InstancedWithBatchIds"),
+    createOption("Instanced/InstancedWithBatchTable"),
+    createOption("Instanced/InstancedWithBatchTableBinary"),
+    createOption("Instanced/InstancedWithCopyright"),
+    createOption("Instanced/InstancedWithoutBatchTable"),
+    createOption("Instanced/InstancedWithoutNormals"),
+    createOption("Instanced/InstancedWithTransform"),
+
+
     createOption("PointCloud/PointCloudBatched"),
     createOption("PointCloud/PointCloudConstantColor"),
     createOption("PointCloud/PointCloudDraco"),
@@ -147,6 +170,7 @@ function createOptions() {
     createOption("PointCloud/PointCloudWithPerPointProperties"),
     createOption("PointCloud/PointCloudWithTransform"),
     createOption("PointCloud/PointCloudWithUnicodePropertyIds"),
+
     createOption("Batched/BatchedAnimated"),
     createOption("Batched/BatchedColors"),
     createOption("Batched/BatchedColorsMix"),
@@ -182,4 +206,3 @@ Sandcastle.addDefaultToolbarButton("Output", function () {
   inputOrOutput = "output";
   recreateTileset();
 });
-      
