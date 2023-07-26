@@ -12,14 +12,32 @@ export class AttributeCompression {
     new Cartesian3();
 
   /**
+   * Decodes two 8-bit values that represent an oct-encoded normal
+   * into a 3D (normalized) normal.
+   *
+   * @param input - The input values
+   * @returns The resulting normal
+   */
+  static octDecode8(input: number[]): number[] {
+    const rangeMax = 255;
+    const result = AttributeCompression.octDecodeInRangeInternalResultScratch;
+    const x = input[0];
+    const y = input[1];
+    AttributeCompression.octDecodeInRangeInternal(x, y, rangeMax, result);
+    const array: number[] = Array(3);
+    Cartesian3.pack(result, array, 0);
+    return array;
+  }
+
+  /**
    * Decodes two 16-bit values that represent an oct-encoded normal
    * into a 3D (normalized) normal.
    *
    * @param input - The input values
    * @returns The resulting normal
    */
-  static octDecode(input: number[]): number[] {
-    const rangeMax = 255;
+  static octDecode16(input: number[]): number[] {
+    const rangeMax = 65535;
     const result = AttributeCompression.octDecodeInRangeInternalResultScratch;
     const x = input[0];
     const y = input[1];
