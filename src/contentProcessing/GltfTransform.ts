@@ -2,7 +2,7 @@ import draco3d from "draco3d";
 
 import { Transform } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
-import { KHRONOS_EXTENSIONS } from "@gltf-transform/extensions";
+import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
 
 import { EXTMeshFeatures } from "../gltfMetadata/EXTMeshFeatures";
 import { EXTStructuralMetadata } from "../gltfMetadata/EXTStructuralMetadata";
@@ -31,7 +31,7 @@ export class GltfTransform {
       return GltfTransform.io;
     }
     const io = new NodeIO();
-    io.registerExtensions(KHRONOS_EXTENSIONS).registerDependencies({
+    io.registerExtensions(ALL_EXTENSIONS).registerDependencies({
       "draco3d.decoder": await draco3d.createDecoderModule(),
       "draco3d.encoder": await draco3d.createEncoderModule(),
     });
