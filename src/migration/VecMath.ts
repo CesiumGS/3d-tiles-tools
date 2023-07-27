@@ -104,6 +104,8 @@ export class VecMath {
   private static readonly forwardScratch = new Cartesian3();
   private static readonly positionScratch0 = new Cartesian3();
   private static readonly positionScratch1 = new Cartesian3();
+  private static readonly axisScratch = new Cartesian3();
+  private static readonly axisPackedScratch = Array(3);
   private static readonly matrix3Scratch = new Matrix3();
   private static readonly matrix4Scratch = new Matrix4();
   private static readonly quaternionScratch = new Quaternion();
@@ -155,6 +157,27 @@ export class VecMath {
     Cartesian3.unpack(positionPacked, 0, position);
     Matrix4.multiplyByPoint(matrix4, position, transformed);
     const result = Cartesian3.pack(transformed, new Array(3));
+    return result;
+  }
+
+  static transformAxis(
+    quaternionPacked: number[],
+    transform: (n: number[]) => number[]
+  ): number[] {
+    // XXX Horribly inefficient...
+    const quaternion = VecMath.quaternionScratch;
+    const axis = VecMath.axisScratch;
+    const axisPacked = VecMath.axisPackedScratch;
+
+    Quaternion.unpack(quaternionPacked, 0, quaternion);
+    const angle = Quaternion.computeAngle(quaternion);
+    Quaternion.computeAxis(quaternion, axis);
+    Cartesian3.pack(axis, axisPacked);
+    const transformedAxis = transform(axisPacked);
+    Cartesian3.unpack(transformedAxis, 0, axis);
+    Quaternion.fromAxisAngle(axis, angle, quaternion);
+
+    const result = Quaternion.pack(quaternion, new Array(4));
     return result;
   }
 

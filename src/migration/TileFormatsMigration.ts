@@ -29,10 +29,7 @@ import { EXTMeshGPUInstancing } from "@gltf-transform/extensions";
 import { Iterables } from "../base/Iterables";
 import { VecMath } from "./VecMath";
 import { TileTableDataI3dm } from "./TileTableDataI3dm";
-import {
-  dedup,
-  prune,
-} from "@gltf-transform/functions";
+import { dedup, prune } from "@gltf-transform/functions";
 
 /**
  * Methods for converting "legacy" tile formats into glTF assets
@@ -223,7 +220,7 @@ export class TileFormatsMigration {
     //*/
 
     // If the B3DM contained glTF 1.0 data, try to upgrade it
-    // with the gltf-pipleine first
+    // with the gltf-pipeline first
     let glbBuffer = tileData.payload;
     const gltfVersion = GltfUtilities.getGltfVersion(glbBuffer);
     if (gltfVersion < 2.0) {
@@ -326,7 +323,7 @@ export class TileFormatsMigration {
       );
     }
     // If the I3DM contained glTF 1.0 data, try to upgrade it
-    // with the gltf-pipleine first
+    // with the gltf-pipeline first
     let glbBuffer = tileData.payload;
     const gltfVersion = GltfUtilities.getGltfVersion(glbBuffer);
     if (gltfVersion < 2.0) {
@@ -431,15 +428,52 @@ export class TileFormatsMigration {
       });
     }
 
-    const positionsGltf = Iterables.map(positions, (p: number[]) => {
+    // TODO Analyze and verify these transforms more systematically!!!
+    // For all current test cases, the transform from the glTF node
+    // is a z-up-to-y-up transform, which is an involution (its own
+    // inverse), meaning that SOME  of the following transforms almost
+    // certainly are only correct for THIS particular case...
+    const convertToGltf = (p: number[]): number[] => {
       let q = p;
       q = VecMath.convertYupToZup(q);
-      return VecMath.inverseTransform(matrix4, q);
-    });
+      return q;
+    };
+    const convertToGltfNode = (p: number[]): number[] => {
+      let q = p;
+      q = VecMath.convertYupToZup(q);
+      q = VecMath.inverseTransform(matrix4, q);
+      return q;
+    };
+    const convertRotationToGltf = (p: number[]): number[] => {
+      let q = p;
+      q = VecMath.convertZupToYup(q);
+      q = VecMath.inverseTransform(matrix4, q);
+      return q;
+    };
 
-    const positionsGltfFlat = Iterables.flatten(positionsGltf);
+    const positionsGltf = Iterables.map(positions, convertToGltf);
+    const positionsGltfNode = Iterables.map(positions, convertToGltfNode);
+
+    console.log("positionsLocal:");
+    for (const p of positionsLocal) {
+      console.log("  ", p);
+    }
+    console.log("positions:");
+    for (const p of positions) {
+      console.log("  ", p);
+    }
+    console.log("positionsGltf:");
+    for (const p of positionsGltf) {
+      console.log("  ", p);
+    }
+    console.log("positionsGltfNode:");
+    for (const p of positionsGltfNode) {
+      console.log("  ", p);
+    }
+
+    const positionsGltfNodeFlat = Iterables.flatten(positionsGltfNode);
     const positionsAccessor = document.createAccessor();
-    positionsAccessor.setArray(new Float32Array(positionsGltfFlat));
+    positionsAccessor.setArray(new Float32Array(positionsGltfNodeFlat));
     positionsAccessor.setType(Accessor.Type.VEC3);
     positionsAccessor.setBuffer(buffer);
 
@@ -457,18 +491,20 @@ export class TileFormatsMigration {
     if (normalsUp && normalsRight) {
       console.log("Create rotations from up and right");
 
-      const convertedNormalsUp = [...normalsUp].map((n: number[]) =>
-        VecMath.convertYupToZup(n)
-      );
-      const convertedNormalsRight = [...normalsRight].map((n: number[]) =>
-        VecMath.convertYupToZup(n)
-      );
+      const normalsUpGltf = [...normalsUp].map(convertToGltf);
+      const normalsRightGltf = [...normalsRight].map(convertToGltf);
 
       const rotationQuaternions =
         TileFormatsMigration.computeRotationQuaternions(
-          convertedNormalsUp,
-          convertedNormalsRight
+          normalsUpGltf,
+          normalsRightGltf
         );
+
+      console.log("rotationQuaternions");
+      for (const p of rotationQuaternions) {
+        console.log(p);
+      }
+
       const rotationQuaternionsFlat = Iterables.flatten(rotationQuaternions);
       rotationsAccessor = document.createAccessor();
       rotationsAccessor.setArray(new Float32Array(rotationQuaternionsFlat));
@@ -477,9 +513,13 @@ export class TileFormatsMigration {
     } else {
       if (featureTable.EAST_NORTH_UP === true) {
         console.log("Create rotations from eastNorthUp");
-        const rotationQuaternions = Iterables.map(
-          positionsGltf,
-          (p: number[]) => VecMath.computeEastNorthUpQuaternion(p)
+        let rotationQuaternions = Iterables.map(positionsGltf, (p: number[]) =>
+          VecMath.computeEastNorthUpQuaternion(p)
+        );
+
+        rotationQuaternions = Iterables.map(
+          rotationQuaternions,
+          (q: number[]) => VecMath.transformAxis(q, convertRotationToGltf)
         );
 
         console.log("rotationQuaternions");
