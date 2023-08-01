@@ -1,6 +1,9 @@
 import StreamZip from "node-stream-zip";
 
 import { TilesetTargets } from "../tilesetData/TilesetTargets";
+import { Tilesets } from "../tilesets/Tilesets";
+import { TilesetError } from "../tilesetData/TilesetError";
+import { Paths } from "../base/Paths";
 
 /**
  * Methods for converting ZIP files into 3D Tiles packages.
@@ -19,6 +22,8 @@ export class ZipToPackage {
    * @param outputFileName The full output file name
    * @param overwrite Whether the output file should be overwritten
    * if it already exists
+   * @throws TilesetError If the input did not contain the tileset JSON
+   * file that was expected for the output.
    */
   static async convert(
     inputFileName: string,
@@ -31,7 +36,17 @@ export class ZipToPackage {
       outputFileName,
       overwrite
     );
-    tilesetTarget.begin(outputFileName, overwrite);
+
+    const outputJsonFileName =
+      Tilesets.determineTilesetJsonFileName(outputFileName);
+
+    let outputJsonFileNameWasFound = false;
+
+    // When a ZIP is converted into a directory, then there
+    // is no requirement for the output file name
+    if (Paths.isDirectory(outputFileName)) {
+      outputJsonFileNameWasFound = true;
+    }
 
     const entries = await zip.entries();
     for (const entry of Object.values(entries)) {
@@ -40,11 +55,20 @@ export class ZipToPackage {
         const key = e.name;
         const content = await zip.entryData(e.name);
         if (content) {
+          if (key === outputJsonFileName) {
+            outputJsonFileNameWasFound = true;
+          }
           tilesetTarget.addEntry(key, content);
         }
       }
     }
     await zip.close();
     await tilesetTarget.end();
+
+    if (!outputJsonFileNameWasFound) {
+      throw new TilesetError(
+        `File ${inputFileName} did not contain a ${outputJsonFileName}`
+      );
+    }
   }
 }

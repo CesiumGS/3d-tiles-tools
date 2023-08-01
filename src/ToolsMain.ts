@@ -18,12 +18,9 @@ import { ContentDataTypes } from "./contentTypes/ContentDataTypes";
 import { PipelineExecutor } from "./pipelines/PipelineExecutor";
 import { Pipelines } from "./pipelines/Pipelines";
 
-import { ZipToPackage } from "./packages/ZipToPackage";
-
-import { TilesetSources } from "./tilesetData/TilesetSources";
-import { TilesetTargets } from "./tilesetData/TilesetTargets";
-
 import { TileFormatsMigration } from "./migration/TileFormatsMigration";
+
+import { TilesetConverter } from "./tilesetProcessing/TilesetConverter";
 
 /**
  * Functions that directly correspond to the command line functionality.
@@ -349,24 +346,7 @@ export class ToolsMain {
 
   static async convert(input: string, output: string, force: boolean) {
     ToolsMain.ensureCanWrite(output, force);
-    const inputExtension = path.extname(input).toLowerCase();
-
-    if (inputExtension === ".zip") {
-      await ZipToPackage.convert(input, output, force);
-    } else {
-      const tilesetSource = TilesetSources.createAndOpen(input);
-      const tilesetTarget = TilesetTargets.createAndBegin(output, force);
-
-      const keys = tilesetSource.getKeys();
-      for (const key of keys) {
-        const content = tilesetSource.getValue(key);
-        if (content) {
-          tilesetTarget.addEntry(key, content);
-        }
-      }
-      tilesetSource.close();
-      await tilesetTarget.end();
-    }
+    await TilesetConverter.convert(input, output, force);
   }
 
   static async combine(input: string, output: string, force: boolean) {
