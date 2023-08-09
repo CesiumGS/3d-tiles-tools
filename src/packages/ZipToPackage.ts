@@ -19,14 +19,19 @@ export class ZipToPackage {
    * If it is empty, then the output will be a directory
    *
    * @param inputFileName The full input file name
+   * @param inputTilesetJsonFileName The name of the tileset JSON file that
+   * is expected to be present in the ZIP. This will usually be
+   * 'tileset.json', but can be overridden to use another JSON file as
+   * the main tileset JSON file.
    * @param outputFileName The full output file name
    * @param overwrite Whether the output file should be overwritten
    * if it already exists
    * @throws TilesetError If the input did not contain the tileset JSON
-   * file that was expected for the output.
+   * file that was expected for the input or the output.
    */
   static async convert(
     inputFileName: string,
+    inputTilesetJsonFileName: string,
     outputFileName: string,
     overwrite: boolean
   ) {
@@ -37,26 +42,31 @@ export class ZipToPackage {
       overwrite
     );
 
-    const outputJsonFileName =
+    const outputTilesetJsonFileName =
       Tilesets.determineTilesetJsonFileName(outputFileName);
 
-    let outputJsonFileNameWasFound = false;
+    let inputTilesetJsonFileNameWasFound = false;
+    let outputTilesetJsonFileNameWasFound = false;
 
-    // When a ZIP is converted into a directory, then there
+    // When a the output is a directory, then there
     // is no requirement for the output file name
     if (Paths.isDirectory(outputFileName)) {
-      outputJsonFileNameWasFound = true;
+      outputTilesetJsonFileNameWasFound = true;
     }
 
     const entries = await zip.entries();
     for (const entry of Object.values(entries)) {
       const e = entry as any;
       if (!e.isDirectory) {
-        const key = e.name;
+        let key = e.name;
         const content = await zip.entryData(e.name);
         if (content) {
-          if (key === outputJsonFileName) {
-            outputJsonFileNameWasFound = true;
+          if (key === inputTilesetJsonFileName) {
+            inputTilesetJsonFileNameWasFound = true;
+            key = outputTilesetJsonFileName;
+          }
+          if (key === outputTilesetJsonFileName) {
+            outputTilesetJsonFileNameWasFound = true;
           }
           tilesetTarget.addEntry(key, content);
         }
@@ -65,9 +75,14 @@ export class ZipToPackage {
     await zip.close();
     await tilesetTarget.end();
 
-    if (!outputJsonFileNameWasFound) {
+    if (!inputTilesetJsonFileNameWasFound) {
       throw new TilesetError(
-        `File ${inputFileName} did not contain a ${outputJsonFileName}`
+        `File ${inputFileName} did not contain a ${inputTilesetJsonFileName}`
+      );
+    }
+    if (!outputTilesetJsonFileNameWasFound) {
+      throw new TilesetError(
+        `File ${inputFileName} did not contain a ${outputTilesetJsonFileName}`
       );
     }
   }

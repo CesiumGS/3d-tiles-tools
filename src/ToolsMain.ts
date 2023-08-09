@@ -344,9 +344,19 @@ export class ToolsMain {
     await PipelineExecutor.executePipeline(pipeline, force);
   }
 
-  static async convert(input: string, output: string, force: boolean) {
+  static async convert(
+    input: string,
+    inputTilesetJsonFileName: string | undefined,
+    output: string,
+    force: boolean
+  ) {
     ToolsMain.ensureCanWrite(output, force);
-    await TilesetConverter.convert(input, output, force);
+    await TilesetConverter.convert(
+      input,
+      inputTilesetJsonFileName,
+      output,
+      force
+    );
   }
 
   static async combine(input: string, output: string, force: boolean) {

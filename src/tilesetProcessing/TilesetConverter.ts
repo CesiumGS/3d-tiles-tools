@@ -1,17 +1,16 @@
 import path from "path";
 
-import { ZipToPackage } from "../packages/ZipToPackage";
-
 import { TilesetSources } from "../tilesetData/TilesetSources";
 import { TilesetTargets } from "../tilesetData/TilesetTargets";
 import { TilesetError } from "../tilesetData/TilesetError";
 
 import { Tilesets } from "../tilesets/Tilesets";
 
+import { ZipToPackage } from "../packages/ZipToPackage";
+
 /**
  * Methods for converting tilesets between different storage formats.
- * (i.e. the file system, or 3D Tiles archives/packages, or in ZIP
- * files)
+ * (i.e. the file system, or 3D Tiles archives/packages).
  */
 export class TilesetConverter {
   /**
@@ -24,8 +23,6 @@ export class TilesetConverter {
    * - A directory that contains a `tileset.json` file
    * - A 3D Tiles package (with `.3tz` or `.3dtiles` extension)
    *
-   * The input can alternatively be a `.zip` file.
-   *
    * Package files are required to contain a `tileset.json` file for the
    * top-level tileset. When the input was a specific tileset JSON file,
    * then this file will be renamed to `tileset.json` if necessary for
@@ -34,34 +31,49 @@ export class TilesetConverter {
    * contains a file that matches the required file for the output.
    *
    * @param input - The full input name
+   * @param inputTilesetJsonFileName The name of the tileset JSON file
+   * in the input. When this is not given, then the name will either be
+   * the file name of the input (if the input was a JSON file), or default
+   * to 'tileset.json' (if the input was a directory or a tileset package)
    * @param output - The full output name
    * @param force - Whether existing output files may be overwritten
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError If the requirements for the tileset JSON
    * file names (stated above) are not met.
    */
-  static async convert(input: string, output: string, force: boolean) {
-    const inputExtension = path.extname(input).toLowerCase();
-    if (inputExtension === ".zip") {
-      await ZipToPackage.convert(input, output, force);
-      return;
+  static async convert(
+    input: string,
+    inputTilesetJsonFileName: string | undefined,
+    output: string,
+    force: boolean
+  ) {
+    if (inputTilesetJsonFileName === undefined) {
+      inputTilesetJsonFileName = Tilesets.determineTilesetJsonFileName(input);
     }
-
-    const inputTilesetJsonFileName =
-      Tilesets.determineTilesetJsonFileName(input);
     const outputTilesetJsonFileName =
       Tilesets.determineTilesetJsonFileName(output);
 
+    const inputExtension = path.extname(input).toLowerCase();
+    if (inputExtension === ".zip") {
+      await ZipToPackage.convert(
+        input,
+        inputTilesetJsonFileName,
+        output,
+        force
+      );
+      return;
+    }
+
     const tilesetSource = TilesetSources.createAndOpen(input);
     const tilesetTarget = TilesetTargets.createAndBegin(output, force);
-    let inputJsonFileNameWasFound = false;
+    let inputTilesetJsonFileNameWasFound = false;
     let causedDuplicate = false;
     const keys = tilesetSource.getKeys();
     for (const key of keys) {
       const content = tilesetSource.getValue(key);
       if (content) {
         if (key === inputTilesetJsonFileName) {
-          inputJsonFileNameWasFound = true;
+          inputTilesetJsonFileNameWasFound = true;
           if (inputTilesetJsonFileName !== outputTilesetJsonFileName) {
             console.log(
               `Storing ${inputTilesetJsonFileName} from ${input} ` +
@@ -80,7 +92,7 @@ export class TilesetConverter {
     tilesetSource.close();
     await tilesetTarget.end();
 
-    if (!inputJsonFileNameWasFound) {
+    if (!inputTilesetJsonFileNameWasFound) {
       throw new TilesetError(
         `File ${inputTilesetJsonFileName} was not found in ${input}`
       );
