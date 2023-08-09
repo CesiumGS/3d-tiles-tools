@@ -88,21 +88,21 @@ function parseToolArgs(a: string[]) {
         "The input can also be the path of a ZIP file that contains the " +
         "tileset data. The tileset JSON file in this ZIP is determined " +
         "by the 'inputTilesetJsonFileName', which is 'tileset.json' by " +
-        "default." +
-        {
-          i: inputStringDefinition,
-          o: outputStringDefinition,
-          inputTilesetJsonFileName: {
-            description:
-              "The name of the tileset JSON file in the input. " +
-              "This is only required when the input is a ZIP file that " +
-              "contains a tileset JSON file that is not called 'tileset.json'.",
-            default: "tileset.json",
-            global: true,
-            normalize: true,
-            type: "string",
-          },
-        }
+        "default.",
+      {
+        i: inputStringDefinition,
+        o: outputStringDefinition,
+        inputTilesetJsonFileName: {
+          description:
+            "The name of the tileset JSON file in the input. " +
+            "This is only required when the input is a ZIP file that " +
+            "contains a tileset JSON file that is not called 'tileset.json'.",
+          default: "tileset.json",
+          global: true,
+          normalize: true,
+          type: "string",
+        },
+      }
     )
     .command(
       "glbToB3dm",
@@ -261,7 +261,8 @@ function parseToolArgs(a: string[]) {
     .demandCommand(1)
     .strict();
 
-  return args.argv as any;
+  const result = args.argv as any;
+  return result;
 }
 
 /**
@@ -291,9 +292,11 @@ console.log("Parsed command line arguments:");
 console.log(parsedToolArgs);
 //*/
 
-const command = parsedToolArgs._[0];
-
 async function run() {
+  if (!parsedToolArgs) {
+    return;
+  }
+  const command = parsedToolArgs._[0];
   console.time("Total");
   await runCommand(command, parsedToolArgs, optionArgs);
   console.timeEnd("Total");
