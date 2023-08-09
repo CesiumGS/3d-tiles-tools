@@ -8,6 +8,13 @@ import { Tileset } from "../structure/Tileset";
 import { GltfTransform } from "../contentProcessing/GltfTransform";
 
 import { getBounds } from "@gltf-transform/core";
+import { TileFormats } from "../tileFormats/TileFormats";
+import { BatchTable } from "../structure/TileFormats/BatchTable";
+import { PntsPointClouds } from "../contentProcessing/pointClouds/PntsPointClouds";
+import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
+import { BufferedContentData } from "../contentTypes/BufferedContentData";
+import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
+import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
 
 // Basic, internal structures for bounding box computations
 type Point3D = [number, number, number];
@@ -19,6 +26,8 @@ const UNIT_CUBE_BOUNDING_BOX: BoundingBox3D = {
   min: [0, 0, 0],
   max: [1, 1, 1],
 };
+const DEFAULT_LEAF_GEOMETRIC_ERROR = 512;
+const DEFAULT_TILESET_GEOMETRIC_ERROR = 4096;
 
 /**
  * A class for creating `Tileset` JSON objects from tile content files.
@@ -34,7 +43,7 @@ export class TilesetJsonCreator {
   // volumes are actually `boundingVolume.box` bounding volumes.
 
   /**
-   * Creates a tileset that uses the specified GLB files as its
+   * Creates a tileset that uses the specified files as its
    * tile contents.
    *
    * Many details about the resulting tileset are intentionally
@@ -45,15 +54,20 @@ export class TilesetJsonCreator {
    * @param contentUris The content URIs
    * @returns The tileset
    */
-  static async createTilesetFromGlbs(baseDir: string, contentUris: string[]) {
+  static async createTilesetFromContents(
+    baseDir: string,
+    contentUris: string[]
+  ) {
     const leafTiles = [];
     for (let i = 0; i < contentUris.length; i++) {
       const contentUri = contentUris[i];
-      const leafTile = await TilesetJsonCreator.createLeafTileFromGlb(
+      const leafTile = await TilesetJsonCreator.createLeafTileFromContent(
         baseDir,
         contentUri
       );
-      leafTiles.push(leafTile);
+      if (leafTile) {
+        leafTiles.push(leafTile);
+      }
     }
     const tileset = TilesetJsonCreator.createTilesetFromLeafTiles(leafTiles);
     return tileset;
@@ -62,9 +76,11 @@ export class TilesetJsonCreator {
   /**
    * Creates a leaf tile with the specified tile content.
    *
-   * The GLB will be loaded from the specified file, given as
-   * `<baseDir>/<contentUri>`. Its bounding wolume will be
-   * computed and used as the bounding volume of the
+   * The content data will be loaded from the specified file, given
+   * as `<baseDir>/<contentUri>`. The content data type will be
+   * determined. If the content data type is one of the supported
+   * types (which are unspecified for now), then its bounding volume
+   * will be computed, and used as the bounding volume of the
    * resulting tile.
    *
    * @param baseDir - The base directory against which the
@@ -72,22 +88,47 @@ export class TilesetJsonCreator {
    * @param contentUri The content URI
    * @returns The leaf tile
    */
-  private static async createLeafTileFromGlb(
+  private static async createLeafTileFromContent(
     baseDir: string,
     contentUri: string
-  ): Promise<Tile> {
-    const glbFileName = path.join(baseDir, contentUri);
-    const boundingBox = await TilesetJsonCreator.computeBoundingBoxFromGlbFile(
-      glbFileName
+  ): Promise<Tile | undefined> {
+    const fileName = path.join(baseDir, contentUri);
+    const data = fs.readFileSync(fileName);
+    const contentData = new BufferedContentData(contentUri, data);
+    const contentDataType = await ContentDataTypeRegistry.findContentDataType(
+      contentData
     );
-    const boundingVolumeBox =
-      TilesetJsonCreator.createBoundingVolumeBoxFromGltfBoundingBox(
-        boundingBox
+
+    let boundingVolumeBox =
+      TilesetJsonCreator.createBoundingVolumeBoxFromBoundingBox(
+        UNIT_CUBE_BOUNDING_BOX
       );
+
+    if (contentDataType === ContentDataTypes.CONTENT_TYPE_GLB) {
+      const gltfBoundingBox =
+        await TilesetJsonCreator.computeBoundingBoxFromGlb(data);
+      boundingVolumeBox =
+        TilesetJsonCreator.createBoundingVolumeBoxFromGltfBoundingBox(
+          gltfBoundingBox
+        );
+    } else if (contentDataType === ContentDataTypes.CONTENT_TYPE_PNTS) {
+      const boundingBox = await TilesetJsonCreator.computeBoundingBoxFromPnts(
+        data
+      );
+      boundingVolumeBox =
+        TilesetJsonCreator.createBoundingVolumeBoxFromGltfBoundingBox(
+          boundingBox
+        );
+    } else {
+      console.log(
+        "WARNING: Content data type " + contentDataType + " is not handled"
+      );
+      return undefined;
+    }
     const boundingVolume = {
       box: boundingVolumeBox,
     };
-    const geometricError = 1.0;
+    const geometricError = DEFAULT_LEAF_GEOMETRIC_ERROR;
     return TilesetJsonCreator.createLeafTile(
       boundingVolume,
       geometricError,
@@ -108,7 +149,7 @@ export class TilesetJsonCreator {
    * @returns The tileset
    */
   private static createTilesetFromLeafTiles(leafTiles: Tile[]): Tileset {
-    const tilesetGeometricError = 1024;
+    const tilesetGeometricError = DEFAULT_TILESET_GEOMETRIC_ERROR;
     let root = undefined;
     if (leafTiles.length === 1) {
       root = leafTiles[0];
@@ -261,21 +302,47 @@ export class TilesetJsonCreator {
   }
 
   /**
-   * Computes the bounding box of the given glTF file.
+   * Computes the bounding box of the given PNTS data
    *
-   * This will compute the bounding box of the default scene
-   * (or the first scene of the asset). If there is no scene,
-   * then a warning will be printed, and a unit cube bounding
-   * box will be returned.
-   *
-   * @param glbFileName - The name of the GLB file
+   * @param pntsBuffer - The PNTS data buffer
    * @returns A promise to the bounding box
    */
-  private static async computeBoundingBoxFromGlbFile(
-    glbFileName: string
+  private static async computeBoundingBoxFromPnts(
+    pntsBuffer: Buffer
   ): Promise<BoundingBox3D> {
-    const glbBuffer = fs.readFileSync(glbFileName);
-    return TilesetJsonCreator.computeBoundingBoxFromGlb(glbBuffer);
+    // Read the tile data from the input data
+    const tileData = TileFormats.readTileData(pntsBuffer);
+    const batchTable = tileData.batchTable.json as BatchTable;
+    const featureTable = tileData.featureTable.json as PntsFeatureTable;
+    const featureTableBinary = tileData.featureTable.binary;
+
+    // Create a `ReadablePointCloud` that allows accessing
+    // the PNTS data
+    const pntsPointCloud = await PntsPointClouds.create(
+      featureTable,
+      featureTableBinary,
+      batchTable
+    );
+
+    // Compute the minimum/maximum position
+    let min: Point3D = [Infinity, Infinity, Infinity];
+    let max: Point3D = [-Infinity, -Infinity, -Infinity];
+    const globalPosition = pntsPointCloud.getGlobalPosition() ?? [0, 0, 0];
+    const localPositions = pntsPointCloud.getPositions();
+    for (const localPosition of localPositions) {
+      const position: Point3D = [
+        localPosition[0] + globalPosition[0],
+        localPosition[1] + globalPosition[1],
+        localPosition[2] + globalPosition[2],
+      ];
+      min = TilesetJsonCreator.min(min, position);
+      max = TilesetJsonCreator.max(max, position);
+    }
+    const result: BoundingBox3D = {
+      min: min,
+      max: max,
+    };
+    return result;
   }
 
   /**
@@ -313,12 +380,7 @@ export class TilesetJsonCreator {
   /**
    * Creates a boundingVolume.box from a given bounding box
    *
-   * @param minX The minimum x
-   * @param minY The minimum y
-   * @param minZ The minimum z
-   * @param maxX The maximum x
-   * @param maxY The maximum y
-   * @param maxZ The maximum z
+   * @param boundingBox The bounding box
    * @return The `boundingVolume.box`
    */
   private static createBoundingVolumeBoxFromBoundingBox(
@@ -394,12 +456,7 @@ export class TilesetJsonCreator {
    * the given bounding box will be transformed with the
    * y-up-to-z-up transform.
    *
-   * @param minX The minimum x
-   * @param minY The minimum y
-   * @param minZ The minimum z
-   * @param maxX The maximum x
-   * @param maxY The maximum y
-   * @param maxZ The maximum z
+   * @param boundingBox The bounding box
    * @return The `boundingVolume.box`
    */
   private static createBoundingVolumeBoxFromGltfBoundingBox(

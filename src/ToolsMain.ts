@@ -421,19 +421,26 @@ export class ToolsMain {
     } else {
       const recurse = true;
       const allFiles = Iterables.overFiles(inputName, recurse);
+      /*
       const glbFiles = Iterables.filter(allFiles, (fileName: string) =>
         Paths.hasExtension(fileName, ".glb")
       );
       contentUris = [...glbFiles].map((fileName: string) =>
         Paths.relativize(inputName, fileName)
       );
+      */
+      contentUris = [...allFiles].map((fileName: string) =>
+        Paths.relativize(inputName, fileName)
+      );
     }
     console.log("Creating tileset.json with content URIs: ", contentUris);
-    const tileset = await TilesetJsonCreator.createTilesetFromGlbs(
+    const tileset = await TilesetJsonCreator.createTilesetFromContents(
       baseDir,
       contentUris
     );
     const tilesetJsonString = JSON.stringify(tileset, null, 2);
+    const outputDirectory = path.dirname(output);
+    Paths.ensureDirectoryExists(outputDirectory);
     fs.writeFileSync(output, Buffer.from(tilesetJsonString));
   }
 
