@@ -241,22 +241,6 @@ export class PntsPointClouds {
   }
 
   /**
-   * Obtains the translation that is implied by the given `RTC_CENTER`
-   * property of a feature table
-   *
-   * @param featureTable - The feature table
-   * @param binary - The binary blob of the feature table
-   * @returns The `RTC_CENTER` value, or `undefined`
-   */
-  private static obtainRtcCenter(
-    rtcCenter: BinaryBodyOffset | number[],
-    binary: Buffer
-  ): [number, number, number] {
-    const c = TileTableData.obtainNumberArray(binary, rtcCenter, 3, "FLOAT32");
-    return [c[0], c[1], c[2]];
-  }
-
-  /**
    * If the given feature table defines the 3DTILES_draco_point_compression
    * extension, then decode that data and return it as a `DracoDecoderResult`.
    *
@@ -560,9 +544,8 @@ export class PntsPointClouds {
 
     // Fetch the `RTC_CENTER` from the feature table, to be used
     // as the "global position" of the point cloud
-    let rtcCenter = undefined;
     if (featureTable.RTC_CENTER) {
-      rtcCenter = PntsPointClouds.obtainRtcCenter(
+      const rtcCenter = TileTableData.obtainRtcCenter(
         featureTable.RTC_CENTER,
         featureTableBinary
       );

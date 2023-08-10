@@ -14,6 +14,22 @@ import { TileFormatError } from "../tileFormats/TileFormatError";
  */
 export class TileTableData {
   /**
+   * Obtains the translation that is implied by the given `RTC_CENTER`
+   * property of a feature table
+   *
+   * @param featureTable - The feature table
+   * @param binary - The binary blob of the feature table
+   * @returns The `RTC_CENTER` value, or `undefined`
+   */
+  static obtainRtcCenter(
+    rtcCenter: BinaryBodyOffset | number[],
+    binary: Buffer
+  ): [number, number, number] {
+    const c = TileTableData.obtainNumberArray(binary, rtcCenter, 3, "FLOAT32");
+    return [c[0], c[1], c[2]];
+  }
+
+  /**
    * Obtains the data from a batch- or feature table property,
    * as an array of numbers.
    *

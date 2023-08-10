@@ -1,31 +1,29 @@
 import fs from "fs";
 import path from "path";
 
-import { BoundingVolume } from "../structure/BoundingVolume";
+import { getBounds } from "@gltf-transform/core";
+
 import { Tile } from "../structure/Tile";
 import { Tileset } from "../structure/Tileset";
+import { BoundingVolume } from "../structure/BoundingVolume";
+import { BatchTable } from "../structure/TileFormats/BatchTable";
+import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
 
 import { GltfTransform } from "../contentProcessing/GltfTransform";
-
-import { getBounds } from "@gltf-transform/core";
-import { TileFormats } from "../tileFormats/TileFormats";
-import { BatchTable } from "../structure/TileFormats/BatchTable";
 import { PntsPointClouds } from "../contentProcessing/pointClouds/PntsPointClouds";
-import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
+
 import { BufferedContentData } from "../contentTypes/BufferedContentData";
 import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
 
-// Basic, internal structures for bounding box computations
-type Point3D = [number, number, number];
-type BoundingBox3D = {
-  min: Point3D;
-  max: Point3D;
-};
-const UNIT_CUBE_BOUNDING_BOX: BoundingBox3D = {
-  min: [0, 0, 0],
-  max: [1, 1, 1],
-};
+import { TileFormats } from "../tileFormats/TileFormats";
+
+import { BoundingVolumes } from "./BoundingVolumes";
+import { BoundingBox3D } from "./BoundingVolumes";
+import { Point3D } from "./BoundingVolumes";
+import { B3dmFeatureTable } from "../structure/TileFormats/B3dmFeatureTable";
+import { TileTableData } from "../migration/TileTableData";
+
 const DEFAULT_LEAF_GEOMETRIC_ERROR = 512;
 const DEFAULT_TILESET_GEOMETRIC_ERROR = 4096;
 
@@ -33,10 +31,12 @@ const DEFAULT_TILESET_GEOMETRIC_ERROR = 4096;
  * A class for creating `Tileset` JSON objects from tile content files.
  */
 export class TilesetJsonCreator {
-  // Implementation note:
+  // Implementation notes:
+  //
   // To reduce ambiguities, the term "bounding box" refers to actual
   // `BoundingBox3D` instances. The term "bounding volume box" refers
   // to the 12-element number arrays that are the `boundingVolume.box`.
+  //
   // Nearly all functions of this class are 'private', and some of
   // them make assumptions that only hold internally - namely, that
   // tiles do not have a `transform` property, or their bounding
@@ -78,10 +78,14 @@ export class TilesetJsonCreator {
    *
    * The content data will be loaded from the specified file, given
    * as `<baseDir>/<contentUri>`. The content data type will be
-   * determined. If the content data type is one of the supported
-   * types (which are unspecified for now), then its bounding volume
-   * will be computed, and used as the bounding volume of the
-   * resulting tile.
+   * determined.
+   *
+   * If the content data type is one of the supported types (which
+   * are unspecified for now), then its bounding volume will be
+   * computed, and used as the bounding volume of the resulting tile.
+   *
+   * If the conetnt data type is not supported, then a warning
+   * will be printed and `undefined` will be returned.
    *
    * @param baseDir - The base directory against which the
    * content URI is resolved
@@ -99,29 +103,65 @@ export class TilesetJsonCreator {
       contentData
     );
 
-    let boundingVolumeBox =
-      TilesetJsonCreator.createBoundingVolumeBoxFromBoundingBox(
-        UNIT_CUBE_BOUNDING_BOX
+    let boundingVolumeBox = BoundingVolumes.createUnitCubeBoundingVolumeBox();
+    if (contentDataType === ContentDataTypes.CONTENT_TYPE_GLB) {
+      const boundingBox = await TilesetJsonCreator.computeBoundingBoxFromGlb(
+        data
       );
 
-    if (contentDataType === ContentDataTypes.CONTENT_TYPE_GLB) {
-      const gltfBoundingBox =
-        await TilesetJsonCreator.computeBoundingBoxFromGlb(data);
+      // TODO Debug log
+      console.log(
+        "Bounding box for " +
+          contentUri +
+          " is " +
+          boundingBox.min +
+          " ... " +
+          boundingBox.max
+      );
+
       boundingVolumeBox =
-        TilesetJsonCreator.createBoundingVolumeBoxFromGltfBoundingBox(
-          gltfBoundingBox
-        );
+        BoundingVolumes.createBoundingVolumeBoxFromGltfBoundingBox(boundingBox);
     } else if (contentDataType === ContentDataTypes.CONTENT_TYPE_PNTS) {
       const boundingBox = await TilesetJsonCreator.computeBoundingBoxFromPnts(
         data
       );
-      boundingVolumeBox =
-        TilesetJsonCreator.createBoundingVolumeBoxFromGltfBoundingBox(
-          boundingBox
-        );
-    } else {
+
+      // TODO Debug log
       console.log(
-        "WARNING: Content data type " + contentDataType + " is not handled"
+        "Bounding box for " +
+          contentUri +
+          " is " +
+          boundingBox.min +
+          " ... " +
+          boundingBox.max
+      );
+
+      // TODO I would have expected that the PNTS bounding box
+      // does NOT require the up-axis transform, i.e. that it should be
+      // createBoundingVolumeBoxFromBoundingBox instead of
+      // createBoundingVolumeBoxFromGltfBoundingBox - review that!
+      boundingVolumeBox =
+        BoundingVolumes.createBoundingVolumeBoxFromGltfBoundingBox(boundingBox);
+    } else if (contentDataType === ContentDataTypes.CONTENT_TYPE_B3DM) {
+      const boundingBox = await TilesetJsonCreator.computeBoundingBoxFromB3dm(
+        data
+      );
+
+      // TODO Debug log
+      console.log(
+        "Bounding box for " +
+          contentUri +
+          " is " +
+          boundingBox.min +
+          " ... " +
+          boundingBox.max
+      );
+
+      boundingVolumeBox =
+        BoundingVolumes.createBoundingVolumeBoxFromGltfBoundingBox(boundingBox);
+    } else {
+      console.warn(
+        "WARNING: Content data type " + contentDataType + " is not supported."
       );
       return undefined;
     }
@@ -216,11 +256,11 @@ export class TilesetJsonCreator {
       const box = tile.boundingVolume.box;
       if (box) {
         const boundingBox =
-          TilesetJsonCreator.createBoundingBoxForBoundingVolumeBox(box);
+          BoundingVolumes.createBoundingBoxForBoundingVolumeBox(box);
         if (!parentBoundingBox) {
           parentBoundingBox = boundingBox;
         } else {
-          parentBoundingBox = TilesetJsonCreator.union(
+          parentBoundingBox = BoundingVolumes.union(
             parentBoundingBox,
             boundingBox
           );
@@ -228,9 +268,9 @@ export class TilesetJsonCreator {
       }
     }
     if (!parentBoundingBox) {
-      parentBoundingBox = UNIT_CUBE_BOUNDING_BOX;
+      parentBoundingBox = BoundingVolumes.createUnitCubeBoundingBox();
     }
-    return TilesetJsonCreator.createBoundingVolumeBoxFromBoundingBox(
+    return BoundingVolumes.createBoundingVolumeBoxFromBoundingBox(
       parentBoundingBox
     );
   }
@@ -259,49 +299,6 @@ export class TilesetJsonCreator {
   }
 
   /**
-   * Computes the component-wise minimum of the given points
-   *
-   * @param p0 - The first point
-   * @param p1 - The second point
-   * @returns The minimum
-   */
-  private static min(p0: Point3D, p1: Point3D): Point3D {
-    return [
-      Math.min(p0[0], p1[0]),
-      Math.min(p0[1], p1[1]),
-      Math.min(p0[2], p1[2]),
-    ];
-  }
-  /**
-   * Computes the component-wise maximum of the given points
-   *
-   * @param p0 - The first point
-   * @param p1 - The second point
-   * @returns The maximum
-   */
-  private static max(p0: Point3D, p1: Point3D): Point3D {
-    return [
-      Math.max(p0[0], p1[0]),
-      Math.max(p0[1], p1[1]),
-      Math.max(p0[2], p1[2]),
-    ];
-  }
-
-  /**
-   * Computes the union of the given bounding boxes
-   *
-   * @param bb0 - The first bounding box
-   * @param bb1 - The second bounding box
-   * @returns The union
-   */
-  private static union(bb0: BoundingBox3D, bb1: BoundingBox3D): BoundingBox3D {
-    return {
-      min: TilesetJsonCreator.min(bb0.min, bb1.min),
-      max: TilesetJsonCreator.max(bb0.max, bb1.max),
-    };
-  }
-
-  /**
    * Computes the bounding box of the given PNTS data
    *
    * @param pntsBuffer - The PNTS data buffer
@@ -325,8 +322,8 @@ export class TilesetJsonCreator {
     );
 
     // Compute the minimum/maximum position
-    let min: Point3D = [Infinity, Infinity, Infinity];
-    let max: Point3D = [-Infinity, -Infinity, -Infinity];
+    const min: Point3D = [Infinity, Infinity, Infinity];
+    const max: Point3D = [-Infinity, -Infinity, -Infinity];
     const globalPosition = pntsPointCloud.getGlobalPosition() ?? [0, 0, 0];
     const localPositions = pntsPointCloud.getPositions();
     for (const localPosition of localPositions) {
@@ -335,14 +332,52 @@ export class TilesetJsonCreator {
         localPosition[1] + globalPosition[1],
         localPosition[2] + globalPosition[2],
       ];
-      min = TilesetJsonCreator.min(min, position);
-      max = TilesetJsonCreator.max(max, position);
+      BoundingVolumes.min(min, position, min);
+      BoundingVolumes.max(max, position, max);
     }
     const result: BoundingBox3D = {
       min: min,
       max: max,
     };
     return result;
+  }
+
+  /**
+   * Computes the bounding box of the given B3DM data
+   *
+   * @param pntsBuffer - The B3DM data buffer
+   * @returns A promise to the bounding box
+   */
+  private static async computeBoundingBoxFromB3dm(
+    pntsBuffer: Buffer
+  ): Promise<BoundingBox3D> {
+    // Compute the bounding box from the payload (GLB data)
+    const tileData = TileFormats.readTileData(pntsBuffer);
+    const glbBuffer = tileData.payload;
+    const gltfBoundngBox = await TilesetJsonCreator.computeBoundingBoxFromGlb(
+      glbBuffer
+    );
+
+    // If the feature table defines an `RTC_CENTER`, then
+    // translate the bounding box by this amount, taking
+    // the y-up-to-z-up-conversion into account
+    const featureTable = tileData.featureTable.json as B3dmFeatureTable;
+    if (featureTable.RTC_CENTER) {
+      const featureTableBinary = tileData.featureTable.binary;
+      const rtcCenter = TileTableData.obtainRtcCenter(
+        featureTable.RTC_CENTER,
+        featureTableBinary
+      );
+      const tx = rtcCenter[0];
+      const ty = rtcCenter[2];
+      const tz = -rtcCenter[1];
+      const b3dmBoundingBox = BoundingVolumes.translateBoundingBox(
+        gltfBoundngBox,
+        [tx, ty, tz]
+      );
+      return b3dmBoundingBox;
+    }
+    return gltfBoundngBox;
   }
 
   /**
@@ -374,159 +409,6 @@ export class TilesetJsonCreator {
       return bounds;
     }
     console.log("No scenes found in glTF - using unit bounding box");
-    return UNIT_CUBE_BOUNDING_BOX;
-  }
-
-  /**
-   * Creates a boundingVolume.box from a given bounding box
-   *
-   * @param boundingBox The bounding box
-   * @return The `boundingVolume.box`
-   */
-  private static createBoundingVolumeBoxFromBoundingBox(
-    boundingBox: BoundingBox3D
-  ): number[] {
-    return TilesetJsonCreator.createBoundingVolumeBox(
-      boundingBox.min[0],
-      boundingBox.min[1],
-      boundingBox.min[2],
-      boundingBox.max[0],
-      boundingBox.max[1],
-      boundingBox.max[2]
-    );
-  }
-
-  /**
-   * Creates a bounding box for a tileset- or tile bounding volume.
-   *
-   * This is the center- and half-axis representation of the
-   * `boundingVolume.box` that is described at
-   * https://github.com/CesiumGS/3d-tiles/tree/main/specification#box,
-   * computed from the minimum- and maximum point of a box.
-   *
-   * @param minX The minimum x
-   * @param minY The minimum y
-   * @param minZ The minimum z
-   * @param maxX The maximum x
-   * @param maxY The maximum y
-   * @param maxZ The maximum z
-   * @return The `boundingVolume.box`
-   */
-  private static createBoundingVolumeBox(
-    minX: number,
-    minY: number,
-    minZ: number,
-    maxX: number,
-    maxY: number,
-    maxZ: number
-  ): number[] {
-    // The size of the box
-    const dx = maxX - minX;
-    const dy = maxY - minY;
-    const dz = maxZ - minZ;
-
-    // The center of the box
-    const cx = minX + dx * 0.5;
-    const cy = minY + dy * 0.5;
-    const cz = minZ + dz * 0.5;
-
-    // The x-direction and half length
-    const hxx = dx * 0.5;
-    const hxy = 0.0;
-    const hxz = 0.0;
-
-    // The y-direction and half length
-    const hyx = 0.0;
-    const hyy = dy * 0.5;
-    const hyz = 0.0;
-
-    // The z-direction and half length
-    const hzx = 0.0;
-    const hzy = 0.0;
-    const hzz = dz * 0.5;
-
-    const box = [cx, cy, cz, hxx, hxy, hxz, hyx, hyy, hyz, hzx, hzy, hzz];
-    return box;
-  }
-
-  /**
-   * Creates a boundingVolume.box from a given glTF bounding box.
-   *
-   * This will take into account the fact that a glTF asset with
-   * the given bounding box will be transformed with the
-   * y-up-to-z-up transform.
-   *
-   * @param boundingBox The bounding box
-   * @return The `boundingVolume.box`
-   */
-  private static createBoundingVolumeBoxFromGltfBoundingBox(
-    boundingBox: BoundingBox3D
-  ): number[] {
-    // Take into account the y-up-to-z-up transform:
-    return TilesetJsonCreator.createBoundingVolumeBox(
-      boundingBox.min[0],
-      -boundingBox.min[2],
-      boundingBox.min[1],
-      boundingBox.max[0],
-      -boundingBox.max[2],
-      boundingBox.max[1]
-    );
-  }
-
-  /**
-   * Create the BoundingBox3D for the given boundingVolume.box
-   *
-   * @param boundingVolumeBox - The bounding volume box
-   * @return The bounding box
-   */
-  private static createBoundingBoxForBoundingVolumeBox(
-    boundingVolumeBox: number[]
-  ): BoundingBox3D {
-    // Ported from de.javagl:j3dtiles-common:0.0.1-SNAPSHOT
-    // even though this is not very elegant...
-
-    const cx = boundingVolumeBox[0];
-    const cy = boundingVolumeBox[1];
-    const cz = boundingVolumeBox[2];
-
-    let minX = Infinity;
-    let minY = Infinity;
-    let minZ = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-    let maxZ = -Infinity;
-    for (let i = 1; i < 4; i++) {
-      const dx = boundingVolumeBox[i * 3 + 0];
-      const dy = boundingVolumeBox[i * 3 + 1];
-      const dz = boundingVolumeBox[i * 3 + 2];
-
-      const x0 = cx + dx;
-      const y0 = cy + dy;
-      const z0 = cz + dz;
-
-      minX = Math.min(minX, x0);
-      minY = Math.min(minY, y0);
-      minZ = Math.min(minZ, z0);
-
-      maxX = Math.max(maxX, x0);
-      maxY = Math.max(maxY, y0);
-      maxZ = Math.max(maxZ, z0);
-
-      const x1 = cx - dx;
-      const y1 = cy - dy;
-      const z1 = cz - dz;
-
-      minX = Math.min(minX, x1);
-      minY = Math.min(minY, y1);
-      minZ = Math.min(minZ, z1);
-
-      maxX = Math.max(maxX, x1);
-      maxY = Math.max(maxY, y1);
-      maxZ = Math.max(maxZ, z1);
-    }
-    return {
-      min: [minX, minY, minZ],
-      max: [maxX, maxY, maxZ],
-    };
+    return BoundingVolumes.createUnitCubeBoundingBox();
   }
 }

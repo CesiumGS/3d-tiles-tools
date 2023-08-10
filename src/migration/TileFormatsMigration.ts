@@ -233,7 +233,7 @@ export class TileFormatsMigration {
     // a new root node above each scene node, that carries the
     // RTC_CENTER as its translation
     if (featureTable.RTC_CENTER) {
-      const rtcCenter = TileFormatsMigration.obtainRtcCenter(
+      const rtcCenter = TileTableData.obtainRtcCenter(
         featureTable.RTC_CENTER,
         featureTableBinary
       );
@@ -310,21 +310,5 @@ export class TileFormatsMigration {
         scene.addChild(rtcRoot);
       }
     }
-  }
-
-  /**
-   * Obtains the translation that is implied by the given `RTC_CENTER`
-   * property of a feature table.
-   *
-   * @param rtcCenter - The `RTC_CENTER` property
-   * @param binary - The binary blob of the feature table
-   * @returns The `RTC_CENTER` value, or `undefined`
-   */
-  private static obtainRtcCenter(
-    rtcCenter: BinaryBodyOffset | number[],
-    binary: Buffer
-  ): [number, number, number] {
-    const c = TileTableData.obtainNumberArray(binary, rtcCenter, 3, "FLOAT32");
-    return [c[0], c[1], c[2]];
   }
 }
