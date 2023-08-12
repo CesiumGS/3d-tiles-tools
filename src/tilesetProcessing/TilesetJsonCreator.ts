@@ -8,6 +8,7 @@ import { Tileset } from "../structure/Tileset";
 import { BoundingVolume } from "../structure/BoundingVolume";
 import { BatchTable } from "../structure/TileFormats/BatchTable";
 import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
+import { B3dmFeatureTable } from "../structure/TileFormats/B3dmFeatureTable";
 
 import { GltfTransform } from "../contentProcessing/GltfTransform";
 import { PntsPointClouds } from "../contentProcessing/pointClouds/PntsPointClouds";
@@ -21,7 +22,7 @@ import { TileFormats } from "../tileFormats/TileFormats";
 import { BoundingVolumes } from "./BoundingVolumes";
 import { BoundingBox3D } from "./BoundingVolumes";
 import { Point3D } from "./BoundingVolumes";
-import { B3dmFeatureTable } from "../structure/TileFormats/B3dmFeatureTable";
+
 import { TileTableData } from "../migration/TileTableData";
 
 const DEFAULT_LEAF_GEOMETRIC_ERROR = 512;
@@ -345,14 +346,14 @@ export class TilesetJsonCreator {
   /**
    * Computes the bounding box of the given B3DM data
    *
-   * @param pntsBuffer - The B3DM data buffer
+   * @param b3dmBuffer - The B3DM data buffer
    * @returns A promise to the bounding box
    */
   private static async computeBoundingBoxFromB3dm(
-    pntsBuffer: Buffer
+    b3dmBuffer: Buffer
   ): Promise<BoundingBox3D> {
     // Compute the bounding box from the payload (GLB data)
-    const tileData = TileFormats.readTileData(pntsBuffer);
+    const tileData = TileFormats.readTileData(b3dmBuffer);
     const glbBuffer = tileData.payload;
     const gltfBoundngBox = await TilesetJsonCreator.computeBoundingBoxFromGlb(
       glbBuffer
@@ -408,7 +409,7 @@ export class TilesetJsonCreator {
       const bounds = getBounds(scene);
       return bounds;
     }
-    console.log("No scenes found in glTF - using unit bounding box");
+    console.warn("No scenes found in glTF - using unit bounding box");
     return BoundingVolumes.createUnitCubeBoundingBox();
   }
 }
