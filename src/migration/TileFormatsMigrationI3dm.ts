@@ -97,10 +97,13 @@ export class TileFormatsMigrationI3dm {
     const nodes = root.listNodes();
     const nodesWithMesh = nodes.filter((n: Node) => n.getMesh() !== null);
 
-    for (const node of nodesWithMesh) {
-      const nodeMatrix = node.getWorldMatrix();
+    const groupedNodes =
+      TileFormatsMigrationI3dm.groupNodesByTransform(nodesWithMesh);
+    for (const group of groupedNodes) {
+      const node0 = group[0];
+      const nodeMatrix = node0.getWorldMatrix();
 
-      console.log("Assigning extension to node");
+      console.log("Creating extension accessors for node matrix ", nodeMatrix);
 
       const positionsAccessor =
         TileFormatsMigrationI3dm.createPositionsInstancingAccessors(
@@ -111,9 +114,6 @@ export class TileFormatsMigrationI3dm {
           nodeMatrix
         );
 
-      const meshGpuInstancing = extMeshGPUInstancing.createInstancedMesh();
-      meshGpuInstancing.setAttribute("TRANSLATION", positionsAccessor);
-
       const rotationsAccessor =
         TileFormatsMigrationI3dm.createRotationsInstancingAccessors(
           document,
@@ -123,10 +123,6 @@ export class TileFormatsMigrationI3dm {
           nodeMatrix
         );
 
-      if (rotationsAccessor) {
-        meshGpuInstancing.setAttribute("ROTATION", rotationsAccessor);
-      }
-
       const scalesAccessor =
         TileFormatsMigrationI3dm.createScalesInstancingAccessors(
           document,
@@ -134,10 +130,25 @@ export class TileFormatsMigrationI3dm {
           featureTableBinary,
           numInstances
         );
-      if (scalesAccessor) {
-        meshGpuInstancing.setAttribute("SCALE", scalesAccessor);
+
+      for (let i = 0; i < group.length; i++) {
+        const node = group[i];
+
+        console.log(
+          "Assigning extension to node " + i + " of group with node matrix ",
+          node.getWorldMatrix()
+        );
+
+        const meshGpuInstancing = extMeshGPUInstancing.createInstancedMesh();
+        meshGpuInstancing.setAttribute("TRANSLATION", positionsAccessor);
+        if (rotationsAccessor) {
+          meshGpuInstancing.setAttribute("ROTATION", rotationsAccessor);
+        }
+        if (scalesAccessor) {
+          meshGpuInstancing.setAttribute("SCALE", scalesAccessor);
+        }
+        node.setExtension("EXT_mesh_gpu_instancing", meshGpuInstancing);
       }
-      node.setExtension("EXT_mesh_gpu_instancing", meshGpuInstancing);
     }
 
     // Create the GLB buffer
@@ -151,6 +162,30 @@ export class TileFormatsMigrationI3dm {
 
     const glb = await io.writeBinary(document);
     return Buffer.from(glb);
+  }
+
+  private static groupNodesByTransform(nodes: Node[]): Node[][] {
+    const keys: number[][] = [];
+    const values: Node[][] = [];
+    for (const node of nodes) {
+      const nodeMatrix = node.getWorldMatrix();
+      let index = -1;
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        if (VecMath.equalsEpsilon(key, nodeMatrix)) {
+          index = i;
+          break;
+        }
+      }
+      if (index !== -1) {
+        values[index].push(node);
+      } else {
+        keys.push(nodeMatrix);
+        const value = [node];
+        values.push(value);
+      }
+    }
+    return values;
   }
 
   /**
