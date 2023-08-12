@@ -3,13 +3,13 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
 });
 
 let currentTileset;
-let currentTilesetName = "Instanced/InstancedAnimated";
+let currentTilesetName = "Instanced/InstancedAxesSimple";
 let inputOrOutput = "input";
+let doZoom = false;
 
 // Remove any old tileset, and add a new tileset based on the
 // currentTilesetName and the inputOrOutput value
 async function recreateTileset() {
-  let doZoom = false;
   if (Cesium.defined(currentTileset)) {
     viewer.scene.primitives.remove(currentTileset);
     currentTileset = undefined;
@@ -26,13 +26,32 @@ async function recreateTileset() {
   currentTileset.style = new Cesium.Cesium3DTileStyle({
     pointSize: "10"
   });
+  
+  // Special handling for tilesets that are "at the origin":
+  // Move them to a certain position on the globe
+  let distance = 500;
+  if (currentTilesetName.startsWith("Instanced/InstancedAxes")) {
+    const transform = Cesium.Transforms.eastNorthUpToFixedFrame(
+      Cesium.Cartesian3.fromDegrees(-75.152408, 39.946975, 0)
+    );
+    const scale = 10.0;
+    const modelMatrix = Cesium.Matrix4.multiplyByUniformScale(
+      transform,
+      scale,
+      new Cesium.Matrix4()
+    );
+    currentTileset.modelMatrix = modelMatrix;
+    distance = 10;
+  }
+  
   if (doZoom) {
     const offset = new Cesium.HeadingPitchRange(
       Cesium.Math.toRadians(-22.5),
       Cesium.Math.toRadians(-22.5),
-      500.0
+      distance
     );
     viewer.zoomTo(currentTileset, offset);
+    doZoom = false;
   }
 }
 
@@ -125,6 +144,7 @@ function createOption(name) {
     text: name,
     onselect: function () {
       currentTilesetName = name;
+      doZoom = true;
       recreateTileset();
     },
   };
@@ -133,7 +153,10 @@ function createOption(name) {
 function createOptions() {
   const options = [
 
+    createOption("Instanced/InstancedAxesSimple"),
+    
     createOption("Instanced/InstancedAnimated"),
+    createOption("Instanced/InstancedAnimatedRotated"),
     createOption("Instanced/InstancedGltfExternal"),
     createOption("Instanced/InstancedOct32POrientation"),
     createOption("Instanced/InstancedOrientation"),
