@@ -90,21 +90,23 @@ export class TileFormatsMigrationI3dm {
     const root = document.getRoot();
     root.getAsset().generator = "glTF-Transform";
 
-    // If the feature table defines an `RTC_CENTER`, then insert
-    // a new root node above each scene node, that carries the
-    // RTC_CENTER as its translation
-    if (featureTable.RTC_CENTER) {
-      const rtcCenter = TileTableData.obtainRtcCenter(
-        featureTable.RTC_CENTER,
-        featureTableBinary
-      );
-      TileFormatsMigration.applyRtcCenter(document, rtcCenter);
-    }
-
     const extMeshGPUInstancing = document.createExtension(EXTMeshGPUInstancing);
     extMeshGPUInstancing.setRequired(true);
 
     const numInstances = featureTable.INSTANCES_LENGTH;
+
+    // Compute the center of all instance positions, and use this as
+    // a reference point for the positions, by assigning it as a
+    // translation to the glTF root node. Note that this computation
+    // is independent of whether an RTC_CENTER was given explicitly:
+    // The computation of the center will take the RTC_CENTER into
+    // account if it was given.
+    const positionsCenter = TileFormatsMigrationI3dm.computePositionsCenter(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    TileFormatsMigration.applyRtcCenter(document, positionsCenter);
 
     const nodes = root.listNodes();
     const nodesWithMesh = nodes.filter((n: Node) => n.getMesh() !== null);
@@ -123,6 +125,7 @@ export class TileFormatsMigrationI3dm {
           featureTable,
           featureTableBinary,
           numInstances,
+          positionsCenter,
           nodeMatrix
         );
 
@@ -178,12 +181,12 @@ export class TileFormatsMigrationI3dm {
 
   /**
    * Groups the given nodes by equal transforms.
-   * 
-   * This will compute an array of groups, where each group is an array of 
+   *
+   * This will compute an array of groups, where each group is an array of
    * nodes that have the same transform (as in `node.getWorldMatrix()`).
    * Two transforms are considered to be equal when they have all equal
    * values, up to a small, unspecified epsilon.
-   * 
+   *
    * @param nodes - The nodes
    * @returns The grouped nodes
    */
@@ -263,6 +266,34 @@ export class TileFormatsMigrationI3dm {
   }
 
   /**
+   * Compute the center of all positions from the given I3DM data.
+   * (This is the arithmetic mean of the positions, as a 3-element
+   * array)
+   *
+   * @param featureTable - The feature table
+   * @param featureTableBinary The feature table binary
+   * @param numInstances The number of instances
+   * @returns The center of the positions
+   */
+  private static computePositionsCenter(
+    featureTable: I3dmFeatureTable,
+    featureTableBinary: Buffer,
+    numInstances: number
+  ) {
+    const positions = TileFormatsMigrationI3dm.createWorldPositions(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    const sum = [0, 0, 0];
+    for (const position of positions) {
+      VecMath.add(sum, position, sum);
+    }
+    const centerOfGravity = VecMath.scale(sum, 1.0 / numInstances);
+    return centerOfGravity;
+  }
+
+  /**
    * Creates a glTF-Transform accessor for the positions (translation)
    * to be put into the `EXT_gpu_mesh_instancing` extension, based on
    * the positions that are read from the given I3DM data.
@@ -280,6 +311,7 @@ export class TileFormatsMigrationI3dm {
     featureTable: I3dmFeatureTable,
     featureTableBinary: Buffer,
     numInstances: number,
+    positionsCenter: number[],
     nodeMatrix: number[]
   ): Accessor {
     const positions = TileFormatsMigrationI3dm.createWorldPositions(
@@ -289,16 +321,24 @@ export class TileFormatsMigrationI3dm {
     );
     const zupToYup = VecMath.createZupToYupPacked4();
     const inverseNodeMatrix = VecMath.invert4(nodeMatrix);
-    const positionsGltfNode = Iterables.map(positions, (p: number[]) => {
+
+    const positionsGltfNode = Iterables.map(positions, (position: number[]) => {
       // To obtain the position that has to be put into the
       // instancing extension:
       // - transform the origin with the node transform
-      // - add the I3DM position (taking z-up-to-y-up into account)
+      // - add the I3DM position
+      //   - subtracting the center of all I3DM positions
+      //   - taking z-up-to-y-up into account
       // - transform the result back with the inverse node transform
       let result = [0, 0, 0];
       result = VecMath.transform(nodeMatrix, result);
-      const q = VecMath.transform(zupToYup, p);
-      result = VecMath.add(result, q);
+      const positionForGltf = VecMath.transform(zupToYup, position);
+      const relativePositionForGltf = VecMath.subtract(positionForGltf, [
+        positionsCenter[0],
+        positionsCenter[2],
+        -positionsCenter[1],
+      ]);
+      result = VecMath.add(result, relativePositionForGltf);
       result = VecMath.transform(inverseNodeMatrix, result);
       return result;
     });
