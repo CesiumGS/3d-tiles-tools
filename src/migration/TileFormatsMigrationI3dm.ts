@@ -25,9 +25,17 @@ export class TileFormatsMigrationI3dm {
    * Convert the given I3DM data into a glTF asset
    *
    * @param i3dmBuffer - The I3DM buffer
+   * @param externalGlbResolver - A function that will be used to resolve
+   * external GLB data if the I3DM uses `header.gltfFormat=0` (meaning
+   * that the payload is not GLB data, but only a GLB URI).
    * @returns The GLB buffer
+   * @throws TileFormatError If the I3DM contained an external GLB URI
+   * that could not resolved by the given resolver
    */
-  static async convertI3dmToGlb(i3dmBuffer: Buffer): Promise<Buffer> {
+  static async convertI3dmToGlb(
+    i3dmBuffer: Buffer,
+    externalGlbResolver: (uri: string) => Promise<Buffer | undefined>
+  ): Promise<Buffer> {
     const tileData = TileFormats.readTileData(i3dmBuffer);
 
     const batchTable = tileData.batchTable.json as BatchTable;
@@ -46,16 +54,20 @@ export class TileFormatsMigrationI3dm {
     }
     //*/
 
-    if (tileData.header.gltfFormat !== 1) {
-      const gltfUri = tileData.payload;
-      // TODO Resolve external GLB buffer
-      throw new TileFormatError(
-        "External references in I3DM are not yet supported"
-      );
+    let glbBuffer = undefined;
+    if (tileData.header.gltfFormat === 1) {
+      glbBuffer = tileData.payload;
+    } else {
+      const glbUri = tileData.payload.toString().replace(/\0/g, "");
+      glbBuffer = await externalGlbResolver(glbUri);
+      if (!glbBuffer) {
+        throw new TileFormatError(
+          `Could not resolve external GLB from ${glbUri}`
+        );
+      }
     }
     // If the I3DM contained glTF 1.0 data, try to upgrade it
     // with the gltf-pipeline first
-    let glbBuffer = tileData.payload;
     const gltfVersion = GltfUtilities.getGltfVersion(glbBuffer);
     if (gltfVersion < 2.0) {
       console.log("Found glTF 1.0 - upgrading to glTF 2.0 with gltf-pipeline");
