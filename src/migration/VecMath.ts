@@ -5,6 +5,7 @@ import { Matrix3 } from "cesium";
 import { Matrix4 } from "cesium";
 import { Cartesian3 } from "cesium";
 import { Quaternion } from "cesium";
+import { DeveloperError } from "../base/DeveloperError";
 
 /**
  * Vector math utility functions.
@@ -133,6 +134,26 @@ export class VecMath {
       Matrix4.multiply(matrix0, matrix1, matrix0);
     }
     const result = Matrix4.pack(matrix0, new Array(16));
+    return result;
+  }
+
+  /**
+   * Perform a component-wise addition of the given arrays, and
+   * return the result.
+   *
+   * @param a - The first array
+   * @param b - The second array
+   * @returns The result
+   * @throws DeveloperError if the arrays have different lengths
+   */
+  static add(a: number[], b: number[]): number[] {
+    if (a.length !== b.length) {
+      throw new DeveloperError("Arrays have different lengths");
+    }
+    const result = Array(a.length);
+    for (let i = 0; i < a.length; i++) {
+      result[i] = a[i] + b[i];
+    }
     return result;
   }
 

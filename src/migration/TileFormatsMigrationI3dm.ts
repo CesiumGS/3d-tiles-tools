@@ -66,6 +66,15 @@ export class TileFormatsMigrationI3dm {
     // Read the GLB data from the payload of the tile
     const io = await GltfTransform.getIO();
     const document = await io.readBinary(glbBuffer);
+
+    //*/
+    if (TileFormatsMigration.DEBUG_LOG) {
+      console.log("Input glTF JSON");
+      const jsonDocument = await io.writeJSON(document);
+      console.log(JSON.stringify(jsonDocument.json, null, 2));
+    }
+    //*/
+
     const root = document.getRoot();
     root.getAsset().generator = "glTF-Transform";
 
@@ -220,18 +229,22 @@ export class TileFormatsMigrationI3dm {
       featureTableBinary,
       numInstances
     );
+    const zupToYup = VecMath.createZupToYupPacked4();
+    const inverseNodeMatrix = VecMath.invert4(nodeMatrix);
+    const positionsGltfNode = Iterables.map(positions, (p: number[]) => {
+      // To obtain the position that has to be put into the
+      // instancing extension:
+      // - transform the origin with the node transform
+      // - add the I3DM position (taking z-up-to-y-up into account)
+      // - transform the result back with the inverse node transform
+      let result = [0, 0, 0];
+      result = VecMath.transform(nodeMatrix, result);
+      const q = VecMath.transform(zupToYup, p);
+      result = VecMath.add(result, q);
+      result = VecMath.transform(inverseNodeMatrix, result);
+      return result;
+    });
 
-    // Convert the (world) positions from the I3DM into positions
-    // that are used within the glTF extension, by transforming
-    // them with Z-up-to-Y-up and the inverse of the matrix that
-    // the glTF extension will be attached to
-    const positionsToGltfNodeMatrix = VecMath.multiplyAll4([
-      VecMath.invert4(nodeMatrix),
-      VecMath.createZupToYupPacked4(),
-    ]);
-    const positionsGltfNode = Iterables.map(positions, (p: number[]) =>
-      VecMath.transform(positionsToGltfNodeMatrix, p)
-    );
     const positionsGltfNodeFlat = Iterables.flatten(positionsGltfNode);
 
     // Create the glTF-Transform accessor containing the resulting data
