@@ -176,6 +176,17 @@ export class TileFormatsMigrationI3dm {
     return Buffer.from(glb);
   }
 
+  /**
+   * Groups the given nodes by equal transforms.
+   * 
+   * This will compute an array of groups, where each group is an array of 
+   * nodes that have the same transform (as in `node.getWorldMatrix()`).
+   * Two transforms are considered to be equal when they have all equal
+   * values, up to a small, unspecified epsilon.
+   * 
+   * @param nodes - The nodes
+   * @returns The grouped nodes
+   */
   private static groupNodesByTransform(nodes: Node[]): Node[][] {
     const keys: number[][] = [];
     const values: Node[][] = [];
