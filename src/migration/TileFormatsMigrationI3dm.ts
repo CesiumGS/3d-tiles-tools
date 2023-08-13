@@ -319,7 +319,7 @@ export class TileFormatsMigrationI3dm {
       featureTableBinary,
       numInstances
     );
-    const zupToYup = VecMath.createZupToYupPacked4();
+    const matrixZupToYup = VecMath.createZupToYupPacked4();
     const inverseNodeMatrix = VecMath.invert4(nodeMatrix);
 
     const positionsGltfNode = Iterables.map(positions, (position: number[]) => {
@@ -332,7 +332,7 @@ export class TileFormatsMigrationI3dm {
       // - transform the result back with the inverse node transform
       let result = [0, 0, 0];
       result = VecMath.transform(nodeMatrix, result);
-      const positionForGltf = VecMath.transform(zupToYup, position);
+      const positionForGltf = VecMath.transform(matrixZupToYup, position);
       const relativePositionForGltf = VecMath.subtract(positionForGltf, [
         positionsCenter[0],
         positionsCenter[2],
@@ -386,14 +386,31 @@ export class TileFormatsMigrationI3dm {
     // as a "EAST_NORTH_UP" matrix, and converts this matrix into
     // a matrix that describes the rotation that has to be assigned
     // to the instances in the glTF extension.
+    // 
+    // The rotation matrix for the glTF extension is computed from 
+    // the matrix that describes the rotation in the I3DM by putting 
+    // this rotation into the context of the node that the extension 
+    // is attached to. 
+    //
+    // A vertex 'v' that had originally been transformed with the 
+    // rotation matrix 'T' from the I3DM is now transformed with
+    // v' = (Mzy * N^-1 * T * N * Myz) * v
+    // meaning that the vertex is...
+    // - converted from y-up to z-up
+    // - transformed with the node rotation
+    // - transformed with the actual matrix from the I3DM
+    // - transformed with the inverse node rotation
+    // - converted from z-up to y-up
     const matrixZupToYup = VecMath.createZupToYupPacked4();
     const matrixYupToZup = VecMath.createYupToZupPacked4();
     const inverseNodeRotation = VecMath.inverseRotation4(nodeMatrix);
+    const nodeRotation = VecMath.extractRotation4(nodeMatrix);
     function convertRotationMatrixToGltf(rotationMatrix4: number[]) {
       const resultMatrix = VecMath.multiplyAll4([
         matrixZupToYup,
         inverseNodeRotation,
         rotationMatrix4,
+        nodeRotation,
         matrixYupToZup,
       ]);
       return resultMatrix;
@@ -452,7 +469,7 @@ export class TileFormatsMigrationI3dm {
         return VecMath.computeEastNorthUpMatrix4(p);
       });
 
-      // Convert the rotation matrices to the glTF coorinate
+      // Convert the rotation matrices to the glTF coordinate
       // space of the node that the instancing extension will
       // be attached to
       const rotationMatricesForGltf = Iterables.map(

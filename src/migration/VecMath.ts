@@ -259,6 +259,24 @@ export class VecMath {
   }
 
   /**
+   * Creates a matrix that only contains the rotation component 
+   * of the given 4x4 matrix.
+   *
+   * @param matrix4Packed - The matrix
+   * @returns The resulting matrix
+   */
+  static extractRotation4(matrix4Packed: number[]): number[] {
+    // TODO This could probably be written in a simpler form...
+    const matrix4 = VecMath.matrix4Scratch0;
+    const matrix3 = VecMath.matrix3Scratch;
+    Matrix4.unpack(matrix4Packed, 0, matrix4);
+    Matrix4.getRotation(matrix4, matrix3);
+    Matrix4.fromRotation(matrix3, matrix4);
+    const result = Matrix4.pack(matrix4, new Array(16));
+    return result;
+  }
+
+  /**
    * Transforms the given 3D position (given as a 3-element array)
    * with the given 4x4 matrix.
    *
