@@ -259,7 +259,7 @@ export class VecMath {
   }
 
   /**
-   * Creates a matrix that only contains the rotation component 
+   * Creates a matrix that only contains the rotation component
    * of the given 4x4 matrix.
    *
    * @param matrix4Packed - The matrix
@@ -333,6 +333,27 @@ export class VecMath {
     Matrix4.getMatrix3(matrix4, matrix3);
     Quaternion.fromRotationMatrix(matrix3, quaternion);
     const result = Quaternion.pack(quaternion, new Array(4));
+    return result;
+  }
+
+  /**
+   * Creates a quaternion from the rotation component of the given
+   * 4x4 matrix.
+   *
+   * The matrix is a flat 16-element array, and the quaternion
+   * is a 4-element array.
+   *
+   * @param matrix4Packed - The matrix
+   * @returns The quaternion.
+   */
+  static quaternionToMatrix4(quaternionPacked: number[]) {
+    const matrix3 = VecMath.matrix3Scratch;
+    const matrix4 = VecMath.matrix4Scratch0;
+    const quaternion = VecMath.quaternionScratch;
+    Quaternion.unpack(quaternionPacked, 0, quaternion);
+    Matrix3.fromQuaternion(quaternion, matrix3);
+    Matrix4.fromRotation(matrix3, matrix4);
+    const result = Matrix4.pack(matrix4, new Array(16));
     return result;
   }
 
