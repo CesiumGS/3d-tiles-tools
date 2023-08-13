@@ -386,13 +386,13 @@ export class TileFormatsMigrationI3dm {
     // as a "EAST_NORTH_UP" matrix, and converts this matrix into
     // a matrix that describes the rotation that has to be assigned
     // to the instances in the glTF extension.
-    // 
-    // The rotation matrix for the glTF extension is computed from 
-    // the matrix that describes the rotation in the I3DM by putting 
-    // this rotation into the context of the node that the extension 
-    // is attached to. 
     //
-    // A vertex 'v' that had originally been transformed with the 
+    // The rotation matrix for the glTF extension is computed from
+    // the matrix that describes the rotation in the I3DM by putting
+    // this rotation into the context of the node that the extension
+    // is attached to.
+    //
+    // A vertex 'v' that had originally been transformed with the
     // rotation matrix 'T' from the I3DM is now transformed with
     // v' = (Mzy * N^-1 * T * N * Myz) * v
     // meaning that the vertex is...
@@ -427,18 +427,30 @@ export class TileFormatsMigrationI3dm {
       numInstances
     );
     if (normalsUp && normalsRight) {
-      // Convert the up- and right normals that are given in the
-      // I3DM to the glTF coordinate system, by transforming them
-      // with the Z-up-to-Y-up transform
-      const convertNormalToGltf = (p: number[]): number[] => {
-        return VecMath.transform(matrixZupToYup, p);
-      };
-      const normalsUpGltf = [...normalsUp].map(convertNormalToGltf);
-      const normalsRightGltf = [...normalsRight].map(convertNormalToGltf);
+      // Compute the rotation quaternions from the up- and right normals
+      // and convert them into 4x4 rotation matrices
+      const inputRotationQuaternions = VecMath.computeRotationQuaternions(
+        [...normalsUp],
+        [...normalsRight]
+      );
+      const rotationMatrices = Iterables.map(
+        inputRotationQuaternions,
+        VecMath.quaternionToMatrix4
+      );
 
-      const rotationQuaternions = VecMath.computeRotationQuaternions(
-        normalsUpGltf,
-        normalsRightGltf
+      // Convert the rotation matrices to the glTF coordinate
+      // space of the node that the instancing extension will
+      // be attached to
+      const rotationMatricesForGltf = Iterables.map(
+        rotationMatrices,
+        convertRotationMatrixToGltf
+      );
+
+      // Create the quaternions for the instancing extension
+      // from the resulting rotation matrices
+      const rotationQuaternions = Iterables.map(
+        rotationMatricesForGltf,
+        VecMath.matrix4ToQuaternion
       );
 
       //*/
