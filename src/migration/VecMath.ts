@@ -1,10 +1,10 @@
-import { Math as CesiumMath } from "cesium";
 import { Transforms } from "cesium";
 import { Ellipsoid } from "cesium";
 import { Matrix3 } from "cesium";
 import { Matrix4 } from "cesium";
 import { Cartesian3 } from "cesium";
 import { Quaternion } from "cesium";
+
 import { DeveloperError } from "../base/DeveloperError";
 
 /**
@@ -22,7 +22,6 @@ export class VecMath {
   private static readonly rightScratch = new Cartesian3();
   private static readonly forwardScratch = new Cartesian3();
   private static readonly positionScratch0 = new Cartesian3();
-  private static readonly positionScratch1 = new Cartesian3();
   private static readonly matrix3Scratch = new Matrix3();
   private static readonly matrix4Scratch0 = new Matrix4();
   private static readonly matrix4Scratch1 = new Matrix4();
