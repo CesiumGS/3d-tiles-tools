@@ -78,4 +78,28 @@ export class TileFormatsMigration {
       }
     }
   }
+
+  /**
+   * Make sure that each scene in the given document has a single
+   * root node. If there is a scene that contains multiple nodes
+   * directly, then remove these nodes and insert a new root
+   * that has the former scene nodes as its chilldren.
+   *
+   * @param document - The glTF-Transform document
+   */
+  static makeSingleRoot(document: Document) {
+    const root = document.getRoot();
+    const scenes = root.listScenes();
+    for (const scene of scenes) {
+      const oldChildren = scene.listChildren();
+      if (oldChildren.length > 1) {
+        const newRoot = document.createNode();
+        for (const oldChild of oldChildren) {
+          scene.removeChild(oldChild);
+          newRoot.addChild(oldChild);
+        }
+        scene.addChild(newRoot);
+      }
+    }
+  }
 }

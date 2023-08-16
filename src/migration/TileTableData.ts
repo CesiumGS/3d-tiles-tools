@@ -65,7 +65,7 @@ export class TileTableData {
           numPositions
         );
       // The 'quantization.offset' will become part of the 'global position'
-      // of the point cloud, so use an offset of [0,0,0] here
+      // so use an offset of [0,0,0] here
       const offset = [0, 0, 0];
       const dequantization = TileTableData.createDequantization(
         offset,

@@ -27,13 +27,15 @@ export class VecMath {
   private static readonly matrix4Scratch0 = new Matrix4();
   private static readonly matrix4Scratch1 = new Matrix4();
   private static readonly quaternionScratch = new Quaternion();
+  private static readonly cartesian3Scratch0 = new Cartesian3();
+  private static readonly cartesian3Scratch1 = new Cartesian3();
 
   /**
    * Create a 4x4 identity matrix as a flat array
    *
    * @returns The matrix
    */
-  static createIdentityPacked4() {
+  private static createIdentityPacked4() {
     return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
   }
 
@@ -211,7 +213,11 @@ export class VecMath {
    * @returns The result
    * @throws DeveloperError if the arrays have different lengths
    */
-  static scale(a: number[], factor: number, result?: number[]): number[] {
+  private static scale(
+    a: number[],
+    factor: number,
+    result?: number[]
+  ): number[] {
     if (result != undefined) {
       if (a.length !== result.length) {
         throw new DeveloperError("Arrays have different lengths");
@@ -222,79 +228,6 @@ export class VecMath {
     for (let i = 0; i < a.length; i++) {
       result[i] = a[i] * factor;
     }
-    return result;
-  }
-
-  /**
-   * Computes the inverse of the given 4x4 matrix, given as
-   * a flat, 16-element array.
-   *
-   * @param matrix4Packed - The matrix
-   * @returns The resulting matrix
-   */
-  static invert4(matrix4Packed: number[]): number[] {
-    const matrix4 = VecMath.matrix4Scratch0;
-    Matrix4.unpack(matrix4Packed, 0, matrix4);
-    Matrix4.inverse(matrix4, matrix4);
-    const result = Matrix4.pack(matrix4, new Array(16));
-    return result;
-  }
-
-  /**
-   * Computes the rotation component of the inverse of the
-   * given 4x4 matrix.
-   *
-   * @param matrix4Packed - The matrix
-   * @returns The resulting matrix
-   */
-  static inverseRotation4(matrix4Packed: number[]): number[] {
-    const matrix4 = VecMath.matrix4Scratch0;
-    const matrix3 = VecMath.matrix3Scratch;
-    Matrix4.unpack(matrix4Packed, 0, matrix4);
-    Matrix4.inverse(matrix4, matrix4);
-    Matrix4.getRotation(matrix4, matrix3);
-    Matrix4.fromRotation(matrix3, matrix4);
-    const result = Matrix4.pack(matrix4, new Array(16));
-    return result;
-  }
-
-  /**
-   * Creates a matrix that only contains the rotation component
-   * of the given 4x4 matrix.
-   *
-   * @param matrix4Packed - The matrix
-   * @returns The resulting matrix
-   */
-  static extractRotation4(matrix4Packed: number[]): number[] {
-    // TODO This could probably be written in a simpler form...
-    const matrix4 = VecMath.matrix4Scratch0;
-    const matrix3 = VecMath.matrix3Scratch;
-    Matrix4.unpack(matrix4Packed, 0, matrix4);
-    Matrix4.getRotation(matrix4, matrix3);
-    Matrix4.fromRotation(matrix3, matrix4);
-    const result = Matrix4.pack(matrix4, new Array(16));
-    return result;
-  }
-
-  /**
-   * Transforms the given 3D position (given as a 3-element array)
-   * with the given 4x4 matrix.
-   *
-   * @param matrix4Packed - The matrix
-   * @param positionPacked - The 3D position
-   * @returns The transformed position
-   */
-  static transform(
-    matrix4Packed: number[],
-    positionPacked: number[]
-  ): number[] {
-    const position = VecMath.positionScratch0;
-    const transformed = VecMath.positionScratch1;
-    const matrix4 = VecMath.matrix4Scratch0;
-    Matrix4.unpack(matrix4Packed, 0, matrix4);
-    Cartesian3.unpack(positionPacked, 0, position);
-    Matrix4.multiplyByPoint(matrix4, position, transformed);
-    const result = Cartesian3.pack(transformed, new Array(3));
     return result;
   }
 
@@ -337,45 +270,93 @@ export class VecMath {
   }
 
   /**
-   * Creates a quaternion from the rotation component of the given
-   * 4x4 matrix.
+   * Compose a matrix from the given translation, rotation quaternion,
+   * and scaling factors.
    *
-   * The matrix is a flat 16-element array, and the quaternion
-   * is a 4-element array.
-   *
-   * @param matrix4Packed - The matrix
-   * @returns The quaternion.
+   * @param translation3D - The translation
+   * @param rotationQuaternion - The rotation quaternion
+   * @param scale3D - The scaling factors
+   * @returns The matrix
    */
-  static quaternionToMatrix4(quaternionPacked: number[]) {
+  static composeMatrixTRS(
+    translation3D: number[],
+    rotationQuaternion?: number[],
+    scale3D?: number[]
+  ) {
+    const result = VecMath.matrix4Scratch0;
+    const matrix = VecMath.matrix4Scratch1;
     const matrix3 = VecMath.matrix3Scratch;
-    const matrix4 = VecMath.matrix4Scratch0;
     const quaternion = VecMath.quaternionScratch;
-    Quaternion.unpack(quaternionPacked, 0, quaternion);
-    Matrix3.fromQuaternion(quaternion, matrix3);
-    Matrix4.fromRotation(matrix3, matrix4);
-    const result = Matrix4.pack(matrix4, new Array(16));
-    return result;
+    const cartesian3 = VecMath.cartesian3Scratch0;
+
+    Cartesian3.unpack(translation3D, 0, cartesian3);
+    Matrix4.fromTranslation(cartesian3, result);
+
+    if (rotationQuaternion) {
+      Quaternion.unpack(rotationQuaternion, 0, quaternion);
+      Matrix3.fromQuaternion(quaternion, matrix3);
+      Matrix4.fromRotation(matrix3, matrix);
+      Matrix4.multiply(result, matrix, result);
+    }
+    if (scale3D) {
+      Cartesian3.unpack(scale3D, 0, cartesian3);
+      Matrix4.fromScale(cartesian3, matrix);
+      Matrix4.multiply(result, matrix, result);
+    }
+    const resultArray = Matrix4.pack(result, new Array(16));
+    return resultArray;
   }
 
   /**
-   * Returns whether the given arrays are equal, up to a small,
-   * unspecified epsilon.
+   * Decompose a matrix into translation, rotation quaternion,
+   * and scaling factors.
    *
-   * @param left - The left array
-   * @param right - The right array
-   * @returns Whether the arrays are epsilon-equal
+   * @param translation3D - The translation
+   * @param rotationMatrix4x4 - The rotation matrix
+   * @param scale3D - The scaling factors
+   * @returns The matrix
    */
-  static equalsEpsilon(left: number[], right: number[]): boolean {
-    if (left.length != right.length) {
-      return false;
+  static decomposeMatrixTRS(matrix4Packed: number[]) {
+    const matrix4 = VecMath.matrix4Scratch0;
+    const translation = VecMath.cartesian3Scratch0;
+    const matrix3 = VecMath.matrix3Scratch;
+    const quaternion = VecMath.quaternionScratch;
+    const scale = VecMath.cartesian3Scratch1;
+    Matrix4.unpack(matrix4Packed, 0, matrix4);
+
+    Matrix4.getTranslation(matrix4, translation);
+
+    Matrix4.getRotation(matrix4, matrix3);
+    Quaternion.fromRotationMatrix(matrix3, quaternion);
+
+    Matrix4.getScale(matrix4, scale);
+
+    const t = Cartesian3.pack(translation, Array(3));
+    const r = Quaternion.pack(quaternion, Array(4));
+    const s = Cartesian3.pack(scale, Array(3));
+    return {
+      t: t,
+      r: r,
+      s: s,
+    };
+  }
+
+  /**
+   * Compute the mean of the given 3D points
+   *
+   * @param points - The input points
+   * @returns The mean
+   */
+  static computeMean3D(points: Iterable<number[]>) {
+    let count = 0;
+    const result = [0, 0, 0];
+    for (const point of points) {
+      VecMath.add(result, point, result);
+      count++;
     }
-    const epsilon = CesiumMath.EPSILON6;
-    const n = left.length;
-    for (let i = 0; i < n; i++) {
-      if (Math.abs(left[i] - right[i]) > epsilon) {
-        return false;
-      }
+    if (count > 0) {
+      VecMath.scale(result, 1.0 / count, result);
     }
-    return true;
+    return result;
   }
 }

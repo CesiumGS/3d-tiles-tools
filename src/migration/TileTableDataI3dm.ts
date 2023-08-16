@@ -3,16 +3,165 @@ import { Iterables } from "../base/Iterables";
 import { I3dmFeatureTable } from "../structure/TileFormats/I3dmFeatureTable";
 
 import { TileTableData } from "./TileTableData";
+import { VecMath } from "./VecMath";
 
 // TODO These should probably be in this directory:
 import { AttributeCompression } from "../contentProcessing/pointClouds/AttributeCompression";
-import { Colors } from "../contentProcessing/pointClouds/Colors";
 
 /**
  * Methods to access the data that is stored in the feature table
  * of I3DM.
  */
 export class TileTableDataI3dm {
+  /**
+   * Compute the matrices that describe the transforms of the instances
+   * based on the given translations, rotation quaternions, and scaling factors
+   * that have been obtained from an I3DM.
+   *
+   * The inputs for this method can be created with the `createWorldPositions`,
+   * `createRotationQuaternions`, and `createScales3D` methods of this class.
+   *
+   * @param translations3D - The translations as 3-element arrays
+   * @param rotationQuaternions - The rotations as 4-element arrays
+   * @param scales3D - The scaling factors as 3-element arrays
+   * @param numInstances The number of elements
+   * @returns The matrices
+   */
+  static createMatrices(
+    translations3D: Iterable<number[]>,
+    rotationQuaternions: Iterable<number[]> | undefined,
+    scales3D: Iterable<number[]> | undefined,
+    numInstances: number
+  ) {
+    const translationsArray = [...translations3D];
+    let rotationQuaternionsArray;
+    if (rotationQuaternions) {
+      rotationQuaternionsArray = [...rotationQuaternions];
+    }
+    let scalesArray;
+    if (scales3D) {
+      scalesArray = [...scales3D];
+    }
+    const i3dmMatrices = [];
+    for (let i = 0; i < numInstances; i++) {
+      const translation = translationsArray[i];
+      const rotationQuaternion = rotationQuaternionsArray
+        ? rotationQuaternionsArray[i]
+        : undefined;
+      const scale = scalesArray ? scalesArray[i] : undefined;
+      const i3dmMatrix = VecMath.composeMatrixTRS(
+        translation,
+        rotationQuaternion,
+        scale
+      );
+      i3dmMatrices.push(i3dmMatrix);
+    }
+    return i3dmMatrices;
+  }
+
+  /**
+   * Create the world positions from the given feature table data.
+   *
+   * This will be the positions, as they are stored in the feature
+   * table either as `POSITIONS` or `POSITIONS_QUANTIZED`, and
+   * will include the RTC center (if it was defined by the
+   * feature table).
+   *
+   * @param featureTable - The feature table
+   * @param featureTableBinary The feature table binary
+   * @param numInstances The number of instances
+   * @returns The positions as an iterable over 3-element arrays
+   */
+  static createWorldPositions(
+    featureTable: I3dmFeatureTable,
+    featureTableBinary: Buffer,
+    numInstances: number
+  ): Iterable<number[]> {
+    const positionsLocal = TileTableData.createPositions(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    let positions = positionsLocal;
+    const quantization = TileTableData.obtainQuantizationOffsetScale(
+      featureTable,
+      featureTableBinary
+    );
+    if (quantization) {
+      positions = Iterables.map(positions, (p: number[]) => {
+        return VecMath.add(p, quantization.offset);
+      });
+    }
+    if (featureTable.RTC_CENTER) {
+      const rtcCenter = TileTableData.obtainRtcCenter(
+        featureTable.RTC_CENTER,
+        featureTableBinary
+      );
+      positions = Iterables.map(positions, (p: number[]) => {
+        return VecMath.add(p, rtcCenter);
+      });
+    }
+    return positions;
+  }
+
+  /**
+   * Create the rotation quaternions from the given feature table data.
+   *
+   * This will compute the rotation quaternions either from
+   * - the NORMAL_UP/NORMAL_RIGHT information
+   * - the NORMAL_UP_OCT32P/NORMAL_RIGHT_OCT32P information
+   * - the east-north-up orientation that is computed from
+   *   the position data in the I3DM, if EAST_NORTH_UP=true
+   *   in the given feature table
+   *
+   * If none of this information is present, `undefined` will be
+   * returned.
+   *
+   * @param featureTable - The feature table
+   * @param featureTableBinary The feature table binary
+   * @param numInstances The number of instances
+   * @returns The rotation quaternions as an iterable over 4-element arrays
+   */
+  static createRotationQuaternions(
+    featureTable: I3dmFeatureTable,
+    featureTableBinary: Buffer,
+    numInstances: number
+  ): Iterable<number[]> | undefined {
+    const normalsUp = TileTableDataI3dm.createNormalsUp(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    const normalsRight = TileTableDataI3dm.createNormalsRight(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    if (normalsUp && normalsRight) {
+      // Compute the rotation quaternions from the up- and right normals
+      const rotationQuaternions = VecMath.computeRotationQuaternions(
+        [...normalsUp],
+        [...normalsRight]
+      );
+      return rotationQuaternions;
+    }
+    if (featureTable.EAST_NORTH_UP === true) {
+      // Obtain the rotation matrices from the world positions
+      // and convert them into quaternions
+      const positions = TileTableDataI3dm.createWorldPositions(
+        featureTable,
+        featureTableBinary,
+        numInstances
+      );
+      const rotationQuaternions = Iterables.map(positions, (p: number[]) => {
+        const enu = VecMath.computeEastNorthUpMatrix4(p);
+        return VecMath.matrix4ToQuaternion(enu);
+      });
+      return rotationQuaternions;
+    }
+    return undefined;
+  }
+
   /**
    * Create the up-normal data from the given feature table data.
    *
@@ -66,7 +215,7 @@ export class TileTableDataI3dm {
    * @param numElements - The number of elements
    * @returns The the iterable over the data
    */
-  static createNormalsRight(
+  private static createNormalsRight(
     featureTable: I3dmFeatureTable,
     binary: Buffer,
     numElements: number
@@ -146,6 +295,41 @@ export class TileTableDataI3dm {
   }
 
   /**
+   * Create the (possibly non-uniform) scaling data from the given
+   * feature table data, as 3-element arrays.
+   *
+   * This will either return the SCALE values (repeated 3 times),
+   * or the SCALE_NON_UNIFORM values, or `undefined` if none
+   * of this information is present.
+   *
+   * @param featureTable - The I3DM feature table
+   * @param binary - The feature table binary
+   * @param numElements - The number of elements
+   * @returns The the iterable over the data
+   */
+  static createScales3D(
+    featureTable: I3dmFeatureTable,
+    featureTableBinary: Buffer,
+    numInstances: number
+  ) {
+    const scales = TileTableDataI3dm.createScale(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    if (scales) {
+      const scales3D = Iterables.map(scales, (s: number) => [s, s, s]);
+      return scales3D;
+    }
+    const scalesNonUniform = TileTableDataI3dm.createNonUniformScale(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    return scalesNonUniform;
+  }
+
+  /**
    * Create the uniform scaling data from the given feature
    * table data.
    *
@@ -157,7 +341,7 @@ export class TileTableDataI3dm {
    * @param numElements - The number of elements
    * @returns The the iterable over the data
    */
-  static createScale(
+  private static createScale(
     featureTable: I3dmFeatureTable,
     binary: Buffer,
     numElements: number
@@ -189,7 +373,7 @@ export class TileTableDataI3dm {
    * @param numElements - The number of elements
    * @returns The the iterable over the data
    */
-  static createNonUniformScale(
+  private static createNonUniformScale(
     featureTable: I3dmFeatureTable,
     binary: Buffer,
     numElements: number

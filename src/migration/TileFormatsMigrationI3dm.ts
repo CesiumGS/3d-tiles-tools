@@ -1,4 +1,10 @@
-import { Accessor, Document, Node } from "@gltf-transform/core";
+import { Accessor } from "@gltf-transform/core";
+import { Logger } from "@gltf-transform/core";
+import { Node } from "@gltf-transform/core";
+import { clearNodeTransform } from "@gltf-transform/functions";
+import { clearNodeParent } from "@gltf-transform/functions";
+import { prune } from "@gltf-transform/functions";
+
 import { EXTMeshGPUInstancing } from "@gltf-transform/extensions";
 
 import { Iterables } from "../base/Iterables";
@@ -12,7 +18,6 @@ import { TileFormatError } from "../tileFormats/TileFormatError";
 import { GltfTransform } from "../contentProcessing/GltfTransform";
 import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
 
-import { TileTableData } from "./TileTableData";
 import { VecMath } from "./VecMath";
 import { TileTableDataI3dm } from "./TileTableDataI3dm";
 import { TileFormatsMigration } from "./TileFormatsMigration";
@@ -43,6 +48,8 @@ export class TileFormatsMigrationI3dm {
 
     const featureTable = tileData.featureTable.json as I3dmFeatureTable;
     const featureTableBinary = tileData.featureTable.binary;
+
+    const numInstances = featureTable.INSTANCES_LENGTH;
 
     //*/
     if (TileFormatsMigration.DEBUG_LOG) {
@@ -90,81 +97,124 @@ export class TileFormatsMigrationI3dm {
     const root = document.getRoot();
     root.getAsset().generator = "glTF-Transform";
 
-    const extMeshGPUInstancing = document.createExtension(EXTMeshGPUInstancing);
-    extMeshGPUInstancing.setRequired(true);
+    // Flatten all nodes in the glTF asset. This will collapse
+    // all nodes to essentially be "root nodes" in the scene
+    const nodes = root.listNodes();
+    for (const node of nodes) {
+      clearNodeParent(node);
+      clearNodeTransform(node);
+    }
+    document.setLogger(new Logger(Logger.Verbosity.SILENT));
+    document.transform(prune());
 
-    const numInstances = featureTable.INSTANCES_LENGTH;
+    // Insert a single root node above the "flatteded" nodes
+    TileFormatsMigration.makeSingleRoot(document);
 
-    // Compute the center of all instance positions, and use this as
-    // a reference point for the positions, by assigning it as a
-    // translation to the glTF root node. Note that this computation
-    // is independent of whether an RTC_CENTER was given explicitly:
-    // The computation of the center will take the RTC_CENTER into
-    // account if it was given.
-    const positionsCenter = TileFormatsMigrationI3dm.computePositionsCenter(
+    // Compute the positions in world space (taking the RTC_CENTER
+    // into account if it was present)
+    const worldPositions = TileTableDataI3dm.createWorldPositions(
       featureTable,
       featureTableBinary,
       numInstances
     );
-    TileFormatsMigration.applyRtcCenter(document, positionsCenter);
 
-    const nodes = root.listNodes();
-    const nodesWithMesh = nodes.filter((n: Node) => n.getMesh() !== null);
+    // Compute the center of all positions. This will later be
+    // inserted as a translation of the root node, similar to
+    // the RTC_CENTER, even if no RTC_CENTER was given explicitly
+    const positionsCenter = VecMath.computeMean3D(worldPositions);
 
-    const groupedNodes =
-      TileFormatsMigrationI3dm.groupNodesByTransform(nodesWithMesh);
-    for (const group of groupedNodes) {
-      const node0 = group[0];
-      const nodeMatrix = node0.getWorldMatrix();
+    // Compute the translations, relative to the center,
+    const translations = Iterables.map(worldPositions, (p: number[]) => {
+      return VecMath.subtract(p, positionsCenter);
+    });
 
-      console.log("Creating extension accessors for node matrix ", nodeMatrix);
+    // Compute the 4x4 rotation quaternions and scaling factors from
+    // the I3DM data, and use this to compute the whole
+    // instancing transforms as 4x4 matrices.
+    const rotationQuaternions = TileTableDataI3dm.createRotationQuaternions(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    const scales3D = TileTableDataI3dm.createScales3D(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    const i3dmMatrices = TileTableDataI3dm.createMatrices(
+      translations,
+      rotationQuaternions,
+      scales3D,
+      numInstances
+    );
 
-      const positionsAccessor =
-        TileFormatsMigrationI3dm.createPositionsInstancingAccessors(
-          document,
-          featureTable,
-          featureTableBinary,
-          numInstances,
-          positionsCenter,
-          nodeMatrix
-        );
+    const matrixZupToYup = VecMath.createZupToYupPacked4();
+    const matrixYupToZup = VecMath.createYupToZupPacked4();
 
-      const rotationsAccessor =
-        TileFormatsMigrationI3dm.createRotationsInstancingAccessors(
-          document,
-          featureTable,
-          featureTableBinary,
-          numInstances,
-          nodeMatrix
-        );
+    // Compute the data for the instancing extension accessors
+    // from the I3DM matrices, by decomposing them into their
+    // TRS (translation, rotation, scale) components and putting
+    // these into flat arrays.
+    const translationsForAccessor = [];
+    const rotationsForAccessor = [];
+    const scalesForAccessor = [];
+    for (const i3dmMatrix of i3dmMatrices) {
+      // Convert the matrix into the right coordinate system
+      const gltfMatrix = VecMath.multiplyAll4([
+        matrixZupToYup,
+        i3dmMatrix,
+        matrixYupToZup,
+      ]);
 
-      const scalesAccessor =
-        TileFormatsMigrationI3dm.createScalesInstancingAccessors(
-          document,
-          featureTable,
-          featureTableBinary,
-          numInstances
-        );
-
-      for (let i = 0; i < group.length; i++) {
-        const node = group[i];
-
-        console.log(
-          "Assigning extension to node " + i + " of group with node matrix ",
-          node.getWorldMatrix()
-        );
-
-        const meshGpuInstancing = extMeshGPUInstancing.createInstancedMesh();
-        meshGpuInstancing.setAttribute("TRANSLATION", positionsAccessor);
-        if (rotationsAccessor) {
-          meshGpuInstancing.setAttribute("ROTATION", rotationsAccessor);
-        }
-        if (scalesAccessor) {
-          meshGpuInstancing.setAttribute("SCALE", scalesAccessor);
-        }
-        node.setExtension("EXT_mesh_gpu_instancing", meshGpuInstancing);
-      }
+      const trs = VecMath.decomposeMatrixTRS(gltfMatrix);
+      translationsForAccessor.push(...trs.t);
+      rotationsForAccessor.push(...trs.r);
+      scalesForAccessor.push(...trs.s);
     }
+
+    // Create the glTF-Transform accessors containing the resulting data
+    const buffer = root.listBuffers()[0];
+
+    const translationsAccessor = document.createAccessor();
+    translationsAccessor.setArray(new Float32Array(translationsForAccessor));
+    translationsAccessor.setType(Accessor.Type.VEC3);
+    translationsAccessor.setBuffer(buffer);
+
+    const rotationsAccessor = document.createAccessor();
+    rotationsAccessor.setArray(new Float32Array(rotationsForAccessor));
+    rotationsAccessor.setType(Accessor.Type.VEC4);
+    rotationsAccessor.setBuffer(buffer);
+
+    const scalesAccessor = document.createAccessor();
+    scalesAccessor.setArray(new Float32Array(scalesForAccessor));
+    scalesAccessor.setType(Accessor.Type.VEC3);
+    scalesAccessor.setBuffer(buffer);
+
+    // Create the extension in the document
+    const extMeshGPUInstancing = document.createExtension(EXTMeshGPUInstancing);
+    extMeshGPUInstancing.setRequired(true);
+
+    // Assign the extension to each node that has a mesh
+    // (always using the same accessors)
+    const nodesWithMesh = root
+      .listNodes()
+      .filter((n: Node) => n.getMesh() !== null);
+    for (const node of nodesWithMesh) {
+      const meshGpuInstancing = extMeshGPUInstancing.createInstancedMesh();
+      meshGpuInstancing.setAttribute("TRANSLATION", translationsAccessor);
+      if (rotationsAccessor) {
+        meshGpuInstancing.setAttribute("ROTATION", rotationsAccessor);
+      }
+      if (scalesAccessor) {
+        meshGpuInstancing.setAttribute("SCALE", scalesAccessor);
+      }
+      node.setExtension("EXT_mesh_gpu_instancing", meshGpuInstancing);
+    }
+
+    // Add the "positions center" that was previously subtracted
+    // from the positions, as a translation of the root node of
+    // the glTF.
+    TileFormatsMigration.applyRtcCenter(document, positionsCenter);
 
     // Create the GLB buffer
     //*/
@@ -177,421 +227,5 @@ export class TileFormatsMigrationI3dm {
 
     const glb = await io.writeBinary(document);
     return Buffer.from(glb);
-  }
-
-  /**
-   * Groups the given nodes by equal transforms.
-   *
-   * This will compute an array of groups, where each group is an array of
-   * nodes that have the same transform (as in `node.getWorldMatrix()`).
-   * Two transforms are considered to be equal when they have all equal
-   * values, up to a small, unspecified epsilon.
-   *
-   * @param nodes - The nodes
-   * @returns The grouped nodes
-   */
-  private static groupNodesByTransform(nodes: Node[]): Node[][] {
-    const keys: number[][] = [];
-    const values: Node[][] = [];
-    for (const node of nodes) {
-      const nodeMatrix = node.getWorldMatrix();
-      let index = -1;
-      for (let i = 0; i < keys.length; i++) {
-        const key = keys[i];
-        if (VecMath.equalsEpsilon(key, nodeMatrix)) {
-          index = i;
-          break;
-        }
-      }
-      if (index !== -1) {
-        values[index].push(node);
-      } else {
-        keys.push(nodeMatrix);
-        const value = [node];
-        values.push(value);
-      }
-    }
-    return values;
-  }
-
-  /**
-   * Create the world positions from the given feature table data.
-   *
-   * This will be the positions, as they are stored in the feature
-   * table either as `POSITIONS` or `POSITIONS_QUANTIZED`, and
-   * will include the RTC center (if it was defined by the
-   * feature table).
-   *
-   * @param featureTable - The feature table
-   * @param featureTableBinary The feature table binary
-   * @param numInstances The number of instances
-   * @returns The positions as an iterable over 3-element arrays
-   */
-  private static createWorldPositions(
-    featureTable: I3dmFeatureTable,
-    featureTableBinary: Buffer,
-    numInstances: number
-  ): Iterable<number[]> {
-    const positionsLocal = TileTableData.createPositions(
-      featureTable,
-      featureTableBinary,
-      numInstances
-    );
-    let positions = positionsLocal;
-    const quantization = TileTableData.obtainQuantizationOffsetScale(
-      featureTable,
-      featureTableBinary
-    );
-    if (quantization) {
-      positions = Iterables.map(positions, (p: number[]) => {
-        const px = p[0] + quantization.offset[0];
-        const py = p[1] + quantization.offset[1];
-        const pz = p[2] + quantization.offset[2];
-        return [px, py, pz];
-      });
-    }
-    if (featureTable.RTC_CENTER) {
-      const rtcCenter = TileTableData.obtainRtcCenter(
-        featureTable.RTC_CENTER,
-        featureTableBinary
-      );
-      positions = Iterables.map(positions, (p: number[]) => {
-        const px = p[0] + rtcCenter[0];
-        const py = p[1] + rtcCenter[1];
-        const pz = p[2] + rtcCenter[2];
-        return [px, py, pz];
-      });
-    }
-    return positions;
-  }
-
-  /**
-   * Compute the center of all positions from the given I3DM data.
-   * (This is the arithmetic mean of the positions, as a 3-element
-   * array)
-   *
-   * @param featureTable - The feature table
-   * @param featureTableBinary The feature table binary
-   * @param numInstances The number of instances
-   * @returns The center of the positions
-   */
-  private static computePositionsCenter(
-    featureTable: I3dmFeatureTable,
-    featureTableBinary: Buffer,
-    numInstances: number
-  ) {
-    const positions = TileFormatsMigrationI3dm.createWorldPositions(
-      featureTable,
-      featureTableBinary,
-      numInstances
-    );
-    const sum = [0, 0, 0];
-    for (const position of positions) {
-      VecMath.add(sum, position, sum);
-    }
-    const centerOfGravity = VecMath.scale(sum, 1.0 / numInstances);
-    return centerOfGravity;
-  }
-
-  /**
-   * Creates a glTF-Transform accessor for the positions (translation)
-   * to be put into the `EXT_gpu_mesh_instancing` extension, based on
-   * the positions that are read from the given I3DM data.
-   *
-   * @param document - The glTF-Transform document
-   * @param featureTable - The feature table
-   * @param featureTableBinary - The feature table binary
-   * @param numInstances - The number of instances
-   * @param nodeMatrix The global transform matrix of the node that
-   * the instancing extension will be attached to
-   * @returns The glTF-Transform accessor
-   */
-  private static createPositionsInstancingAccessors(
-    document: Document,
-    featureTable: I3dmFeatureTable,
-    featureTableBinary: Buffer,
-    numInstances: number,
-    positionsCenter: number[],
-    nodeMatrix: number[]
-  ): Accessor {
-    const positions = TileFormatsMigrationI3dm.createWorldPositions(
-      featureTable,
-      featureTableBinary,
-      numInstances
-    );
-    const matrixZupToYup = VecMath.createZupToYupPacked4();
-    const inverseNodeMatrix = VecMath.invert4(nodeMatrix);
-
-    const positionsGltfNode = Iterables.map(positions, (position: number[]) => {
-      // To obtain the position that has to be put into the
-      // instancing extension:
-      // - transform the origin with the node transform
-      // - add the I3DM position
-      //   - subtracting the center of all I3DM positions
-      //   - taking z-up-to-y-up into account
-      // - transform the result back with the inverse node transform
-      let result = [0, 0, 0];
-      result = VecMath.transform(nodeMatrix, result);
-      const positionForGltf = VecMath.transform(matrixZupToYup, position);
-      const relativePositionForGltf = VecMath.subtract(positionForGltf, [
-        positionsCenter[0],
-        positionsCenter[2],
-        -positionsCenter[1],
-      ]);
-      result = VecMath.add(result, relativePositionForGltf);
-      result = VecMath.transform(inverseNodeMatrix, result);
-      return result;
-    });
-
-    const positionsGltfNodeFlat = Iterables.flatten(positionsGltfNode);
-
-    // Create the glTF-Transform accessor containing the resulting data
-    const root = document.getRoot();
-    const buffer = root.listBuffers()[0];
-    const positionsAccessor = document.createAccessor();
-    positionsAccessor.setArray(new Float32Array(positionsGltfNodeFlat));
-    positionsAccessor.setType(Accessor.Type.VEC3);
-    positionsAccessor.setBuffer(buffer);
-    return positionsAccessor;
-  }
-
-  /**
-   * Creates a glTF-Transform accessor for the rotations to be put
-   * into the `EXT_gpu_mesh_instancing` extension, based on
-   * the rotations that are read from the given I3DM data.
-   *
-   * @param document - The glTF-Transform document
-   * @param featureTable - The feature table
-   * @param featureTableBinary - The feature table binary
-   * @param numInstances - The number of instances
-   * @param nodeMatrix The global transform matrix of the node that
-   * the instancing extension will be attached to
-   * @returns The glTF-Transform accessor, or undefined if the
-   * I3DM did not define rotations
-   */
-  private static createRotationsInstancingAccessors(
-    document: Document,
-    featureTable: I3dmFeatureTable,
-    featureTableBinary: Buffer,
-    numInstances: number,
-    nodeMatrix: number[]
-  ): Accessor | undefined {
-    const positions = TileFormatsMigrationI3dm.createWorldPositions(
-      featureTable,
-      featureTableBinary,
-      numInstances
-    );
-
-    // Create a function that receives a 4x4 matrix that was obtained
-    // as a "EAST_NORTH_UP" matrix, and converts this matrix into
-    // a matrix that describes the rotation that has to be assigned
-    // to the instances in the glTF extension.
-    //
-    // The rotation matrix for the glTF extension is computed from
-    // the matrix that describes the rotation in the I3DM by putting
-    // this rotation into the context of the node that the extension
-    // is attached to.
-    //
-    // A vertex 'v' that had originally been transformed with the
-    // rotation matrix 'T' from the I3DM is now transformed with
-    // v' = (Mzy * N^-1 * T * N * Myz) * v
-    // meaning that the vertex is...
-    // - converted from y-up to z-up
-    // - transformed with the node rotation
-    // - transformed with the actual matrix from the I3DM
-    // - transformed with the inverse node rotation
-    // - converted from z-up to y-up
-    const matrixZupToYup = VecMath.createZupToYupPacked4();
-    const matrixYupToZup = VecMath.createYupToZupPacked4();
-    const inverseNodeRotation = VecMath.inverseRotation4(nodeMatrix);
-    const nodeRotation = VecMath.extractRotation4(nodeMatrix);
-    function convertRotationMatrixToGltf(rotationMatrix4: number[]) {
-      const resultMatrix = VecMath.multiplyAll4([
-        matrixZupToYup,
-        inverseNodeRotation,
-        rotationMatrix4,
-        nodeRotation,
-        matrixYupToZup,
-      ]);
-      return resultMatrix;
-    }
-
-    const normalsUp = TileTableDataI3dm.createNormalsUp(
-      featureTable,
-      featureTableBinary,
-      numInstances
-    );
-    const normalsRight = TileTableDataI3dm.createNormalsRight(
-      featureTable,
-      featureTableBinary,
-      numInstances
-    );
-    if (normalsUp && normalsRight) {
-      // Compute the rotation quaternions from the up- and right normals
-      // and convert them into 4x4 rotation matrices
-      const inputRotationQuaternions = VecMath.computeRotationQuaternions(
-        [...normalsUp],
-        [...normalsRight]
-      );
-      const rotationMatrices = Iterables.map(
-        inputRotationQuaternions,
-        VecMath.quaternionToMatrix4
-      );
-
-      // Convert the rotation matrices to the glTF coordinate
-      // space of the node that the instancing extension will
-      // be attached to
-      const rotationMatricesForGltf = Iterables.map(
-        rotationMatrices,
-        convertRotationMatrixToGltf
-      );
-
-      // Create the quaternions for the instancing extension
-      // from the resulting rotation matrices
-      const rotationQuaternions = Iterables.map(
-        rotationMatricesForGltf,
-        VecMath.matrix4ToQuaternion
-      );
-
-      //*/
-      if (TileFormatsMigration.DEBUG_LOG) {
-        console.log("Create rotations from up and right");
-        console.log("rotationQuaternions");
-        for (const p of rotationQuaternions) {
-          console.log(p);
-        }
-      }
-      //*/
-
-      const rotationQuaternionsFlat = Iterables.flatten(rotationQuaternions);
-
-      // Create the glTF-Transform accessor containing the resulting data
-      const root = document.getRoot();
-      const buffer = root.listBuffers()[0];
-      const rotationsAccessor = document.createAccessor();
-      rotationsAccessor.setArray(new Float32Array(rotationQuaternionsFlat));
-      rotationsAccessor.setType(Accessor.Type.VEC4);
-      rotationsAccessor.setBuffer(buffer);
-      return rotationsAccessor;
-    }
-
-    if (featureTable.EAST_NORTH_UP === true) {
-      // Obtain the rotation matrices from the world positions
-      const rotationMatrices = Iterables.map(positions, (p: number[]) => {
-        return VecMath.computeEastNorthUpMatrix4(p);
-      });
-
-      // Convert the rotation matrices to the glTF coordinate
-      // space of the node that the instancing extension will
-      // be attached to
-      const rotationMatricesForGltf = Iterables.map(
-        rotationMatrices,
-        convertRotationMatrixToGltf
-      );
-
-      // Create the quaternions for the instancing extension
-      // from the resulting rotation matrices
-      const rotationQuaternions = Iterables.map(
-        rotationMatricesForGltf,
-        VecMath.matrix4ToQuaternion
-      );
-
-      //*/
-      if (TileFormatsMigration.DEBUG_LOG) {
-        console.log("Create rotations from eastNorthUp");
-        console.log("rotationQuaternions");
-        for (const p of rotationQuaternions) {
-          console.log(p);
-        }
-      }
-      //*/
-
-      const rotationQuaternionsFlat = Iterables.flatten(rotationQuaternions);
-
-      // Create the glTF-Transform accessor containing the resulting data
-      const root = document.getRoot();
-      const buffer = root.listBuffers()[0];
-      const rotationsAccessor = document.createAccessor();
-      rotationsAccessor.setArray(new Float32Array(rotationQuaternionsFlat));
-      rotationsAccessor.setType(Accessor.Type.VEC4);
-      rotationsAccessor.setBuffer(buffer);
-      return rotationsAccessor;
-    }
-
-    return undefined;
-  }
-
-  /**
-   * Creates a glTF-Transform accessor for the scalings to be put
-   * into the `EXT_gpu_mesh_instancing` extension, based on
-   * the scaling information from the given I3DM data.
-   *
-   * @param document - The glTF-Transform document
-   * @param featureTable - The feature table
-   * @param featureTableBinary - The feature table binary
-   * @param numInstances - The number of instances
-   * @returns The glTF-Transform accessor, or undefined
-   * if the I3DM did not contain scaling information
-   */
-  private static createScalesInstancingAccessors(
-    document: Document,
-    featureTable: I3dmFeatureTable,
-    featureTableBinary: Buffer,
-    numInstances: number
-  ): Accessor | undefined {
-    const scales = TileTableDataI3dm.createScale(
-      featureTable,
-      featureTableBinary,
-      numInstances
-    );
-    if (scales) {
-      //*/
-      if (TileFormatsMigration.DEBUG_LOG) {
-        console.log("Create scales (uniform)");
-      }
-      //*/
-      const scales3D = Iterables.map(scales, (s: number) => [s, s, s]);
-      const scalesFlat = Iterables.flatten(scales3D);
-
-      // Create the glTF-Transform accessor containing the resulting data
-      const root = document.getRoot();
-      const buffer = root.listBuffers()[0];
-      const scalesAccessor = document.createAccessor();
-      scalesAccessor.setArray(new Float32Array(scalesFlat));
-      scalesAccessor.setType(Accessor.Type.VEC3);
-      scalesAccessor.setBuffer(buffer);
-      return scalesAccessor;
-    }
-
-    const scalesNonUniform = TileTableDataI3dm.createNonUniformScale(
-      featureTable,
-      featureTableBinary,
-      numInstances
-    );
-    if (scalesNonUniform) {
-      //*/
-      if (TileFormatsMigration.DEBUG_LOG) {
-        console.log("Create scales (non-uniform)");
-      }
-      //*/
-
-      // Convert from z-up to y-up (but not with a rotation, because
-      // that would change the sign of the scaling factors)
-      const scalesGltf = Iterables.map(scalesNonUniform, (s: number[]) => {
-        return [s[0], s[2], s[1]];
-      });
-      const scalesFlat = Iterables.flatten(scalesGltf);
-
-      // Create the glTF-Transform accessor containing the resulting data
-      const root = document.getRoot();
-      const buffer = root.listBuffers()[0];
-      const scalesAccessor = document.createAccessor();
-      scalesAccessor.setArray(new Float32Array(scalesFlat));
-      scalesAccessor.setType(Accessor.Type.VEC3);
-      scalesAccessor.setBuffer(buffer);
-      return scalesAccessor;
-    }
-
-    return undefined;
   }
 }

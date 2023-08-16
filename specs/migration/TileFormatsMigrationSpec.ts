@@ -774,4 +774,40 @@ describe("TileFormatsMigration", function () {
     );
     expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
   });
+
+  it("converts InstancedAxesSimple to the expected output", async function () {
+    const subDir = "InstancedAxes/";
+    const name = "InstancedAxesSimple";
+    const fileNameWithoutExtension = "instancedAxesSimple";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedAxesRotated to the expected output", async function () {
+    const subDir = "InstancedAxes/";
+    const name = "InstancedAxesRotated";
+    const fileNameWithoutExtension = "instancedAxesRotated";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts InstancedAxesScaled to the expected output", async function () {
+    const subDir = "InstancedAxes/";
+    const name = "InstancedAxesScaled";
+    const fileNameWithoutExtension = "instancedAxesScaled";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
 });
