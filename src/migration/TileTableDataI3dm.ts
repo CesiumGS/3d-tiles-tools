@@ -14,12 +14,61 @@ import { AttributeCompression } from "../contentProcessing/pointClouds/Attribute
  */
 export class TileTableDataI3dm {
   /**
-   * Compute the matrices that describe the transforms of the instances
-   * based on the given translations, rotation quaternions, and scaling factors
-   * that have been obtained from an I3DM.
+   * Create the matrices that describe the instancing transforms of
+   * the given I3DM data.
    *
-   * The inputs for this method can be created with the `createWorldPositions`,
-   * `createRotationQuaternions`, and `createScales3D` methods of this class.
+   * This will compute the matrices that combine the translation
+   * (position), rotation, and scaling information that is obtained
+   * from the given I3DM feature table data.
+   *
+   * @param featureTable - The feature table
+   * @param featureTableBinary The feature table binary
+   * @param numInstances The number of instances
+   * @returns The matrices as an iterable over 16-element arrays
+   */
+  static createInstanceMatrices(
+    featureTable: I3dmFeatureTable,
+    featureTableBinary: Buffer,
+    numInstances: number
+  ): number[][] {
+    const translations = TileTableDataI3dm.createWorldPositions(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    const rotationQuaternions = TileTableDataI3dm.createRotationQuaternions(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    const scales3D = TileTableDataI3dm.createScales3D(
+      featureTable,
+      featureTableBinary,
+      numInstances
+    );
+    const i3dmMatrices = TileTableDataI3dm.createMatrices(
+      translations,
+      rotationQuaternions,
+      scales3D,
+      numInstances
+    );
+    return i3dmMatrices;
+  }
+
+  /**
+   * Compute the matrices that describe the transforms of the instances
+   * based on the given translations, rotation quaternions, and scaling factors.
+   *
+   * Usually, the inputs for this method can be created with the
+   * `createWorldPositions`, `createRotationQuaternions`, and
+   * `createScales3D` methods of this class.
+   *
+   * In some cases, the positions may be modified before being passed to
+   * this method. For example, when converting I3DM into a glTF asset
+   * that uses `EXT_mesh_gpu_instancing` then the positions may be
+   * made _relative_ to a certain center point whose translation is
+   * then taken into account by assigning it to the root node of
+   * the resulting glTF asset.
    *
    * @param translations3D - The translations as 3-element arrays
    * @param rotationQuaternions - The rotations as 4-element arrays

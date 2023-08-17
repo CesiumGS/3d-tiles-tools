@@ -30,15 +30,6 @@ export class VecMath {
   private static readonly cartesian3Scratch1 = new Cartesian3();
 
   /**
-   * Create a 4x4 identity matrix as a flat array
-   *
-   * @returns The matrix
-   */
-  private static createIdentityPacked4() {
-    return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-  }
-
-  /**
    * Create a 4x4 Y-up-to-Z-up conversion matrix as a flat array
    *
    * @returns The matrix
@@ -128,7 +119,7 @@ export class VecMath {
   static multiplyAll4(matrices4Packed: number[][]): number[] {
     const matrix0 = VecMath.matrix4Scratch0;
     const matrix1 = VecMath.matrix4Scratch1;
-    Matrix4.unpack(VecMath.createIdentityPacked4(), 0, matrix0);
+    Matrix4.clone(Matrix4.IDENTITY, matrix0);
     for (let i = 0; i < matrices4Packed.length; i++) {
       const matrixPacked = matrices4Packed[i];
       Matrix4.unpack(matrixPacked, 0, matrix1);
@@ -307,15 +298,20 @@ export class VecMath {
   }
 
   /**
-   * Decompose a matrix into translation, rotation quaternion,
+   * Decompose a 4x4 matrix into translation, rotation quaternion,
    * and scaling factors.
    *
-   * @param translation3D - The translation
-   * @param rotationMatrix4x4 - The rotation matrix
-   * @param scale3D - The scaling factors
-   * @returns The matrix
+   * @param matrix4Packed - The matrix as a 16-element array
+   * @returns An object containing the translation `t` as
+   * a 3-element array, the rotation `r` as a quaternion in
+   * a 4-element array, and the scaling factors `s` as a
+   * 3-element array.
    */
-  static decomposeMatrixTRS(matrix4Packed: number[]) {
+  static decomposeMatrixTRS(matrix4Packed: number[]): {
+    t: number[];
+    r: number[];
+    s: number[];
+  } {
     const matrix4 = VecMath.matrix4Scratch0;
     const translation = VecMath.cartesian3Scratch0;
     const matrix3 = VecMath.matrix3Scratch;

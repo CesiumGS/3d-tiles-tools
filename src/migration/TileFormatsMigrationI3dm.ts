@@ -61,6 +61,9 @@ export class TileFormatsMigrationI3dm {
     }
     //*/
 
+    // Obtain the GLB buffer for the tile data. With `gltfFormat===1`, it
+    // is stored directly as the payload. Otherwise (with `gltfFormat===0`)
+    // the payload is a URI that has to be resolved.
     let glbBuffer = undefined;
     if (tileData.header.gltfFormat === 1) {
       glbBuffer = tileData.payload;
@@ -73,6 +76,7 @@ export class TileFormatsMigrationI3dm {
         );
       }
     }
+
     // If the I3DM contained glTF 1.0 data, try to upgrade it
     // with the gltf-pipeline first
     const gltfVersion = GltfUtilities.getGltfVersion(glbBuffer);
@@ -82,9 +86,11 @@ export class TileFormatsMigrationI3dm {
       glbBuffer = await GltfUtilities.replaceCesiumRtcExtension(glbBuffer);
     }
 
-    // Read the GLB data from the payload of the tile
+    // Create a glTF-Transform document from the GLB buffer
     const io = await GltfTransform.getIO();
     const document = await io.readBinary(glbBuffer);
+    const root = document.getRoot();
+    root.getAsset().generator = "glTF-Transform";
 
     //*/
     if (TileFormatsMigration.DEBUG_LOG) {
@@ -94,11 +100,10 @@ export class TileFormatsMigrationI3dm {
     }
     //*/
 
-    const root = document.getRoot();
-    root.getAsset().generator = "glTF-Transform";
-
     // Flatten all nodes in the glTF asset. This will collapse
-    // all nodes to essentially be "root nodes" in the scene
+    // all nodes to essentially be "root nodes" in the scene.
+    // The transforms of these nodes will be the identity matrix,
+    // and their previous transforms will be baked into the meshes.
     const nodes = root.listNodes();
     for (const node of nodes) {
       clearNodeParent(node);
@@ -194,7 +199,7 @@ export class TileFormatsMigrationI3dm {
     const extMeshGPUInstancing = document.createExtension(EXTMeshGPUInstancing);
     extMeshGPUInstancing.setRequired(true);
 
-    // Assign the extension to each node that has a mesh
+    // Assign the extension object to each node that has a mesh
     // (always using the same accessors)
     const nodesWithMesh = root
       .listNodes()
@@ -216,7 +221,6 @@ export class TileFormatsMigrationI3dm {
     // the glTF.
     TileFormatsMigration.applyRtcCenter(document, positionsCenter);
 
-    // Create the GLB buffer
     //*/
     if (TileFormatsMigration.DEBUG_LOG) {
       console.log("JSON document");
@@ -225,6 +229,7 @@ export class TileFormatsMigrationI3dm {
     }
     //*/
 
+    // Create the GLB buffer
     const glb = await io.writeBinary(document);
     return Buffer.from(glb);
   }
