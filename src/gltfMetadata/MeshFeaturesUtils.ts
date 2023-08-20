@@ -36,8 +36,8 @@ export class MeshFeaturesUtils {
       const primitives = mesh.listPrimitives();
       sb.increaseIndent();
       MeshFeaturesUtils.createPrimitivesFeaturesString(sb, primitives);
-      sb.increaseIndent();
-      sb.increaseIndent();
+      sb.decreaseIndent();
+      sb.decreaseIndent();
     }
   }
 
