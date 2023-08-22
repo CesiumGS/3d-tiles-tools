@@ -454,6 +454,30 @@ export class TileTableData {
     };
   }
 
+
+  /**
+   * Obtain the component type of the BATCH_ID data (if present).
+   * This will be a string like `"UINT8"` or `"FLOAT32"`.
+   *
+   * @param featureTable - The PNTS feature table
+   * @returns The BATCH_ID component type
+   */
+  static obtainBatchIdComponentType(
+    featureTable: PntsFeatureTable | I3dmFeatureTable
+  ): string | undefined {
+    const batchId = featureTable.BATCH_ID;
+    if (!batchId) {
+      return undefined;
+    }
+    const legacyComponentType = batchId.componentType ?? "UNSIGNED_SHORT";
+    const componentType =
+      TileTableData.convertLegacyComponentTypeToComponentType(
+        legacyComponentType
+      );
+    return componentType;
+  }
+
+
   /**
    * Converts the given "legacy" type to a metadata type.
    *

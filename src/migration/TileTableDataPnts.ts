@@ -4,6 +4,8 @@ import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
 
 import { TileTableData } from "./TileTableData";
 
+import { TileFormatError } from "../tileFormats/TileFormatError";
+
 // TODO These should probably be in this directory:
 import { AttributeCompression } from "../contentProcessing/pointClouds/AttributeCompression";
 import { Colors } from "../contentProcessing/pointClouds/Colors";
@@ -272,4 +274,36 @@ export class TileTableDataPnts {
       numElements
     );
   }
+
+  /**
+   * Create the BATCH_ID data from the given feature table data,
+   * or undefined if there is no BATCH_ID information.
+   *
+   * @param featureTable - The PNTS feature table
+   * @param binary - The feature table binary
+   * @returns The batch IDs
+   */
+  static createBatchIds(
+    featureTable: PntsFeatureTable,
+    binary: Buffer
+  ): Iterable<number> | undefined {
+    const batchId = featureTable.BATCH_ID;
+    if (!batchId) {
+      return undefined;
+    }
+    const batchLength = featureTable.BATCH_LENGTH;
+    if (batchLength === undefined) {
+      throw new TileFormatError("Found BATCH_ID but no BATCH_LENGTH");
+    }
+    const numPoints = featureTable.POINTS_LENGTH;
+    const legacyComponentType = batchId.componentType ?? "UNSIGNED_SHORT";
+    const batchIds = TileTableData.createBatchIdsFromBinary(
+      binary,
+      batchId.byteOffset,
+      legacyComponentType,
+      numPoints
+    );
+    return batchIds;
+  }
+
 }

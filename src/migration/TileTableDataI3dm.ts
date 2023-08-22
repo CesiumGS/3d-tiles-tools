@@ -441,4 +441,32 @@ export class TileTableDataI3dm {
     }
     return undefined;
   }
+
+  /**
+   * Create the BATCH_ID data from the given feature table data,
+   * or undefined if there is no BATCH_ID information.
+   *
+   * @param featureTable - The PNTS feature table
+   * @param binary - The feature table binary
+   * @returns The batch IDs
+   */
+  static createBatchIds(
+    featureTable: I3dmFeatureTable,
+    binary: Buffer
+  ): Iterable<number> | undefined {
+    const batchId = featureTable.BATCH_ID;
+    if (!batchId) {
+      return undefined;
+    }
+    const numPElements = featureTable.INSTANCES_LENGTH;
+    const legacyComponentType = batchId.componentType ?? "UNSIGNED_SHORT";
+    const batchIds = TileTableData.createBatchIdsFromBinary(
+      binary,
+      batchId.byteOffset,
+      legacyComponentType,
+      numPElements
+    );
+    return batchIds;
+  }
+
 }

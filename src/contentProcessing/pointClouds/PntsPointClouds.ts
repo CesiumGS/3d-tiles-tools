@@ -3,18 +3,17 @@ import { Iterables } from "../../base/Iterables";
 import { PntsFeatureTable } from "../../structure/TileFormats/PntsFeatureTable";
 import { BatchTable } from "../../structure/TileFormats/BatchTable";
 
-import { TileFormatError } from "../../tileFormats/TileFormatError";
-
 import { DefaultPointCloud } from "./DefaultPointCloud";
 import { Colors } from "./Colors";
+import { ReadablePointCloud } from "./ReadablePointCloud";
 
 import { TileTableData } from "../../migration/TileTableData";
+import { BatchTables } from "../../migration/BatchTables";
+import { TileTableDataPnts } from "../../migration/TileTableDataPnts";
 
 import { DracoDecoder } from "../draco/DracoDecoder";
 import { DracoDecoderResult } from "../draco/DracoDecoderResult";
-import { ReadablePointCloud } from "./ReadablePointCloud";
-import { BatchTables } from "../../migration/BatchTables";
-import { TileTableDataPnts } from "../../migration/TileTableDataPnts";
+
 
 /**
  * Methods to create `ReadablePointCloud` instances from PNTS data
@@ -103,13 +102,13 @@ export class PntsPointClouds {
 
     // Assign the batch IDs as the "_FEATURE_ID_0" attribute
     if (!pointCloud.getAttributeValues("_FEATURE_ID_0")) {
-      const batchIds = PntsPointClouds.createBatchIds(
+      const batchIds = TileTableDataPnts.createBatchIds(
         featureTable,
         featureTableBinary
       );
       if (batchIds) {
         const componentType =
-          PntsPointClouds.obtainBatchIdComponentType(featureTable);
+          TileTableData.obtainBatchIdComponentType(featureTable);
         if (componentType) {
           pointCloud.addAttribute(
             "_FEATURE_ID_0",
@@ -367,56 +366,4 @@ export class PntsPointClouds {
     }
   }
 
-  /**
-   * Create the BATCH_ID data from the given feature table data,
-   * or undefined if there is no BATCH_ID information.
-   *
-   * @param featureTable - The PNTS feature table
-   * @param binary - The feature table binary
-   * @returns The batch IDs
-   */
-  private static createBatchIds(
-    featureTable: PntsFeatureTable,
-    binary: Buffer
-  ): Iterable<number> | undefined {
-    const batchId = featureTable.BATCH_ID;
-    if (!batchId) {
-      return undefined;
-    }
-    const batchLength = featureTable.BATCH_LENGTH;
-    if (batchLength === undefined) {
-      throw new TileFormatError("Found BATCH_ID but no BATCH_LENGTH");
-    }
-    const numPoints = featureTable.POINTS_LENGTH;
-    const legacyComponentType = batchId.componentType ?? "UNSIGNED_SHORT";
-    const batchIds = TileTableData.createBatchIdsFromBinary(
-      binary,
-      batchId.byteOffset,
-      legacyComponentType,
-      numPoints
-    );
-    return batchIds;
-  }
-
-  /**
-   * Obtain the component type of the BATCH_ID data (if present).
-   * This will be a string like `"UINT8"` or `"FLOAT32"`.
-   *
-   * @param featureTable - The PNTS feature table
-   * @returns The BATCH_ID component type
-   */
-  private static obtainBatchIdComponentType(
-    featureTable: PntsFeatureTable
-  ): string | undefined {
-    const batchId = featureTable.BATCH_ID;
-    if (!batchId) {
-      return undefined;
-    }
-    const legacyComponentType = batchId.componentType ?? "UNSIGNED_SHORT";
-    const componentType =
-      TileTableData.convertLegacyComponentTypeToComponentType(
-        legacyComponentType
-      );
-    return componentType;
-  }
 }
