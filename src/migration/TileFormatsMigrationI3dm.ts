@@ -21,6 +21,12 @@ import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
 import { VecMath } from "./VecMath";
 import { TileTableDataI3dm } from "./TileTableDataI3dm";
 import { TileFormatsMigration } from "./TileFormatsMigration";
+import { TileTableData } from "./TileTableData";
+import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
+
+import { EXTInstanceFeatures } from "../gltfMetadata/EXTInstanceFeatures";
+import { InstanceFeaturesUtils } from "../gltfMetadata/InstanceFeaturesUtils";
+import { StructuralMetadataUtils } from "../gltfMetadata/StructuralMetadataUtils";
 
 /**
  * Methods for converting I3DM tile data into GLB
@@ -177,7 +183,8 @@ export class TileFormatsMigrationI3dm {
       scalesForAccessor.push(...trs.s);
     }
 
-    // Create the glTF-Transform accessors containing the resulting data
+    // Create the glTF-Transform accessors containing the data
+    // for the EXT_mesh_gpu_instancing extension
     const buffer = root.listBuffers()[0];
 
     const translationsAccessor = document.createAccessor();
@@ -195,16 +202,89 @@ export class TileFormatsMigrationI3dm {
     scalesAccessor.setType(Accessor.Type.VEC3);
     scalesAccessor.setBuffer(buffer);
 
-    // Create the extension in the document
+    // If there is a batch table, convert it into a property table
+    // using the EXT_structural_metadata extension. This method
+    // will convert the batch table into a metadata schema and
+    // assign it to the document. It will return `undefined´ if
+    // there is no batch table (or when no metadata schema can
+    // be created from the batch table)
+    const propertyTable =
+      TileTableDataToStructuralMetadata.convertBatchTableToPropertyTable(
+        document,
+        batchTable,
+        batchTableBinary,
+        numInstances
+      );
+
+    // If the input data defines a BATCH_ID, then convert this into
+    // the EXT_instance_features extension. If the input does
+    // NOT define a BATCH_ID, but has a batch table (as indicated
+    // by the propertyTable being defined), then create artificial
+    // batch IDs, consisting of consecutive numbers.
+    let featureIdComponentType = "UINT16";
+    let batchIds = undefined;
+    const batchId = featureTable.BATCH_ID;
+    if (batchId) {
+      batchIds = TileTableDataI3dm.createBatchIds(
+        featureTable,
+        featureTableBinary
+      );
+      const componentType =
+        TileTableData.obtainBatchIdComponentType(featureTable);
+      if (componentType !== undefined) {
+        featureIdComponentType = componentType;
+      }
+    } else if (propertyTable) {
+      batchIds = [];
+      for (let i = 0; i < numInstances; i++) {
+        batchIds.push(i);
+      }
+    }
+
+    // If there are batch IDs (either from the BATCH_ID, or created
+    // as consecutive numbers for accessing the property table), then
+    // use them to create a feature ID accessor that will be used
+    // in the EXT_instance_features extension
+    let extInstanceFeatures = undefined;
+    let instanceFeaturesAccessor = undefined;
+    let featureCount = 0;
+    const featureIdAttributeNumber = 0;
+    const featureIdAttributeName = `_FEATURE_ID_${featureIdAttributeNumber}`;
+    if (batchIds) {
+      extInstanceFeatures = document.createExtension(EXTInstanceFeatures);
+
+      instanceFeaturesAccessor = document.createAccessor();
+      instanceFeaturesAccessor.setBuffer(buffer);
+      instanceFeaturesAccessor.setType(Accessor.Type.SCALAR);
+
+      const batchIdsArray = [...batchIds];
+      featureCount = new Set(batchIdsArray).size;
+
+      if (featureIdComponentType === "UINT8") {
+        instanceFeaturesAccessor.setArray(new Uint8Array(batchIdsArray));
+      } else if (featureIdComponentType === "UINT16") {
+        instanceFeaturesAccessor.setArray(new Uint16Array(batchIdsArray));
+      } else if (featureIdComponentType === "UINT32") {
+        instanceFeaturesAccessor.setArray(new Uint8Array(batchIdsArray));
+      } else {
+        throw new TileFormatError(
+          `Expected UINT8, UINT16 or UINT32 as the ` +
+            `BATCH_ID component type, but found ${featureIdComponentType}`
+        );
+      }
+    }
+
+    // Create the EXT_mesh_gpu_instancing extension in the document
     const extMeshGPUInstancing = document.createExtension(EXTMeshGPUInstancing);
     extMeshGPUInstancing.setRequired(true);
 
-    // Assign the extension object to each node that has a mesh
+    // Assign the extension objects to each node that has a mesh
     // (always using the same accessors)
     const nodesWithMesh = root
       .listNodes()
       .filter((n: Node) => n.getMesh() !== null);
     for (const node of nodesWithMesh) {
+      // Assign the EXT_mesh_gpu_instancing extension object
       const meshGpuInstancing = extMeshGPUInstancing.createInstancedMesh();
       meshGpuInstancing.setAttribute("TRANSLATION", translationsAccessor);
       if (rotationsAccessor) {
@@ -213,7 +293,34 @@ export class TileFormatsMigrationI3dm {
       if (scalesAccessor) {
         meshGpuInstancing.setAttribute("SCALE", scalesAccessor);
       }
+      if (instanceFeaturesAccessor) {
+        meshGpuInstancing.setAttribute(
+          featureIdAttributeName,
+          instanceFeaturesAccessor
+        );
+      }
       node.setExtension("EXT_mesh_gpu_instancing", meshGpuInstancing);
+
+      // If the input defined batch ID, then assign them using the
+      // EXT_instance_features extension.
+      if (instanceFeaturesAccessor && extInstanceFeatures) {
+        // Create a `FeatureId` object. This object indicates that the IDs
+        // are stored in the attribute `_FEATURE_ID_${attributeNumber}`
+        const featureIdFromAttribute = extInstanceFeatures.createFeatureId();
+        featureIdFromAttribute.setFeatureCount(featureCount);
+        featureIdFromAttribute.setAttribute(featureIdAttributeNumber);
+
+        if (propertyTable) {
+          featureIdFromAttribute.setPropertyTable(propertyTable);
+        }
+
+        // Create a `InstanceFeatures` object that contains the
+        // created `FeatureID` objects, and store it as an
+        // extension object in the `Node`
+        const instanceFeatures = extInstanceFeatures.createInstanceFeatures();
+        instanceFeatures.addFeatureId(featureIdFromAttribute);
+        node.setExtension("EXT_instance_features", instanceFeatures);
+      }
     }
 
     // Add the "positions center" that was previously subtracted
@@ -226,6 +333,14 @@ export class TileFormatsMigrationI3dm {
       console.log("JSON document");
       const jsonDocument = await io.writeJSON(document);
       console.log(JSON.stringify(jsonDocument.json, null, 2));
+
+      console.log("Metadata information:");
+      console.log(
+        InstanceFeaturesUtils.createInstanceFeaturesInfoString(document)
+      );
+      console.log(
+        StructuralMetadataUtils.createStructuralMetadataInfoString(document)
+      );
     }
     //*/
 

@@ -199,7 +199,7 @@ export class TileTableDataToStructuralMetadata {
     const classes = metadataSchema.classes || {};
     const classNames = Object.keys(classes);
     if (classNames.length < 1) {
-      return;
+      return undefined;
     }
     const className = classNames[0];
     const metadataClass = classes[className];
