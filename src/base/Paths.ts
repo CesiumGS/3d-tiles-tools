@@ -28,12 +28,15 @@ export class Paths {
   }
 
   /**
-   * Returns whether the given path is a directory
+   * Returns whether the given path is an existing directory
    *
    * @param p - The path
-   * @returns Whether the path is a directory
+   * @returns Whether the path is an existing directory
    */
   static isDirectory(p: string): boolean {
+    if (!fs.existsSync(p)) {
+      return false;
+    }
     return fs.lstatSync(p).isDirectory();
   }
 

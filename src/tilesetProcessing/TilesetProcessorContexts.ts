@@ -136,17 +136,16 @@ export class TilesetProcessorContexts {
    * name is the last path component of the given name.
    *
    * Otherwise (if the given name is a directory, or the name of a file
-   * that does not end with '.json'), then the default name 'tileset.json'
-   * is returned.
+   * that does not end with '.json' - for example, an archive file
+   * that ends with `.3tz` or `.3dtiles`), then the default name
+   * 'tileset.json' is returned.
    *
-   * @param tilesetSourceName - The tileset source name
+   * @param tilesetDataName - The name of the tileset data
    * @returns The tileset file name
    */
-  private static determineTilesetJsonFileName(
-    tilesetSourceName: string
-  ): string {
-    if (tilesetSourceName.toLowerCase().endsWith(".json")) {
-      return path.basename(tilesetSourceName);
+  private static determineTilesetJsonFileName(tilesetDataName: string): string {
+    if (tilesetDataName.toLowerCase().endsWith(".json")) {
+      return path.basename(tilesetDataName);
     }
     return "tileset.json";
   }

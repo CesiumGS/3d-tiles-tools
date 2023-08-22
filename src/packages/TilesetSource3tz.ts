@@ -1,4 +1,5 @@
 import fs from "fs";
+import zlib from "zlib";
 
 import { defined } from "../base/defined";
 
@@ -24,7 +25,7 @@ export class TilesetSource3tz implements TilesetSource {
    *
    * This is created from the `"@3dtilesIndex1@"` file of a 3TZ file.
    *
-   * It is an array if `IndexEntry` objects, sorted by the MD5 hash,
+   * It is an array of `IndexEntry` objects, sorted by the MD5 hash,
    * in ascending order.
    */
   private zipIndex: IndexEntry[] | undefined;
@@ -81,12 +82,16 @@ export class TilesetSource3tz implements TilesetSource {
     if (!defined(this.fd) || !this.zipIndex) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
-    const entryData = ArchiveFunctions3tz.readEntryData(
-      this.fd,
-      this.zipIndex,
-      key
-    );
-    return entryData;
+    const entry = ArchiveFunctions3tz.readEntry(this.fd, this.zipIndex, key);
+    if (!entry) {
+      return undefined;
+    }
+    if (entry.compression_method === 8) {
+      // Indicating DEFLATE
+      const inflatedData = zlib.inflateRawSync(entry.data);
+      return inflatedData;
+    }
+    return entry.data;
   }
 
   /** {@inheritDoc TilesetSource.close} */
