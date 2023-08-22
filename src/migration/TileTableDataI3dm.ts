@@ -468,5 +468,4 @@ export class TileTableDataI3dm {
     );
     return batchIds;
   }
-
 }

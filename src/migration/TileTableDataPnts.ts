@@ -305,5 +305,4 @@ export class TileTableDataPnts {
     );
     return batchIds;
   }
-
 }

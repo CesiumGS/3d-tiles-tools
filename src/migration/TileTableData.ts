@@ -454,12 +454,11 @@ export class TileTableData {
     };
   }
 
-
   /**
    * Obtain the component type of the BATCH_ID data (if present).
    * This will be a string like `"UINT8"` or `"FLOAT32"`.
    *
-   * @param featureTable - The PNTS feature table
+   * @param featureTable - The feature table
    * @returns The BATCH_ID component type
    */
   static obtainBatchIdComponentType(
@@ -476,7 +475,6 @@ export class TileTableData {
       );
     return componentType;
   }
-
 
   /**
    * Converts the given "legacy" type to a metadata type.

@@ -14,7 +14,6 @@ import { TileTableDataPnts } from "../../migration/TileTableDataPnts";
 import { DracoDecoder } from "../draco/DracoDecoder";
 import { DracoDecoderResult } from "../draco/DracoDecoderResult";
 
-
 /**
  * Methods to create `ReadablePointCloud` instances from PNTS data
  */
@@ -365,5 +364,4 @@ export class PntsPointClouds {
       }
     }
   }
-
 }
