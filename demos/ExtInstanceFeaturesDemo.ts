@@ -63,7 +63,7 @@ async function createExampleDocument(): Promise<Document> {
   const accessor = document.createAccessor();
   accessor.setBuffer(buffer);
   accessor.setType(Accessor.Type.SCALAR);
-  accessor.setArray(new Int16Array(ids));
+  accessor.setArray(new Uint16Array(ids));
 
   // Create an accessor containing the translations of the instances
   // prettier-ignore
