@@ -10,7 +10,7 @@ import { TileFormatsMigrationI3dm } from "./TileFormatsMigrationI3dm";
  * the legacy formats.
  */
 export class TileFormatsMigration {
-  static readonly DEBUG_LOG = true;
+  static readonly DEBUG_LOG = false;
 
   /**
    * Convert the given PNTS data into a glTF asset

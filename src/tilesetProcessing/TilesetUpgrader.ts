@@ -40,6 +40,11 @@ export class TilesetUpgrader {
   private readonly gltfUpgradeOptions: any;
 
   /**
+   * The tileset processor that will perform the actual upgrade
+   */
+  private tilesetProcessor: BasicTilesetProcessor | undefined;
+
+  /**
    * Creates a new instance
    *
    * @param quiet - Whether log messages should be omitted
@@ -134,6 +139,7 @@ export class TilesetUpgrader {
       quiet,
       processExternalTilesets
     );
+    this.tilesetProcessor = tilesetProcessor;
     await tilesetProcessor.begin(
       tilesetSourceName,
       tilesetTargetName,
@@ -152,6 +158,7 @@ export class TilesetUpgrader {
     // Perform the updates for the tile contents
     await this.performContentUpgrades(tilesetProcessor);
     await tilesetProcessor.end();
+    delete this.tilesetProcessor;
   }
 
   /**
@@ -362,7 +369,27 @@ export class TilesetUpgrader {
       this.logCallback(`  Upgrading I3DM to GLB for ${sourceKey}`);
 
       targetKey = this.processContentUri(sourceKey);
-      targetValue = await TileFormatsMigration.convertI3dmToGlb(sourceValue);
+
+      // Define the resolver for external GLB files in I3DM files:
+      // It will look up the entry using the 'tilesetProcessor'
+      const externalGlbResolver = async (
+        uri: string
+      ): Promise<Buffer | undefined> => {
+        if (!this.tilesetProcessor) {
+          return undefined;
+        }
+        const externalGlbEntry = await this.tilesetProcessor.fetchSourceEntry(
+          uri
+        );
+        if (!externalGlbEntry) {
+          return undefined;
+        }
+        return externalGlbEntry.value;
+      };
+      targetValue = await TileFormatsMigration.convertI3dmToGlb(
+        sourceValue,
+        externalGlbResolver
+      );
     } else if (this.upgradeOptions.upgradeI3dmGltf1ToGltf2) {
       this.logCallback(`  Upgrading GLB in ${sourceKey}`);
       targetValue = await ContentUpgrades.upgradeI3dmGltf1ToGltf2(
