@@ -2,10 +2,11 @@ import draco3d from "draco3d";
 
 import { Transform } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
-import { KHRONOS_EXTENSIONS } from "@gltf-transform/extensions";
+import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
 
-import { EXTMeshFeatures } from "../gltfMetadata/EXTMeshFeatures";
 import { EXTStructuralMetadata } from "../gltfMetadata/EXTStructuralMetadata";
+import { EXTMeshFeatures } from "../gltfMetadata/EXTMeshFeatures";
+import { EXTInstanceFeatures } from "../gltfMetadata/EXTInstanceFeatures";
 
 /**
  * Utilities for using glTF-Transform in the 3D Tiles tools
@@ -31,16 +32,17 @@ export class GltfTransform {
       return GltfTransform.io;
     }
     const io = new NodeIO();
-    io.registerExtensions(KHRONOS_EXTENSIONS).registerDependencies({
+    io.registerExtensions(ALL_EXTENSIONS).registerDependencies({
       "draco3d.decoder": await draco3d.createDecoderModule(),
       "draco3d.encoder": await draco3d.createEncoderModule(),
     });
-    // Note: The order of these calls matters. The EXTMeshFeatures depend
-    // on the EXTStructuralMetadata, because the EXTMeshFeatures may
-    // refer to PropertyTable objects via their FeatureId. So the
-    // EXTStructuralMetadata has to be read first.
+    // Note: The order of these calls matters. The EXTMeshFeatures and
+    // EXTInstanceFeatures depend on the EXTStructuralMetadata, because
+    // they may refer to PropertyTable objects via their FeatureId.
+    // So the EXTStructuralMetadata has to be read first.
     io.registerExtensions([EXTStructuralMetadata]);
     io.registerExtensions([EXTMeshFeatures]);
+    io.registerExtensions([EXTInstanceFeatures]);
     GltfTransform.io = io;
     return io;
   }

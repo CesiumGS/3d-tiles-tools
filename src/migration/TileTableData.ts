@@ -1,3 +1,4 @@
+import { Iterables } from "../base/Iterables";
 import { PropertyModel } from "../metadata/PropertyModel";
 import { PropertyModels } from "../metadata/PropertyModels";
 import { NumericBuffers } from "../metadata/binary/NumericBuffers";
@@ -5,14 +6,262 @@ import { NumericPropertyModel } from "../metadata/binary/NumericPropertyModel";
 
 import { BatchTableBinaryBodyReference } from "../structure/TileFormats/BatchTableBinaryBodyReference";
 import { BinaryBodyOffset } from "../structure/TileFormats/BinaryBodyOffset";
+import { I3dmFeatureTable } from "../structure/TileFormats/I3dmFeatureTable";
+import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
 
 /**
- * Method to access the data that is stored in batch- or feature tables
+ * Methods to access the data that is stored in batch- or feature tables
  * of the legacy tile formats in a generic form.
  */
 export class TileTableData {
+  /**
+   * Create the position data from the given feature table data.
+   *
+   * This will return the POSITION or POSITION_QUANTIZED data
+   * as an iterable over 3D float arrays. The actual positions
+   * of the returned will be relative to the position
+   * that is returned by `obtainGlobalPosition`
+   *
+   * @param featureTable - The feature table
+   * @param binary - The feature table binary
+   * @param numPositions - The number of positions
+   * @returns The the iterable over the data
+   * @throws TileFormatError If the given feature table contains
+   * neither a POSITION nor a POSITION_QUANTIZED
+   */
+  static createPositions(
+    featureTable: PntsFeatureTable | I3dmFeatureTable,
+    binary: Buffer,
+    numPositions: number
+  ): Iterable<number[]> {
+    if (featureTable.POSITION) {
+      const byteOffset = featureTable.POSITION.byteOffset;
+      return TileTableData.createPositionsFromBinary(
+        binary,
+        byteOffset,
+        numPositions
+      );
+    }
+
+    if (featureTable.POSITION_QUANTIZED) {
+      const quantization = TileTableData.obtainQuantizationOffsetScale(
+        featureTable,
+        binary
+      );
+
+      if (!quantization) {
+        throw new TileFormatError(
+          `The feature table contains POSITION_QUANTIZED, but not ` +
+            `QUANTIZED_VOLUME_OFFSET and QUANTIZED_VOLUME_OFFSET`
+        );
+      }
+      const byteOffset = featureTable.POSITION_QUANTIZED.byteOffset;
+      const quantizedPositions =
+        TileTableData.createQuantizedPositionsFromBinary(
+          binary,
+          byteOffset,
+          numPositions
+        );
+      // The 'quantization.offset' will become part of the 'global position'
+      // so use an offset of [0,0,0] here
+      const offset = [0, 0, 0];
+      const dequantization = TileTableData.createDequantization(
+        offset,
+        quantization.scale
+      );
+      return Iterables.map(quantizedPositions, dequantization);
+    }
+
+    throw new TileFormatError(
+      "The feature table contains neither POSITION nor POSITION_QUANTIZED"
+    );
+  }
+
+  /**
+   * Create the position data from the given data
+   *
+   * @param binary - The feature table binary
+   * @param byteOffset - The byte offset
+   * @param numPositions - The number of positions
+   * @returns The the iterable over the data
+   */
+  static createPositionsFromBinary(
+    binary: Buffer,
+    byteOffset: number,
+    numPositions: number
+  ): Iterable<number[]> {
+    const legacyType = "VEC3";
+    const legacyComponentType = "FLOAT";
+    return TileTableData.createNumericArrayIterable(
+      legacyType,
+      legacyComponentType,
+      binary,
+      byteOffset,
+      numPositions
+    );
+  }
+
+  /**
+   * Create the quantized positions data from the given data
+   *
+   * @param binary - The feature table binary
+   * @param byteOffset - The byte offset
+   * @param numPositions - The number of positions
+   * @returns The the iterable over the data
+   */
+  private static createQuantizedPositionsFromBinary(
+    binary: Buffer,
+    byteOffset: number,
+    numPositions: number
+  ): Iterable<number[]> {
+    const legacyType = "VEC3";
+    const legacyComponentType = "UNSIGNED_SHORT";
+    return TileTableData.createNumericArrayIterable(
+      legacyType,
+      legacyComponentType,
+      binary,
+      byteOffset,
+      numPositions
+    );
+  }
+
+  /**
+   * Obtain the quantization information from the given PNTS-
+   * or I3DM feature table.
+   *
+   * If the feature table does not contain QUANTIZED_VOLUME_OFFSET
+   * or QUANTIZED_VOLUME_SCALE, then `undefined` is returned.
+   * Otherwise, the offset and scale are returned.
+   *
+   * @param featureTable - The feature table
+   * @param featureTableBinary - The feature table binary
+   * @returns The quantization information
+   */
+  static obtainQuantizationOffsetScale(
+    featureTable: PntsFeatureTable | I3dmFeatureTable,
+    featureTableBinary: Buffer
+  ):
+    | {
+        offset: number[];
+        scale: number[];
+      }
+    | undefined {
+    if (!featureTable.QUANTIZED_VOLUME_OFFSET) {
+      return undefined;
+    }
+    if (!featureTable.QUANTIZED_VOLUME_SCALE) {
+      return undefined;
+    }
+    const volumeOffset = TileTableData.obtainNumberArray(
+      featureTableBinary,
+      featureTable.QUANTIZED_VOLUME_OFFSET,
+      3,
+      "FLOAT32"
+    );
+    const volumeScale = TileTableData.obtainNumberArray(
+      featureTableBinary,
+      featureTable.QUANTIZED_VOLUME_SCALE,
+      3,
+      "FLOAT32"
+    );
+    return {
+      offset: volumeOffset,
+      scale: volumeScale,
+    };
+  }
+
+  /**
+   * Obtains the translation that is implied by the given `RTC_CENTER`
+   * property of a feature table
+   *
+   * @param rtcCenter - The `RTC_CENTER` property
+   * @param binary - The binary blob of the feature table
+   * @returns The `RTC_CENTER` value
+   */
+  static obtainRtcCenter(
+    rtcCenter: BinaryBodyOffset | number[],
+    binary: Buffer
+  ): [number, number, number] {
+    const c = TileTableData.obtainNumberArray(binary, rtcCenter, 3, "FLOAT32");
+    return [c[0], c[1], c[2]];
+  }
+
+  /**
+   * Returns the "global position" that is implied by the given feature table.
+   *
+   * This position will include the RTC_CENTER (if present) and the
+   * quantization offset (if present), and will be `undefined` if
+   * neither of them is present.
+   *
+   * @param featureTable - The feature table
+   * @param featureTableBinary - The feature tabel binary
+   * @returns The global position
+   */
+  static obtainGlobalPosition(
+    featureTable: PntsFeatureTable | I3dmFeatureTable,
+    featureTableBinary: Buffer
+  ): [number, number, number] | undefined {
+    // Compute the "global position", which may include
+    // the RTC_CENTER and the quantization offset.
+    let globalPosition: [number, number, number] | undefined = undefined;
+
+    // Fetch the `RTC_CENTER` from the feature table, to be used
+    // as on part of the "global position"
+    let rtcCenter = undefined;
+    if (featureTable.RTC_CENTER) {
+      rtcCenter = TileTableData.obtainRtcCenter(
+        featureTable.RTC_CENTER,
+        featureTableBinary
+      );
+      // Take the y-up-vs-z-up transform into account:
+      globalPosition = [rtcCenter[0], rtcCenter[2], -rtcCenter[1]];
+    }
+
+    // Add the quantization offset to the global position
+    const quantization = TileTableData.obtainQuantizationOffsetScale(
+      featureTable,
+      featureTableBinary
+    );
+    if (quantization) {
+      if (!globalPosition) {
+        globalPosition = [0, 0, 0];
+      }
+      // Take the y-up-vs-z-up transform into account:
+      globalPosition[0] += quantization.offset[0];
+      globalPosition[1] += quantization.offset[2];
+      globalPosition[2] += -quantization.offset[1];
+    }
+    return globalPosition;
+  }
+
+  /**
+   * Create the batch ID data from the given data
+   *
+   * @param binary - The feature table binary
+   * @param byteOffset - The byte offset
+   * @param legacyComponentType - The (legacy) component type
+   * (e.g. "UNSIGNED_BYTE" - not "UINT8")
+   * @param numPoints - The number of points
+   * @returns The iterable over the result values
+   */
+  static createBatchIdsFromBinary(
+    binary: Buffer,
+    byteOffset: number,
+    legacyComponentType: string,
+    numPoints: number
+  ): Iterable<number> {
+    const batchIds = TileTableData.createNumericScalarIterable(
+      "SCALAR",
+      legacyComponentType,
+      binary,
+      byteOffset,
+      numPoints
+    );
+    return batchIds;
+  }
+
   /**
    * Obtains the data from a batch- or feature table property,
    * as an array of numbers.
@@ -171,6 +420,60 @@ export class TileTableData {
       componentType
     );
     return propertyModel;
+  }
+
+  /**
+   * Creates a function that receives a 3D point and returns a 3D
+   * point, applying the dequantization of
+   * ```
+   * POSITION = POSITION_QUANTIZED * QUANTIZED_VOLUME_SCALE / 65535.0 + QUANTIZED_VOLUME_OFFSET
+   * ```
+   * as described in the specification.
+   *
+   * @param volumeOffset - The volume offset
+   * @param volumeScale - The volume scale
+   * @returns The dequantization function
+   */
+  private static createDequantization(
+    volumeOffset: number[],
+    volumeScale: number[]
+  ): (input: number[]) => number[] {
+    const scaleX = volumeScale[0] / 65535.0;
+    const scaleY = volumeScale[1] / 65535.0;
+    const scaleZ = volumeScale[2] / 65535.0;
+    const offsetX = volumeOffset[0];
+    const offsetY = volumeOffset[1];
+    const offsetZ = volumeOffset[2];
+    return (input: number[]) => {
+      const output = [
+        input[0] * scaleX + offsetX,
+        input[1] * scaleY + offsetY,
+        input[2] * scaleZ + offsetZ,
+      ];
+      return output;
+    };
+  }
+
+  /**
+   * Obtain the component type of the BATCH_ID data (if present).
+   * This will be a string like `"UINT8"` or `"FLOAT32"`.
+   *
+   * @param featureTable - The feature table
+   * @returns The BATCH_ID component type
+   */
+  static obtainBatchIdComponentType(
+    featureTable: PntsFeatureTable | I3dmFeatureTable
+  ): string | undefined {
+    const batchId = featureTable.BATCH_ID;
+    if (!batchId) {
+      return undefined;
+    }
+    const legacyComponentType = batchId.componentType ?? "UNSIGNED_SHORT";
+    const componentType =
+      TileTableData.convertLegacyComponentTypeToComponentType(
+        legacyComponentType
+      );
+    return componentType;
   }
 
   /**

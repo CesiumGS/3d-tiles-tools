@@ -1,20 +1,22 @@
-const viewer = new Cesium.Viewer("cesiumContainer");
+const viewer = new Cesium.Viewer("cesiumContainer", {
+  globe: false
+});
 
 let currentTileset;
-let currentTilesetName = "PointCloud/PointCloudBatched";
+let currentTilesetName = "InstancedAxes/InstancedAxesSimple";
 let inputOrOutput = "input";
+let doZoom = false;
 
 // Remove any old tileset, and add a new tileset based on the
 // currentTilesetName and the inputOrOutput value
 async function recreateTileset() {
-  let doZoom = false;
   if (Cesium.defined(currentTileset)) {
     viewer.scene.primitives.remove(currentTileset);
     currentTileset = undefined;
   } else {
     doZoom = true;
   }
-    
+
   currentTileset = viewer.scene.primitives.add(
     await Cesium.Cesium3DTileset.fromUrl(
       `http://localhost:8003/${inputOrOutput}/${currentTilesetName}/tileset.json`, {
@@ -24,13 +26,32 @@ async function recreateTileset() {
   currentTileset.style = new Cesium.Cesium3DTileStyle({
     pointSize: "10"
   });
+  
+  // Special handling for tilesets that are "at the origin":
+  // Move them to a certain position on the globe
+  let distance = 500;
+  if (currentTilesetName.startsWith("InstancedAxes")) {
+    const transform = Cesium.Transforms.eastNorthUpToFixedFrame(
+      Cesium.Cartesian3.fromDegrees(-75.152408, 39.946975, 0)
+    );
+    const scale = 1.0;
+    const modelMatrix = Cesium.Matrix4.multiplyByUniformScale(
+      transform,
+      scale,
+      new Cesium.Matrix4()
+    );
+    currentTileset.modelMatrix = modelMatrix;
+    distance = 10;
+  }
+  
   if (doZoom) {
     const offset = new Cesium.HeadingPitchRange(
       Cesium.Math.toRadians(-22.5),
       Cesium.Math.toRadians(-22.5),
-      25.0
+      distance
     );
     viewer.zoomTo(currentTileset, offset);
+    doZoom = false;
   }
 }
 
@@ -53,7 +74,7 @@ function createTooltip() {
     return tooltip;
   }
   const tooltip = createTooltip();
-  
+
   // Show the given HTML content in the tooltip
   // at the given screen position
   function showTooltip(screenX, screenY, htmlContent) {
@@ -62,7 +83,7 @@ function createTooltip() {
     tooltip.style.top = `${screenY}px`;
     tooltip.innerHTML = htmlContent;
   }
-  
+
   // Create an HTML string that contains information
   // about the given metadata, under the given title
   function createMetadataHtml(title, metadata) {
@@ -81,7 +102,7 @@ function createTooltip() {
     }
     return html;
   }
-  
+
   // Install the handler that will check the element that is
   // under the mouse cursor when the mouse is moved, and
   // add any metadata that it contains to the label.
@@ -89,30 +110,30 @@ function createTooltip() {
   handler.setInputAction(function (movement) {
     let tooltipText = "";
     const picked = viewer.scene.pick(movement.endPosition);
-    
+
     if (picked) {
         if (picked instanceof Cesium.Cesium3DTileFeature) {
             tooltipText += createMetadataHtml("Batch table", picked);
         }
     }
-  
+
     const tilesetMetadata = picked?.content?.tileset?.metadata;
     tooltipText += createMetadataHtml("Tileset metadata", tilesetMetadata);
-  
+
     const tileMetadata = picked?.content?.tile?.metadata;
     tooltipText += createMetadataHtml("Tile metadata", tileMetadata);
-  
+
     const groupMetadata = picked?.content?.group?.metadata;
     tooltipText += createMetadataHtml("Group metadata", groupMetadata);
-  
+
     const contentMetadata = picked?.content?.metadata;
     tooltipText += createMetadataHtml("Content metadata", contentMetadata);
-  
+
     const screenX = movement.endPosition.x;
     const screenY = movement.endPosition.y;
     showTooltip(screenX, screenY, tooltipText);
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-  
+
 
 
 //============================================================================
@@ -123,6 +144,7 @@ function createOption(name) {
     text: name,
     onselect: function () {
       currentTilesetName = name;
+      doZoom = true;
       recreateTileset();
     },
   };
@@ -130,6 +152,31 @@ function createOption(name) {
 
 function createOptions() {
   const options = [
+
+    createOption("InstancedAxes/InstancedAxesSimple"),
+    createOption("InstancedAxes/InstancedAxesRotated"),
+    createOption("InstancedAxes/InstancedAxesScaled"),
+    
+    createOption("Instanced/InstancedAnimated"),
+    createOption("Instanced/InstancedGltfExternal"),
+    createOption("Instanced/InstancedOct32POrientation"),
+    createOption("Instanced/InstancedOrientation"),
+    createOption("Instanced/InstancedQuantized"),
+    createOption("Instanced/InstancedQuantizedOct32POrientation"),
+    createOption("Instanced/InstancedRedMaterial"),
+    createOption("Instanced/InstancedRTC"),
+    createOption("Instanced/InstancedScale"),
+    createOption("Instanced/InstancedScaleNonUniform"),
+    createOption("Instanced/InstancedTextured"),
+    createOption("Instanced/InstancedWithBatchIds"),
+    createOption("Instanced/InstancedWithBatchTable"),
+    createOption("Instanced/InstancedWithBatchTableBinary"),
+    createOption("Instanced/InstancedWithCopyright"),
+    createOption("Instanced/InstancedWithoutBatchTable"),
+    createOption("Instanced/InstancedWithoutNormals"),
+    createOption("Instanced/InstancedWithTransform"),
+
+
     createOption("PointCloud/PointCloudBatched"),
     createOption("PointCloud/PointCloudConstantColor"),
     createOption("PointCloud/PointCloudDraco"),
@@ -147,6 +194,7 @@ function createOptions() {
     createOption("PointCloud/PointCloudWithPerPointProperties"),
     createOption("PointCloud/PointCloudWithTransform"),
     createOption("PointCloud/PointCloudWithUnicodePropertyIds"),
+
     createOption("Batched/BatchedAnimated"),
     createOption("Batched/BatchedColors"),
     createOption("Batched/BatchedColorsMix"),
@@ -182,4 +230,3 @@ Sandcastle.addDefaultToolbarButton("Output", function () {
   inputOrOutput = "output";
   recreateTileset();
 });
-      

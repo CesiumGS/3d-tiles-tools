@@ -1,7 +1,9 @@
-import { Extension, Primitive } from "@gltf-transform/core";
 import { GLTF } from "@gltf-transform/core";
+import { Primitive } from "@gltf-transform/core";
+import { Extension } from "@gltf-transform/core";
 import { ReaderContext } from "@gltf-transform/core";
 import { WriterContext } from "@gltf-transform/core";
+
 import { FeatureId } from "./MeshFeatures";
 import { FeatureIdTexture } from "./MeshFeatures";
 import { MeshFeatures } from "./MeshFeatures";
