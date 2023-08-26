@@ -13,7 +13,7 @@ import { PipelineError } from "./PipelineError";
 
 import { BasicTilesetProcessor } from "../tilesetProcessing/BasicTilesetProcessor";
 
-import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
+import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 import { ContentOps } from "../contentProcessing/ContentOps";
 import { TileFormatsMigration } from "../migration/TileFormatsMigration";
 

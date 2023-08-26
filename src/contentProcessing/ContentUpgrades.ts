@@ -1,4 +1,4 @@
-import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
+import { GltfUtilities } from "./GltfUtilities";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 

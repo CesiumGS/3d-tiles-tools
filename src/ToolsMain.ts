@@ -12,7 +12,7 @@ import { TileFormats } from "./tileFormats/TileFormats";
 import { TileDataLayouts } from "./tileFormats/TileDataLayouts";
 
 import { ContentOps } from "./contentProcessing/ContentOps";
-import { GltfUtilities } from "./contentProcessing/GtlfUtilities";
+import { GltfUtilities } from "./contentProcessing/GltfUtilities";
 
 import { ContentDataTypes } from "./contentTypes/ContentDataTypes";
 
