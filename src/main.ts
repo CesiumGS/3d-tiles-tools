@@ -385,7 +385,7 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   } else if (command === "analyze") {
     ToolsMain.analyze(input, output, force);
   } else if (command === "createTilesetJson") {
-    ToolsMain.createTilesetJson(input, output, force);
+    await ToolsMain.createTilesetJson(input, output, force);
   } else {
     throw new DeveloperError(`Invalid command: ${command}`);
   }
