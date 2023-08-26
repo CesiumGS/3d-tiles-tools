@@ -61,6 +61,27 @@ export class BoundingVolumes {
   }
 
   /**
+   * Computes an array containing the 8 corners of the given
+   * bounding box.
+   *
+   * @param boundingBox - The bounding box
+   * @returns The corners
+   */
+  static computeBoundingBoxCorners(boundingBox: BoundingBox3D): Point3D[] {
+    const min = boundingBox.min;
+    const max = boundingBox.max;
+    const c0: Point3D = [min[0], min[1], min[2]];
+    const c1: Point3D = [max[0], min[1], min[2]];
+    const c2: Point3D = [min[0], max[1], min[2]];
+    const c3: Point3D = [max[0], max[1], min[2]];
+    const c4: Point3D = [min[0], min[1], max[2]];
+    const c5: Point3D = [max[0], min[1], max[2]];
+    const c6: Point3D = [min[0], max[1], max[2]];
+    const c7: Point3D = [max[0], max[1], max[2]];
+    return [c0, c1, c2, c3, c4, c5, c6, c7];
+  }
+
+  /**
    * Creates a bounding box for a tileset- or tile bounding volume.
    *
    * This is the center- and half-axis representation of the
@@ -292,7 +313,10 @@ export class BoundingVolumes {
    * @param bb1 - The second bounding box
    * @returns The union
    */
-  static union(bb0: BoundingBox3D, bb1: BoundingBox3D): BoundingBox3D {
+  static computeBoundingBoxUnion(
+    bb0: BoundingBox3D,
+    bb1: BoundingBox3D
+  ): BoundingBox3D {
     return {
       min: BoundingVolumes.min(bb0.min, bb1.min),
       max: BoundingVolumes.max(bb0.max, bb1.max),
