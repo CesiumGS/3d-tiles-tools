@@ -247,9 +247,7 @@ export abstract class TilesetProcessor {
    * @param key - The key (file name)
    * @returns The object containing the entry and its type
    */
-  private async fetchSourceEntry(
-    key: string
-  ): Promise<TilesetEntry | undefined> {
+  async fetchSourceEntry(key: string): Promise<TilesetEntry | undefined> {
     const context = this.getContext();
     const tilesetSource = context.tilesetSource;
 

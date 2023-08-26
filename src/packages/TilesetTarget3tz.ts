@@ -93,7 +93,7 @@ export class TilesetTarget3tz implements TilesetTarget {
    *
    * @param archive - The archiver archive
    * @param outputStream - The output stream that the archive is writing to
-   * @returns The promise that has to be waited for in "close"
+   * @returns The promise that has to be waited for in "end"
    */
   private static createFinishedPromise(
     archive: archiver.Archiver,

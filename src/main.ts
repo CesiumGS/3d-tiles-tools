@@ -78,12 +78,30 @@ function parseToolArgs(a: string[]) {
     })
     .command(
       "convert",
-      "Convert between tilesets and tileset package formats. " +
-        "The input and output can be paths to tileset JSON files, " +
-        "'.3tz', or '.3dtiles' files.",
+      "Convert between tilesets and tileset package formats.\n" +
+        "The input and output can be one of the following:\n" +
+        "- The path of a tileset JSON file\n" +
+        "- The path of a directory that contains a 'tileset.json' file\n" +
+        "- The path of a '.3tz' file\n" +
+        "- The path of a '.3dtiles' file\n" +
+        "\n" +
+        "The input can also be the path of a ZIP file that contains the " +
+        "tileset data. The tileset JSON file in this ZIP is determined " +
+        "by the 'inputTilesetJsonFileName', which is 'tileset.json' by " +
+        "default.",
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
+        inputTilesetJsonFileName: {
+          description:
+            "The name of the tileset JSON file in the input. " +
+            "This is only required when the input is a ZIP file that " +
+            "contains a tileset JSON file that is not called 'tileset.json'.",
+          default: "tileset.json",
+          global: true,
+          normalize: true,
+          type: "string",
+        },
       }
     )
     .command(
@@ -252,7 +270,8 @@ function parseToolArgs(a: string[]) {
     .demandCommand(1)
     .strict();
 
-  return args.argv as any;
+  const result = args.argv as any;
+  return result;
 }
 
 /**
@@ -282,9 +301,11 @@ console.log("Parsed command line arguments:");
 console.log(parsedToolArgs);
 //*/
 
-const command = parsedToolArgs._[0];
-
 async function run() {
+  if (!parsedToolArgs) {
+    return;
+  }
+  const command = parsedToolArgs._[0];
   console.time("Total");
   await runCommand(command, parsedToolArgs, optionArgs);
   console.timeEnd("Total");
@@ -334,14 +355,19 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
     console.log(
       `The 'tilesetToDatabase' command is deprecated. Use 'convert' instead.`
     );
-    await ToolsMain.convert(input, output, force);
+    await ToolsMain.convert(input, undefined, output, force);
   } else if (command === "databaseToTileset") {
     console.log(
       `The 'databaseToTileset' command is deprecated. Use 'convert' instead.`
     );
-    await ToolsMain.convert(input, output, force);
+    await ToolsMain.convert(input, undefined, output, force);
   } else if (command === "convert") {
-    await ToolsMain.convert(input, output, force);
+    await ToolsMain.convert(
+      input,
+      toolArgs.inputTilesetJsonFileName,
+      output,
+      force
+    );
   } else if (command === "combine") {
     await ToolsMain.combine(input, output, force);
   } else if (command === "upgrade") {

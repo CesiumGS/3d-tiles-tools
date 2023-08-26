@@ -288,8 +288,8 @@ export class StructuralMetadataUtils {
       const primitives = mesh.listPrimitives();
       sb.increaseIndent();
       StructuralMetadataUtils.createPrimitivesMetadataString(sb, primitives);
-      sb.increaseIndent();
-      sb.increaseIndent();
+      sb.decreaseIndent();
+      sb.decreaseIndent();
     }
   }
 

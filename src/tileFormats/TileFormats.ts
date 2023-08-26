@@ -1,4 +1,7 @@
 import { Buffers } from "../base/Buffers";
+import { B3dmFeatureTable } from "../structure/TileFormats/B3dmFeatureTable";
+import { BatchTable } from "../structure/TileFormats/BatchTable";
+import { I3dmFeatureTable } from "../structure/TileFormats/I3dmFeatureTable";
 
 import { CompositeTileData } from "./CompositeTileData";
 import { TileData } from "./TileData";
@@ -277,9 +280,9 @@ export class TileFormats {
    */
   static createB3dmTileDataFromGlb(
     glbData: Buffer,
-    featureTableJson: any,
+    featureTableJson: B3dmFeatureTable | undefined,
     featureTableBinary: Buffer | undefined,
-    batchTableJson: any,
+    batchTableJson: BatchTable | undefined,
     batchTableBinary: Buffer | undefined
   ): TileData {
     const defaultFeatureTableJson = {
@@ -349,9 +352,9 @@ export class TileFormats {
    */
   static createI3dmTileDataFromGlb(
     glbData: Buffer,
-    featureTableJson: any,
+    featureTableJson: I3dmFeatureTable | undefined,
     featureTableBinary: Buffer | undefined,
-    batchTableJson: any,
+    batchTableJson: BatchTable | undefined,
     batchTableBinary: Buffer | undefined
   ): TileData {
     const defaultFeatureTableJson = {
