@@ -93,6 +93,12 @@ Convert between tilesets and tileset package formats.
 npx 3d-tiles-tools convert -i ./specs/data/TilesetOfTilesets/tileset.json -o ./output/TilesetOfTilesets.3tz
 ```
 
+Additional command line options:
+
+| Flag | Description | Required |
+| ---- | ----------- | -------- |
+|`--inputTilesetJsonFileName`|The name of the input file that should be considered to be the top-level tileset JSON file| No |
+
 The input- and output arguments for this command may be
 
 - The name of a directory that contains a `tileset.json` file (or the full path to a tileset JSON file)
@@ -100,6 +106,11 @@ The input- and output arguments for this command may be
 - The name of a `.3dtiles` file
 
 The input may also be a `.zip` file that contains a `tileset.json` file.
+
+When the input is a `.zip` file or a directory that contains multiple tileset JSON files, and none of them is called `tileset.json`, then the `--inputTilesetJsonFileName` argument can be used to define the JSON file that should be considered to be the top-level tileset JSON. For example, when there is an `ambiguous.zip` tile that does contain two JSON files called `tilesetA.json` and `tilesetB.json`, the following command can be used to designate `tilesetA.json` as the top-level tileset JSON file:
+```
+npx 3d-tiles-tools convert -i ./specs/data/convert/ambiguous.zip -o ./output/ambiguous.3tz --inputTilesetJsonFileName tilesetA.json
+```
 
 #### databaseToTileset
 
