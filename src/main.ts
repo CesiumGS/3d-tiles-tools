@@ -208,7 +208,7 @@ function parseToolArgs(a: string[]) {
     )
     .command(
       "upgrade",
-      "Upgrades legacy tilests to comply to the 3D Tiles specification.\n\n" +
+      "Upgrades legacy tilesets to comply to the 3D Tiles specification.\n\n" +
         "By default, this will upgrade legacy tilesets to comply to 3D Tiles 1.0. " +
         "These upgrades include:\n" +
         "- The asset version will be set to '1.0'\n" +
@@ -221,7 +221,7 @@ function parseToolArgs(a: string[]) {
         "- Content that uses a 'url' will be upgraded to use 'uri'.\n" +
         "- The 'refine' value will be converted to be in all-uppercase.\n" +
         "- The '3DTILES_content_gltf' extension declaration will be removed.\n" +
-        "- PNTS and B3DM content will be converted to glTF.\n" +
+        "- PNTS, B3DM, and I3DM content will be converted to glTF.\n" +
         "\n",
       {
         i: inputStringDefinition,
