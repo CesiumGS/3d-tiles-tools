@@ -285,10 +285,10 @@ export class ExplicitTraversedTile implements TraversedTile {
 
   /**
    * Creates a string representation of this tile.
-   * 
+   *
    * The exact format is not specified, but it will contain information
    * that is suitable for identifying this tile within a tile hierarchy.
-   * 
+   *
    * @returns The string
    */
   toString = (): string => {
