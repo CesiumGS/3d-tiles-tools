@@ -283,8 +283,15 @@ export class ExplicitTraversedTile implements TraversedTile {
     return subtreeUri;
   }
 
-  // TODO For debugging
+  /**
+   * Creates a string representation of this tile.
+   * 
+   * The exact format is not specified, but it will contain information
+   * that is suitable for identifying this tile within a tile hierarchy.
+   * 
+   * @returns The string
+   */
   toString = (): string => {
-    return `ExplicitTraversedTile, level ${this.level}, path ${this.path}`;
+    return `ExplicitTraversedTile[level=${this.level}, path=${this.path}]`;
   };
 }
