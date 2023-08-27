@@ -85,7 +85,9 @@ export class TileTableDataToStructuralMetadata {
     // and assign it to the document root
     const structuralMetadata = extStructuralMetadata.createStructuralMetadata();
 
-    const schema = extStructuralMetadata.createSchemaFrom(metadataSchema);
+    const schema = extStructuralMetadata.createSchemaFrom(
+      metadataSchema as any
+    );
     structuralMetadata.setSchema(schema);
 
     const propertyAttribute = extStructuralMetadata.createPropertyAttribute();
@@ -213,7 +215,9 @@ export class TileTableDataToStructuralMetadata {
     // contains the schema and assign it to the document root
     const structuralMetadata = extStructuralMetadata.createStructuralMetadata();
 
-    const schema = extStructuralMetadata.createSchemaFrom(metadataSchema);
+    const schema = extStructuralMetadata.createSchemaFrom(
+      metadataSchema as any
+    );
     structuralMetadata.setSchema(schema);
 
     const root = document.getRoot();
