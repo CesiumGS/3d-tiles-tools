@@ -9,10 +9,11 @@ import { PntsPointClouds } from "../contentProcessing/pointClouds/PntsPointCloud
 import { GltfTransformPointClouds } from "../contentProcessing/pointClouds/GltTransformPointClouds";
 import { ReadablePointCloud } from "../contentProcessing/pointClouds/ReadablePointCloud";
 
-import { TileTableData } from "./TileTableData";
+import { TileTableData } from "../tileTableData/TileTableData";
+
 import { TileFormatsMigration } from "./TileFormatsMigration";
 import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
-import { BatchTables } from "./BatchTables";
+import { BatchTables } from "../tileTableData/BatchTables";
 import { Ids } from "./Ids";
 
 import { MeshFeatures } from "../gltfMetadata/MeshFeatures";

@@ -3,6 +3,7 @@ import { Primitive } from "@gltf-transform/core";
 import { Accessor } from "@gltf-transform/core";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
+
 import { EXTMeshFeatures } from "../gltfMetadata/EXTMeshFeatures";
 import { FeatureId } from "../gltfMetadata/MeshFeatures";
 

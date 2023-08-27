@@ -15,10 +15,10 @@ import { AccessorCreation } from "./AccessorCreation";
 import { TileFormatsMigration } from "./TileFormatsMigration";
 
 import { PropertyTableModels } from "../metadata/PropertyTableModels";
-import { BinaryPropertyTableModel } from "../metadata/binary/BinaryPropertyTableModel";
-import { BinaryPropertyTableBuilder } from "../metadata/binary/BinaryPropertyTableBuilder";
 import { PropertyModels } from "../metadata/PropertyModels";
 import { PropertyModel } from "../metadata/PropertyModel";
+import { BinaryPropertyTableModel } from "../metadata/binary/BinaryPropertyTableModel";
+import { BinaryPropertyTableBuilder } from "../metadata/binary/BinaryPropertyTableBuilder";
 
 /**
  * Methods to transfer information from (legacy) batch table data

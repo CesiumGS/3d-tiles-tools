@@ -18,11 +18,12 @@ import { TileFormatError } from "../tileFormats/TileFormatError";
 import { GltfTransform } from "../contentProcessing/GltfTransform";
 import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 
-import { VecMath } from "./VecMath";
-import { TileTableDataI3dm } from "./TileTableDataI3dm";
+import { VecMath } from "../tileTableData/VecMath";
 import { TileFormatsMigration } from "./TileFormatsMigration";
-import { TileTableData } from "./TileTableData";
 import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
+
+import { TileTableDataI3dm } from "../tileTableData/TileTableDataI3dm";
+import { TileTableData } from "../tileTableData/TileTableData";
 
 import { EXTInstanceFeatures } from "../gltfMetadata/EXTInstanceFeatures";
 import { InstanceFeaturesUtils } from "../gltfMetadata/InstanceFeaturesUtils";

@@ -4,12 +4,12 @@ import { PntsFeatureTable } from "../../structure/TileFormats/PntsFeatureTable";
 import { BatchTable } from "../../structure/TileFormats/BatchTable";
 
 import { DefaultPointCloud } from "./DefaultPointCloud";
-import { Colors } from "./Colors";
 import { ReadablePointCloud } from "./ReadablePointCloud";
 
-import { TileTableData } from "../../migration/TileTableData";
-import { BatchTables } from "../../migration/BatchTables";
-import { TileTableDataPnts } from "../../migration/TileTableDataPnts";
+import { TileTableData } from "../../tileTableData/TileTableData";
+import { BatchTables } from "../../tileTableData/BatchTables";
+import { Colors } from "../../tileTableData/Colors";
+import { TileTableDataPnts } from "../../tileTableData/TileTableDataPnts";
 
 import { DracoDecoder } from "../draco/DracoDecoder";
 import { DracoDecoderResult } from "../draco/DracoDecoderResult";

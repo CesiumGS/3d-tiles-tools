@@ -4,9 +4,7 @@ import { I3dmFeatureTable } from "../structure/TileFormats/I3dmFeatureTable";
 
 import { TileTableData } from "./TileTableData";
 import { VecMath } from "./VecMath";
-
-// TODO These should probably be in this directory:
-import { AttributeCompression } from "../contentProcessing/pointClouds/AttributeCompression";
+import { AttributeCompression } from "./AttributeCompression";
 
 /**
  * Methods to access the data that is stored in the feature table

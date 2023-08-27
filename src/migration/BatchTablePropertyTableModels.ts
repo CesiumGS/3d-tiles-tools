@@ -1,4 +1,4 @@
-import { TileTableData } from "./TileTableData";
+import { TileTableData } from "../tileTableData/TileTableData";
 import { BatchTableClassProperties } from "./BatchTableClassProperties";
 import { Ids } from "./Ids";
 

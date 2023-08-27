@@ -6,7 +6,7 @@ import { TileFormats } from "../tileFormats/TileFormats";
 import { GltfTransform } from "../contentProcessing/GltfTransform";
 import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 
-import { TileTableData } from "./TileTableData";
+import { TileTableData } from "../tileTableData/TileTableData";
 import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
 import { TileTableDataToMeshFeatures } from "./TileTableDataToMeshFeatures";
 import { TileFormatsMigration } from "./TileFormatsMigration";

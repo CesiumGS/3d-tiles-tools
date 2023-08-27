@@ -7,7 +7,7 @@ import { TileTableData } from "./TileTableData";
 import { TileFormatError } from "../tileFormats/TileFormatError";
 
 // TODO These should probably be in this directory:
-import { AttributeCompression } from "../contentProcessing/pointClouds/AttributeCompression";
+import { AttributeCompression } from "./AttributeCompression";
 import { Colors } from "../contentProcessing/pointClouds/Colors";
 
 /**
