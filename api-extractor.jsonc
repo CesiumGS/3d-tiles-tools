@@ -73,4 +73,20 @@
     "enabled": true
   },
 
+  "messages": {
+    "extractorMessageReporting": {
+
+      /**
+       * Ignore the message that says that declarations that are marked as `@internal`
+       * should be prefixed with an underscore.
+       *
+       * https://api-extractor.com/pages/messages/ae-internal-missing-underscore/
+       */
+      "ae-internal-missing-underscore": {
+        "logLevel": "none",
+        "addToApiReportFile": false
+      }
+    }
+  }
+
 }
