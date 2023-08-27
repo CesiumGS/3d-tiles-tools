@@ -15,7 +15,7 @@ import { IndexEntry } from "./IndexEntry";
 /**
  * @internal
  */
-interface ZipLocalFileHeader {
+export interface ZipLocalFileHeader {
   signature: number;
   compression_method: number;
   comp_size: number;
@@ -282,7 +282,7 @@ export class ArchiveFunctions3tz {
     };
   }
 
-  private static readZipLocalFileHeader(
+  static readZipLocalFileHeader(
     fd: number,
     offset: number | bigint,
     path: string
