@@ -336,9 +336,6 @@ export class ImplicitTraversedTile implements TraversedTile {
     for (const contentAvailabilityInfo of contentAvailabilityInfos) {
       const available = contentAvailabilityInfo.isAvailable(tileIndex);
       if (available) {
-        // TODO The existence of the root content URI should
-        // have been validated. So this could also throw
-        // an error if the template URI is not found.
         const templateUri = this._root.asRawTile().content?.uri;
         if (defined(templateUri)) {
           const contentUri = ImplicitTilings.substituteTemplateUri(
@@ -353,6 +350,10 @@ export class ImplicitTraversedTile implements TraversedTile {
             group: undefined,
           };
           contents.push(content);
+        } else {
+          throw new ImplicitTilingError(
+            "The root of the implicit tileset did not define a template URI"
+          );
         }
       }
     }
@@ -407,10 +408,10 @@ export class ImplicitTraversedTile implements TraversedTile {
 
   /**
    * Creates a string representation of this tile.
-   * 
+   *
    * The exact format is not specified, but it will contain information
    * that is suitable for identifying this tile within a tile hierarchy.
-   * 
+   *
    * @returns The string
    */
   toString = (): string => {
