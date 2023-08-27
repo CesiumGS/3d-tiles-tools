@@ -4,8 +4,8 @@ import { Accessor } from "@gltf-transform/core";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
 
-import { EXTMeshFeatures } from "../gltfMetadata/EXTMeshFeatures";
-import { FeatureId } from "../gltfMetadata/MeshFeatures";
+import { EXTMeshFeatures } from "../gltfExtensions/EXTMeshFeatures";
+import { FeatureId } from "../gltfExtensions/MeshFeatures";
 
 /**
  * Methods related to the conversion of legacy tile table data

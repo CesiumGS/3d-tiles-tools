@@ -1,11 +1,11 @@
 import { Document } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 
-import { EXTStructuralMetadata } from "../gltfMetadata/EXTStructuralMetadata";
-import { MeshPrimitiveStructuralMetadata } from "../gltfMetadata/StructuralMetadata";
-import { PropertyTable } from "../gltfMetadata/StructuralMetadata";
-import { StructuralMetadata } from "../gltfMetadata/StructuralMetadata";
-import { StructuralMetadataPropertyTables } from "../gltfMetadata/StructuralMetadataPropertyTables";
+import { EXTStructuralMetadata } from "../gltfExtensions/EXTStructuralMetadata";
+import { MeshPrimitiveStructuralMetadata } from "../gltfExtensions/StructuralMetadata";
+import { PropertyTable } from "../gltfExtensions/StructuralMetadata";
+import { StructuralMetadata } from "../gltfExtensions/StructuralMetadata";
+import { StructuralMetadataPropertyTables } from "../gltfExtensions/StructuralMetadataPropertyTables";
 
 import { BatchTable } from "../structure/TileFormats/BatchTable";
 

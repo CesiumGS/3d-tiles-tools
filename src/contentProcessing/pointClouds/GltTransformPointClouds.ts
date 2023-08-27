@@ -8,7 +8,7 @@ import { QuantizeOptions } from "@gltf-transform/functions";
 
 import { KHRMeshQuantization } from "@gltf-transform/extensions";
 
-import { EXTMeshFeatures } from "../../gltfMetadata/EXTMeshFeatures";
+import { EXTMeshFeatures } from "../../gltfExtensions/EXTMeshFeatures";
 
 import { Iterables } from "../../base/Iterables";
 

@@ -25,9 +25,9 @@ import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMe
 import { TileTableDataI3dm } from "../tileTableData/TileTableDataI3dm";
 import { TileTableData } from "../tileTableData/TileTableData";
 
-import { EXTInstanceFeatures } from "../gltfMetadata/EXTInstanceFeatures";
-import { InstanceFeaturesUtils } from "../gltfMetadata/InstanceFeaturesUtils";
-import { StructuralMetadataUtils } from "../gltfMetadata/StructuralMetadataUtils";
+import { EXTInstanceFeatures } from "../gltfExtensions/EXTInstanceFeatures";
+import { InstanceFeaturesUtils } from "../gltfExtensions/InstanceFeaturesUtils";
+import { StructuralMetadataUtils } from "../gltfExtensions/StructuralMetadataUtils";
 
 /**
  * Methods for converting I3DM tile data into GLB
