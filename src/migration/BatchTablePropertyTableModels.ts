@@ -11,6 +11,8 @@ import { TileFormatError } from "../tileFormats/TileFormatError";
 
 /**
  * Methods to create `PropertyTableModel` instances for batch table data
+ *
+ * @internal
  */
 export class BatchTablePropertyTableModels {
   /**

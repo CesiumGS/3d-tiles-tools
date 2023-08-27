@@ -1,6 +1,8 @@
 /**
  * Interface for a feature- or batch table that is
  * part of `TileData`.
+ *
+ * @internal
  */
 export interface Table {
   /**

@@ -10,6 +10,8 @@ import { EXTInstanceFeatures } from "../gltfExtensions/EXTInstanceFeatures";
 
 /**
  * Utilities for using glTF-Transform in the 3D Tiles tools
+ *
+ * @internal
  */
 export class GltfTransform {
   /**

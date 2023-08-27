@@ -6,6 +6,8 @@ import { TileContentProcessor } from "./TileContentProcessor";
 /**
  * Methods to create `TileContentProcessor` instances that
  * process GLB data with `gltf-pipeline`.
+ *
+ * @internal
  */
 export class TileContentProcessorsGltfPipeline {
   /**

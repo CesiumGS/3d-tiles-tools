@@ -2,7 +2,14 @@
 // and should be considered an implementation detail.
 
 // Basic, internal structures for bounding box computations
+/**
+ * @internal
+ */
 export type Point3D = [number, number, number];
+
+/**
+ * @internal
+ */
 export type BoundingBox3D = {
   min: Point3D;
   max: Point3D;
@@ -16,6 +23,8 @@ export type BoundingBox3D = {
  * To reduce ambiguities, the term "bounding box" refers to actual
  * `BoundingBox3D` instances. The term "bounding volume box" refers
  * to the 12-element number arrays that are the `boundingVolume.box`.
+ *
+ * @internal
  */
 export class BoundingVolumes {
   /**

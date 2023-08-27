@@ -31,6 +31,8 @@ import { StructuralMetadataUtils } from "../gltfExtensions/StructuralMetadataUti
 
 /**
  * Methods for converting I3DM tile data into GLB
+ *
+ * @internal
  */
 export class TileFormatsMigrationI3dm {
   /**

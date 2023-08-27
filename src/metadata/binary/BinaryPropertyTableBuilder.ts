@@ -15,6 +15,8 @@ import { BinaryPropertyTables } from "./BinaryPropertyTables";
 /**
  * A class for building `BinaryPropertyModel` instances
  * from property values that are given as arrays.
+ *
+ * @internal
  */
 export class BinaryPropertyTableBuilder {
   /**

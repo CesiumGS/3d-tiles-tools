@@ -2,6 +2,8 @@
  * An error that may be thrown to indicate that tile data
  * was invalid in some way, with the error mesage hopefully
  * containing some helpful details.
+ *
+ * @internal
  */
 export class TileFormatError extends Error {
   constructor(message: string) {

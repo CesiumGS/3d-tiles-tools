@@ -35,6 +35,8 @@ import { PropertyTable } from "./StructuralMetadata";
  *   binaryPropertyTable
  * );
  * ```
+ *
+ * @internal
  */
 export class StructuralMetadataPropertyTables {
   /**

@@ -2,6 +2,8 @@ import { TileContentProcessor } from "./TileContentProcessor";
 
 /**
  * Methods related to `TileContentProcessor` instances
+ *
+ * @internal
  */
 export class TileContentProcessors {
   /**

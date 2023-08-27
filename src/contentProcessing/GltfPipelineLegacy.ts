@@ -6,6 +6,8 @@ import { Extensions } from "../tilesets/Extensions";
 /**
  * Methods and fragments ported from a legacy version of gltf-pipeline.
  * (Sorry, no more specific details here...)
+ *
+ * @internal
  */
 export class GltfPipelineLegacy {
   static async process(gltf: any) {

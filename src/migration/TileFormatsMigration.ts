@@ -8,6 +8,8 @@ import { TileFormatsMigrationI3dm } from "./TileFormatsMigrationI3dm";
  * Methods for converting "legacy" tile formats into glTF assets
  * that use metadata extensions to represent the information from
  * the legacy formats.
+ *
+ * @internal
  */
 export class TileFormatsMigration {
   static readonly DEBUG_LOG = false;

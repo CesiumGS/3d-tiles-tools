@@ -9,6 +9,8 @@ import { FeatureId } from "./InstanceFeatures";
 
 /**
  * Utilities related to the glTF `EXT_instance_features` extension.
+ *
+ * @internal
  */
 export class InstanceFeaturesUtils {
   /**

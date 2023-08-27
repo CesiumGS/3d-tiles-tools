@@ -10,6 +10,8 @@ import { FeatureId } from "../gltfExtensions/MeshFeatures";
 /**
  * Methods related to the conversion of legacy tile table data
  * to the `EXT_mesh_features` extension.
+ *
+ * @internal
  */
 export class TileTableDataToMeshFeatures {
   /**

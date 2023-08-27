@@ -15,6 +15,8 @@ import { Buffers } from "../base/Buffers";
 
 /**
  * Methods to execute `TilesetStage` objects.
+ *
+ * @internal
  */
 export class TilesetStageExecutor {
   /**

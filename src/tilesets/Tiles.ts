@@ -5,6 +5,8 @@ import { TileTraversalCallback } from "./TileTraversalCallback";
 
 /**
  * Utility methods related to tiles, given as `Tile` objects.
+ *
+ * @internal
  */
 export class Tiles {
   /**

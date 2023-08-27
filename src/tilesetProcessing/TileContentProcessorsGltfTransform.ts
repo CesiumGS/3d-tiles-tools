@@ -8,6 +8,8 @@ import { GltfTransform } from "../contentProcessing/GltfTransform";
 /**
  * Methods to create `TileContentProcessor` instances that
  * process GLB data with `gltf-transform`.
+ *
+ * @internal
  */
 export class TileContentProcessorsGltfTransform {
   /**

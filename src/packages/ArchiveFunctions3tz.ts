@@ -12,6 +12,9 @@ import { IndexEntry } from "./IndexEntry";
 // changes are marked with "ZIP64_BUGFIX", but details have to be taken
 // from the git change log.
 
+/**
+ * @internal
+ */
 interface ZipLocalFileHeader {
   signature: number;
   compression_method: number;
@@ -279,7 +282,7 @@ export class ArchiveFunctions3tz {
     };
   }
 
-  static readZipLocalFileHeader(
+  private static readZipLocalFileHeader(
     fd: number,
     offset: number | bigint,
     path: string

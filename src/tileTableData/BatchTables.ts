@@ -2,6 +2,8 @@ import { BatchTable } from "../structure/TileFormats/BatchTable";
 
 /**
  * Internal uutility methods related to the migration of batch tables
+ *
+ * @internal
  */
 export class BatchTables {
   /**

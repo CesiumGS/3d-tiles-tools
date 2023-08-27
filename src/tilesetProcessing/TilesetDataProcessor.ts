@@ -21,6 +21,8 @@ import { TilesetProcessor } from "./TilesetProcessor";
  * where the entry processors are `TilesetEntryProcessor` instances
  * that will receive the `TilesetEntry` from the source, and return
  * a `TilesetEntry` that should be put into the target.
+ *
+ * @internal
  */
 export class TilesetDataProcessor extends TilesetProcessor {
   /**

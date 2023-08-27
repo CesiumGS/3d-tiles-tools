@@ -23,6 +23,8 @@ import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
 
 /**
  * Methods for converting PNTS tile data into GLB
+ *
+ * @internal
  */
 export class TileFormatsMigrationPnts {
   /**

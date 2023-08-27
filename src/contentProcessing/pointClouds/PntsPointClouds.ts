@@ -16,6 +16,8 @@ import { DracoDecoderResult } from "../draco/DracoDecoderResult";
 
 /**
  * Methods to create `ReadablePointCloud` instances from PNTS data
+ *
+ * @internal
  */
 export class PntsPointClouds {
   /**

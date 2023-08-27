@@ -4,6 +4,8 @@ import { DeveloperError } from "../../base/DeveloperError";
 
 /**
  * Functions related to S2 cells
+ *
+ * @internal
  */
 export class S2Cell {
   // The maximum level supported within an S2 cell ID. Each level is represented by two bits in the final cell ID

@@ -21,6 +21,8 @@ import { AccessorCreation } from "../../migration/AccessorCreation";
 /**
  * An internal interface representing a point cloud with
  * glTF-Transform structures.
+ *
+ * @internal
  */
 export interface GltfTransformPointCloud {
   /**

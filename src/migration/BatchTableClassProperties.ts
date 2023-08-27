@@ -7,6 +7,8 @@ import { TypeDetection } from "./TypeDetection";
 
 /**
  * Methods to create `ClassProperty` objects from batch table properties.
+ *
+ * @internal
  */
 export class BatchTableClassProperties {
   /**

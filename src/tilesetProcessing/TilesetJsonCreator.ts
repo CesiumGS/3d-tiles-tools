@@ -33,6 +33,8 @@ const DEFAULT_TILESET_GEOMETRIC_ERROR = 4096;
 
 /**
  * A class for creating `Tileset` JSON objects from tile content files.
+ *
+ * @internal
  */
 export class TilesetJsonCreator {
   // Implementation notes:

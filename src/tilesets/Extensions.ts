@@ -10,6 +10,8 @@ type Extensible = { extensionsUsed?: any; extensionsRequired?: any };
 
 /**
  * Utility methods for handling extensions
+ *
+ * @internal
  */
 export class Extensions {
   /**

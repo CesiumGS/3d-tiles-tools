@@ -10,6 +10,8 @@ import { TilesetTarget } from "../tilesetData/TilesetTarget";
  * This is initialized during the `TilesetProcessor.begin` call, if all
  * the source- and target information could be resolved, and is supposed
  * to represent a consistent, properly initialized state to work on.
+ *
+ * @internal
  */
 export interface TilesetProcessorContext {
   /**

@@ -11,6 +11,8 @@ import { TileFormatError } from "../tileFormats/TileFormatError";
 /**
  * Methods to access the data that is stored in the feature table
  * of PNTS.
+ *
+ * @internal
  */
 export class TileTableDataPnts {
   /**

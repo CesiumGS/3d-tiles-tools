@@ -6,6 +6,8 @@ import { Math as CesiumMath } from "cesium";
  *
  * Methods for decoding (point cloud) attribute values that are
  * stored in compressed forms.
+ *
+ * @internal
  */
 export class AttributeCompression {
   private static readonly octDecodeInRangeInternalResultScratch =

@@ -5,6 +5,8 @@ import { GltfPackOptions } from "./GltfPackOptions";
 
 /**
  * Utility class for using gltfpack in the 3D Tiles tools
+ *
+ * @internal
  */
 export class GltfPack {
   /**

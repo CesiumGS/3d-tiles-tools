@@ -21,6 +21,8 @@ import { TileFormatsMigration } from "../migration/TileFormatsMigration";
  * A class for "upgrading" a tileset from a previous version to
  * a more recent version. The details of what that means exactly
  * are not (yet) specified.
+ *
+ * @internal
  */
 export class TilesetUpgrader {
   /**

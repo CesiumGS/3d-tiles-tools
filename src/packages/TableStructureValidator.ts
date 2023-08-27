@@ -4,6 +4,8 @@ import { Database } from "better-sqlite3";
  * A simple type describing the structure of a database
  * table, consisting of the table name, and the names
  * and types of the columns.
+ *
+ * @internal
  */
 export type TableStructure = {
   /**
@@ -23,6 +25,8 @@ export type TableStructure = {
 /**
  * A class that can validate that a (better-sqlite3) Database
  * has a certain structure.
+ *
+ * @internal
  */
 export class TableStructureValidator {
   /**

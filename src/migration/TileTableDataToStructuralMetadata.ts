@@ -23,6 +23,8 @@ import { BinaryPropertyTableBuilder } from "../metadata/binary/BinaryPropertyTab
 /**
  * Methods to transfer information from (legacy) batch table data
  * into glTF assets, using the `EXT_structural_metadata` extension.
+ *
+ * @internal
  */
 export class TileTableDataToStructuralMetadata {
   /**

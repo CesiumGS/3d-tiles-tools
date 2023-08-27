@@ -10,6 +10,8 @@ import { ClassProperty } from "../structure/Metadata/ClassProperty";
 /**
  * Implementation of a `PropertyTableModel` that is backed by
  * `PropertyModel` instances
+ *
+ * @internal
  */
 export class DefaultPropertyTableModel implements PropertyTableModel {
   /**

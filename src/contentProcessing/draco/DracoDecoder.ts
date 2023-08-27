@@ -14,6 +14,8 @@ import { DracoDecoderResult } from "./DracoDecoderResult";
 /**
  * A thin wrapper around Draco, tailored for decompressing
  * point cloud data.
+ *
+ * @internal
  */
 export class DracoDecoder {
   // Implementation note: This was largely ported from CesiumJS

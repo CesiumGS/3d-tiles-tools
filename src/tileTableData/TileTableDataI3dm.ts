@@ -9,6 +9,8 @@ import { AttributeCompression } from "./AttributeCompression";
 /**
  * Methods to access the data that is stored in the feature table
  * of I3DM.
+ *
+ * @internal
  */
 export class TileTableDataI3dm {
   /**

@@ -10,6 +10,8 @@ import { GltfPipelineLegacy } from "./GltfPipelineLegacy";
 
 /**
  * Internal utility methods related to glTF/GLB data.
+ *
+ * @internal
  */
 export class GltfUtilities {
   /**

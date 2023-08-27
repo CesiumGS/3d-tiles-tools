@@ -13,6 +13,8 @@ import { TileFormatsMigration } from "./TileFormatsMigration";
 
 /**
  * Methods for converting B3DM tile data into GLB
+ *
+ * @internal
  */
 export class TileFormatsMigrationB3dm {
   /**

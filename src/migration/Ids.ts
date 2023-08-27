@@ -1,5 +1,7 @@
 /**
  * Internal utility methods related to IDs
+ *
+ * @internal
  */
 export class Ids {
   /**

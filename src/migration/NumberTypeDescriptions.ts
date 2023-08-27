@@ -21,6 +21,8 @@ interface NumberTypeDescription {
 
 /**
  * Methods to compute the ("metadata") component type for numeric values.
+ *
+ * @internal
  */
 export class NumberTypeDescriptions {
   /**
