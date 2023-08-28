@@ -215,8 +215,7 @@ export class TileTableData {
         featureTable.RTC_CENTER,
         featureTableBinary
       );
-      // Take the y-up-vs-z-up transform into account:
-      globalPosition = [rtcCenter[0], rtcCenter[2], -rtcCenter[1]];
+      globalPosition = [rtcCenter[0], rtcCenter[1], rtcCenter[2]];
     }
 
     // Add the quantization offset to the global position
@@ -228,10 +227,9 @@ export class TileTableData {
       if (!globalPosition) {
         globalPosition = [0, 0, 0];
       }
-      // Take the y-up-vs-z-up transform into account:
       globalPosition[0] += quantization.offset[0];
-      globalPosition[1] += quantization.offset[2];
-      globalPosition[2] += -quantization.offset[1];
+      globalPosition[1] += quantization.offset[1];
+      globalPosition[2] += quantization.offset[2];
     }
     return globalPosition;
   }

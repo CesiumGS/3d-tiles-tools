@@ -125,14 +125,9 @@ export class TilesetJsonCreator {
       );
       return undefined;
     }
-    // TODO Debug log
     console.log(
-      "Bounding box for " +
-        contentUri +
-        " is " +
-        boundingBox.min +
-        " ... " +
-        boundingBox.max
+      `Bounding box for ${contentUri} is ` +
+        `${boundingBox.min} ... ${boundingBox.max}`
     );
     const boundingVolumeBox =
       BoundingVolumes.createBoundingVolumeBoxFromGltfBoundingBox(boundingBox);
@@ -302,6 +297,10 @@ export class TilesetJsonCreator {
     if (!unionBoundingBox) {
       unionBoundingBox = BoundingVolumes.createUnitCubeBoundingBox();
     }
+    console.log(
+      `Union bounding box is ` +
+        `${unionBoundingBox.min} ... ${unionBoundingBox.max}`
+    );
     return BoundingVolumes.createBoundingVolumeBoxFromBoundingBox(
       unionBoundingBox
     );
@@ -359,10 +358,15 @@ export class TilesetJsonCreator {
     const globalPosition = pntsPointCloud.getGlobalPosition() ?? [0, 0, 0];
     const localPositions = pntsPointCloud.getPositions();
     for (const localPosition of localPositions) {
-      const position: Point3D = [
+      const yupPosition: Point3D = [
         localPosition[0] + globalPosition[0],
         localPosition[1] + globalPosition[1],
         localPosition[2] + globalPosition[2],
+      ];
+      const position: Point3D = [
+        yupPosition[0],
+        yupPosition[2],
+        -yupPosition[1],
       ];
       BoundingVolumes.min(min, position, min);
       BoundingVolumes.max(max, position, max);
@@ -514,12 +518,9 @@ export class TilesetJsonCreator {
       if (!innerBoundingBox) {
         continue;
       }
-      // TODO Debug log
       console.log(
-        "  Inner bounding box for CMPT is " +
-          innerBoundingBox.min +
-          " ... " +
-          innerBoundingBox.max
+        `  Inner bounding box for CMPT is ` +
+          `${innerBoundingBox.min} ... ${innerBoundingBox.max}`
       );
 
       if (!unionBoundingBox) {

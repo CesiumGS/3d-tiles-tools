@@ -159,13 +159,19 @@ export class GltfTransformPointClouds {
     const mesh = document.createMesh();
     mesh.addPrimitive(primitive);
 
-    // Create the node, with the the y-up-to-z-up transform
+    // Create the node, with the the z-up-to-y-up transform
     // and the "global position" of the point cloud
     const node = document.createNode();
     node.setMatrix([1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
     const globalPosition = readablePointCloud.getGlobalPosition();
     if (globalPosition) {
-      node.setTranslation(globalPosition);
+      // The translation has to take the z-up-to-y-up
+      // conversion into account
+      node.setTranslation([
+        globalPosition[0],
+        globalPosition[2],
+        -globalPosition[1],
+      ]);
     }
     node.setMesh(mesh);
 
