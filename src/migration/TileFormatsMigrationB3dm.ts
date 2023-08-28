@@ -4,7 +4,7 @@ import { B3dmFeatureTable } from "../structure/TileFormats/B3dmFeatureTable";
 import { TileFormats } from "../tileFormats/TileFormats";
 
 import { GltfTransform } from "../contentProcessing/GltfTransform";
-import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
+import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 
 import { TileTableData } from "./TileTableData";
 import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";

@@ -16,7 +16,7 @@ export class TileContentProcessorsGltfTransform {
    *
    * It will process each tile content that has the content
    * type `ContentDataTypes.CONTENT_TYPE_GLB`, by calling
-   * the `gtlf-transform` 'transform' method with the
+   * the `gltf-transform` 'transform' method with the
    * input content data, applying the given transforms.
    *
    * @param transforms - The `gltf-transform` `Transform` instances

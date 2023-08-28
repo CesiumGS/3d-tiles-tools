@@ -16,7 +16,7 @@ import { TileFormats } from "../tileFormats/TileFormats";
 import { TileFormatError } from "../tileFormats/TileFormatError";
 
 import { GltfTransform } from "../contentProcessing/GltfTransform";
-import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
+import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 
 import { VecMath } from "./VecMath";
 import { TileTableDataI3dm } from "./TileTableDataI3dm";

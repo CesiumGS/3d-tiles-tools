@@ -258,6 +258,15 @@ function parseToolArgs(a: string[]) {
       "Unpack a tileset database to a tileset folder. (Deprecated - use 'convert' instead)",
       { i: inputStringDefinition, o: outputStringDefinition }
     )
+    .command(
+      "createTilesetJson",
+      "Creates a 'tileset.json' file that just refers to given GLB tile content files. " +
+        "If the input is a single file, then this will result in a single (root) tile with " +
+        "the input file as its tile content. If the input is a directory, then all files" +
+        "with '.glb' file extension in this directory will be used as tile content, " +
+        "recursively.",
+      { i: inputStringDefinition, o: outputStringDefinition }
+    )
     .demandCommand(1)
     .strict();
 
@@ -375,6 +384,8 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
     await ToolsMain.pipeline(input, force);
   } else if (command === "analyze") {
     ToolsMain.analyze(input, output, force);
+  } else if (command === "createTilesetJson") {
+    await ToolsMain.createTilesetJson(input, output, force);
   } else {
     throw new DeveloperError(`Invalid command: ${command}`);
   }

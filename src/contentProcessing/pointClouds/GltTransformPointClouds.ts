@@ -22,7 +22,7 @@ import { AccessorCreation } from "../../migration/AccessorCreation";
  * An internal interface representing a point cloud with
  * glTF-Transform structures.
  */
-export interface GtlfTransformPointCloud {
+export interface GltfTransformPointCloud {
   /**
    * The actual document that represents the point cloud
    */
@@ -56,14 +56,14 @@ export class GltfTransformPointClouds {
    * @param readablePointCloud - The `ReadablePointCloud`
    * @param mayRequireAlpha - Whether the point cloud may
    * require an alpha component for its colors.
-   * @returns The GtlfTransformPointCloud
+   * @returns The GltfTransformPointCloud
    * @throws TileFormatError If the input data does not
    * at least contain a `POSITION` attribute.
    */
   static build(
     readablePointCloud: ReadablePointCloud,
     mayRequireAlpha: boolean
-  ): GtlfTransformPointCloud {
+  ): GltfTransformPointCloud {
     // Prepare the glTF-Transform document and primitive
     const document = new Document();
     document.getRoot().getAsset().generator = "glTF-Transform";
@@ -159,20 +159,26 @@ export class GltfTransformPointClouds {
     const mesh = document.createMesh();
     mesh.addPrimitive(primitive);
 
-    // Create the node, with the the y-up-to-z-up transform
+    // Create the node, with the the z-up-to-y-up transform
     // and the "global position" of the point cloud
     const node = document.createNode();
     node.setMatrix([1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
     const globalPosition = readablePointCloud.getGlobalPosition();
     if (globalPosition) {
-      node.setTranslation(globalPosition);
+      // The translation has to take the z-up-to-y-up
+      // conversion into account
+      node.setTranslation([
+        globalPosition[0],
+        globalPosition[2],
+        -globalPosition[1],
+      ]);
     }
     node.setMesh(mesh);
 
     const scene = document.createScene();
     scene.addChild(node);
 
-    const result: GtlfTransformPointCloud = {
+    const result: GltfTransformPointCloud = {
       document: document,
       primitive: primitive,
     };

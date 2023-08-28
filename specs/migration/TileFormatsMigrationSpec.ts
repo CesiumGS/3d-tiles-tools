@@ -1,6 +1,6 @@
 import fs from "fs";
 
-import { GltfUtilities } from "../../src/contentProcessing/GtlfUtilities";
+import { GltfUtilities } from "../../src/contentProcessing/GltfUtilities";
 
 import { Tilesets } from "../../src/tilesets/Tilesets";
 

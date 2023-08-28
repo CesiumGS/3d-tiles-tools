@@ -14,7 +14,7 @@ export class TileContentProcessorsGltfPipeline {
    *
    * It will process each tile content that has the content
    * type `ContentDataTypes.CONTENT_TYPE_GLB`, by calling
-   * the `gtlf-pipeline` `processGlb` method with the input
+   * the `gltf-pipeline` `processGlb` method with the input
    * content data and the given options.
    *
    * @param options - The options for `gltf-pipeline`
