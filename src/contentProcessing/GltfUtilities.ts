@@ -194,6 +194,9 @@ export class GltfUtilities {
    * @param gltf - The glTF object
    */
   private static replaceCesiumRtcExtensionInternal(gltf: any) {
+    if (!gltf.extensions) {
+      return;
+    }
     const rtcExtension = gltf.extensions["CESIUM_RTC"];
     if (!rtcExtension) {
       return;
