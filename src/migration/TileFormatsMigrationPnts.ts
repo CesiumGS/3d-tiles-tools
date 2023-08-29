@@ -6,7 +6,7 @@ import { TileFormats } from "../tileFormats/TileFormats";
 import { GltfTransform } from "../contentProcessing/GltfTransform";
 
 import { PntsPointClouds } from "../contentProcessing/pointClouds/PntsPointClouds";
-import { GltfTransformPointClouds } from "../contentProcessing/pointClouds/GltTransformPointClouds";
+import { GltfTransformPointClouds } from "../contentProcessing/pointClouds/GltfTransformPointClouds";
 import { ReadablePointCloud } from "../contentProcessing/pointClouds/ReadablePointCloud";
 
 import { TileTableData } from "../tileTableData/TileTableData";
