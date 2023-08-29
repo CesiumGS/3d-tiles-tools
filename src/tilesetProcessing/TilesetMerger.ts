@@ -252,7 +252,7 @@ export class TilesetMerger {
       if (!existingIdentifiers.includes(identifier)) {
         return identifier;
       }
-      identifier = prefix + "-" + counter;
+      identifier = `${prefix}-${counter}`;
       counter++;
     }
   }

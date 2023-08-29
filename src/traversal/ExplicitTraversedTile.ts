@@ -205,7 +205,7 @@ export class ExplicitTraversedTile implements TraversedTile {
     const traversedChildren = [];
     for (let i = 0; i < children.length; i++) {
       const child = children[i];
-      const childPath = this.path + "/children/" + i;
+      const childPath = `${this.path}/children/${i}`;
       const traversedChild = new ExplicitTraversedTile(
         child,
         childPath,
