@@ -54,7 +54,7 @@ async function createExampleDocument(): Promise<Document> {
 
   // Create a 'Schema' object from the JSON input, and assign it
   // to the 'StructuralMetadata'
-  const schema = extStructuralMetadata.createSchemaFrom(exampleSchema);
+  const schema = extStructuralMetadata.createSchemaFrom(exampleSchema as any);
   structuralMetadata.setSchema(schema);
 
   // Use the `BinaryPropertyTableBuilder` to create a `BinaryPropertyTable`.
