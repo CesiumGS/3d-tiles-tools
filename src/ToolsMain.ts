@@ -249,7 +249,7 @@ export class ToolsMain {
       const n = compositeTileData.innerTileBuffers.length;
       for (let i = 0; i < n; i++) {
         const innerTileDataBuffer = compositeTileData.innerTileBuffers[i];
-        const innerTileBaseName = inputBaseName + ".inner[" + i + "]";
+        const innerTileBaseName = `${inputBaseName}.inner[${i}]`;
         ToolsMain.analyzeInternal(
           innerTileBaseName,
           innerTileDataBuffer,
