@@ -149,8 +149,8 @@ export class GltfUtilities {
     if (!options.customStages) {
       options.customStages = [];
     }
-    const customStage = (gltf: any) => {
-      GltfPipelineLegacy.process(gltf);
+    const customStage = async (gltf: any) => {
+      await GltfPipelineLegacy.process(gltf);
       return gltf;
     };
     options.customStages.push(customStage);
