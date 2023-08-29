@@ -9,6 +9,8 @@ import { StringBuilder } from "./StringBuilder";
 
 /**
  * Utilities related to the glTF `EXT_mesh_features` extension.
+ *
+ * @internal
  */
 export class MeshFeaturesUtils {
   /**

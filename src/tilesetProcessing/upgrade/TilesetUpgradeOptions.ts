@@ -5,6 +5,8 @@
  *
  * The exact set of options (and how they may eventually
  * be exposed to the user) still have to be decided.
+ *
+ * @internal
  */
 export type TilesetUpgradeOptions = {
   // Options for the general upgrade process

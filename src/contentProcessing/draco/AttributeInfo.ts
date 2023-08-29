@@ -3,6 +3,8 @@ import { QuantizationInfo } from "./QuantizationInfo";
 /**
  * Information about the structure of an attriubte, after it
  * was decoded from the Draco representation.
+ *
+ * @internal
  */
 export type AttributeInfo = {
   /**

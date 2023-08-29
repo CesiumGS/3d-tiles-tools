@@ -7,6 +7,8 @@ import { TilesetStageExecutor } from "./TilesetStageExecutor";
 
 /**
  * Methods to execute `Pipeline` objects.
+ *
+ * @internal
  */
 export class PipelineExecutor {
   /**

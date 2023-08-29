@@ -1,9 +1,9 @@
 import { Document } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
 
-import { EXTStructuralMetadata } from "../src/gltfMetadata/EXTStructuralMetadata";
-import { StructuralMetadataPropertyTables } from "../src/gltfMetadata/StructuralMetadataPropertyTables";
-import { StructuralMetadata } from "../src/gltfMetadata/StructuralMetadata";
+import { EXTStructuralMetadata } from "../src/gltfExtensions/EXTStructuralMetadata";
+import { StructuralMetadataPropertyTables } from "../src/gltfExtensions/StructuralMetadataPropertyTables";
+import { StructuralMetadata } from "../src/gltfExtensions/StructuralMetadata";
 
 import { BinaryPropertyTableBuilder } from "../src/metadata/binary/BinaryPropertyTableBuilder";
 import { BinaryPropertyTableModel } from "../src/metadata/binary/BinaryPropertyTableModel";
@@ -54,7 +54,7 @@ async function createExampleDocument(): Promise<Document> {
 
   // Create a 'Schema' object from the JSON input, and assign it
   // to the 'StructuralMetadata'
-  const schema = extStructuralMetadata.createSchemaFrom(exampleSchema);
+  const schema = extStructuralMetadata.createSchemaFrom(exampleSchema as any);
   structuralMetadata.setSchema(schema);
 
   // Use the `BinaryPropertyTableBuilder` to create a `BinaryPropertyTable`.

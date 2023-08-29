@@ -4,8 +4,8 @@ import { NodeIO } from "@gltf-transform/core";
 
 import { EXTMeshGPUInstancing } from "@gltf-transform/extensions";
 
-import { EXTInstanceFeatures } from "../src/gltfMetadata/EXTInstanceFeatures";
-import { InstanceFeaturesUtils } from "../src/gltfMetadata/InstanceFeaturesUtils";
+import { EXTInstanceFeatures } from "../src/gltfExtensions/EXTInstanceFeatures";
+import { InstanceFeaturesUtils } from "../src/gltfExtensions/InstanceFeaturesUtils";
 
 function createMesh(document: Document) {
   const root = document.getRoot();

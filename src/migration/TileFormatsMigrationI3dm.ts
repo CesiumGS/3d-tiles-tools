@@ -18,18 +18,21 @@ import { TileFormatError } from "../tileFormats/TileFormatError";
 import { GltfTransform } from "../contentProcessing/GltfTransform";
 import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 
-import { VecMath } from "./VecMath";
-import { TileTableDataI3dm } from "./TileTableDataI3dm";
+import { VecMath } from "../tileTableData/VecMath";
 import { TileFormatsMigration } from "./TileFormatsMigration";
-import { TileTableData } from "./TileTableData";
 import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
 
-import { EXTInstanceFeatures } from "../gltfMetadata/EXTInstanceFeatures";
-import { InstanceFeaturesUtils } from "../gltfMetadata/InstanceFeaturesUtils";
-import { StructuralMetadataUtils } from "../gltfMetadata/StructuralMetadataUtils";
+import { TileTableDataI3dm } from "../tileTableData/TileTableDataI3dm";
+import { TileTableData } from "../tileTableData/TileTableData";
+
+import { EXTInstanceFeatures } from "../gltfExtensions/EXTInstanceFeatures";
+import { InstanceFeaturesUtils } from "../gltfExtensions/InstanceFeaturesUtils";
+import { StructuralMetadataUtils } from "../gltfExtensions/StructuralMetadataUtils";
 
 /**
  * Methods for converting I3DM tile data into GLB
+ *
+ * @internal
  */
 export class TileFormatsMigrationI3dm {
   /**
@@ -116,7 +119,7 @@ export class TileFormatsMigrationI3dm {
       clearNodeTransform(node);
     }
     document.setLogger(new Logger(Logger.Verbosity.SILENT));
-    document.transform(prune());
+    await document.transform(prune());
 
     // Insert a single root node above the "flatteded" nodes
     TileFormatsMigration.makeSingleRoot(document);

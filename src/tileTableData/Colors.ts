@@ -13,6 +13,8 @@
  *
  * The prefix "linear" indicates linear RGB/RGBA values (often
  * used as factors).
+ *
+ * @internal
  */
 export class Colors {
   /**

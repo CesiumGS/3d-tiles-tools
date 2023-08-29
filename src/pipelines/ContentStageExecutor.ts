@@ -19,6 +19,8 @@ import { TileFormatsMigration } from "../migration/TileFormatsMigration";
 
 /**
  * Methods to execute `ContentStage` objects.
+ *
+ * @internal
  */
 export class ContentStageExecutor {
   /**

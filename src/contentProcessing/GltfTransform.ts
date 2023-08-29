@@ -4,12 +4,14 @@ import { Transform } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
 import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
 
-import { EXTStructuralMetadata } from "../gltfMetadata/EXTStructuralMetadata";
-import { EXTMeshFeatures } from "../gltfMetadata/EXTMeshFeatures";
-import { EXTInstanceFeatures } from "../gltfMetadata/EXTInstanceFeatures";
+import { EXTStructuralMetadata } from "../gltfExtensions/EXTStructuralMetadata";
+import { EXTMeshFeatures } from "../gltfExtensions/EXTMeshFeatures";
+import { EXTInstanceFeatures } from "../gltfExtensions/EXTInstanceFeatures";
 
 /**
  * Utilities for using glTF-Transform in the 3D Tiles tools
+ *
+ * @internal
  */
 export class GltfTransform {
   /**

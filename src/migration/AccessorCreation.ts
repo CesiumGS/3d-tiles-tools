@@ -20,6 +20,8 @@ import { TileFormatError } from "../tileFormats/TileFormatError";
  * accessing the batch- or feature tables of the legacy tile
  * formats, and that are supposed to be converted into accessors
  * that are part of the glTF metadata extensions.
+ *
+ * @internal
  */
 export class AccessorCreation {
   /**

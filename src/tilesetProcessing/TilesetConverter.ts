@@ -11,6 +11,8 @@ import { ZipToPackage } from "../packages/ZipToPackage";
 /**
  * Methods for converting tilesets between different storage formats.
  * (i.e. the file system, or 3D Tiles archives/packages).
+ *
+ * @internal
  */
 export class TilesetConverter {
   /**

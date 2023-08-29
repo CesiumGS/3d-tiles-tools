@@ -4,6 +4,11 @@ import { TextureInfo } from "@gltf-transform/core";
 import { IProperty } from "@gltf-transform/core";
 import { PropertyType } from "@gltf-transform/core";
 
+import { ClassPropertyType } from "./EXTStructuralMetadata";
+import { ClassPropertyComponentType } from "./EXTStructuralMetadata";
+import { EnumValueType } from "./EXTStructuralMetadata";
+import { PropertyTablePropertyOffsetType } from "./EXTStructuralMetadata";
+
 const NAME = "EXT_structural_metadata";
 
 //============================================================================
@@ -55,8 +60,8 @@ type AnyValue =
 interface IClassProperty extends IProperty {
   objectName: string;
   description: string;
-  type: string;
-  componentType: string;
+  type: ClassPropertyType;
+  componentType: ClassPropertyComponentType;
   enumType: string;
   array: boolean;
   count: number;
@@ -73,7 +78,7 @@ interface IClassProperty extends IProperty {
 interface IEnum extends IProperty {
   objectName: string;
   description: string;
-  valueType: string;
+  valueType: EnumValueType;
   values: EnumValue[];
 }
 
@@ -94,8 +99,8 @@ interface IPropertyTableProperty extends IProperty {
   values: Uint8Array;
   arrayOffsets: Uint8Array;
   stringOffsets: Uint8Array;
-  arrayOffsetType: string;
-  stringOffsetType: string;
+  arrayOffsetType: PropertyTablePropertyOffsetType;
+  stringOffsetType: PropertyTablePropertyOffsetType;
   offset: any;
   scale: any;
   max: any;
@@ -374,17 +379,17 @@ export class ClassProperty extends ExtensionProperty<IClassProperty> {
     return this.set("description", description);
   }
 
-  getType(): string {
+  getType(): ClassPropertyType {
     return this.get("type");
   }
-  setType(type: string) {
+  setType(type: ClassPropertyType) {
     return this.set("type", type);
   }
 
-  getComponentType(): string {
+  getComponentType(): ClassPropertyComponentType {
     return this.get("componentType");
   }
-  setComponentType(componentType: string) {
+  setComponentType(componentType: ClassPropertyComponentType) {
     return this.set("componentType", componentType);
   }
 
@@ -499,10 +504,10 @@ export class Enum extends ExtensionProperty<IEnum> {
     return this.set("description", description);
   }
 
-  getValueType(): string {
+  getValueType(): EnumValueType {
     return this.get("valueType");
   }
-  setValueType(valueType: string) {
+  setValueType(valueType: EnumValueType) {
     return this.set("valueType", valueType);
   }
 
@@ -648,17 +653,17 @@ export class PropertyTableProperty extends ExtensionProperty<IPropertyTablePrope
     return this.set("stringOffsets", stringOffsets);
   }
 
-  getArrayOffsetType(): string {
+  getArrayOffsetType(): PropertyTablePropertyOffsetType {
     return this.get("arrayOffsetType");
   }
-  setArrayOffsetType(arrayOffsetType: string) {
+  setArrayOffsetType(arrayOffsetType: PropertyTablePropertyOffsetType) {
     return this.set("arrayOffsetType", arrayOffsetType);
   }
 
-  getStringOffsetType(): string {
+  getStringOffsetType(): PropertyTablePropertyOffsetType {
     return this.get("stringOffsetType");
   }
-  setStringOffsetType(stringOffsetType: string) {
+  setStringOffsetType(stringOffsetType: PropertyTablePropertyOffsetType) {
     return this.set("stringOffsetType", stringOffsetType);
   }
 

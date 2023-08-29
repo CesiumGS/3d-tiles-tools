@@ -15,6 +15,7 @@ import { TileFormatError } from "./TileFormatError";
  * Methods for reading, creating, and writing data in
  * B3DM, I3DM, PNTS, and CMPT format.
  *
+ * @internal
  */
 export class TileFormats {
   /**

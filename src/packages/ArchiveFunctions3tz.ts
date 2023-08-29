@@ -12,7 +12,10 @@ import { IndexEntry } from "./IndexEntry";
 // changes are marked with "ZIP64_BUGFIX", but details have to be taken
 // from the git change log.
 
-interface ZipLocalFileHeader {
+/**
+ * @internal
+ */
+export interface ZipLocalFileHeader {
   signature: number;
   compression_method: number;
   comp_size: number;

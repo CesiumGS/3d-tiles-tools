@@ -2,6 +2,8 @@
  * Common base interface for a stage in a pipeline.
  *
  * Specializations are `TilesetStage` and `ContentStage`.
+ *
+ * @internal
  */
 export interface Stage {
   /**

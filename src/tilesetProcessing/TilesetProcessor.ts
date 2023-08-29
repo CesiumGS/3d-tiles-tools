@@ -19,6 +19,8 @@ import { TilesetProcessorContexts } from "./TilesetProcessorContexts";
  * Subclasses can access the `TilesetProcessorContext`, which
  * contains the parsed tileset and its schema, and can offer
  * predefined sets of more specialized operations.
+ *
+ * @internal
  */
 export abstract class TilesetProcessor {
   /**

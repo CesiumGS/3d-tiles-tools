@@ -1,4 +1,4 @@
-import { TileTableData } from "./TileTableData";
+import { TileTableData } from "../tileTableData/TileTableData";
 import { BatchTableClassProperties } from "./BatchTableClassProperties";
 import { Ids } from "./Ids";
 
@@ -11,6 +11,8 @@ import { TileFormatError } from "../tileFormats/TileFormatError";
 
 /**
  * Methods to create `PropertyTableModel` instances for batch table data
+ *
+ * @internal
  */
 export class BatchTablePropertyTableModels {
   /**

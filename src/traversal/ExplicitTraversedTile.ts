@@ -205,7 +205,7 @@ export class ExplicitTraversedTile implements TraversedTile {
     const traversedChildren = [];
     for (let i = 0; i < children.length; i++) {
       const child = children[i];
-      const childPath = this.path + "/children/" + i;
+      const childPath = `${this.path}/children/${i}`;
       const traversedChild = new ExplicitTraversedTile(
         child,
         childPath,
@@ -283,8 +283,15 @@ export class ExplicitTraversedTile implements TraversedTile {
     return subtreeUri;
   }
 
-  // TODO For debugging
+  /**
+   * Creates a string representation of this tile.
+   *
+   * The exact format is not specified, but it will contain information
+   * that is suitable for identifying this tile within a tile hierarchy.
+   *
+   * @returns The string
+   */
   toString = (): string => {
-    return `ExplicitTraversedTile, level ${this.level}, path ${this.path}`;
+    return `ExplicitTraversedTile[level=${this.level}, path=${this.path}]`;
   };
 }

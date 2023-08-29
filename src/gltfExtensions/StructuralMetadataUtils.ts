@@ -20,6 +20,8 @@ import { BinaryPropertyModels } from "../metadata/binary/BinaryPropertyModels";
 
 /**
  * Utilities related to the glTF `EXT_structural_metadata` extension.
+ *
+ * @internal
  */
 export class StructuralMetadataUtils {
   /**

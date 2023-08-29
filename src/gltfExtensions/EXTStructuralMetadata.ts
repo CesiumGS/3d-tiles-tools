@@ -24,7 +24,18 @@ import { StructuralMetadata } from "./StructuralMetadata";
 
 const NAME = "EXT_structural_metadata";
 
-function ifNot<T>(value: T, defaultValue: T) {
+/**
+ * Returns the given value if it is **NOT** equal to the given
+ * default value.
+ *
+ * Returns `undefined` if the given value **IS** equal to the
+ * given default value.
+ *
+ * @param value - The value
+ * @param defaultValue - The default value
+ * @returns The result
+ */
+function ifNot<T>(value: T, defaultValue: T): T | undefined {
   if (value === defaultValue) {
     return undefined;
   }
@@ -35,8 +46,57 @@ function ifNot<T>(value: T, defaultValue: T) {
 // Interfaces for the JSON structure
 // (See `EXTMeshFeatures` for details about the concepts)
 
-// TODO Consider limiting the type from string to the valid set for
-// type, componentType, valueType, arrayOffsetType, stringOffsetType
+/**
+ * The type of a metadata class property
+ */
+export type ClassPropertyType =
+  | "SCALAR"
+  | "VEC2"
+  | "VEC3"
+  | "VEC4"
+  | "MAT2"
+  | "MAT3"
+  | "MAT4"
+  | "STRING"
+  | "BOOLEAN"
+  | "ENUM";
+
+/**
+ * The component type of a metadata class property
+ */
+export type ClassPropertyComponentType =
+  | "INT8"
+  | "UINT8"
+  | "INT16"
+  | "UINT16"
+  | "INT32"
+  | "UINT32"
+  | "INT64"
+  | "UINT64"
+  | "FLOAT32"
+  | "FLOAT64";
+
+/**
+ * The value type of a metadata enum
+ */
+export type EnumValueType =
+  | "INT8"
+  | "UINT8"
+  | "INT16"
+  | "UINT16"
+  | "INT32"
+  | "UINT32"
+  | "INT64"
+  | "UINT64";
+
+/**
+ * The type of the string- or array offsets for a property table property
+ */
+export type PropertyTablePropertyOffsetType =
+  | "UINT8"
+  | "UINT16"
+  | "UINT32"
+  | "UINT64";
 
 interface StructuralMetadataDef {
   schema?: SchemaDef;
@@ -73,8 +133,8 @@ type AnyValue =
 interface ClassPropertyDef {
   name?: string;
   description?: string;
-  type: string;
-  componentType?: string;
+  type: ClassPropertyType;
+  componentType?: ClassPropertyComponentType;
   enumType?: string;
   array?: boolean;
   count?: number;
@@ -91,7 +151,7 @@ interface ClassPropertyDef {
 interface EnumDef {
   name?: string;
   description?: string;
-  valueType?: string;
+  valueType?: EnumValueType;
   values: EnumValueDef[];
 }
 
@@ -112,8 +172,8 @@ interface PropertyTablePropertyDef {
   values: number;
   arrayOffsets?: number;
   stringOffsets?: number;
-  arrayOffsetType?: string;
-  stringOffsetType?: string;
+  arrayOffsetType?: PropertyTablePropertyOffsetType;
+  stringOffsetType?: PropertyTablePropertyOffsetType;
   offset?: NumericValue;
   scale?: NumericValue;
   max?: NumericValue;

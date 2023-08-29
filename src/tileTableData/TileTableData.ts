@@ -14,6 +14,8 @@ import { TileFormatError } from "../tileFormats/TileFormatError";
 /**
  * Methods to access the data that is stored in batch- or feature tables
  * of the legacy tile formats in a generic form.
+ *
+ * @internal
  */
 export class TileTableData {
   /**

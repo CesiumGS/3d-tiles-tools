@@ -1,5 +1,7 @@
 /**
  * Internal utility class to build formatted strings
+ *
+ * @internal
  */
 export class StringBuilder {
   private s: string;

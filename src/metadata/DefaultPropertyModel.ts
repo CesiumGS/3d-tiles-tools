@@ -3,6 +3,8 @@ import { PropertyModel } from "./PropertyModel";
 /**
  * Default implementation of a `PropertyModel` that is
  * backed by untyped JSON data.
+ *
+ * @internal
  */
 export class DefaultPropertyModel implements PropertyModel {
   private readonly data: any[];

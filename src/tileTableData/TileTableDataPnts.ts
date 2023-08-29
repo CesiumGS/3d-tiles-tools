@@ -3,16 +3,16 @@ import { Iterables } from "../base/Iterables";
 import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
 
 import { TileTableData } from "./TileTableData";
+import { AttributeCompression } from "./AttributeCompression";
+import { Colors } from "./Colors";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
-
-// TODO These should probably be in this directory:
-import { AttributeCompression } from "../contentProcessing/pointClouds/AttributeCompression";
-import { Colors } from "../contentProcessing/pointClouds/Colors";
 
 /**
  * Methods to access the data that is stored in the feature table
  * of PNTS.
+ *
+ * @internal
  */
 export class TileTableDataPnts {
   /**

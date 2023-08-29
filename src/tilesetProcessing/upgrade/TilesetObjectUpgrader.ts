@@ -11,6 +11,8 @@ import { TilesetUpgradeOptions } from "./TilesetUpgradeOptions";
  * A class for "upgrading" the `Tileset` object that was parsed from
  * a tileset JSON, from a previous version to a more recent version.
  * The details of what that means exactly are not (yet) specified.
+ *
+ * @internal
  */
 export class TilesetObjectUpgrader {
   /**

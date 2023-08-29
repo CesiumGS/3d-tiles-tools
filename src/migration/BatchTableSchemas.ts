@@ -8,6 +8,8 @@ import { Ids } from "./Ids";
 
 /**
  * Methods to create metadata 'Schema' objects from batch tables
+ *
+ * @internal
  */
 export class BatchTableSchemas {
   /**

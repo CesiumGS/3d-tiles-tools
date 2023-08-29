@@ -1,5 +1,7 @@
 /**
  * Options for gltfpack
+ *
+ * @internal
  */
 export type GltfPackOptions = Partial<{
   /**

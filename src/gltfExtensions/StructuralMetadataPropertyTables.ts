@@ -2,6 +2,7 @@ import { MetadataError } from "../metadata/MetadataError";
 import { BinaryPropertyTable } from "../metadata/binary/BinaryPropertyTable";
 
 import { EXTStructuralMetadata } from "./EXTStructuralMetadata";
+import { PropertyTablePropertyOffsetType } from "./EXTStructuralMetadata";
 import { PropertyTable } from "./StructuralMetadata";
 
 /**
@@ -34,6 +35,8 @@ import { PropertyTable } from "./StructuralMetadata";
  *   binaryPropertyTable
  * );
  * ```
+ *
+ * @internal
  */
 export class StructuralMetadataPropertyTables {
   /**
@@ -154,8 +157,12 @@ export class StructuralMetadataPropertyTables {
     const propertyTableProperty =
       extStructuralMetadata.createPropertyTableProperty();
 
-    propertyTableProperty.setArrayOffsetType(arrayOffsetType);
-    propertyTableProperty.setStringOffsetType(stringOffsetType);
+    propertyTableProperty.setArrayOffsetType(
+      arrayOffsetType as PropertyTablePropertyOffsetType
+    );
+    propertyTableProperty.setStringOffsetType(
+      stringOffsetType as PropertyTablePropertyOffsetType
+    );
     propertyTableProperty.setOffset(propertyTablePropertyJson.offset);
     propertyTableProperty.setScale(propertyTablePropertyJson.scale);
     propertyTableProperty.setMax(propertyTablePropertyJson.max);

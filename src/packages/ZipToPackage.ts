@@ -7,6 +7,8 @@ import { Paths } from "../base/Paths";
 
 /**
  * Methods for converting ZIP files into 3D Tiles packages.
+ *
+ * @internal
  */
 export class ZipToPackage {
   /**

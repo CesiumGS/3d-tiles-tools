@@ -21,6 +21,8 @@ import { TileFormatsMigration } from "../migration/TileFormatsMigration";
  * A class for "upgrading" a tileset from a previous version to
  * a more recent version. The details of what that means exactly
  * are not (yet) specified.
+ *
+ * @internal
  */
 export class TilesetUpgrader {
   /**
@@ -421,7 +423,7 @@ export class TilesetUpgrader {
     if (this.upgradeOptions.upgradeExternalTilesets) {
       this.logCallback(`  Upgrading external tileset in ${sourceKey}`);
       const externalTileset = JSON.parse(sourceValue.toString()) as Tileset;
-      this.upgradeTileset(externalTileset);
+      await this.upgradeTileset(externalTileset);
       const externalTilesetJsonString = JSON.stringify(
         externalTileset,
         null,

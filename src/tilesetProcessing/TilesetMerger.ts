@@ -25,6 +25,8 @@ import { Tilesets } from "../tilesets/Tilesets";
 /**
  * A class for merging multiple tilesets, to create a tileset that refers
  * to the merged ones as external tilesets.
+ *
+ * @internal
  */
 export class TilesetMerger {
   /**
@@ -250,7 +252,7 @@ export class TilesetMerger {
       if (!existingIdentifiers.includes(identifier)) {
         return identifier;
       }
-      identifier = prefix + "-" + counter;
+      identifier = `${prefix}-${counter}`;
       counter++;
     }
   }

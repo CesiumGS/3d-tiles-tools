@@ -8,6 +8,8 @@ import { GltfPackOptions } from "../contentProcessing/GltfPackOptions";
 /**
  * Methods to create `TileContentProcessor` instances that
  * process GLB data with `gltfpack`.
+ *
+ * @internal
  */
 export class TileContentProcessorsGltfpack {
   /**

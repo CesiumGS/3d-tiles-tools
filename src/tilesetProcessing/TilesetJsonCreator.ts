@@ -24,15 +24,17 @@ import { BoundingVolumes } from "./BoundingVolumes";
 import { BoundingBox3D } from "./BoundingVolumes";
 import { Point3D } from "./BoundingVolumes";
 
-import { TileTableData } from "../migration/TileTableData";
-import { TileTableDataI3dm } from "../migration/TileTableDataI3dm";
-import { VecMath } from "../migration/VecMath";
+import { TileTableData } from "../tileTableData/TileTableData";
+import { TileTableDataI3dm } from "../tileTableData/TileTableDataI3dm";
+import { VecMath } from "../tileTableData/VecMath";
 
 const DEFAULT_LEAF_GEOMETRIC_ERROR = 512;
 const DEFAULT_TILESET_GEOMETRIC_ERROR = 4096;
 
 /**
  * A class for creating `Tileset` JSON objects from tile content files.
+ *
+ * @internal
  */
 export class TilesetJsonCreator {
   // Implementation notes:

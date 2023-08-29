@@ -71,9 +71,14 @@ async function tilesetPackageConversion(options: any) {
   const overwrite = options.force;
 
   const inputExtension = path.extname(input).toLowerCase();
-
+  const inputTilesetJsonFileName = path.basename(input);
   if (inputExtension === ".zip") {
-    await ZipToPackage.convert(input, output, overwrite);
+    await ZipToPackage.convert(
+      input,
+      inputTilesetJsonFileName,
+      output,
+      overwrite
+    );
   } else {
     const tilesetSource = TilesetSources.createAndOpen(input);
     const tilesetTarget = TilesetTargets.createAndBegin(output, overwrite);

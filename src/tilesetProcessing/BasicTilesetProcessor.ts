@@ -36,6 +36,8 @@ import { Paths } from "../base/Paths";
  * The operations may involve modifications of the actual
  * `Tileset` object. The modified tileset object will be
  * written into the target when `end()` is called.
+ *
+ * @internal
  */
 export class BasicTilesetProcessor extends TilesetProcessor {
   /**

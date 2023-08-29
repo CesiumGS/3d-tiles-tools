@@ -22,6 +22,8 @@ import { BufferedContentData } from "../contentTypes/BufferedContentData";
 /**
  * A class for combining external tileset of a given tileset, to
  * create a new, combined tileset.
+ *
+ * @internal
  */
 export class TilesetCombiner {
   /**

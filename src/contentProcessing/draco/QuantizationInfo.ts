@@ -1,6 +1,8 @@
 /**
  * The information that is included in an `AttributeInfo` for
  * the case that the Draco data was quantized
+ *
+ * @internal
  */
 export type QuantizationInfo = {
   /**

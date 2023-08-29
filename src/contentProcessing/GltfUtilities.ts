@@ -10,6 +10,8 @@ import { GltfPipelineLegacy } from "./GltfPipelineLegacy";
 
 /**
  * Internal utility methods related to glTF/GLB data.
+ *
+ * @internal
  */
 export class GltfUtilities {
   /**
@@ -147,8 +149,8 @@ export class GltfUtilities {
     if (!options.customStages) {
       options.customStages = [];
     }
-    const customStage = (gltf: any) => {
-      GltfPipelineLegacy.process(gltf);
+    const customStage = async (gltf: any) => {
+      await GltfPipelineLegacy.process(gltf);
       return gltf;
     };
     options.customStages.push(customStage);
@@ -192,6 +194,9 @@ export class GltfUtilities {
    * @param gltf - The glTF object
    */
   private static replaceCesiumRtcExtensionInternal(gltf: any) {
+    if (!gltf.extensions) {
+      return;
+    }
     const rtcExtension = gltf.extensions["CESIUM_RTC"];
     if (!rtcExtension) {
       return;

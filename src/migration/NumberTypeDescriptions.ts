@@ -21,6 +21,8 @@ interface NumberTypeDescription {
 
 /**
  * Methods to compute the ("metadata") component type for numeric values.
+ *
+ * @internal
  */
 export class NumberTypeDescriptions {
   /**
@@ -55,12 +57,12 @@ export class NumberTypeDescriptions {
    */
   private static createComponentType(description: NumberTypeDescription) {
     if (!description.isIntegral) {
-      return "FLOAT" + description.requiredBits;
+      return `FLOAT${description.requiredBits}`;
     }
     if (description.isSigned) {
-      return "INT" + description.requiredBits;
+      return `INT${description.requiredBits}`;
     }
-    return "UINT" + description.requiredBits;
+    return `UINT${description.requiredBits}`;
   }
 
   /**

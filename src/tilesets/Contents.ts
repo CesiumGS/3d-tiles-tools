@@ -2,6 +2,8 @@ import { Content } from "../structure/Content";
 
 /**
  * Utility methods related to tile content, given as `Content` object.
+ *
+ * @internal
  */
 export class Contents {
   /**

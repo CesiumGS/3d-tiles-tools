@@ -15,6 +15,8 @@ import { DeveloperError } from "../base/DeveloperError";
  * on plain number arrays, which are the common denominator between
  * Cesium (with its own classes like 'Matrix4') and glTF-Transform
  * (which uses internal/hidden type definitions like 'mat4')
+ *
+ * @internal
  */
 export class VecMath {
   // Scratch variables for the implementation
