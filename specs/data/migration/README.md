@@ -14,7 +14,7 @@ The `TileFormatsMigrationSpec.ts` tests are processing these inputs:
 When there are any changes (differences) compared to the "golden" output, then they should be
 reviewed, and, if confirmed to be correct, be moved to the "golden" directory and committed.
 
-A sandcastle for visually inspecting the inputs/outputs is added in `TileFormatsMigrationSandcastle.js`.
+A sandcastle for visually inspecting the inputs/outputs is added in `TileFormatsMigrationTestSandcastle.js`.
 
 When serving **this** directory (i.e. the `./specs/data/migration/` directory) with a server,
 then this sandcastle allows selecing the different test cases and compare the input/output.
