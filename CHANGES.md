@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-### x.x.x - yyyy-mm-dd
+### 0.3.0 - 2023-08-30
 
 - Transparently decompress entries in `3tz` files when they are compressed with `DEFLATE` (via [#55](https://github.com/CesiumGS/3d-tiles-tools/pull/55))
   - The exact behavior in terms of entry compression is not specified yet. This is tracked in [#56](https://github.com/CesiumGS/3d-tiles-tools/issues/56)
