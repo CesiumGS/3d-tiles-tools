@@ -22,6 +22,8 @@ export class ArchiveFunctions3tz {
     // (undocumented)
     static readZipIndex(fd: number): IndexEntry[];
     // (undocumented)
+    static readZipLocalFileHeader(fd: number, offset: number | bigint, path: string): ZipLocalFileHeader;
+    // (undocumented)
     static zipIndexFind(zipIndex: IndexEntry[], searchHash: Buffer): number;
 }
 
@@ -947,6 +949,20 @@ export class UnzippingResourceResolver implements ResourceResolver {
 export class Uris {
     static isAbsoluteUri(uri: string): boolean;
     static isDataUri(uri: string): boolean;
+}
+
+// @internal (undocumented)
+export interface ZipLocalFileHeader {
+    // (undocumented)
+    comp_size: number;
+    // (undocumented)
+    compression_method: number;
+    // (undocumented)
+    extra_size: number;
+    // (undocumented)
+    filename_size: number;
+    // (undocumented)
+    signature: number;
 }
 
 // (No @packageDocumentation comment for this package)
