@@ -1,5 +1,3 @@
-import path from "path";
-
 import pino from "pino";
 import { Logger } from "pino";
 import { LoggerOptions } from "pino";
