@@ -92,11 +92,9 @@ export class TilesetStageExecutor {
         overwrite
       );
     } else if (tilesetStage.name === TilesetStages.TILESET_STAGE_UPGRADE) {
-      const quiet = false;
       const gltfUpgradeOptions = undefined;
       const targetVersion = "1.1";
       const tilesetUpgrader = new TilesetUpgrader(
-        quiet,
         targetVersion,
         gltfUpgradeOptions
       );

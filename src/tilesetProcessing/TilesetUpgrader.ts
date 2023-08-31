@@ -17,6 +17,9 @@ import { TilesetEntry } from "../tilesetData/TilesetEntry";
 
 import { TileFormatsMigration } from "../migration/TileFormatsMigration";
 
+import { LoggerFactory } from "../logging/LoggerFactory";
+const logger = LoggerFactory("upgrade");
+
 /**
  * A class for "upgrading" a tileset from a previous version to
  * a more recent version. The details of what that means exactly
@@ -25,11 +28,6 @@ import { TileFormatsMigration } from "../migration/TileFormatsMigration";
  * @internal
  */
 export class TilesetUpgrader {
-  /**
-   * A function that will receive log messages during the upgrade process
-   */
-  private readonly logCallback: (message: any) => void;
-
   /**
    * The options for the upgrade.
    */
@@ -49,20 +47,13 @@ export class TilesetUpgrader {
   /**
    * Creates a new instance
    *
-   * @param quiet - Whether log messages should be omitted
    * @param targetVersion - The target version - 1.0 or 1.1
    * @param gltfUpgradeOptions - Options that may be passed
    * to `gltf-pipeline` when GLB data in B3DM or I3DM is
    * supposed to be upgraded.
    * @throws DeveloperError If the version is neither 1.0 nor 1.1
    */
-  constructor(quiet: boolean, targetVersion: string, gltfUpgradeOptions: any) {
-    if (quiet !== true) {
-      this.logCallback = (message: any) => console.log(message);
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-      this.logCallback = (message: any) => {};
-    }
+  constructor(targetVersion: string, gltfUpgradeOptions: any) {
     this.gltfUpgradeOptions = gltfUpgradeOptions;
     this.upgradeOptions = TilesetUpgrader.optionsFor(targetVersion);
   }
@@ -170,8 +161,7 @@ export class TilesetUpgrader {
    */
   async upgradeTileset(tileset: Tileset) {
     const tilesetObjectUpgrader = new TilesetObjectUpgrader(
-      this.upgradeOptions,
-      this.logCallback
+      this.upgradeOptions
     );
     await tilesetObjectUpgrader.upgradeTilesetObject(tileset);
   }
@@ -251,8 +241,8 @@ export class TilesetUpgrader {
       return await this.processEntryUnchecked(sourceEntry, type);
     } catch (error) {
       const sourceKey = sourceEntry.key;
-      this.logCallback(`Failed to upgrade ${sourceKey}: ${error}`);
-      this.logCallback(error);
+      logger.error(`Failed to upgrade ${sourceKey}: ${error}`);
+      logger.error(error);
       const targetKey = this.processContentUri(sourceKey);
       const targetEntry = {
         key: targetKey,
@@ -283,9 +273,7 @@ export class TilesetUpgrader {
     } else if (type == ContentDataTypes.CONTENT_TYPE_TILESET) {
       return this.processEntryTileset(sourceEntry);
     }
-    this.logCallback(
-      `  No upgrade operation to perform for ${sourceEntry.key}`
-    );
+    logger.debug(`  No upgrade operation to perform for ${sourceEntry.key}`);
     return sourceEntry;
   };
 
@@ -304,12 +292,12 @@ export class TilesetUpgrader {
     let targetKey = sourceKey;
     let targetValue = sourceValue;
     if (this.upgradeOptions.upgradePntsToGlb) {
-      this.logCallback(`  Upgrading PNTS to GLB for ${sourceKey}`);
+      logger.debug(`  Upgrading PNTS to GLB for ${sourceKey}`);
 
       targetKey = this.processContentUri(sourceKey);
       targetValue = await TileFormatsMigration.convertPntsToGlb(sourceValue);
     } else {
-      this.logCallback(`  Not upgrading ${sourceKey} (disabled via option)`);
+      logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
     }
     const targetEntry = {
       key: targetKey,
@@ -333,18 +321,18 @@ export class TilesetUpgrader {
     let targetKey = sourceKey;
     let targetValue = sourceValue;
     if (this.upgradeOptions.upgradeB3dmToGlb) {
-      this.logCallback(`  Upgrading B3DM to GLB for ${sourceKey}`);
+      logger.debug(`  Upgrading B3DM to GLB for ${sourceKey}`);
 
       targetKey = this.processContentUri(sourceKey);
       targetValue = await TileFormatsMigration.convertB3dmToGlb(sourceValue);
     } else if (this.upgradeOptions.upgradeB3dmGltf1ToGltf2) {
-      this.logCallback(`  Upgrading GLB in ${sourceKey}`);
+      logger.debug(`  Upgrading GLB in ${sourceKey}`);
       targetValue = await ContentUpgrades.upgradeB3dmGltf1ToGltf2(
         sourceValue,
         this.gltfUpgradeOptions
       );
     } else {
-      this.logCallback(`  Not upgrading ${sourceKey} (disabled via option)`);
+      logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
     }
     const targetEntry = {
       key: targetKey,
@@ -368,7 +356,7 @@ export class TilesetUpgrader {
     let targetKey = sourceKey;
     let targetValue = sourceValue;
     if (this.upgradeOptions.upgradeI3dmToGlb) {
-      this.logCallback(`  Upgrading I3DM to GLB for ${sourceKey}`);
+      logger.debug(`  Upgrading I3DM to GLB for ${sourceKey}`);
 
       targetKey = this.processContentUri(sourceKey);
 
@@ -393,13 +381,13 @@ export class TilesetUpgrader {
         externalGlbResolver
       );
     } else if (this.upgradeOptions.upgradeI3dmGltf1ToGltf2) {
-      this.logCallback(`  Upgrading GLB in ${sourceKey}`);
+      logger.debug(`  Upgrading GLB in ${sourceKey}`);
       targetValue = await ContentUpgrades.upgradeI3dmGltf1ToGltf2(
         sourceValue,
         this.gltfUpgradeOptions
       );
     } else {
-      this.logCallback(`  Not upgrading ${sourceKey} (disabled via option)`);
+      logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
     }
     const targetEntry = {
       key: targetKey,
@@ -421,7 +409,7 @@ export class TilesetUpgrader {
     const targetKey = sourceKey;
     let targetValue = sourceValue;
     if (this.upgradeOptions.upgradeExternalTilesets) {
-      this.logCallback(`  Upgrading external tileset in ${sourceKey}`);
+      logger.debug(`  Upgrading external tileset in ${sourceKey}`);
       const externalTileset = JSON.parse(sourceValue.toString()) as Tileset;
       await this.upgradeTileset(externalTileset);
       const externalTilesetJsonString = JSON.stringify(
@@ -432,7 +420,7 @@ export class TilesetUpgrader {
       const externalTilesetJsonBuffer = Buffer.from(externalTilesetJsonString);
       targetValue = externalTilesetJsonBuffer;
     } else {
-      this.logCallback(
+      logger.debug(
         `  Not upgrading external tileset in ${sourceKey} (disabled via option)`
       );
     }

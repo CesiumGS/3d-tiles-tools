@@ -38,6 +38,8 @@
     "gltfpack": "^0.19.1",
     "minimist": "^1.2.7",
     "node-stream-zip": "^1.15.0",
+    "pino": "^8.15.0",
+    "pino-pretty": "^10.2.0",
     "seedrandom": "^3.0.5",
     "sharp": "^0.32.1",
     "yargs": "^17.5.1"

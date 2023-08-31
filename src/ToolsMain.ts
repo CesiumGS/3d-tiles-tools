@@ -25,6 +25,9 @@ import { TilesetConverter } from "./tilesetProcessing/TilesetConverter";
 
 import { TilesetJsonCreator } from "./tilesetProcessing/TilesetJsonCreator";
 
+import { LoggerFactory } from "./logging/LoggerFactory";
+const logger = LoggerFactory("CLI");
+
 /**
  * Functions that directly correspond to the command line functionality.
  *
@@ -41,32 +44,60 @@ import { TilesetJsonCreator } from "./tilesetProcessing/TilesetJsonCreator";
  */
 export class ToolsMain {
   static async b3dmToGlb(input: string, output: string, force: boolean) {
+    logger.debug(`Executing b3dmToGlb`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const inputTileData = TileFormats.readTileData(inputBuffer);
     const outputBuffer = inputTileData.payload;
     fs.writeFileSync(output, outputBuffer);
+    logger.debug(`Executing b3dmToGlb DONE`);
   }
   static async convertB3dmToGlb(input: string, output: string, force: boolean) {
+    logger.debug(`Executing convertB3dmToGlb`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const outputBuffer = await TileFormatsMigration.convertB3dmToGlb(
       inputBuffer
     );
     fs.writeFileSync(output, outputBuffer);
+    logger.debug(`Executing convertB3dmToGlb DONE`);
   }
   static async convertPntsToGlb(input: string, output: string, force: boolean) {
+    logger.debug(`Executing convertPntsToGlb`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const outputBuffer = await TileFormatsMigration.convertPntsToGlb(
       inputBuffer
     );
     fs.writeFileSync(output, outputBuffer);
+    logger.debug(`Executing convertPntsToGlb DONE`);
   }
   static async i3dmToGlb(input: string, output: string, force: boolean) {
-    return ToolsMain.b3dmToGlb(input, output, force);
+    logger.debug(`Executing i3dmToGlb`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+    ToolsMain.ensureCanWrite(output, force);
+    const inputBuffer = fs.readFileSync(input);
+    const inputTileData = TileFormats.readTileData(inputBuffer);
+    const outputBuffer = inputTileData.payload;
+    fs.writeFileSync(output, outputBuffer);
+    logger.debug(`Executing i3dmToGlb DONE`);
   }
   static async cmptToGlb(input: string, output: string, force: boolean) {
+    logger.debug(`Executing cmptToGlb`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
     const inputBuffer = fs.readFileSync(input);
     const glbBuffers = TileFormats.extractGlbBuffers(inputBuffer);
     const glbsLength = glbBuffers.length;
@@ -91,6 +122,7 @@ export class ToolsMain {
       );
       fs.writeFileSync(glbPath, upgradedOutputBuffer);
     }
+    logger.debug(`Executing cmptToGlb DONE`);
   }
   static async glbToB3dm(input: string, output: string, force: boolean) {
     ToolsMain.ensureCanWrite(output, force);
@@ -374,6 +406,13 @@ export class ToolsMain {
     targetVersion: string,
     gltfUpgradeOptions: any
   ) {
+    logger.debug(`Executing upgrade`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+    logger.debug(`  targetVersion: ${targetVersion}`);
+    logger.debug(`  gltfUpgradeOptions: ${JSON.stringify(gltfUpgradeOptions)}`);
+
     ToolsMain.ensureCanWrite(output, force);
     await Tilesets.upgrade(
       input,
@@ -382,6 +421,8 @@ export class ToolsMain {
       targetVersion,
       gltfUpgradeOptions
     );
+
+    logger.debug(`Executing upgrade DONE`);
   }
 
   static async merge(inputs: string[], output: string, force: boolean) {

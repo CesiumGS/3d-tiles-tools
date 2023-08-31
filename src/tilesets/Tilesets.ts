@@ -87,9 +87,7 @@ export class Tilesets {
     targetVersion: string,
     gltfUpgradeOptions: any
   ) {
-    const quiet = false;
     const tilesetUpgrader = new TilesetUpgrader(
-      quiet,
       targetVersion,
       gltfUpgradeOptions
     );
@@ -109,10 +107,8 @@ export class Tilesets {
    * @throws TilesetError When the input could not be processed
    */
   static async upgradeTileset(tileset: Tileset, targetVersion: string) {
-    const quiet = false;
     const gltfUpgradeOptions = undefined;
     const tilesetUpgrader = new TilesetUpgrader(
-      quiet,
       targetVersion,
       gltfUpgradeOptions
     );
