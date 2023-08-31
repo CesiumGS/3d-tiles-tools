@@ -4,10 +4,6 @@ import { TilesetUpgrader } from "../../src/tilesetProcessing/TilesetUpgrader";
 
 import { Tileset } from "../../src/structure/Tileset";
 
-// By default, the `TilesetUpgrader` will log messages for
-// each modification (upgrade step) to the console.
-// This flag can be used to disable the log messages:
-const quiet = true;
 const gltfUpgradeOptions = undefined;
 
 // A unit bounding box, used for all tiles
@@ -68,7 +64,6 @@ describe("TilesetUpgrader", function () {
   it("upgrades the version number to 1.1", async function () {
     const targetVersion = "1.1";
     const tilesetUpgrader = new TilesetUpgrader(
-      quiet,
       targetVersion,
       gltfUpgradeOptions
     );
@@ -81,7 +76,6 @@ describe("TilesetUpgrader", function () {
   it("upgrades the content.url to content.uri", async function () {
     const targetVersion = "1.0";
     const tilesetUpgrader = new TilesetUpgrader(
-      quiet,
       targetVersion,
       gltfUpgradeOptions
     );
@@ -97,7 +91,6 @@ describe("TilesetUpgrader", function () {
   it("upgrades the refine values to be in uppercase", async function () {
     const targetVersion = "1.0";
     const tilesetUpgrader = new TilesetUpgrader(
-      quiet,
       targetVersion,
       gltfUpgradeOptions
     );
@@ -113,7 +106,6 @@ describe("TilesetUpgrader", function () {
   it("removes the unnecessary extension declaration for 3DTILES_content_gltf", async function () {
     const targetVersion = "1.1";
     const tilesetUpgrader = new TilesetUpgrader(
-      quiet,
       targetVersion,
       gltfUpgradeOptions
     );
