@@ -13,6 +13,7 @@ import { Paths } from "../base/Paths";
 import { DeveloperError } from "../base/DeveloperError";
 
 import { Tileset } from "../structure/Tileset";
+import { Tile } from "../structure/Tile";
 
 import { TilesetSource } from "../tilesetData/TilesetSource";
 import { TilesetTarget } from "../tilesetData/TilesetTarget";
@@ -268,7 +269,7 @@ export class TilesetMerger {
     tilesetJsonFileNames: string[]
   ) {
     const length = tilesets.length;
-    const children = new Array(length);
+    const children = Array<Tile>(length);
     for (let i = 0; i < length; ++i) {
       const tilesetJsonFileName = tilesetJsonFileNames[i];
       const tilesetSourceIdentifier = tilesetSourceIdentifiers[i];
@@ -331,7 +332,7 @@ export class TilesetMerger {
 
   private static getMergedSphere(tilesets: Tileset[]): number[] {
     const length = tilesets.length;
-    const boundingSpheres = new Array(length);
+    const boundingSpheres = Array<BoundingSphere>(length);
     for (let i = 0; i < length; ++i) {
       boundingSpheres[i] = BoundingSphere.unpack(
         TilesetMerger.getBoundingSphere(tilesets[i])

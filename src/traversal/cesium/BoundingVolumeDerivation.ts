@@ -191,7 +191,7 @@ export class BoundingVolumeDerivation {
     let halfAxes = Matrix3.clone(rootHalfAxes);
     halfAxes = Matrix3.multiplyByScale(halfAxes, scaleFactors, halfAxes);
 
-    const childBox = new Array(12);
+    const childBox = Array<number>(12);
     Cartesian3.pack(center, childBox);
     Matrix3.pack(halfAxes, childBox, 3);
     return childBox;

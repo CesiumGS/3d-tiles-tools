@@ -56,7 +56,7 @@ export class NumericArrayPropertyModel implements PropertyModel {
     const arrayOffset = arraySlice.offset;
     const arrayLength = arraySlice.length;
 
-    const result = new Array(arrayLength);
+    const result = Array<number>(arrayLength);
     for (let i = 0; i < arrayLength; i++) {
       const n = arrayOffset + i;
 

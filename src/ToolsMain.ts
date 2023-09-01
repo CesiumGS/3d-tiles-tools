@@ -101,7 +101,7 @@ export class ToolsMain {
     const inputBuffer = fs.readFileSync(input);
     const glbBuffers = TileFormats.extractGlbBuffers(inputBuffer);
     const glbsLength = glbBuffers.length;
-    const glbPaths = new Array(glbsLength);
+    const glbPaths = Array<string>(glbsLength);
     if (glbsLength === 0) {
       throw new DeveloperError(`No glbs found in ${input}.`);
     } else if (glbsLength === 1) {

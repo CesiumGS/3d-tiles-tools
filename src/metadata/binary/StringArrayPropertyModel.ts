@@ -58,7 +58,7 @@ export class StringArrayPropertyModel implements PropertyModel {
     const arrayOffset = arraySlice.offset;
     const arrayLength = arraySlice.length;
 
-    const result = new Array(arrayLength);
+    const result = Array<string>(arrayLength);
     for (let i = 0; i < arrayLength; i++) {
       const n = arrayOffset + i;
 

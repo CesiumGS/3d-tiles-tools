@@ -106,7 +106,7 @@ export class VecMath {
     Matrix3.setColumn(matrix3, 2, forward, matrix3);
     Quaternion.fromRotationMatrix(matrix3, quaternion);
 
-    const result = Quaternion.pack(quaternion, new Array(4));
+    const result = Quaternion.pack(quaternion, Array<number>(4));
     return result;
   }
 
@@ -127,7 +127,7 @@ export class VecMath {
       Matrix4.unpack(matrixPacked, 0, matrix1);
       Matrix4.multiply(matrix0, matrix1, matrix0);
     }
-    const result = Matrix4.pack(matrix0, new Array(16));
+    const result = Matrix4.pack(matrix0, Array<number>(16));
     return result;
   }
 
@@ -153,7 +153,7 @@ export class VecMath {
         throw new DeveloperError("Arrays have different lengths");
       }
     } else {
-      result = Array(a.length);
+      result = Array<number>(a.length);
     }
     for (let i = 0; i < a.length; i++) {
       result[i] = a[i] + b[i];
@@ -183,7 +183,7 @@ export class VecMath {
         throw new DeveloperError("Arrays have different lengths");
       }
     } else {
-      result = Array(a.length);
+      result = Array<number>(a.length);
     }
     for (let i = 0; i < a.length; i++) {
       result[i] = a[i] - b[i];
@@ -215,7 +215,7 @@ export class VecMath {
         throw new DeveloperError("Arrays have different lengths");
       }
     } else {
-      result = Array(a.length);
+      result = Array<number>(a.length);
     }
     for (let i = 0; i < a.length; i++) {
       result[i] = a[i] * factor;
@@ -236,7 +236,7 @@ export class VecMath {
     const matrix4 = VecMath.matrix4Scratch0;
     Cartesian3.unpack(positionPacked, 0, position);
     Transforms.eastNorthUpToFixedFrame(position, Ellipsoid.WGS84, matrix4);
-    const result = Matrix4.pack(matrix4, new Array(16));
+    const result = Matrix4.pack(matrix4, Array<number>(16));
     return result;
   }
 
@@ -257,7 +257,7 @@ export class VecMath {
     Matrix4.unpack(matrix4Packed, 0, matrix4);
     Matrix4.getMatrix3(matrix4, matrix3);
     Quaternion.fromRotationMatrix(matrix3, quaternion);
-    const result = Quaternion.pack(quaternion, new Array(4));
+    const result = Quaternion.pack(quaternion, new Array<number>(4));
     return result;
   }
 
@@ -295,7 +295,7 @@ export class VecMath {
       Matrix4.fromScale(cartesian3, matrix);
       Matrix4.multiply(result, matrix, result);
     }
-    const resultArray = Matrix4.pack(result, new Array(16));
+    const resultArray = Matrix4.pack(result, Array<number>(16));
     return resultArray;
   }
 
@@ -328,9 +328,9 @@ export class VecMath {
 
     Matrix4.getScale(matrix4, scale);
 
-    const t = Cartesian3.pack(translation, Array(3));
-    const r = Quaternion.pack(quaternion, Array(4));
-    const s = Cartesian3.pack(scale, Array(3));
+    const t = Cartesian3.pack(translation, Array<number>(3));
+    const r = Quaternion.pack(quaternion, Array<number>(4));
+    const s = Cartesian3.pack(scale, Array<number>(3));
     return {
       t: t,
       r: r,

@@ -276,7 +276,7 @@ export class DracoDecoder {
     let quantization: QuantizationInfo | undefined = undefined;
     const qTransform = new (draco as any).AttributeQuantizationTransform();
     if (qTransform.InitFromAttribute(dracoAttribute)) {
-      const minValues = new Array(numComponents);
+      const minValues = Array<number>(numComponents);
       for (let i = 0; i < numComponents; ++i) {
         minValues[i] = qTransform.min_value(i);
       }

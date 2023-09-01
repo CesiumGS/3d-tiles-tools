@@ -26,7 +26,7 @@ export class AttributeCompression {
     const x = input[0];
     const y = input[1];
     AttributeCompression.octDecodeInRangeInternal(x, y, rangeMax, result);
-    const array: number[] = Array(3);
+    const array = Array<number>(3);
     Cartesian3.pack(result, array, 0);
     return array;
   }
@@ -44,7 +44,7 @@ export class AttributeCompression {
     const x = input[0];
     const y = input[1];
     AttributeCompression.octDecodeInRangeInternal(x, y, rangeMax, result);
-    const array: number[] = Array(3);
+    const array = Array<number>(3);
     Cartesian3.pack(result, array, 0);
     return array;
   }
