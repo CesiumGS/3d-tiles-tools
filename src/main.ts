@@ -322,11 +322,11 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   const tilesOnly = toolArgs.tilesOnly;
   const parsedOptionArgs = parseOptionArgs(optionArgs);
 
-  logger.trace("Command line call:");
-  logger.trace("  command: " + command);
-  logger.trace("  inputs: " + inputs);
-  logger.trace("  output: " + output);
-  logger.trace("  force: " + force);
+  logger.trace(`Command line call:`);
+  logger.trace(`  command: ${command}`);
+  logger.trace(`  inputs: ${inputs}`);
+  logger.trace(`  output: ${output}`);
+  logger.trace(`  force: ${force}`);
   logger.trace(`  optionArgs: ${optionArgs}`);
   logger.trace(`  parsedOptionArgs: ${JSON.stringify(parsedOptionArgs)}`);
 
