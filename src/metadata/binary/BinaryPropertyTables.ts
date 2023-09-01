@@ -463,7 +463,7 @@ export class BinaryPropertyTables {
     return [...values];
   }
 
-  private static flattenFully(values: any): any {
+  private static flattenFully(values: any): any[] {
     let result = values;
     if (Array.isArray(result)) {
       result = [];
