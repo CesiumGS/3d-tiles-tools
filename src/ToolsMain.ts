@@ -255,7 +255,7 @@ export class ToolsMain {
         logger.error(`Cannot write ${fileName}`);
         return;
       }
-      console.info(`Writing ${fileName}`);
+      logger.info(`Writing ${fileName}`);
       fs.writeFileSync(fileName, Buffer.from(jsonString));
     };
 
@@ -267,10 +267,10 @@ export class ToolsMain {
         return;
       }
       if (!ToolsMain.canWrite(fileName, force)) {
-        console.error(`Cannot write ${fileName}`);
+        logger.error(`Cannot write ${fileName}`);
         return;
       }
-      console.info(`Writing ${fileName}`);
+      logger.info(`Writing ${fileName}`);
       fs.writeFileSync(fileName, buffer);
     };
 
@@ -515,7 +515,7 @@ export class ToolsMain {
         Paths.relativize(inputName, fileName)
       );
     }
-    console.info("Creating tileset.json with content URIs: ", contentUris);
+    logger.info("Creating tileset.json with content URIs: ", contentUris);
     const tileset = await TilesetJsonCreator.createTilesetFromContents(
       baseDir,
       contentUris

@@ -126,12 +126,8 @@ export class TilesetUpgrader {
     tilesetTargetName: string,
     overwrite: boolean
   ): Promise<void> {
-    const quiet = true;
     const processExternalTilesets = this.upgradeOptions.upgradeExternalTilesets;
-    const tilesetProcessor = new BasicTilesetProcessor(
-      quiet,
-      processExternalTilesets
-    );
+    const tilesetProcessor = new BasicTilesetProcessor(processExternalTilesets);
     this.tilesetProcessor = tilesetProcessor;
     await tilesetProcessor.begin(
       tilesetSourceName,

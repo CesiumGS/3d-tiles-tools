@@ -55,12 +55,11 @@ export class BasicTilesetProcessor extends TilesetProcessor {
   /**
    * Creates a new instance
    *
-   * @param quiet - Whether log messages should be omitted
    * @param processExternalTilesets - Whether external tilesets
    * should be processed.
    */
-  constructor(quiet?: boolean, processExternalTilesets?: boolean) {
-    super(quiet);
+  constructor(processExternalTilesets?: boolean) {
+    super();
     if (processExternalTilesets === undefined) {
       this.processExternalTilesets = true;
     } else {

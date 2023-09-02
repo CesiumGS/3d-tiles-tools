@@ -17,6 +17,9 @@ import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 import { ContentOps } from "../contentProcessing/ContentOps";
 import { TileFormatsMigration } from "../migration/TileFormatsMigration";
 
+import { LoggerFactory } from "../logging/LoggerFactory";
+const logger = LoggerFactory("pipeline");
+
 /**
  * Methods to execute `ContentStage` objects.
  *
@@ -94,7 +97,7 @@ export class ContentStageExecutor {
       await ContentStageExecutor.executeSeparateGltf(tilesetProcessor);
     } else {
       const message = `    Unknown contentStage name: ${contentStage.name}`;
-      console.log(message);
+      logger.debug(message);
     }
   }
 
