@@ -38,7 +38,7 @@ export class NumericArrayPropertyModel implements PropertyModel {
   }
 
   /** {@inheritDoc PropertyModel.getPropertyValue} */
-  getPropertyValue(index: number): number[] | bigint[] | (number | bigint)[][] {
+  getPropertyValue(index: number): (number | bigint | (number | bigint)[])[] {
     const type = this.type;
     const valuesBuffer = this.valuesBuffer;
     const componentType = this.componentType;
@@ -56,7 +56,7 @@ export class NumericArrayPropertyModel implements PropertyModel {
     const arrayOffset = arraySlice.offset;
     const arrayLength = arraySlice.length;
 
-    const result = Array<number>(arrayLength);
+    const result = Array<number | bigint | (number | bigint)[]>(arrayLength);
     for (let i = 0; i < arrayLength; i++) {
       const n = arrayOffset + i;
 
