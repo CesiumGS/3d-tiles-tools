@@ -22,6 +22,9 @@ import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 
 import { Paths } from "../base/Paths";
 
+import { LoggerFactory } from "../logging/LoggerFactory";
+const logger = LoggerFactory("tilesetProcessing");
+
 /**
  * Implementation of a `TilesetProcessor` that offers methods for
  * common operations on tileset data.
@@ -503,8 +506,8 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
   ): Promise<TilesetEntry> {
-    console.log(
-      "Processing external tileset " + externalTilesetSourceEntry.key
+    logger.debug(
+      `Processing external tileset ${externalTilesetSourceEntry.key}`
     );
 
     // Parse the external tileset from the given entry
@@ -531,8 +534,8 @@ export class BasicTilesetProcessor extends TilesetProcessor {
       value: targetTilesetJsonBuffer,
     };
 
-    console.log(
-      "Processing external tileset " + externalTilesetSourceEntry.key + " DONE"
+    logger.debug(
+      `Processing external tileset ${externalTilesetSourceEntry.key} DONE`
     );
 
     return externalTilesetTargetEntry;

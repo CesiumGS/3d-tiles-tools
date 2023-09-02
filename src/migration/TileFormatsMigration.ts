@@ -12,7 +12,11 @@ import { TileFormatsMigrationI3dm } from "./TileFormatsMigrationI3dm";
  * @internal
  */
 export class TileFormatsMigration {
-  static readonly DEBUG_LOG = false;
+  // A compile-time flag to enable/disable printing VERY detailed information
+  // about the  input and output files during the migration. This will, for
+  // example, print the batch/feature table of the input, as well as the
+  // output glTF JSON and its metadata information.
+  static readonly DEBUG_LOG_FILE_CONTENT = false;
 
   /**
    * Convert the given PNTS data into a glTF asset

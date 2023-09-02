@@ -7,9 +7,13 @@ import { GltfTransform } from "../contentProcessing/GltfTransform";
 import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 
 import { TileTableData } from "../tileTableData/TileTableData";
+
 import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
 import { TileTableDataToMeshFeatures } from "./TileTableDataToMeshFeatures";
 import { TileFormatsMigration } from "./TileFormatsMigration";
+
+import { InstanceFeaturesUtils } from "../gltfExtensions/InstanceFeaturesUtils";
+import { StructuralMetadataUtils } from "../gltfExtensions/StructuralMetadataUtils";
 
 import { LoggerFactory } from "../logging/LoggerFactory";
 const logger = LoggerFactory("migration");
@@ -35,7 +39,10 @@ export class TileFormatsMigrationB3dm {
     const featureTable = tileData.featureTable.json as B3dmFeatureTable;
     const featureTableBinary = tileData.featureTable.binary;
 
-    if (logger.isLevelEnabled("trace")) {
+    if (
+      TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&
+      logger.isLevelEnabled("trace")
+    ) {
       logger.trace("Batch table:\n" + JSON.stringify(batchTable, null, 2));
       logger.trace("Feature table:\n" + JSON.stringify(featureTable, null, 2));
     }
@@ -98,10 +105,20 @@ export class TileFormatsMigrationB3dm {
       }
     }
 
-    if (logger.isLevelEnabled("trace")) {
+    if (
+      TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&
+      logger.isLevelEnabled("trace")
+    ) {
       const jsonDocument = await io.writeJSON(document);
       const json = jsonDocument.json;
-      logger.trace("JSON document:\n" + JSON.stringify(json, null, 2));
+      logger.trace("Output glTF JSON:\n" + JSON.stringify(json, null, 2));
+      logger.trace("Metadata information:");
+      logger.trace(
+        InstanceFeaturesUtils.createInstanceFeaturesInfoString(document)
+      );
+      logger.trace(
+        StructuralMetadataUtils.createStructuralMetadataInfoString(document)
+      );
     }
 
     // Create the GLB buffer

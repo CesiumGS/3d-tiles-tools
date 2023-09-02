@@ -17,9 +17,14 @@ import { BatchTables } from "../tileTableData/BatchTables";
 import { Ids } from "./Ids";
 
 import { MeshFeatures } from "../gltfExtensions/MeshFeatures";
+import { InstanceFeaturesUtils } from "../gltfExtensions/InstanceFeaturesUtils";
+import { StructuralMetadataUtils } from "../gltfExtensions/StructuralMetadataUtils";
 
 import { PropertyModel } from "../metadata/PropertyModel";
 import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
+
+import { LoggerFactory } from "../logging/LoggerFactory";
+const logger = LoggerFactory("migration");
 
 /**
  * Methods for converting PNTS tile data into GLB
@@ -42,15 +47,13 @@ export class TileFormatsMigrationPnts {
     const featureTable = tileData.featureTable.json as PntsFeatureTable;
     const featureTableBinary = tileData.featureTable.binary;
 
-    //*/
-    if (TileFormatsMigration.DEBUG_LOG) {
-      console.log("Batch table");
-      console.log(JSON.stringify(batchTable, null, 2));
-
-      console.log("Feature table");
-      console.log(JSON.stringify(featureTable, null, 2));
+    if (
+      TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&
+      logger.isLevelEnabled("trace")
+    ) {
+      logger.trace("Batch table:\n" + JSON.stringify(batchTable, null, 2));
+      logger.trace("Feature table:\n" + JSON.stringify(featureTable, null, 2));
     }
-    //*/
 
     // Create a `ReadablePointCloud` that allows accessing
     // the PNTS data
@@ -128,13 +131,21 @@ export class TileFormatsMigrationPnts {
     // Create the GLB buffer
     const io = await GltfTransform.getIO();
 
-    //*/
-    if (TileFormatsMigration.DEBUG_LOG) {
-      console.log("JSON document");
+    if (
+      TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&
+      logger.isLevelEnabled("trace")
+    ) {
       const jsonDocument = await io.writeJSON(document);
-      console.log(JSON.stringify(jsonDocument.json, null, 2));
+      const json = jsonDocument.json;
+      logger.trace("Output glTF JSON:\n" + JSON.stringify(json, null, 2));
+      logger.trace("Metadata information:");
+      logger.trace(
+        InstanceFeaturesUtils.createInstanceFeaturesInfoString(document)
+      );
+      logger.trace(
+        StructuralMetadataUtils.createStructuralMetadataInfoString(document)
+      );
     }
-    //*/
 
     const glb = await io.writeBinary(document);
     return Buffer.from(glb);

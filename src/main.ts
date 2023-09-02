@@ -355,12 +355,12 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   } else if (command === "ungzip") {
     await ToolsMain.ungzip(input, output, force);
   } else if (command === "tilesetToDatabase") {
-    console.log(
+    logger.info(
       `The 'tilesetToDatabase' command is deprecated. Use 'convert' instead.`
     );
     await ToolsMain.convert(input, undefined, output, force);
   } else if (command === "databaseToTileset") {
-    console.log(
+    logger.info(
       `The 'databaseToTileset' command is deprecated. Use 'convert' instead.`
     );
     await ToolsMain.convert(input, undefined, output, force);

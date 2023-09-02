@@ -1,5 +1,8 @@
 import { Content } from "../structure/Content";
 
+import { LoggerFactory } from "../logging/LoggerFactory";
+const logger = LoggerFactory("tilesets");
+
 /**
  * Utility methods related to tile content, given as `Content` object.
  *
@@ -23,7 +26,7 @@ export class Contents {
     }
     const legacyContent = content as any;
     if (legacyContent.url) {
-      console.warn(
+      logger.warn(
         "The 'url' property of tile content is deprecated. Using it as 'uri' instead."
       );
       return legacyContent.url;
