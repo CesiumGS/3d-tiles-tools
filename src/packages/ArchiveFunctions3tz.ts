@@ -8,10 +8,16 @@ import { IndexEntry } from "./IndexEntry";
 // NOTE: These functions are carved out and ported to TypeScript from
 // https://github.com/bjornblissing/3d-tiles-tools/blob/2f4844d5bdd704509bff65199898981228594aaa/validator/lib/archive.js
 // TODO: The given implementation does not handle hash collisions!
-// NOTE: Fixed an issue for ZIP64 inputs. See the part marked as "ZIP64_BUGFIX"
+// NOTE: Fixed several issues for ZIP64 and large ZIP files. Some of the
+// changes are marked with "ZIP64_BUGFIX", but details have to be taken
+// from the git change log.
 
-interface ZipLocalFileHeader {
+/**
+ * @internal
+ */
+export interface ZipLocalFileHeader {
   signature: number;
+  compression_method: number;
   comp_size: number;
   filename_size: number;
   extra_size: number;
@@ -63,7 +69,9 @@ export class ArchiveFunctions3tz {
     buffer: Buffer,
     expectedFilename: string
   ) {
-    let comp_size = buffer.readUInt32LE(20);
+    const comp_size_from_record = buffer.readUInt32LE(20);
+    let comp_size = BigInt(comp_size_from_record);
+    const uncomp_size = buffer.readUInt32LE(24);
     const filename_size = buffer.readUInt16LE(28);
     const extra_size = buffer.readUInt16LE(30);
     const extrasStartOffset =
@@ -71,22 +79,38 @@ export class ArchiveFunctions3tz {
 
     // ZIP64_BUGFIX: If this size is found, then the size is
     // stored in the extra field
-    if (comp_size === 0xffffffff) {
+    if (comp_size === 0xffffffffn) {
       if (extra_size < 28) {
         throw new TilesetError("No zip64 extras buffer found");
       }
-      // NOTE: The "ZIP64 header ID" might appear at a different position
-      // in the extras buffer, but I don't see a sensible way to
-      // differentiate between a 0x0001 appearing "randomly" as "some"
-      // value in the extras, and the value actually indicating a ZIP64
-      // header. So we look for it only at the start of the extras buffer:
       const extra_tag = buffer.readUInt16LE(extrasStartOffset + 0);
       if (
         extra_tag !== ArchiveFunctions3tz.ZIP64_EXTENDED_INFORMATION_EXTRA_SIG
       ) {
         throw new TilesetError("No zip64 extras signature found");
       }
-      comp_size = Number(buffer.readBigUInt64LE(extrasStartOffset + 12));
+
+      // According to the specification, the layout of the extras block is
+      //
+      // 0x0001                 2 bytes    Tag for this "extra" block type
+      // Size                   2 bytes    Size of this "extra" block
+      // Original Size          8 bytes    Original uncompressed file size
+      // Compressed Size        8 bytes    Size of compressed data
+      // Relative Header Offset 8 bytes    Offset of local header record
+      // Disk Start Number      4 bytes    Number of the disk on which this file starts
+      //
+      // The order of the fields is fixed, but the fields MUST only appear
+      // if the corresponding directory record field is set to 0xFFFF or
+      // 0xFFFFFFFF.
+      // So the offset for reading values from the "extras" depends on which
+      // of the fields in the original record had the 0xFFFFFFFF value:
+      let offsetInExtrasForCompSize = 4;
+      if (uncomp_size === 0xffffffff) {
+        offsetInExtrasForCompSize += 8;
+      }
+      comp_size = buffer.readBigUInt64LE(
+        extrasStartOffset + offsetInExtrasForCompSize
+      );
     }
 
     const filename = buffer.toString(
@@ -99,49 +123,26 @@ export class ArchiveFunctions3tz {
         `Central Directory File Header filename was ${filename}, expected ${expectedFilename}`
       );
     }
-
-    let offset = buffer.readUInt32LE(42);
-    /*
-    // if we get this offset, then the offset is stored in the 64 bit extra field
-    if (offset === 0xffffffff) {
-      let offset64Found = false;
-      const endExtrasOffset =
-        ArchiveFunctions3tz.ZIP_CENTRAL_DIRECTORY_STATIC_SIZE +
-        filename_size +
-        extra_size;
-      let currentOffset =
-        ArchiveFunctions3tz.ZIP_CENTRAL_DIRECTORY_STATIC_SIZE + filename_size;
-      while (!offset64Found && currentOffset < endExtrasOffset) {
-        const extra_tag = buffer.readUInt16LE(currentOffset);
-        const extra_size = buffer.readUInt16LE(currentOffset + 2);
-        if (
-          extra_tag ===
-            ArchiveFunctions3tz.ZIP64_EXTENDED_INFORMATION_EXTRA_SIG &&
-          extra_size == 8
-        ) {
-          offset = Number(buffer.readBigUInt64LE(currentOffset + 4));
-          offset64Found = true;
-        } else {
-          currentOffset += extra_size;
-        }
+    let offset = BigInt(buffer.readUInt32LE(42));
+    if (offset === 0xffffffffn) {
+      // See notes about the layout of the extras block above:
+      let offsetInExtrasForOffset = 4;
+      if (uncomp_size === 0xffffffff) {
+        offsetInExtrasForOffset += 8;
       }
-      if (!offset64Found) {
-        throw new TilesetError("No zip64 extended offset found");
+      if (comp_size_from_record === 0xffffffff) {
+        offsetInExtrasForOffset += 8;
       }
-    }
-    */
-    // if we get this offset, then the offset is stored in the 64 bit extra field.
-    // The size and signature of the buffer have already been checked when the
-    // actual "comp_size" has been read.
-    if (offset === 0xffffffff) {
-      offset = Number(buffer.readBigUInt64LE(extrasStartOffset + 20));
+      offset = buffer.readBigUInt64LE(
+        extrasStartOffset + offsetInExtrasForOffset
+      );
     }
 
     const localFileDataSize =
       ArchiveFunctions3tz.ZIP_LOCAL_FILE_HEADER_STATIC_SIZE +
       filename_size +
       +48 /* over-estimated local file header extra field size, to try and read all data in one go */ +
-      comp_size;
+      Number(comp_size);
     const localFileDataBuffer = Buffer.alloc(localFileDataSize);
 
     fs.readSync(fd, localFileDataBuffer, 0, localFileDataSize, offset);
@@ -250,6 +251,7 @@ export class ArchiveFunctions3tz {
         `Bad local file header signature: 0x${signature.toString(16)}`
       );
     }
+    const compression_method = buffer.readUInt16LE(8);
     const comp_size = buffer.readUInt32LE(18);
     const filename_size = buffer.readUInt16LE(26);
     const extra_size = buffer.readUInt16LE(28);
@@ -273,6 +275,7 @@ export class ArchiveFunctions3tz {
     }
     return {
       signature: signature,
+      compression_method: compression_method,
       comp_size: comp_size,
       filename_size: filename_size,
       extra_size: extra_size,
@@ -288,7 +291,7 @@ export class ArchiveFunctions3tz {
       ArchiveFunctions3tz.ZIP_LOCAL_FILE_HEADER_STATIC_SIZE + path.length;
     const headerBuffer = Buffer.alloc(headerSize);
     //console.log(`readZipLocalFileHeader path: ${path} headerSize: ${headerSize} offset: ${offset}`);
-    fs.readSync(fd, headerBuffer, 0, headerSize, Number(offset));
+    fs.readSync(fd, headerBuffer, 0, headerSize, offset);
     //console.log(`headerBuffer: ${result.buffer}`);
     const header = ArchiveFunctions3tz.parseLocalFileHeader(headerBuffer, path);
     //console.log(header);
@@ -323,7 +326,7 @@ export class ArchiveFunctions3tz {
     const headerSize =
       ArchiveFunctions3tz.ZIP_LOCAL_FILE_HEADER_STATIC_SIZE + 320;
     const headerBuffer = Buffer.alloc(headerSize);
-    fs.readSync(fd, headerBuffer, 0, headerSize, Number(offset));
+    fs.readSync(fd, headerBuffer, 0, headerSize, offset);
     const filename_size = headerBuffer.readUInt16LE(26);
     const filename = headerBuffer.toString(
       "utf8",
@@ -333,7 +336,16 @@ export class ArchiveFunctions3tz {
     return filename;
   }
 
-  static readEntryData(fd: number, zipIndex: IndexEntry[], path: string) {
+  static readEntry(
+    fd: number,
+    zipIndex: IndexEntry[],
+    path: string
+  ):
+    | {
+        compression_method: number;
+        data: Buffer;
+      }
+    | undefined {
     const normalizedPath = ArchiveFunctions3tz.normalizePath(path);
     const match = ArchiveFunctions3tz.searchIndex(zipIndex, normalizedPath);
     if (match) {
@@ -343,14 +355,18 @@ export class ArchiveFunctions3tz {
         path
       );
       const fileDataOffset =
-        Number(match.offset) +
-        ArchiveFunctions3tz.ZIP_LOCAL_FILE_HEADER_STATIC_SIZE +
-        header.filename_size +
-        header.extra_size;
+        match.offset +
+        BigInt(ArchiveFunctions3tz.ZIP_LOCAL_FILE_HEADER_STATIC_SIZE) +
+        BigInt(header.filename_size) +
+        BigInt(header.extra_size);
       const fileContentsBuffer = Buffer.alloc(header.comp_size);
       //console.log(`Fetching data at offset ${fileDataOffset} size: ${header.comp_size}`);
       fs.readSync(fd, fileContentsBuffer, 0, header.comp_size, fileDataOffset);
-      return fileContentsBuffer;
+
+      return {
+        compression_method: header.compression_method,
+        data: fileContentsBuffer,
+      };
     }
     //console.log('No entry found for path ', path)
     return undefined;

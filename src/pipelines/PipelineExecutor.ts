@@ -5,8 +5,13 @@ import path from "path";
 import { Pipeline } from "./Pipeline";
 import { TilesetStageExecutor } from "./TilesetStageExecutor";
 
+import { LoggerFactory } from "../logging/LoggerFactory";
+const logger = LoggerFactory("pipeline");
+
 /**
  * Methods to execute `Pipeline` objects.
+ *
+ * @internal
  */
 export class PipelineExecutor {
   /**
@@ -43,8 +48,6 @@ export class PipelineExecutor {
    * an error.
    */
   static async executePipeline(pipeline: Pipeline, overwrite: boolean) {
-    console.log("Executing pipeline");
-
     let currentInput = pipeline.input;
     let currentOutput = undefined;
     let currentOverwrite = true;
@@ -70,7 +73,7 @@ export class PipelineExecutor {
       const message =
         `  Executing tilesetStage ${t} of ` +
         `${tilesetStages.length}: ${tilesetStage.name}`;
-      console.log(message);
+      logger.debug(message);
 
       if (t == tilesetStages.length - 1) {
         currentOutput = pipeline.output;

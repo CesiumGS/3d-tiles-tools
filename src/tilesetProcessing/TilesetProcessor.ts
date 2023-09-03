@@ -2,18 +2,15 @@ import { DeveloperError } from "../base/DeveloperError";
 
 import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
 
-import { Tileset } from "../structure/Tileset";
-
 import { TilesetError } from "../tilesetData/TilesetError";
-import { TilesetTargets } from "../tilesetData/TilesetTargets";
-import { TilesetSources } from "../tilesetData/TilesetSources";
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
-
-import { Tilesets } from "../tilesets/Tilesets";
 
 import { TilesetEntryProcessor } from "./TilesetEntryProcessor";
 import { TilesetProcessorContext } from "./TilesetProcessorContext";
-import { TilesetProcessing } from "./TilesetProcessing";
+import { TilesetProcessorContexts } from "./TilesetProcessorContexts";
+
+import { LoggerFactory } from "../logging/LoggerFactory";
+const logger = LoggerFactory("tilesetProcessing");
 
 /**
  * A base class for classes that can process tilesets.
@@ -25,40 +22,14 @@ import { TilesetProcessing } from "./TilesetProcessing";
  * Subclasses can access the `TilesetProcessorContext`, which
  * contains the parsed tileset and its schema, and can offer
  * predefined sets of more specialized operations.
+ *
+ * @internal
  */
 export abstract class TilesetProcessor {
-  /**
-   * A function that will receive log messages
-   */
-  private readonly logCallback: (message: any) => void;
-
   /**
    * The context that was created in `begin`
    */
   private context: TilesetProcessorContext | undefined;
-
-  /**
-   * Creates a new instance
-   *
-   * @param quiet - Whether log messages should be omitted
-   */
-  constructor(quiet?: boolean) {
-    if (quiet !== true) {
-      this.logCallback = (message: any) => console.log(message);
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-      this.logCallback = (message: any) => {};
-    }
-  }
-
-  /**
-   * Internal method to just call the log callback
-   *
-   * @param message - The message
-   */
-  protected log(message: any): void {
-    this.logCallback(message);
-  }
 
   /**
    * Returns the `TilesetProcessorContext` that contains all
@@ -97,66 +68,11 @@ export abstract class TilesetProcessor {
     if (this.context) {
       throw new TilesetError("Processing has already begun");
     }
-    let tilesetSource;
-    let tilesetTarget;
-    try {
-      tilesetSource = TilesetSources.createAndOpen(tilesetSourceName);
-      tilesetTarget = TilesetTargets.createAndBegin(
-        tilesetTargetName,
-        overwrite
-      );
-
-      const tilesetSourceJsonFileName =
-        Tilesets.determineTilesetJsonFileName(tilesetSourceName);
-
-      const tilesetTargetJsonFileName =
-        Tilesets.determineTilesetJsonFileName(tilesetTargetName);
-
-      // Obtain the tileset object from the tileset JSON file
-      const sourceTileset = TilesetProcessing.parseSourceValue<Tileset>(
-        tilesetSource,
-        tilesetSourceJsonFileName
-      );
-
-      // Resolve the schema, either from the `tileset.schema`
-      // or the `tileset.schemaUri`
-      const schema = TilesetProcessing.resolveSchema(
-        tilesetSource,
-        sourceTileset
-      );
-
-      // If nothing has thrown up to this point, then
-      // a `TilesetProcessorContext` with a valid
-      // state can be created:
-      this.context = {
-        tilesetSource: tilesetSource,
-        tilesetSourceJsonFileName: tilesetSourceJsonFileName,
-        sourceTileset: sourceTileset,
-        schema: schema,
-        tilesetTarget: tilesetTarget,
-        tilesetTargetJsonFileName: tilesetTargetJsonFileName,
-        targetTileset: sourceTileset,
-        processedKeys: {},
-        targetKeys: {},
-      };
-    } catch (error) {
-      if (tilesetSource) {
-        try {
-          tilesetSource.close();
-        } catch (e) {
-          // Error already about to be re-thrown
-        }
-      }
-      if (tilesetTarget) {
-        try {
-          await tilesetTarget.end();
-        } catch (e) {
-          // Error already about to be re-thrown
-        }
-      }
-      delete this.context;
-      throw error;
-    }
+    this.context = await TilesetProcessorContexts.create(
+      tilesetSourceName,
+      tilesetTargetName,
+      overwrite
+    );
   }
 
   /**
@@ -169,31 +85,34 @@ export abstract class TilesetProcessor {
    */
   async end() {
     const context = this.getContext();
-    const tilesetSource = context.tilesetSource;
-    const tilesetTarget = context.tilesetTarget;
 
-    // Perform a no-op on all entries that have not yet
-    // been marked as processed
-    await this.processAllEntriesInternal(
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      async (sourceEntry: TilesetEntry, type: string | undefined) => {
-        return sourceEntry;
-      }
-    );
-
-    // Clean up by closing the source and the target
-    delete this.context;
+    let pendingError = undefined;
     try {
-      tilesetSource.close();
+      // Perform a no-op on all entries that have not yet
+      // been marked as processed
+      await this.processAllEntriesInternal(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        async (sourceEntry: TilesetEntry, type: string | undefined) => {
+          return sourceEntry;
+        }
+      );
     } catch (error) {
-      try {
-        await tilesetTarget.end();
-      } catch (e) {
-        // Error already about to be re-thrown
-      }
-      throw error;
+      pendingError = error;
     }
-    await tilesetTarget.end();
+    // Always clean up by deleting the context
+    delete this.context;
+
+    // Try to close the context
+    try {
+      await TilesetProcessorContexts.close(context);
+    } catch (e) {
+      if (!pendingError) {
+        pendingError = e;
+      }
+    }
+    if (pendingError) {
+      throw pendingError;
+    }
   }
 
   /**
@@ -249,7 +168,7 @@ export abstract class TilesetProcessor {
       this.markAsProcessed(sourceKey);
       const message = `No ${sourceKey} found in input`;
       //throw new TilesetError(message);
-      console.warn(message);
+      logger.warn(message);
       return;
     }
     const targetEntry = await this.processEntryInternal(
@@ -288,11 +207,11 @@ export abstract class TilesetProcessor {
       sourceEntry.value
     );
 
-    this.log(`Processing source: ${sourceEntry.key} with type ${type}`);
+    logger.debug(`Processing source: ${sourceEntry.key} with type ${type}`);
 
     const targetEntry = await entryProcessor(sourceEntry, type);
 
-    this.log(`        to target: ${targetEntry?.key}`);
+    logger.debug(`        to target: ${targetEntry?.key}`);
 
     return targetEntry;
   }
@@ -305,16 +224,14 @@ export abstract class TilesetProcessor {
    * @param key - The key (file name)
    * @returns The object containing the entry and its type
    */
-  private async fetchSourceEntry(
-    key: string
-  ): Promise<TilesetEntry | undefined> {
+  async fetchSourceEntry(key: string): Promise<TilesetEntry | undefined> {
     const context = this.getContext();
     const tilesetSource = context.tilesetSource;
 
     const sourceKey = key;
     const sourceValue = tilesetSource.getValue(sourceKey);
     if (!sourceValue) {
-      console.warn("No input found for " + sourceKey);
+      logger.warn(`No input found for ${sourceKey}`);
       return undefined;
     }
     const sourceEntry: TilesetEntry = {

@@ -18,6 +18,8 @@ import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
 import { BoundingVolumeDerivation } from "./cesium/BoundingVolumeDerivation";
 import { MetadataSemanticOverrides } from "./MetadataSemanticOverrides";
 
+import { Tiles } from "../tilesets/Tiles";
+
 /**
  * An implementation of a `TraversedTile` that represents a tile
  * within an implicit tileset during its traversal.
@@ -126,29 +128,30 @@ export class ImplicitTraversedTile implements TraversedTile {
     const refine = rootTile.refine;
     const transform = undefined;
     const metadata = undefined;
-    const contents = this.getRawContents();
     const implicitTiling = undefined;
     const extensions = undefined;
     const extras = undefined;
 
-    return {
+    const tile = {
       boundingVolume: boundingVolume,
       viewerRequestVolume: viewerRequestVolume,
       geometricError: geometricError,
       refine: refine,
       transform: transform,
       metadata: metadata,
-      contents: contents,
       implicitTiling: implicitTiling,
       extensions: extensions,
       extras: extras,
     };
+    Tiles.setContents(tile, this.getRawContents());
+    return tile;
   }
 
   /** {@inheritDoc TraversedTile.asFinalTile} */
   asFinalTile(): Tile {
     const tile = this.asRawTile();
-    tile.contents = this.getFinalContents();
+    Tiles.setContents(tile, this.getFinalContents());
+
     const subtreeMetadataModel = this._subtreeModel.subtreeMetadataModel;
     if (subtreeMetadataModel) {
       const tileIndex = this._localCoordinate.toIndex();
@@ -333,9 +336,6 @@ export class ImplicitTraversedTile implements TraversedTile {
     for (const contentAvailabilityInfo of contentAvailabilityInfos) {
       const available = contentAvailabilityInfo.isAvailable(tileIndex);
       if (available) {
-        // TODO The existence of the root content URI should
-        // have been validated. So this could also throw
-        // an error if the template URI is not found.
         const templateUri = this._root.asRawTile().content?.uri;
         if (defined(templateUri)) {
           const contentUri = ImplicitTilings.substituteTemplateUri(
@@ -350,6 +350,10 @@ export class ImplicitTraversedTile implements TraversedTile {
             group: undefined,
           };
           contents.push(content);
+        } else {
+          throw new ImplicitTilingError(
+            "The root of the implicit tileset did not define a template URI"
+          );
         }
       }
     }
@@ -402,15 +406,21 @@ export class ImplicitTraversedTile implements TraversedTile {
     return undefined;
   }
 
-  // TODO For debugging
+  /**
+   * Creates a string representation of this tile.
+   *
+   * The exact format is not specified, but it will contain information
+   * that is suitable for identifying this tile within a tile hierarchy.
+   *
+   * @returns The string
+   */
   toString = (): string => {
     return (
-      `ImplicitTraversedTile, ` +
-      `level ${this._globalLevel}, ` +
-      `global: ${this._globalCoordinate}, ` +
-      `root: ${this._rootCoordinate}, ` +
-      `local: ${this._localCoordinate}`
-      //`path ${this.path}`
+      `ImplicitTraversedTile[` +
+      `level=${this._globalLevel}, ` +
+      `global=${this._globalCoordinate}, ` +
+      `root=${this._rootCoordinate}, ` +
+      `local=${this._localCoordinate}]`
     );
   };
 }

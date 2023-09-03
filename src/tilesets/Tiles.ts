@@ -5,6 +5,8 @@ import { TileTraversalCallback } from "./TileTraversalCallback";
 
 /**
  * Utility methods related to tiles, given as `Tile` objects.
+ *
+ * @internal
  */
 export class Tiles {
   /**
@@ -15,8 +17,8 @@ export class Tiles {
    * defined `tile.contents`, or an empty array, when the tile does
    * not have contents.
    *
-   * @param tile The `Tile`
-   * @returns The content URIs
+   * @param tile - The `Tile`
+   * @returns The contents
    */
   static getContents(tile: Tile): Content[] {
     if (tile.content) {
@@ -29,6 +31,30 @@ export class Tiles {
   }
 
   /**
+   * Set the contents of the given tile.
+   *
+   * If the given array is empty, then the `content` and `contents`
+   * of the tile will be deleted. If it has length 1, then this
+   * content will become the `content` of the tile. Otherwise,
+   * the given array is set as the `contents` of the tile.
+   *
+   * @param tile - The `Tile`
+   * @param contents - The tile contents
+   */
+  static setContents(tile: Tile, contents: Content[]) {
+    if (contents.length === 0) {
+      delete tile.content;
+      delete tile.contents;
+    } else if (contents.length === 1) {
+      tile.content = contents[0];
+      delete tile.contents;
+    } else {
+      delete tile.content;
+      tile.contents = contents;
+    }
+  }
+
+  /**
    * Obtains the content URIs from the given tile.
    *
    * This will either return a single-element array, when the tile
@@ -38,7 +64,7 @@ export class Tiles {
    * used. In this case, a warning will be printed, and the `url`
    * will be returned.
    *
-   * @param tile The `Tile`
+   * @param tile - The `Tile`
    * @returns The content URIs
    */
   static getContentUris(tile: Tile): string[] {

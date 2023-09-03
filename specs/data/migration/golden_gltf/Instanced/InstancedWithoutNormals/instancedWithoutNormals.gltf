@@ -1,0 +1,207 @@
+{
+  "asset": {
+    "generator": "glTF-Transform",
+    "version": "2.0"
+  },
+  "accessors": [
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 25,
+      "bufferView": 0,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC4",
+      "componentType": 5126,
+      "count": 25,
+      "bufferView": 0,
+      "byteOffset": 300
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 25,
+      "bufferView": 0,
+      "byteOffset": 700
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 25,
+      "bufferView": 0,
+      "byteOffset": 1000
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 8,
+      "max": [
+        10,
+        10,
+        10
+      ],
+      "min": [
+        -10,
+        -10,
+        -10
+      ],
+      "bufferView": 1,
+      "byteOffset": 0
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 36,
+      "bufferView": 2,
+      "byteOffset": 0
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1052
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1052,
+      "byteLength": 96,
+      "byteStride": 12,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1148,
+      "byteLength": 72,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1220,
+      "byteLength": 25
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 1245
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          1
+        ],
+        "roughnessFactor": 0.4000000059604645,
+        "metallicFactor": 0
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Cube",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 4
+          },
+          "mode": 4,
+          "material": 0,
+          "indices": 5
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "Cube",
+      "mesh": 0,
+      "extensions": {
+        "EXT_instance_features": {
+          "featureIds": [
+            {
+              "featureCount": 25,
+              "attribute": 0,
+              "propertyTable": 0
+            }
+          ]
+        },
+        "EXT_mesh_gpu_instancing": {
+          "attributes": {
+            "TRANSLATION": 0,
+            "ROTATION": 1,
+            "SCALE": 2,
+            "_FEATURE_ID_0": 3
+          }
+        }
+      }
+    },
+    {
+      "translation": [
+        1215013.84,
+        4081608.45,
+        4736316.76
+      ],
+      "children": [
+        0
+      ]
+    }
+  ],
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [
+        1
+      ]
+    }
+  ],
+  "scene": 0,
+  "extensionsUsed": [
+    "EXT_structural_metadata",
+    "EXT_instance_features",
+    "EXT_mesh_gpu_instancing"
+  ],
+  "extensionsRequired": [
+    "EXT_mesh_gpu_instancing"
+  ],
+  "extensions": {
+    "EXT_structural_metadata": {
+      "schema": {
+        "id": "ID_batch_table",
+        "name": "Generated from batch_table",
+        "classes": {
+          "class_batch_table": {
+            "name": "Generated from batch_table",
+            "properties": {
+              "Height": {
+                "name": "Height",
+                "description": "Generated from Height",
+                "type": "SCALAR",
+                "componentType": "UINT8",
+                "required": true
+              }
+            }
+          }
+        }
+      },
+      "propertyTables": [
+        {
+          "name": "Property Table",
+          "class": "class_batch_table",
+          "count": 25,
+          "properties": {
+            "Height": {
+              "values": 3
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "asset": {
+    "generator": "glTF-Transform",
+    "version": "2.0"
+  },
+  "accessors": [
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 1000,
+      "max": [
+        4.992090702056885,
+        4.987441539764404,
+        4.997342109680176
+      ],
+      "min": [
+        -4.977985382080078,
+        -4.9834065437316895,
+        -4.989932537078857
+      ],
+      "bufferView": 0,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 1000,
+      "bufferView": 0,
+      "byteOffset": 12
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5121,
+      "count": 1000,
+      "bufferView": 0,
+      "byteOffset": 24
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 28000,
+      "byteStride": 28,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 28000,
+      "byteLength": 64
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 28064,
+      "byteLength": 36
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 28100,
+      "byteLength": 96
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 28196,
+      "byteLength": 32
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 28228
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "metallicFactor": 0
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "_FEATURE_ID_0": 2
+          },
+          "mode": 0,
+          "material": 0,
+          "extensions": {
+            "EXT_mesh_features": {
+              "featureIds": [
+                {
+                  "featureCount": 8,
+                  "attribute": 0,
+                  "propertyTable": 0
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "translation": [
+        1215012.8828876738,
+        4081605.22126042,
+        4736313.051199594
+      ],
+      "rotation": [
+        -0.7071067811865475,
+        0,
+        0,
+        0.7071067811865476
+      ],
+      "mesh": 0
+    }
+  ],
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "extensionsUsed": [
+    "EXT_mesh_features",
+    "EXT_structural_metadata"
+  ],
+  "extensions": {
+    "EXT_structural_metadata": {
+      "schema": {
+        "id": "ID_batch_table",
+        "name": "Generated from batch_table",
+        "classes": {
+          "class_batch_table": {
+            "name": "Generated from batch_table",
+            "properties": {
+              "name": {
+                "name": "name",
+                "description": "Generated from name",
+                "type": "STRING",
+                "required": true
+              },
+              "dimensions": {
+                "name": "dimensions",
+                "description": "Generated from dimensions",
+                "type": "VEC3",
+                "componentType": "FLOAT32",
+                "required": true
+              },
+              "id": {
+                "name": "id",
+                "description": "Generated from id",
+                "type": "SCALAR",
+                "componentType": "UINT32",
+                "required": true
+              }
+            }
+          }
+        }
+      },
+      "propertyTables": [
+        {
+          "name": "Property Table",
+          "class": "class_batch_table",
+          "count": 8,
+          "properties": {
+            "name": {
+              "values": 1,
+              "stringOffsets": 2
+            },
+            "dimensions": {
+              "values": 3
+            },
+            "id": {
+              "values": 4
+            }
+          }
+        }
+      ]
+    }
+  }
+}

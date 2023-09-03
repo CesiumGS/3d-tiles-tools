@@ -10,6 +10,9 @@ import { TilesetError } from "./TilesetError";
 import { TilesetSource } from "./TilesetSource";
 import { TilesetSourceFs } from "./TilesetSourceFs";
 
+import { LoggerFactory } from "../logging/LoggerFactory";
+const logger = LoggerFactory("tilesetData");
+
 /**
  * Methods related to `TilesetSource` instances
  *
@@ -64,7 +67,7 @@ export class TilesetSources {
     if (extension === "") {
       return new TilesetSourceFs();
     }
-    console.log("Unknown tileset source type: " + extension);
+    logger.error("Unknown tileset source type: " + extension);
     return undefined;
   }
 
@@ -75,9 +78,7 @@ export class TilesetSources {
    * @param tilesetSource - The `TilesetSource`
    * @returns The iterator over the entries
    */
-  static getEntries(
-    tilesetSource: TilesetSource
-  ): IterableIterator<TilesetEntry> {
+  static getEntries(tilesetSource: TilesetSource): Iterable<TilesetEntry> {
     const keys = tilesetSource.getKeys();
     const entries = Iterables.map(keys, (k) => {
       const v = tilesetSource.getValue(k);

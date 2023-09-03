@@ -16,15 +16,38 @@ Parts of the current implementation may still change. This page is only a short 
   - `Uris`: Detect data URIs or absolute URIs
   - Special cases: `defined` and `defaultValue`. These have some documentation explaining why they should rarely be used in TypeScript.
 
+- `./src/binary`: Common classes for the `buffer/bufferView` concept
+  - `BinaryBufferStructure`: A class that describes the "JSON part" of buffers and buffer views (i.e. their data layout and buffer URIs)
+  - `BinaryBufferData`: A class that contains the actual data of buffers and buffer views as JavaScript `Buffer`s
+  - `BinaryBufferDataResolver`: Resolves the `BinaryBufferData` for a given `BinaryBufferStructure`
+
 - `./src/contentProcessing`: Operations that are applied to tile content
   - `ContentOps`: Functions like `glbToB3dm`, _always_ operating on buffers: "Buffer in - Buffer out"
   - `GltfUtilites`/`GltfPipelineLegacy`: Wrappers around `gltf-pipeline` (e.g. for optimizing/upgrading the GLB in a B3DM)
+  - `GltfPack`: Wrappers around `gltfpack` (e.g. for applying meshopt compression)
+  - `GltfTransform`: Wrappers around `glTF-Transform` (e.g. for applying meshopt compression)
+
+- `./src/contentProcessing/draco`: Utility classes for Draco decoding
+  - `DracoDecoder`: A thin wrapper around Draco, mainly for decoding `3DTILES_draco_point_compression` data
+  - `DracoDecoderResult` + related classes: Summarizes the result of decoding `3DTILES_draco_point_compression` data
+
+- `./src/contentProcessing/pointClouds`: Utility classes for point clouds, focussing on reading PNTS and writing GLB
+  - `ReadablePointCloud`: An abstraction of "point cloud data" (read from PNTS, written to GLB)
+  - `PntsPointClouds`: Creates `ReadablePointCloud` objects from PNTS data
+  - `GltfTransformPointClouds`: Converts `ReadablePointCloud` objects into glTF/GLB assets
 
 - `./src/contentTypes`: Classes for determining the type of content data
   - `ContentData` as the main interface, implemented as `BufferedContentData` (to be created from a buffer that already exists in memory), or `LazyContentData` (that resolves "as little data as possible" to determine the content type)
   - `ContentDataTypes`: A set of strings representing different content data types, like `CONTENT_TYPE_B3DM` or `CONTENT_TYPE_TILESET`.
   - `ContentDataTypeRegistry`: Receives a `ContentData` object and returns one of the `ContentDataTypes` strings
   - `ContentDataTypeChecks`: Offers methods to create predicates that check for certain `included/excluded` content types
+
+- `./src/gltfExtensions`: Implementations of glTF metadata extensions for glTF-Transform
+  - `EXTMeshFeatures` and `MeshFeatures`: Implementation of `EXT_mesh_features`
+  - `EXTStructuralMetadata` and `StructuralMetadata`: Implementation of `EXT_structural_metadata`
+  - `EXTInstanceFeatures` and `InstanceFeatures`: Implementation of `EXT_instance_features`
+  - `*Utils`: Utility classes for debug-printing metadata
+  - `StructuralMetadataPropertyTables`: Utility class for generating `EXT_structural_metadata` property tables from `BinaryPropertyTable` objects
 
 - `./src/implicitTiling/`: Classes that represent the structure and information of implicit tilesets
   - `AvailabilityInfo`: A simple interface for representing information about the availability of tiles, content, or child subtrees in implicit tiling. This is accessed with an _index_. Instances of classes implementing this interface can be created with the `AvailabilityInfos` class. 
@@ -47,6 +70,19 @@ Parts of the current implementation may still change. This page is only a short 
     - For the JSON-based representation of metadata entities, metadata entity model instances can be created with `MetadataEntityModels`
     - `./src/metadata/binary` contains implementations of the metadata interfaces for _binary_ data, with `BinaryPropertyTableModel` being the top-level class, implementing the `PropertyTableModel` interface.
 
+- `./src/migration/`: Classes related to the migration of "legacy" tile formats to glTF+extensions
+  - `TileFormatsMigration`: The main class with the entry points to convert legacy tile formats into glTF+Extensions
+    - `TileFormatsMigrationB3dm/I3dm/Pnts`: The classes containing the format-specific migrations
+  - `BatchTableSchemas`: Methods to create metadata `Schema` objects that describe the structure and properties of batch tables
+  - `BatchTableClassProperties`: Methods for creating the metadata `ClassProperty` objects from the property information that is contained in batch tables
+  - `BatchTablePropertyTableModels`: Methods to create `PropertyModel` instances for the "columns" of a batc table
+  - `BatchTables`: Internal utility methods
+  - `Ids`: Methods to convert (legacy) batch table property names into "property IDs", with the constraints that are given by the 3D Metadata specification
+  - `NumberTypeDescriptions` and `TypeDetection`: Methods for "best-effort guesses" about the metadata property type that may be used for representing batch table properties that had been given as JSON
+  - `TileTableDataToMeshFeatures`: Methods for creating the glTF `EXT_mesh_features` extension objects from table data, specifically for converting the `_BATCHID` attributes into the extension objects that use the `_FEATURE_ID_n` attribute
+  - `TileTableDataToStructuralMetadata`: Methods for converting batch table information into an `EXT_structural_metadata` representation. This can either convert batch table columns into per-point property attributes for point clouds, or it can convert batch tables into `PropertyTable` objects
+  - `AccessorCreation`: Methods for creating glTF-Transform `Accessor` objects from `PropertyModel` objects - basically converting the "table column" that is represented with the `PropertyModel` into a glTF vertex attribute
+
 - `./src/packages`: Classes for reading or creating 3D Tiles Package files
   - These are implementations of the `TilesetSource` and `TilesetTarget` interface (see `./src/tilesetData`), based on 3TZ or 3DTILES
 
@@ -67,6 +103,11 @@ Parts of the current implementation may still change. This page is only a short 
   - `TileData` as a data structure for B3DM, I3DM, PNTS
   - `CompositeTileData` as a data structure for ... composite tile data (hence the name...)
   - `TileFormats`: Methods for handling tile data, mainly reading/writing tile data from/to buffers
+
+- `./src/tileTabledata`: Classes for handling the batch- and feature table data in the (legacy) tile formats, B3DM, I3DM, PNTS and CMPT
+  - `TileTableData`: Methods for accessing values from batch- and feature tables in a generic form (mainly as iterables or arrays of numbers)
+  - `TileTableDataPnts`: Methods for accessing the batch- and feature table values that are specific for PNTS
+  - `TileTableDataI3dm`: Methods for accessing the batch- and feature table values that are specific for I3DM
 
 - `./src/tilesetData`: Abstractions for the "files" that are "a tileset"
   - The goal is to have an abstraction that works for file systems as well as 3D Tiles packages (3TZ or 3DTILES)

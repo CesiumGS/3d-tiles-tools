@@ -13,11 +13,17 @@ import { PipelineError } from "./PipelineError";
 
 import { BasicTilesetProcessor } from "../tilesetProcessing/BasicTilesetProcessor";
 
-import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
+import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 import { ContentOps } from "../contentProcessing/ContentOps";
+import { TileFormatsMigration } from "../migration/TileFormatsMigration";
+
+import { LoggerFactory } from "../logging/LoggerFactory";
+const logger = LoggerFactory("pipeline");
 
 /**
  * Methods to execute `ContentStage` objects.
+ *
+ * @internal
  */
 export class ContentStageExecutor {
   /**
@@ -62,6 +68,14 @@ export class ContentStageExecutor {
       await ContentStageExecutor.executeGlbToI3dm(tilesetProcessor);
     } else if (contentStage.name === ContentStages.CONTENT_STAGE_B3DM_TO_GLB) {
       await ContentStageExecutor.executeB3dmToGlb(tilesetProcessor);
+    } else if (
+      contentStage.name === ContentStages.CONTENT_STAGE_CONVERT_B3DM_TO_GLB
+    ) {
+      await ContentStageExecutor.executeConvertB3dmToGlb(tilesetProcessor);
+    } else if (
+      contentStage.name === ContentStages.CONTENT_STAGE_CONVERT_PNTS_TO_GLB
+    ) {
+      await ContentStageExecutor.executeConvertPntsToGlb(tilesetProcessor);
     } else if (contentStage.name === ContentStages.CONTENT_STAGE_I3DM_TO_GLB) {
       await ContentStageExecutor.executeI3dmToGlb(tilesetProcessor);
     } else if (
@@ -83,7 +97,7 @@ export class ContentStageExecutor {
       await ContentStageExecutor.executeSeparateGltf(tilesetProcessor);
     } else {
       const message = `    Unknown contentStage name: ${contentStage.name}`;
-      console.log(message);
+      logger.debug(message);
     }
   }
 
@@ -274,6 +288,110 @@ export class ContentStageExecutor {
       const targetEntry = {
         key: uriProcessor(sourceEntry.key),
         value: ContentOps.i3dmToGlbBuffer(sourceEntry.value),
+      };
+      return targetEntry;
+    };
+    await tilesetProcessor.processTileContentEntries(
+      uriProcessor,
+      entryProcessor
+    );
+  }
+
+  /**
+   * Performs the 'convertB3dmToGlb' content stage with the given processor.
+   *
+   * This will process all tile contents entries of the source tileset
+   * that have the `CONTENT_TYPE_B3DM`. These entries will be replaced
+   * by entries that contain GLB data that was created from the B3DM.
+   *
+   * If the entries have names that end in `.b3dm`, then these
+   * extensions will be changed to `.glb`.
+   *
+   * @param tilesetProcessor - The `BasicTilesetProcessor`
+   * @returns A promise that resolves when the process is finished
+   * @throws Error If one of the processing steps causes
+   * an error.
+   */
+  private static async executeConvertB3dmToGlb(
+    tilesetProcessor: BasicTilesetProcessor
+  ): Promise<void> {
+    // Define the rule for updating the key (file name) of
+    // the entries, as well as possible template URIs of
+    // implicit tileset roots.
+    const uriProcessor = (uri: string) => {
+      if (Paths.hasExtension(uri, ".b3dm")) {
+        return Paths.replaceExtension(uri, ".glb");
+      }
+      return uri;
+    };
+
+    // Define the `TilesetEntryProcessor` that generates an
+    // entry with GLB data from an entry with B3DM data.
+    const entryProcessor = async (
+      sourceEntry: TilesetEntry,
+      type: string | undefined
+    ) => {
+      if (type !== ContentDataTypes.CONTENT_TYPE_B3DM) {
+        return sourceEntry;
+      }
+      const targetValue = await TileFormatsMigration.convertB3dmToGlb(
+        sourceEntry.value
+      );
+      const targetEntry = {
+        key: uriProcessor(sourceEntry.key),
+        value: targetValue,
+      };
+      return targetEntry;
+    };
+    await tilesetProcessor.processTileContentEntries(
+      uriProcessor,
+      entryProcessor
+    );
+  }
+
+  /**
+   * Performs the 'convertPntsToGlb' content stage with the given processor.
+   *
+   * This will process all tile contents entries of the source tileset
+   * that have the `CONTENT_TYPE_ONTS`. These entries will be replaced
+   * by entries that contain GLB data that was created from the PNTS.
+   *
+   * If the entries have names that end in `.pnts`, then these
+   * extensions will be changed to `.glb`.
+   *
+   * @param tilesetProcessor - The `BasicTilesetProcessor`
+   * @returns A promise that resolves when the process is finished
+   * @throws Error If one of the processing steps causes
+   * an error.
+   */
+  private static async executeConvertPntsToGlb(
+    tilesetProcessor: BasicTilesetProcessor
+  ): Promise<void> {
+    // Define the rule for updating the key (file name) of
+    // the entries, as well as possible template URIs of
+    // implicit tileset roots.
+    const uriProcessor = (uri: string) => {
+      if (Paths.hasExtension(uri, ".pnts")) {
+        return Paths.replaceExtension(uri, ".glb");
+      }
+      return uri;
+    };
+
+    // Define the `TilesetEntryProcessor` that generates an
+    // entry with GLB data from an entry with PNTS data.
+    const entryProcessor = async (
+      sourceEntry: TilesetEntry,
+      type: string | undefined
+    ) => {
+      if (type !== ContentDataTypes.CONTENT_TYPE_PNTS) {
+        return sourceEntry;
+      }
+      const targetValue = await TileFormatsMigration.convertPntsToGlb(
+        sourceEntry.value
+      );
+      const targetEntry = {
+        key: uriProcessor(sourceEntry.key),
+        value: targetValue,
       };
       return targetEntry;
     };

@@ -52,4 +52,18 @@ export interface PropertyTableModel {
   getPropertyTableProperty(
     propertyId: string
   ): PropertyTableProperty | undefined;
+
+  /**
+   * Returns the property names (column names) of this table
+   *
+   * @returns The property names
+   */
+  getPropertyNames(): string[];
+
+  /**
+   * Returns the number of rows that this table consists of
+   *
+   * @returns The number of rows
+   */
+  getCount(): number;
 }

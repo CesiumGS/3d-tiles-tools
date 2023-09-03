@@ -7,6 +7,8 @@ import { Stage } from "./Stage";
  *
  * Instances of this are created with the `ContentStages`
  * class, and contained within a `TilesetStage`.
+ *
+ * @internal
  */
 export interface ContentStage extends Stage {
   /**

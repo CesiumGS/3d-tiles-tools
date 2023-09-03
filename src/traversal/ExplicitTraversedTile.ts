@@ -12,6 +12,8 @@ import { Schema } from "../structure/Metadata/Schema";
 
 import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
 
+import { Tiles } from "../tilesets/Tiles";
+
 /**
  * An implementation of a `TraversedTile` that reflects a tile
  * that actually appears as a JSON representation in the tileset.
@@ -142,22 +144,19 @@ export class ExplicitTraversedTile implements TraversedTile {
   asFinalTile(): Tile {
     const tile = this._tile;
 
-    const contents = this.getFinalContents();
-
     const finalTile = {
       boundingVolume: tile.boundingVolume,
       viewerRequestVolume: tile.viewerRequestVolume,
       geometricError: tile.geometricError,
       refine: tile.refine,
       transform: tile.transform,
-      content: undefined,
-      contents: contents,
       children: tile.children,
       metadata: tile.metadata,
       implicitTiling: tile.implicitTiling,
       extensions: tile.extensions,
       extras: tile.extras,
     };
+    Tiles.setContents(finalTile, this.getFinalContents());
 
     const schema = this._schema;
     if (schema) {
@@ -206,7 +205,7 @@ export class ExplicitTraversedTile implements TraversedTile {
     const traversedChildren = [];
     for (let i = 0; i < children.length; i++) {
       const child = children[i];
-      const childPath = this.path + "/children/" + i;
+      const childPath = `${this.path}/children/${i}`;
       const traversedChild = new ExplicitTraversedTile(
         child,
         childPath,
@@ -284,8 +283,15 @@ export class ExplicitTraversedTile implements TraversedTile {
     return subtreeUri;
   }
 
-  // TODO For debugging
+  /**
+   * Creates a string representation of this tile.
+   *
+   * The exact format is not specified, but it will contain information
+   * that is suitable for identifying this tile within a tile hierarchy.
+   *
+   * @returns The string
+   */
   toString = (): string => {
-    return `ExplicitTraversedTile, level ${this.level}, path ${this.path}`;
+    return `ExplicitTraversedTile[level=${this.level}, path=${this.path}]`;
   };
 }

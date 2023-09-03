@@ -1,3 +1,5 @@
+import path from "path";
+
 import { Tile } from "../structure/Tile";
 import { Tileset } from "../structure/Tileset";
 import { Content } from "../structure/Content";
@@ -12,7 +14,16 @@ import { TilesetEntryProcessor } from "./TilesetEntryProcessor";
 
 import { TraversedTile } from "../traversal/TraversedTile";
 import { TilesetTraverser } from "../traversal/TilesetTraverser";
+import { TraversalCallback } from "../traversal/TraversalCallback";
+
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
+
+import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
+
+import { Paths } from "../base/Paths";
+
+import { LoggerFactory } from "../logging/LoggerFactory";
+const logger = LoggerFactory("tilesetProcessing");
 
 /**
  * Implementation of a `TilesetProcessor` that offers methods for
@@ -25,18 +36,35 @@ import { TilesetEntry } from "../tilesetData/TilesetEntry";
  * - Explicit tiles (as `Tile` instances)
  * - The tileset (and its schema) itself
  *
- * The operations may involve modifiications of the actual
+ * The operations may involve modifications of the actual
  * `Tileset` object. The modified tileset object will be
  * written into the target when `end()` is called.
+ *
+ * @internal
  */
 export class BasicTilesetProcessor extends TilesetProcessor {
   /**
+   * Whether external tilesets should be processed transparently.
+   *
+   * When this is 'true', then the methods that process tile
+   * content will also be applied to the contents of external
+   * tilesets.
+   */
+  private readonly processExternalTilesets: boolean;
+
+  /**
    * Creates a new instance
    *
-   * @param quiet - Whether log messages should be omitted
+   * @param processExternalTilesets - Whether external tilesets
+   * should be processed.
    */
-  constructor(quiet?: boolean) {
-    super(quiet);
+  constructor(processExternalTilesets?: boolean) {
+    super();
+    if (processExternalTilesets === undefined) {
+      this.processExternalTilesets = true;
+    } else {
+      this.processExternalTilesets = processExternalTilesets;
+    }
   }
 
   /**
@@ -111,14 +139,12 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * Apply the given callback to all `TraversedTile` instances
    * that result from traversing the tileset.
    *
-   * @param callback - The callback
+   * @param callback - The callback.
    * @returns A promise that resolves when the process is finished
    * @throws DeveloperError If `begin` was not called yet
    * @throws TilesetError When an error is thrown during processing
    */
-  async forEachTile(
-    callback: (traversedTile: TraversedTile) => Promise<boolean>
-  ): Promise<void> {
+  async forEachTile(callback: TraversalCallback): Promise<void> {
     const context = this.getContext();
     const tileset = context.sourceTileset;
     await this.forEachTileAt(tileset.root, callback);
@@ -140,7 +166,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    */
   private async forEachTileAt(
     tile: Tile,
-    callback: (traversedTile: TraversedTile) => Promise<boolean>
+    callback: TraversalCallback
   ): Promise<void> {
     const context = this.getContext();
     const tilesetSource = context.tilesetSource;
@@ -200,6 +226,8 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     const tileset = context.sourceTileset;
     const schema = context.schema;
     const targetTileset = await callback(tileset, schema);
+    // Use the processed tileset as the source of subsequent operations
+    context.sourceTileset = targetTileset;
     context.targetTileset = targetTileset;
   }
 
@@ -215,27 +243,74 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * @param uriProcessor - The processor that updates keys and URIs
    * @param entryProcessor - The `TilesetEntryProcessor`
    * @returns A promise that resolves when the process is finished
-   * @throws Error If one of the processing steps causes
-   * an error.
+   * @throws Error If one of the processing steps causes an error.
    */
   async processTileContentEntries(
     uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
   ): Promise<void> {
-    // Traverse the (explicit) tiles of the input tileset
-    await this.forEachExplicitTile(async (tile: Tile): Promise<void> => {
+    const context = this.getContext();
+    const tileset = context.sourceTileset;
+    const basePath = ".";
+    await this.processTilesetTileContentEntries(
+      basePath,
+      tileset,
+      uriProcessor,
+      entryProcessor
+    );
+  }
+
+  /**
+   * Process all entries that are tile content of any of the
+   * tiles in the given tileset.
+   *
+   * This will process all tile content entries of the given tileset
+   * with the given `TilesetEntryProcessor`. The given `uriProcessor`
+   * will be used for updating the `key` (file name) of the entries,
+   * as well as possible template URIs at the roots of implicit
+   * tilesets.
+   *
+   * @param basePath - The path that the (relative) content URIs of
+   * the given tileset are resolved against, in order to obtain the
+   * full path for the content data. For the root tileset, this is
+   * just the current directory, `"."`. For external tilesets, it
+   * will be the directory that contained the tileset JSON file of
+   * the external tileset.
+   * @param tileset - The tileset
+   * @param uriProcessor - The processor that updates keys and URIs
+   * @param entryProcessor - The `TilesetEntryProcessor`
+   * @returns A promise that resolves when the process is finished
+   * @throws Error If one of the processing steps causes
+   * an error.
+   */
+  private async processTilesetTileContentEntries(
+    basePath: string,
+    tileset: Tileset,
+    uriProcessor: (uri: string) => string,
+    entryProcessor: TilesetEntryProcessor
+  ): Promise<void> {
+    // The callback that will be applied to each explicit
+    // tile in the tileset.
+    const tileCallback = async (tile: Tile): Promise<void> => {
       // When the tile is not an implicit tiling root,
       // then just update the entries that correspond
       // to the tile contents.
       if (!tile.implicitTiling) {
-        await this.processExplicitTileContentEntries(tile, entryProcessor);
+        await this.processExplicitTileContentEntries(
+          basePath,
+          tile,
+          uriProcessor,
+          entryProcessor
+        );
       } else {
         // For implicit tiling roots, traverse the implicit tile hierarchy
         // that starts at this tile, and process each entry that corresponds
         // to the content of one of the implicit tiles.
         await this.forEachTileAt(tile, async (traversedTile: TraversedTile) => {
           await this.processTraversedTileContentEntries(
+            basePath,
             traversedTile,
+            uriProcessor,
             entryProcessor
           );
           return true;
@@ -248,6 +323,13 @@ export class BasicTilesetProcessor extends TilesetProcessor {
           content.uri = uriProcessor(content.uri);
         }
       }
+    };
+
+    const root = tileset.root;
+    await Tiles.traverseExplicit(root, async (tilePath: Tile[]) => {
+      const tile = tilePath[tilePath.length - 1];
+      await tileCallback(tile);
+      return true;
     });
   }
 
@@ -258,17 +340,23 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * will be updated to reflect possible changes of the keys (file
    * names) that are performed by the `entryProcessor`.
    *
+   * @param basePath - The base path (see processTilesetTileContentEntries)
    * @param tile - The tile
-   * @param entryProcessor The `TilesetEntryProcessor`
+   * @param uriProcessor - The processor that updates keys and URIs
+   * @param entryProcessor - The `TilesetEntryProcessor`
    * @returns A promise that resolves when the process is finished
    */
   private async processExplicitTileContentEntries(
+    basePath: string,
     tile: Tile,
+    uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
   ): Promise<void> {
     const contents = BasicTilesetProcessor.getTileContents(tile);
     const targetContentUris = await this.processContentEntries(
+      basePath,
       contents,
+      uriProcessor,
       entryProcessor
     );
     BasicTilesetProcessor.updateTileContent(tile, targetContentUris);
@@ -281,48 +369,175 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * content of the given tile, calls `processEntries` on them,
    * and stores the resulting entries.
    *
+   * @param basePath - The base path (see processTilesetTileContentEntries)
    * @param traversedTile - The traversed tile
-   * @param entryProcessor The `TilesetEntryProcessor`
+   * @param uriProcessor - The processor that updates keys and URIs
+   * @param entryProcessor - The `TilesetEntryProcessor`
    * @returns A promise that resolves when the process is finished
    */
   private async processTraversedTileContentEntries(
+    basePath: string,
     traversedTile: TraversedTile,
+    uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
   ): Promise<void> {
     if (traversedTile.isImplicitTilesetRoot()) {
       return;
     }
     const contents = traversedTile.getFinalContents();
-    await this.processContentEntries(contents, entryProcessor);
+    await this.processContentEntries(
+      basePath,
+      contents,
+      uriProcessor,
+      entryProcessor
+    );
   }
 
   /**
    * Process all entries that correspond to the given contents.
    *
-   * @param tile - The tile
-   * @param entryProcessor The `TilesetEntryProcessor`
+   * The method will return the "target names" of these contents - i.e.
+   * the file names / uris that the contents have after being processed
+   * with the given entry processor (and it will make sure that the
+   * entry processor is only applied ONCE to each entry).
+   *
+   * If one of the contents is an external tileset, and the
+   * `this.processExternalTilesets` flag is `true`, then the
+   * method will call `processTilesetTileContentEntries`
+   * on this tileset, to recursively handle the content entries
+   * of the external tileset.
+   *
+   * @param basePath - The base path (see processTilesetTileContentEntries)
+   * @param contents - The contents
+   * @param uriProcessor - The processor that updates keys and URIs
+   * @param entryProcessor - The `TilesetEntryProcessor`
    * @returns A promise that resolves when the process is finished,
    * containing the new names that the entries have after processing
    */
   private async processContentEntries(
+    basePath: string,
     contents: Content[],
+    uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
   ): Promise<string[]> {
     const targetContentUris: string[] = [];
     for (const content of contents) {
+      // Resolve the content URI against the base path, to
+      // obtain the full URI (which is still relative to
+      // the directory of the "root" tileset)
       const sourceContentUri = content.uri;
-      let targetContentUri;
-      if (this.isProcessed(sourceContentUri)) {
-        targetContentUri = this.getTargetKey(sourceContentUri);
+      const fullSourceContentUri = Paths.join(basePath, sourceContentUri);
+
+      let fullTargetContentUri;
+      if (this.isProcessed(fullSourceContentUri)) {
+        fullTargetContentUri = this.getTargetKey(fullSourceContentUri);
       } else {
-        await this.processEntry(sourceContentUri, entryProcessor);
-        targetContentUri = this.getTargetKey(sourceContentUri);
+        // By default, each content entry will be processed with
+        // the given entryProcessor. But if external tilesets
+        // should be processed, and the given entry is an
+        // external tileset, then it will also be processed with
+        // the 'processExternalTilesetContentEntries' method, to
+        // recursively handle the contents of the external tileset.
+        let externalHandlingEntryProcessor = entryProcessor;
+        if (this.processExternalTilesets) {
+          externalHandlingEntryProcessor = async (
+            sourceEntry: TilesetEntry,
+            type: string | undefined
+          ) => {
+            const targetEntry = await entryProcessor(sourceEntry, type);
+            if (targetEntry) {
+              if (type === ContentDataTypes.CONTENT_TYPE_TILESET) {
+                const externalBasePath = path.dirname(sourceEntry.key);
+                return this.processExternalTilesetContentEntries(
+                  externalBasePath,
+                  targetEntry,
+                  uriProcessor,
+                  entryProcessor
+                );
+              }
+            }
+            return targetEntry;
+          };
+        }
+        await this.processEntry(
+          fullSourceContentUri,
+          externalHandlingEntryProcessor
+        );
+        fullTargetContentUri = this.getTargetKey(fullSourceContentUri);
       }
-      if (targetContentUri) {
+      if (fullTargetContentUri) {
+        // Remove the "basePath" from the (possibly modified)
+        // URI, to obtain the URI that will become the new
+        // content.uri in the tileset JSON.
+        const targetContentUri = Paths.relativize(
+          basePath,
+          fullTargetContentUri
+        );
         targetContentUris.push(targetContentUri);
       }
     }
     return targetContentUris;
+  }
+
+  /**
+   * Process all entries that correspond to tile content of a tile
+   * in the given tileset.
+   *
+   * This will traverse the tile hierarchy of the given tileset
+   * and eventually apply the given entry processor to each tile
+   * content. The JSON that is parsed from the given entry will
+   * be modified, and the modified JSON (with possibly updated
+   * content URIs) will be returned as the new entry for the
+   * external tileset.
+   *
+   * @param basePath - The base path (see processTilesetTileContentEntries)
+   * @param externalTilesetSourceEntry - The tileset entry that
+   * contains the external tileset.
+   * @param uriProcessor - The processor that updates keys and URIs
+   * @param entryProcessor - The `TilesetEntryProcessor`
+   * @returns A promise that resolves when the process is finished,
+   * containing the new names that the entries have after processing
+   * @throws Error If processing the external tileset causes an error
+   */
+  private async processExternalTilesetContentEntries(
+    basePath: string,
+    externalTilesetSourceEntry: TilesetEntry,
+    uriProcessor: (uri: string) => string,
+    entryProcessor: TilesetEntryProcessor
+  ): Promise<TilesetEntry> {
+    logger.debug(
+      `Processing external tileset ${externalTilesetSourceEntry.key}`
+    );
+
+    // Parse the external tileset from the given entry
+    const externalTileset = JSON.parse(
+      externalTilesetSourceEntry.value.toString()
+    ) as Tileset;
+
+    // Process all content entries of the external tileset
+    // (possibly updating the content URIs in this tileset)
+    await this.processTilesetTileContentEntries(
+      basePath,
+      externalTileset,
+      uriProcessor,
+      entryProcessor
+    );
+
+    // Create the buffer that contains the (possibly modified)
+    // external tileset JSON data, and return this as the
+    // new entry for the external tileset.
+    const externalTilesetJsonString = JSON.stringify(externalTileset, null, 2);
+    const targetTilesetJsonBuffer = Buffer.from(externalTilesetJsonString);
+    const externalTilesetTargetEntry = {
+      key: externalTilesetSourceEntry.key,
+      value: targetTilesetJsonBuffer,
+    };
+
+    logger.debug(
+      `Processing external tileset ${externalTilesetSourceEntry.key} DONE`
+    );
+
+    return externalTilesetTargetEntry;
   }
 
   /**

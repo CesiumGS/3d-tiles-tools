@@ -4,6 +4,8 @@
  *
  * This may be used for B3DM, I3DM or PNTS `TileData`, or
  * for CMPT `CompositeTileData`.
+ *
+ * @internal
  */
 export interface Header {
   /**

@@ -8,6 +8,8 @@ import { TilesetStage } from "./TilesetStage";
  * set of `TilesetStage` steps that should be executed.
  * Instances of this are created with the `Pipelines`
  * class, and executed with a `PipelineExecutor`.
+ *
+ * @internal
  */
 export interface Pipeline {
   /**

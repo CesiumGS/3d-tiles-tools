@@ -1,0 +1,172 @@
+{
+  "asset": {
+    "generator": "glTF-Transform",
+    "version": "2.0"
+  },
+  "accessors": [
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 1000,
+      "max": [
+        2.5,
+        2.5,
+        2.5
+      ],
+      "min": [
+        -2.5,
+        -2.5,
+        -2.5
+      ],
+      "bufferView": 0,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5121,
+      "count": 1000,
+      "normalized": true,
+      "bufferView": 0,
+      "byteOffset": 12
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5126,
+      "count": 1000,
+      "bufferView": 0,
+      "byteOffset": 16
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 1000,
+      "bufferView": 0,
+      "byteOffset": 20
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 1000,
+      "bufferView": 0,
+      "byteOffset": 32
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 36000,
+      "byteStride": 36,
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 36000
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "metallicFactor": 0
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "COLOR_0": 1,
+            "_TEMPERATURE__": 2,
+            "_SECONDARYCOLOR": 3,
+            "_ID": 4
+          },
+          "mode": 0,
+          "material": 0,
+          "extensions": {
+            "EXT_structural_metadata": {
+              "propertyAttributes": [
+                0
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "rotation": [
+        -0.7071067811865475,
+        0,
+        0,
+        0.7071067811865476
+      ],
+      "mesh": 0
+    }
+  ],
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "extensionsUsed": [
+    "EXT_structural_metadata"
+  ],
+  "extensions": {
+    "EXT_structural_metadata": {
+      "schema": {
+        "id": "ID_batch_table",
+        "name": "Generated from batch_table",
+        "classes": {
+          "class_batch_table": {
+            "name": "Generated from batch_table",
+            "properties": {
+              "temperature__": {
+                "name": "temperature ℃",
+                "description": "Generated from temperature ℃",
+                "type": "SCALAR",
+                "componentType": "FLOAT32",
+                "required": true
+              },
+              "secondaryColor": {
+                "name": "secondaryColor",
+                "description": "Generated from secondaryColor",
+                "type": "VEC3",
+                "componentType": "FLOAT32",
+                "required": true
+              },
+              "id": {
+                "name": "id",
+                "description": "Generated from id",
+                "type": "SCALAR",
+                "componentType": "UINT16",
+                "required": true
+              }
+            }
+          }
+        }
+      },
+      "propertyAttributes": [
+        {
+          "class": "class_batch_table",
+          "properties": {
+            "temperature__": {
+              "attribute": "_TEMPERATURE__"
+            },
+            "secondaryColor": {
+              "attribute": "_SECONDARYCOLOR"
+            },
+            "id": {
+              "attribute": "_ID"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

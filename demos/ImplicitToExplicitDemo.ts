@@ -26,6 +26,7 @@ async function buildExplicitHierarchy(
   // and contents (which contains the template URI)
   if (traversedTile.isImplicitTilesetRoot()) {
     delete explicitTile.implicitTiling;
+    delete explicitTile.content;
     delete explicitTile.contents;
   }
 

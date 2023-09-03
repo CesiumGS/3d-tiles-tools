@@ -4,6 +4,8 @@ import { ContentDataTypeRegistry } from "./ContentDataTypeRegistry";
 /**
  * Methods to create predicates that check whether a given
  * `ContentData` has a certain type.
+ *
+ * @internal
  */
 export class ContentDataTypeChecks {
   /**

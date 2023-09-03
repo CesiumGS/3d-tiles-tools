@@ -23,6 +23,8 @@ import { TilesetEntry } from "../tilesetData/TilesetEntry";
  * containing the resulting entry, or `undefined` if the entry
  * should be omitted in the target.
  * @throws TilesetError When the input could not be processed
+ *
+ * @internal
  */
 export type TilesetEntryProcessor = (
   sourceEntry: TilesetEntry,

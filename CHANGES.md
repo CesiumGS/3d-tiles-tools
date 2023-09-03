@@ -1,6 +1,22 @@
 Change Log
 ==========
 
+### 0.3.0 - 2023-08-30
+
+- Transparently decompress entries in `3tz` files when they are compressed with `DEFLATE` (via [#55](https://github.com/CesiumGS/3d-tiles-tools/pull/55))
+  - The exact behavior in terms of entry compression is not specified yet. This is tracked in [#56](https://github.com/CesiumGS/3d-tiles-tools/issues/56)
+- Extended the handling of tileset JSON files for the `convert` command (via [#54](https://github.com/CesiumGS/3d-tiles-tools/pull/54))
+  - The `convert` command did not anticipate that the `.3dtiles` and `.3tz` formats require the top-level tileset file to be called `tileset.json`. This is enforced now. For cases where the input is ambiguous (for example, for a ZIP file or a directory that contain multiple tileset JSON files, with none being called `tileset.json`), the name of the top-level tileset JSON file can be defined with the `--inputTilesetJsonFileName` command line argument.
+- The `upgrade` command has been generalized (via [#41](https://github.com/CesiumGS/3d-tiles-tools/pull/41) and [#52](https://github.com/CesiumGS/3d-tiles-tools/pull/52))
+  - The default behavior of the the `upgrade` command remained unaffected
+  - When passing in the `--targetVersion 1.1` command line argument, then the upgrade will attempt to do a more extensive upgrade of the (legacy) PNTS, B3DM, and I3DM tile formats. It will convert these tile formats into glTF assets that use the `EXT_structural_metadata`, `EXT_mesh_features`, and `EXT_instance_features` extensions, to represent the former batch- and feature table information. This is intended as a _preview feature_. The CMPT format can not yet be upgraded. There are corner cases (for example, animations in the glTF assets that are used for I3DM) that can not generically be translated into glTF assets with extensions. The scope and configurability of the command will be extended and specified more extensively in the future.
+- The behavior of `b3dmToGlb` and `i3dmToGlb` commands has changed: They originally upgraded any glTF 1.0 content that they encountered to glTF 2.0. Now, they _only_ extract the actual glTF data as it is. 
+- Operations that modified the content of tiles (for example, converting B3DM to GLB) only had been applied to the top-level input tileset. Now, these operations by default are also applied to the contents of _external_ tilesets that are referred to from the top-level tileset (via [#42](https://github.com/CesiumGS/3d-tiles-tools/pull/42) and [#48](https://github.com/CesiumGS/3d-tiles-tools/pull/48))
+- Certain operations on tilesets caused the output tileset to use a `tile.contents[]` array even when there only was a single content. This was fixed in [#38](https://github.com/CesiumGS/3d-tiles-tools/pull/38), to make sure that a single `tile.content` is used in these cases, and the `tile.contents[]` array only when there actually are multiple contents.
+- Added further `structure` classes that are (largely) auto-generated from JSON schema (via [#36](https://github.com/CesiumGS/3d-tiles-tools/pull/36))
+  - The classes in the `structure/TileFormats` package represent the batch- and feature table JSON of the (legacy) tile formats
+  - The classes in the `structure/Style` package represent the JSON structures for 3D Tiles styling
+
 ### 0.2.1 - 2023-04-27
 
 - Internal refactorings and bugfixes for tileset processing and pipelines: 

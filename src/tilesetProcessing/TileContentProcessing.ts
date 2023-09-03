@@ -6,6 +6,7 @@ import { TileContentProcessor } from "./TileContentProcessor";
 /**
  * Methods for processing the tile content of tilesets.
  *
+ * @internal
  */
 export class TileContentProcessing {
   /**

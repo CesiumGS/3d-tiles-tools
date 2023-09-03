@@ -1,5 +1,3 @@
-import { defined } from "../../base/defined";
-
 import { PropertyModel } from "../PropertyModel";
 import { MetadataError } from "../MetadataError";
 
@@ -91,7 +89,7 @@ export class BinaryPropertyModels {
     // Obtain the `arrayOffsets` buffer view data
     const arrayOffsetsBufferViewIndex = propertyTableProperty.arrayOffsets;
     let arrayOffsetsBufferViewData = undefined;
-    if (defined(arrayOffsetsBufferViewIndex)) {
+    if (arrayOffsetsBufferViewIndex !== undefined) {
       arrayOffsetsBufferViewData = bufferViewsData[arrayOffsetsBufferViewIndex];
     }
     const arrayOffsetType = propertyTableProperty.arrayOffsetType ?? "UINT32";
@@ -99,7 +97,7 @@ export class BinaryPropertyModels {
     // Obtain the `stringOffsets` buffer view data
     const stringOffsetsBufferViewIndex = propertyTableProperty.stringOffsets;
     let stringOffsetsBufferViewData = undefined;
-    if (defined(stringOffsetsBufferViewIndex)) {
+    if (stringOffsetsBufferViewIndex !== undefined) {
       stringOffsetsBufferViewData =
         bufferViewsData[stringOffsetsBufferViewIndex];
     }
@@ -108,7 +106,7 @@ export class BinaryPropertyModels {
     // Determine the `enumValueType` of the property
     const enumType = classProperty.enumType;
     let enumValueType = undefined;
-    if (defined(enumType)) {
+    if (enumType !== undefined) {
       const binaryEnumInfo = binaryPropertyTable.binaryEnumInfo;
       const enumValueTypes = binaryEnumInfo.enumValueTypes;
       enumValueType = enumValueTypes[enumType] ?? "UINT16";
@@ -120,6 +118,55 @@ export class BinaryPropertyModels {
     const componentType = classProperty.componentType;
     const count = classProperty.count;
     const isArray = classProperty.array === true;
+
+    const propertyModel = BinaryPropertyModels.createPropertyModelInternal(
+      propertyId,
+      type,
+      componentType,
+      isArray,
+      count,
+      valuesBufferViewData,
+      arrayOffsetsBufferViewData,
+      arrayOffsetType,
+      stringOffsetsBufferViewData,
+      stringOffsetType,
+      enumValueType
+    );
+    return propertyModel;
+  }
+
+  /**
+   * Internal method to create a `PropertyModel` based on all
+   * the raw data elements that have been obtained from the
+   * `BinaryPropertyTable` for a specific property.
+   *
+   * @param propertyId - The property ID
+   * @param type The type
+   * @param componentType The component type
+   * @param isArray Whether the property is an array
+   * @param count The count (array length)
+   * @param valuesBufferViewData The values data
+   * @param arrayOffsetsBufferViewData The array offsets data
+   * @param arrayOffsetType The array offsets type
+   * @param stringOffsetsBufferViewData The string offsets data
+   * @param stringOffsetType The string offsets type
+   * @param enumValueType The enum value type
+   * @returns The `PropertyModel`
+   * @throws MetadataError if the given data is inconsistent
+   */
+  static createPropertyModelInternal(
+    propertyId: string,
+    type: string,
+    componentType: string | undefined,
+    isArray: boolean,
+    count: number | undefined,
+    valuesBufferViewData: Buffer,
+    arrayOffsetsBufferViewData: Buffer | undefined,
+    arrayOffsetType: string,
+    stringOffsetsBufferViewData: Buffer | undefined,
+    stringOffsetType: string,
+    enumValueType: string | undefined
+  ): PropertyModel {
     if (isArray) {
       if (type === "STRING") {
         if (!stringOffsetsBufferViewData) {
@@ -168,7 +215,7 @@ export class BinaryPropertyModels {
       }
       // The 'type' must be a numeric (array) type here
 
-      if (!defined(componentType)) {
+      if (componentType === undefined) {
         throw new MetadataError(
           `The property ${propertyId} is a numeric array, ` +
             `but no component type has been defined`
@@ -224,7 +271,7 @@ export class BinaryPropertyModels {
 
     // The property must be a (non-array) numeric property here
 
-    if (!defined(componentType)) {
+    if (componentType === undefined) {
       throw new MetadataError(
         `The property ${propertyId} is numeric, ` +
           `but no component type has been defined`
@@ -267,7 +314,7 @@ export class BinaryPropertyModels {
     offsetType: string,
     count: number | undefined
   ): { offset: number; length: number } {
-    if (defined(count)) {
+    if (count !== undefined) {
       return {
         offset: index * count,
         length: count,
@@ -288,9 +335,9 @@ export class BinaryPropertyModels {
       index + 1,
       offsetType
     );
-    const length = nextOffset - offset;
+    const length = Number(nextOffset) - Number(offset);
     return {
-      offset: offset,
+      offset: Number(offset),
       length: length,
     };
   }

@@ -132,7 +132,7 @@ function handleRequest(
   }
   const content = tilesetSource.getValue(path);
 
-  //console.log("Content for " + path + " is " + content);
+  //console.log("Content for " + path + " is " + content?.length);
 
   if (!content) {
     console.log("Return 404 for " + path);

@@ -15,6 +15,27 @@ import { DataError } from "./DataError";
  */
 export class Buffers {
   /**
+   * Creates a buffer from a typed array
+   *
+   * @param array - The typed array
+   * @returns The buffer
+   */
+  static fromTypedArray(
+    array:
+      | Int8Array
+      | Uint8Array
+      | Uint8ClampedArray
+      | Int16Array
+      | Uint16Array
+      | Int32Array
+      | Uint32Array
+      | Float32Array
+      | Float64Array
+  ) {
+    return Buffer.from(array.buffer, array.byteOffset, array.byteLength);
+  }
+
+  /**
    * Applies GZIP compression to the given buffer, and returns
    * the result.
    *

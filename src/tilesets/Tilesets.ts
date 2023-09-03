@@ -14,6 +14,8 @@ import { TilesetUpgrader } from "../tilesetProcessing/TilesetUpgrader";
  * wrappers around the classes that implement parts of the command
  * line functionality (and that may become `TilesetStage`s in a
  * pipeline at some point).
+ *
+ * @internal
  */
 export class Tilesets {
   /**
@@ -70,6 +72,7 @@ export class Tilesets {
    * @param tilesetTargetName - The tileset target name
    * @param overwrite Whether the target should be overwritten if
    * it already exists
+   * @param targetVersion - The target version - 1.0 or 1.1
    * @param gltfUpgradeOptions - Options that may be passed
    * to `gltf-pipeline` when GLB data in B3DM or I3DM is
    * supposed to be upgraded.
@@ -81,23 +84,34 @@ export class Tilesets {
     tilesetSourceName: string,
     tilesetTargetName: string,
     overwrite: boolean,
+    targetVersion: string,
     gltfUpgradeOptions: any
   ) {
-    const quiet = false;
-    const tilesetUpgrader = new TilesetUpgrader(quiet, gltfUpgradeOptions);
-    tilesetUpgrader.upgrade(tilesetSourceName, tilesetTargetName, overwrite);
+    const tilesetUpgrader = new TilesetUpgrader(
+      targetVersion,
+      gltfUpgradeOptions
+    );
+    await tilesetUpgrader.upgrade(
+      tilesetSourceName,
+      tilesetTargetName,
+      overwrite
+    );
   }
 
   /**
    * Performs the `upgrade` operation directly on a tileset
    *
+   * @param tileset - The tileset
+   * @param targetVersion - The target version - 1.0 or 1.1
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError When the input could not be processed
    */
-  static async upgradeTileset(tileset: Tileset) {
-    const quiet = false;
+  static async upgradeTileset(tileset: Tileset, targetVersion: string) {
     const gltfUpgradeOptions = undefined;
-    const tilesetUpgrader = new TilesetUpgrader(quiet, gltfUpgradeOptions);
+    const tilesetUpgrader = new TilesetUpgrader(
+      targetVersion,
+      gltfUpgradeOptions
+    );
     await tilesetUpgrader.upgradeTileset(tileset);
   }
 
@@ -108,15 +122,16 @@ export class Tilesets {
    * name is the last path component of the given name.
    *
    * Otherwise (if the given name is a directory, or the name of a file
-   * that does not end with '.json'), then the default name 'tileset.json'
-   * is returned.
+   * that does not end with '.json' - for example, an archive file
+   * that ends with `.3tz` or `.3dtiles`), then the default name
+   * 'tileset.json' is returned.
    *
-   * @param tilesetSourceName - The tileset source name
+   * @param tilesetDataName - The name of the tileset data
    * @returns The tileset file name
    */
-  static determineTilesetJsonFileName(tilesetSourceName: string): string {
-    if (tilesetSourceName.toLowerCase().endsWith(".json")) {
-      return path.basename(tilesetSourceName);
+  static determineTilesetJsonFileName(tilesetDataName: string): string {
+    if (tilesetDataName.toLowerCase().endsWith(".json")) {
+      return path.basename(tilesetDataName);
     }
     return "tileset.json";
   }

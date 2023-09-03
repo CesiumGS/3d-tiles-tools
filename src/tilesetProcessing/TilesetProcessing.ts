@@ -9,6 +9,8 @@ import { TilesetSource } from "../tilesetData/TilesetSource";
 
 /**
  * Internal utility methods for the tileset processing
+ *
+ * @internal
  */
 export class TilesetProcessing {
   /**

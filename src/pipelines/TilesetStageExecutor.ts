@@ -1,3 +1,5 @@
+import { Buffers } from "../base/Buffers";
+
 import { TilesetStage } from "./TilesetStage";
 import { ContentStageExecutor } from "./ContentStageExecutor";
 import { PipelineError } from "./PipelineError";
@@ -6,15 +8,20 @@ import { TilesetStages } from "./TilesetStages";
 import { BasicTilesetProcessor } from "../tilesetProcessing/BasicTilesetProcessor";
 import { TilesetUpgrader } from "../tilesetProcessing/TilesetUpgrader";
 import { TilesetCombiner } from "../tilesetProcessing/TilesetCombiner";
+import { TilesetDataProcessor } from "../tilesetProcessing/TilesetDataProcessor";
 
 import { ContentDataTypeChecks } from "../contentTypes/ContentDataTypeChecks";
 import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
-import { TilesetDataProcessor } from "../tilesetProcessing/TilesetDataProcessor";
+
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
-import { Buffers } from "../base/Buffers";
+
+import { LoggerFactory } from "../logging/LoggerFactory";
+const logger = LoggerFactory("pipeline");
 
 /**
  * Methods to execute `TilesetStage` objects.
+ *
+ * @internal
  */
 export class TilesetStageExecutor {
   /**
@@ -37,9 +44,9 @@ export class TilesetStageExecutor {
     currentOutput: string,
     overwrite: boolean
   ) {
-    console.log(`  Executing tilesetStage : ${tilesetStage.name}`);
-    console.log(`    currentInput:  ${currentInput}`);
-    console.log(`    currentOutput: ${currentOutput}`);
+    logger.debug(`  Executing tilesetStage : ${tilesetStage.name}`);
+    logger.debug(`    currentInput:  ${currentInput}`);
+    logger.debug(`    currentOutput: ${currentOutput}`);
 
     try {
       await TilesetStageExecutor.executeTilesetStageInternal(
@@ -90,9 +97,12 @@ export class TilesetStageExecutor {
         overwrite
       );
     } else if (tilesetStage.name === TilesetStages.TILESET_STAGE_UPGRADE) {
-      const quiet = false;
       const gltfUpgradeOptions = undefined;
-      const tilesetUpgrader = new TilesetUpgrader(quiet, gltfUpgradeOptions);
+      const targetVersion = "1.1";
+      const tilesetUpgrader = new TilesetUpgrader(
+        targetVersion,
+        gltfUpgradeOptions
+      );
       await tilesetUpgrader.upgrade(currentInput, currentOutput, overwrite);
     } else if (tilesetStage.name === TilesetStages.TILESET_STAGE_COMBINE) {
       const externalTilesetDetector = ContentDataTypeChecks.createIncludedCheck(
@@ -133,8 +143,7 @@ export class TilesetStageExecutor {
     overwrite: boolean,
     condition: (type: string | undefined) => boolean
   ): Promise<void> {
-    const quiet = true;
-    const tilesetProcessor = new TilesetDataProcessor(quiet);
+    const tilesetProcessor = new TilesetDataProcessor();
     await tilesetProcessor.begin(currentInput, currentOutput, overwrite);
 
     // The entry processor receives the source entry, and
@@ -179,8 +188,7 @@ export class TilesetStageExecutor {
     currentOutput: string,
     overwrite: boolean
   ): Promise<void> {
-    const quiet = true;
-    const tilesetProcessor = new TilesetDataProcessor(quiet);
+    const tilesetProcessor = new TilesetDataProcessor();
     await tilesetProcessor.begin(currentInput, currentOutput, overwrite);
 
     // The entry processor receives the source entry, and
@@ -235,7 +243,7 @@ export class TilesetStageExecutor {
           const message =
             `    Executing contentStage ${c} of ` +
             `${contentStages.length}: ${contentStage.name}`;
-          console.log(message);
+          logger.debug(message);
 
           await ContentStageExecutor.executeContentStage(
             contentStage,

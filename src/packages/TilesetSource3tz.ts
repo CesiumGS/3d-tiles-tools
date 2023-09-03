@@ -1,4 +1,5 @@
 import fs from "fs";
+import zlib from "zlib";
 
 import { defined } from "../base/defined";
 
@@ -24,7 +25,7 @@ export class TilesetSource3tz implements TilesetSource {
    *
    * This is created from the `"@3dtilesIndex1@"` file of a 3TZ file.
    *
-   * It is an array if `IndexEntry` objects, sorted by the MD5 hash,
+   * It is an array of `IndexEntry` objects, sorted by the MD5 hash,
    * in ascending order.
    */
   private zipIndex: IndexEntry[] | undefined;
@@ -52,35 +53,28 @@ export class TilesetSource3tz implements TilesetSource {
   }
 
   /** {@inheritDoc TilesetSource.getKeys} */
-  getKeys(): IterableIterator<string> {
+  getKeys(): Iterable<string> {
     if (!defined(this.fd) || !this.zipIndex) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
-    return TilesetSource3tz.createKeysIterator(this.fd, this.zipIndex);
+    return TilesetSource3tz.createKeysIterable(this.fd, this.zipIndex);
   }
 
-  private static createKeysIterator(fd: number, zipIndex: IndexEntry[]) {
-    let index = 0;
-    const iterator = {
-      [Symbol.iterator]() {
-        return this;
-      },
-      next(): IteratorResult<string, any> {
-        if (index >= zipIndex.length) {
-          return { value: undefined, done: true };
+  private static createKeysIterable(
+    fd: number,
+    zipIndex: IndexEntry[]
+  ): Iterable<string> {
+    const iterable = {
+      [Symbol.iterator]: function* (): Iterator<string> {
+        for (let index = 0; index < zipIndex.length; index++) {
+          const entry = zipIndex[index];
+          const offset = entry.offset;
+          const fileName = ArchiveFunctions3tz.readFileName(fd, offset);
+          yield fileName;
         }
-        const entry = zipIndex[index];
-        const offset = entry.offset;
-        const fileName = ArchiveFunctions3tz.readFileName(fd, offset);
-        const result = {
-          value: fileName,
-          done: false,
-        };
-        index++;
-        return result;
       },
     };
-    return iterator;
+    return iterable;
   }
 
   /** {@inheritDoc TilesetSource.getValue} */
@@ -88,12 +82,16 @@ export class TilesetSource3tz implements TilesetSource {
     if (!defined(this.fd) || !this.zipIndex) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
-    const entryData = ArchiveFunctions3tz.readEntryData(
-      this.fd,
-      this.zipIndex,
-      key
-    );
-    return entryData;
+    const entry = ArchiveFunctions3tz.readEntry(this.fd, this.zipIndex, key);
+    if (!entry) {
+      return undefined;
+    }
+    if (entry.compression_method === 8) {
+      // Indicating DEFLATE
+      const inflatedData = zlib.inflateRawSync(entry.data);
+      return inflatedData;
+    }
+    return entry.data;
   }
 
   /** {@inheritDoc TilesetSource.close} */

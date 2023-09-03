@@ -1,0 +1,241 @@
+{
+  "asset": {
+    "generator": "glTF-Transform",
+    "version": "2.0"
+  },
+  "accessors": [
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 25,
+      "bufferView": 1,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC4",
+      "componentType": 5126,
+      "count": 25,
+      "bufferView": 1,
+      "byteOffset": 300
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 25,
+      "bufferView": 1,
+      "byteOffset": 700
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 25,
+      "bufferView": 1,
+      "byteOffset": 1000
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 24,
+      "max": [
+        10,
+        10,
+        10
+      ],
+      "min": [
+        -10,
+        -10,
+        -10
+      ],
+      "bufferView": 2,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 24,
+      "bufferView": 2,
+      "byteOffset": 12
+    },
+    {
+      "type": "VEC2",
+      "componentType": 5126,
+      "count": 24,
+      "bufferView": 2,
+      "byteOffset": 24
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 36,
+      "bufferView": 3,
+      "byteOffset": 0
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 1892,
+      "byteLength": 20090
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1052
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1052,
+      "byteLength": 768,
+      "byteStride": 32,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1820,
+      "byteLength": 72,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 21984,
+      "byteLength": 25
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9729,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "textures": [
+    {
+      "source": 0,
+      "sampler": 0
+    }
+  ],
+  "images": [
+    {
+      "name": "bricks",
+      "mimeType": "image/jpeg",
+      "bufferView": 0
+    }
+  ],
+  "buffers": [
+    {
+      "name": "textured_box",
+      "byteLength": 22009
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "metallicFactor": 0,
+        "baseColorTexture": {
+          "index": 0
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 4,
+            "NORMAL": 5,
+            "TEXCOORD_0": 6
+          },
+          "mode": 4,
+          "material": 0,
+          "indices": 7
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "extensions": {
+        "EXT_instance_features": {
+          "featureIds": [
+            {
+              "featureCount": 25,
+              "attribute": 0,
+              "propertyTable": 0
+            }
+          ]
+        },
+        "EXT_mesh_gpu_instancing": {
+          "attributes": {
+            "TRANSLATION": 0,
+            "ROTATION": 1,
+            "SCALE": 2,
+            "_FEATURE_ID_0": 3
+          }
+        }
+      }
+    },
+    {
+      "translation": [
+        1215013.84,
+        4081608.45,
+        4736316.76
+      ],
+      "children": [
+        0
+      ]
+    }
+  ],
+  "scenes": [
+    {
+      "nodes": [
+        1
+      ]
+    }
+  ],
+  "scene": 0,
+  "extensionsUsed": [
+    "EXT_structural_metadata",
+    "EXT_instance_features",
+    "EXT_mesh_gpu_instancing"
+  ],
+  "extensionsRequired": [
+    "EXT_mesh_gpu_instancing"
+  ],
+  "extensions": {
+    "EXT_structural_metadata": {
+      "schema": {
+        "id": "ID_batch_table",
+        "name": "Generated from batch_table",
+        "classes": {
+          "class_batch_table": {
+            "name": "Generated from batch_table",
+            "properties": {
+              "Height": {
+                "name": "Height",
+                "description": "Generated from Height",
+                "type": "SCALAR",
+                "componentType": "UINT8",
+                "required": true
+              }
+            }
+          }
+        }
+      },
+      "propertyTables": [
+        {
+          "name": "Property Table",
+          "class": "class_batch_table",
+          "count": 25,
+          "properties": {
+            "Height": {
+              "values": 4
+            }
+          }
+        }
+      ]
+    }
+  }
+}
