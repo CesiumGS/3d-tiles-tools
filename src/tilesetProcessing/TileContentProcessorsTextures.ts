@@ -1,5 +1,3 @@
-import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
-
 import { TileContentProcessor } from "./TileContentProcessor";
 
 import { KtxEtc1sOptions } from "../ktx/KtxEtc1sOptions";
