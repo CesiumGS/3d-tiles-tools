@@ -23,8 +23,8 @@ import { StructuralMetadataUtils } from "../gltfExtensions/StructuralMetadataUti
 import { PropertyModel } from "../metadata/PropertyModel";
 import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("migration");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("migration");
 
 /**
  * Methods for converting PNTS tile data into GLB

@@ -20,8 +20,8 @@ import { PropertyModel } from "../metadata/PropertyModel";
 import { BinaryPropertyTableModel } from "../metadata/binary/BinaryPropertyTableModel";
 import { BinaryPropertyTableBuilder } from "../metadata/binary/BinaryPropertyTableBuilder";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("migration");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("migration");
 
 /**
  * Methods to transfer information from (legacy) batch table data

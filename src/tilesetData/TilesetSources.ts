@@ -10,8 +10,8 @@ import { TilesetError } from "./TilesetError";
 import { TilesetSource } from "./TilesetSource";
 import { TilesetSourceFs } from "./TilesetSourceFs";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("tilesetData");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("tilesetData");
 
 /**
  * Methods related to `TilesetSource` instances

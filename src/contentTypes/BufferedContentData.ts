@@ -5,8 +5,8 @@ import { Buffers } from "../base/Buffers";
 
 import { ContentData } from "./ContentData";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("tilesetProcessing");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("tilesetProcessing");
 
 /**
  * Implementation of the `ContentData` interface that stores

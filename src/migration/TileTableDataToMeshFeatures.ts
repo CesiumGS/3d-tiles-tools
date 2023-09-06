@@ -7,8 +7,8 @@ import { TileFormatError } from "../tileFormats/TileFormatError";
 import { EXTMeshFeatures } from "../gltfExtensions/EXTMeshFeatures";
 import { FeatureId } from "../gltfExtensions/MeshFeatures";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("migration");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("migration");
 
 /**
  * Methods related to the conversion of legacy tile table data

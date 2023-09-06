@@ -7,8 +7,8 @@ import { Extensions } from "../../tilesets/Extensions";
 
 import { TilesetUpgradeOptions } from "./TilesetUpgradeOptions";
 
-import { LoggerFactory } from "../../logging/LoggerFactory";
-const logger = LoggerFactory("upgrade");
+import { Loggers } from "../../logging/Loggers";
+const logger = Loggers.get("upgrade");
 
 /**
  * A class for "upgrading" the `Tileset` object that was parsed from

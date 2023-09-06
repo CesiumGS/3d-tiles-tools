@@ -17,8 +17,8 @@ import { TilesetEntry } from "../tilesetData/TilesetEntry";
 
 import { TileFormatsMigration } from "../migration/TileFormatsMigration";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("upgrade");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("upgrade");
 
 /**
  * A class for "upgrading" a tileset from a previous version to

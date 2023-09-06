@@ -5,8 +5,8 @@ import path from "path";
 import { Pipeline } from "./Pipeline";
 import { TilesetStageExecutor } from "./TilesetStageExecutor";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("pipeline");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("pipeline");
 
 /**
  * Methods to execute `Pipeline` objects.
