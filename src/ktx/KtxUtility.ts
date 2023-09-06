@@ -2,12 +2,11 @@ import sharp from "sharp";
 import fs from "fs";
 import path from "path";
 
-import { DataError } from "../base/DataError";
-
 import { BasisEncoder } from "./BasisEncoder";
 import { KtxOptions } from "./KtxOptions";
 import { KtxEtc1sOptions } from "./KtxEtc1sOptions";
 import { KtxUastcOptions } from "./KtxUastcOptions";
+import { KtxError } from "./KtxError";
 
 import { LoggerFactory } from "../logging/LoggerFactory";
 const logger = LoggerFactory("KTX");
@@ -26,6 +25,8 @@ export class KtxUtility {
    * @param inputFileName - The input file name
    * @param outputFileName - The output file name
    * @param options The options for the KTX compression
+   * @throws KtxError If the input data could not be read or
+   * encoded to KTX
    */
   static async convertImageFile(
     inputFileName: string,
@@ -54,6 +55,8 @@ export class KtxUtility {
    * @param inputImageData - The input file name
    * @param options The options for the KTX compression
    * @returns The KTX compressed data
+   * @throws KtxError If the input data could not be read or
+   * encoded to KTX
    */
   static async convertImageData(
     inputImageData: Buffer,
@@ -69,7 +72,7 @@ export class KtxUtility {
       .raw()
       .toBuffer();
     if (!imageWidth || !imageHeight) {
-      throw new DataError("Could not determine size of image data");
+      throw new KtxError("Could not determine size of image data");
     }
     const result = await KtxUtility.encodeImageData(
       imageWidth,
@@ -89,6 +92,8 @@ export class KtxUtility {
    * @param rgbaPixels The pixels
    * @param options The options for the KTX compression
    * @returns The KTX data
+   * @throws KtxError If the input data could not be
+   * encoded to KTX
    */
   private static async encodeImageData(
     imageWidth: number,
@@ -117,17 +122,28 @@ export class KtxUtility {
       false
     );
 
-    const basisData = new Uint8Array(imageWidth * imageHeight * 4 * 100);
+    // Allocate a buffer that should be large enough to hold the
+    // encoded data.
+    // NOTE: The example code for the basis encoder pragmatically says that
+    // > "If this buffer isn't large enough compression will fail"
+    // There doesn't seem to be a way to determine (or even just estimate)
+    // the required size. A base size of `w*h*4` (for RGBA pixels) sounds
+    // reasonable, with a factor of `* 2` to be safe...
+    const basisData = new Uint8Array(imageWidth * imageHeight * 4 * 2);
 
-    logger.info(`Encoding ${imageWidth}x${imageHeight} pixels to KTX`);
-    if (logger.isLevelEnabled("debug")) {
-      logger.debug(`Encoding options:\n${JSON.stringify(options, null, 2)}`);
+    logger.debug(`Encoding ${imageWidth}x${imageHeight} pixels to KTX`);
+    if (logger.isLevelEnabled("trace")) {
+      logger.trace(`Encoding options: ${JSON.stringify(options)}`);
     }
 
     const resultSize = basisEncoder.encode(basisData);
+    if (resultSize === 0) {
+      throw new KtxError("Could not encode image data to KTX");
+    }
+
     const result = Buffer.from(basisData.subarray(0, resultSize));
 
-    logger.info(`Encoding ${imageWidth}x${imageHeight} pixels to KTX DONE`);
+    logger.debug(`Encoding ${imageWidth}x${imageHeight} pixels to KTX DONE`);
 
     return result;
   }
