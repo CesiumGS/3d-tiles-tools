@@ -29,8 +29,8 @@ import { EXTInstanceFeatures } from "../gltfExtensions/EXTInstanceFeatures";
 import { InstanceFeaturesUtils } from "../gltfExtensions/InstanceFeaturesUtils";
 import { StructuralMetadataUtils } from "../gltfExtensions/StructuralMetadataUtils";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("migration");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("migration");
 
 /**
  * Methods for converting I3DM tile data into GLB

@@ -1,7 +1,7 @@
 import { Content } from "../structure/Content";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("tilesets");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("tilesets");
 
 /**
  * Utility methods related to tile content, given as `Content` object.

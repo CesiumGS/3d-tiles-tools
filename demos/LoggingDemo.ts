@@ -1,8 +1,8 @@
-import { LoggerFactory } from "../src/logging/LoggerFactory";
+import { Loggers } from "../src/logging/Loggers";
 
 // Create a default logger to use in this file.
 // (The __fileName is optional)
-const logger = LoggerFactory(__filename);
+const logger = Loggers.get(__filename);
 
 logger.trace("trace");
 logger.debug("debug");
@@ -28,7 +28,7 @@ childLogger.error(new Error("thrownError"));
 childLogger.fatal("fatal");
 
 // Create a "custom" logger with a special name
-const customLogger = LoggerFactory("Demo");
+const customLogger = Loggers.get("Demo");
 
 customLogger.trace("trace");
 customLogger.debug("debug");

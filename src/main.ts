@@ -1,8 +1,8 @@
 import yargs from "yargs/yargs";
 import { DeveloperError } from "./base/DeveloperError";
 
-import { LoggerFactory } from "./logging/LoggerFactory";
-const logger = LoggerFactory("CLI");
+import { Loggers } from "./logging/Loggers";
+const logger = Loggers.get("CLI");
 
 import { ToolsMain } from "./ToolsMain";
 

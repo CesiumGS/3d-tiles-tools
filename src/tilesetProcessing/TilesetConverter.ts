@@ -8,8 +8,8 @@ import { Tilesets } from "../tilesets/Tilesets";
 
 import { ZipToPackage } from "../packages/ZipToPackage";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("tilesetProcessing");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("tilesetProcessing");
 
 /**
  * Methods for converting tilesets between different storage formats.

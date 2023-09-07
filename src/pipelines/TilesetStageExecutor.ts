@@ -15,8 +15,8 @@ import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("pipeline");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("pipeline");
 
 /**
  * Methods to execute `TilesetStage` objects.

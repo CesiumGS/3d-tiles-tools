@@ -22,8 +22,8 @@ import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 
 import { Paths } from "../base/Paths";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("tilesetProcessing");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("tilesetProcessing");
 
 /**
  * Implementation of a `TilesetProcessor` that offers methods for

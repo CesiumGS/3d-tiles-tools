@@ -9,8 +9,8 @@ import { TilesetEntryProcessor } from "./TilesetEntryProcessor";
 import { TilesetProcessorContext } from "./TilesetProcessorContext";
 import { TilesetProcessorContexts } from "./TilesetProcessorContexts";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("tilesetProcessing");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("tilesetProcessing");
 
 /**
  * A base class for classes that can process tilesets.

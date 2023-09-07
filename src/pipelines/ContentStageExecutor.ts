@@ -17,8 +17,8 @@ import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 import { ContentOps } from "../contentProcessing/ContentOps";
 import { TileFormatsMigration } from "../migration/TileFormatsMigration";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("pipeline");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("pipeline");
 
 /**
  * Methods to execute `ContentStage` objects.

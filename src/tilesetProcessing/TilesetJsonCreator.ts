@@ -28,8 +28,8 @@ import { TileTableData } from "../tileTableData/TileTableData";
 import { TileTableDataI3dm } from "../tileTableData/TileTableDataI3dm";
 import { VecMath } from "../tileTableData/VecMath";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("tilesetProcessing");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("tilesetProcessing");
 
 const DEFAULT_LEAF_GEOMETRIC_ERROR = 512;
 const DEFAULT_TILESET_GEOMETRIC_ERROR = 4096;

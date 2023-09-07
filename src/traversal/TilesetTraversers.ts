@@ -18,8 +18,8 @@ import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 import { TilesetSource3tz } from "../packages/TilesetSource3tz";
 import { Paths } from "../base/Paths";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("traversal");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("traversal");
 
 /**
  * Internal utility methods for tileset traversal, used for

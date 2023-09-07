@@ -25,8 +25,8 @@ import { TilesetConverter } from "./tilesetProcessing/TilesetConverter";
 
 import { TilesetJsonCreator } from "./tilesetProcessing/TilesetJsonCreator";
 
-import { LoggerFactory } from "./logging/LoggerFactory";
-const logger = LoggerFactory("CLI");
+import { Loggers } from "./logging/Loggers";
+const logger = Loggers.get("CLI");
 
 /**
  * Functions that directly correspond to the command line functionality.
