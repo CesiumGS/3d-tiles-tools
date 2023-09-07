@@ -11,3 +11,5 @@ package-lock.json
 /specs/data/output
 /specs/data/migration/output_gltf
 /specs/data/migration/output
+/packages/**/build
+*.tsbuildinfo

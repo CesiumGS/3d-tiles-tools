@@ -1,31 +1,31 @@
 import fs from "fs";
 import path from "path";
 
-import { Paths } from "./base/Paths";
-import { DeveloperError } from "./base/DeveloperError";
-import { Buffers } from "./base/Buffers";
-import { Iterables } from "./base/Iterables";
+import { Paths } from "@3d-tiles-tools/all";
+import { DeveloperError } from "@3d-tiles-tools/all";
+import { Buffers } from "@3d-tiles-tools/all";
+import { Iterables } from "@3d-tiles-tools/all";
 
-import { Tilesets } from "./tilesets/Tilesets";
+import { Tilesets } from "@3d-tiles-tools/all";
 
-import { TileFormats } from "./tileFormats/TileFormats";
-import { TileDataLayouts } from "./tileFormats/TileDataLayouts";
+import { TileFormats } from "@3d-tiles-tools/all";
+import { TileDataLayouts } from "@3d-tiles-tools/all";
 
-import { ContentOps } from "./contentProcessing/ContentOps";
-import { GltfUtilities } from "./contentProcessing/GltfUtilities";
+import { ContentOps } from "@3d-tiles-tools/all";
+import { GltfUtilities } from "@3d-tiles-tools/all";
 
-import { ContentDataTypes } from "./contentTypes/ContentDataTypes";
+import { ContentDataTypes } from "@3d-tiles-tools/all";
 
-import { PipelineExecutor } from "./pipelines/PipelineExecutor";
-import { Pipelines } from "./pipelines/Pipelines";
+import { PipelineExecutor } from "@3d-tiles-tools/all";
+import { Pipelines } from "@3d-tiles-tools/all";
 
-import { TileFormatsMigration } from "./migration/TileFormatsMigration";
+import { TileFormatsMigration } from "@3d-tiles-tools/all";
 
-import { TilesetConverter } from "./tilesetProcessing/TilesetConverter";
+import { TilesetConverter } from "@3d-tiles-tools/all";
 
-import { TilesetJsonCreator } from "./tilesetProcessing/TilesetJsonCreator";
+import { TilesetJsonCreator } from "@3d-tiles-tools/all";
 
-import { Loggers } from "./logging/Loggers";
+import { Loggers } from "@3d-tiles-tools/all";
 const logger = Loggers.get("CLI");
 
 /**

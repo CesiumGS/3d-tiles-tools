@@ -1,7 +1,10 @@
 import yargs from "yargs/yargs";
-import { DeveloperError } from "./base/DeveloperError";
 
-import { Loggers } from "./logging/Loggers";
+import { DeveloperError } from "@3d-tiles-tools/all";
+
+
+
+import { Loggers } from "@3d-tiles-tools/all";
 const logger = Loggers.get("CLI");
 
 import { ToolsMain } from "./ToolsMain";

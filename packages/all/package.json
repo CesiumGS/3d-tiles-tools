@@ -1,40 +1,58 @@
 {
-  "private": true,
-  "name": "3d-tiles-tools",
+  "name": "@3d-tiles-tools/all",
   "version": "0.3.0",
-  "license": "Apache-2.0",
   "description": "3D Tiles tools",
-  "author": {
-    "name": "Cesium GS, Inc. and Contributors"
-  },
-  "keywords": [
-    "3D Tiles"
-  ],
-  "homepage": "https://github.com/CesiumGS/3d-tiles-tools",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/CesiumGS/3d-tiles-tools.git"
-  },
-  "bugs": {
-    "url": "https://github.com/CesiumGS/3d-tiles-tools/issues"
-  },
-  "engines": {
-    "node": ">=16.0.0"
-  },
   "type": "module",
-  "workspaces": [
-    "packages/*"
-  ],
-  "dependencies": {
-    "@3d-tiles-tools/cli": "^0.3.0",
-    "@3d-tiles-tools/all": "^0.3.0"
-  }  ,
-  "devDependencies": {
-    "@3d-tiles-tools/cli": "^0.3.0",
-    "@3d-tiles-tools/all": "^0.3.0"
-  }  ,
+  "source": "./src/index.ts",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
+  "bin": {
+    "3d-tiles-tools": "./build/main"
+  },
+  "dependencies": {
+    "@gltf-transform/core": "^3.2.1",
+    "@gltf-transform/extensions": "^3.2.1",
+    "@gltf-transform/functions": "^3.2.1",
+    "archiver": "^5.3.1",
+    "better-sqlite3": "^8.0.1",
+    "cesium": "^1.103.0",
+    "draco3d": "^1.5.6",
+    "draco3dgltf": "^1.5.6",
+    "gltf-pipeline": "^4.1.0",
+    "gltfpack": "^0.19.1",
+    "minimist": "^1.2.7",
+    "node-stream-zip": "^1.15.0",
+    "pino": "^8.15.0",
+    "pino-pretty": "^10.2.0",
+    "seedrandom": "^3.0.5",
+    "sharp": "^0.32.1",
+    "yargs": "^17.5.1"
+  },
+  "devDependencies": {
+    "@microsoft/api-documenter": "^7.19.24",
+    "@microsoft/api-extractor": "^7.33.6",
+    "@types/archiver": "^5.3.1",
+    "@types/better-sqlite3": "^7.6.2",
+    "@types/draco3d": "^1.4.2",
+    "@types/jasmine": "^4.0.3",
+    "@types/minimist": "^1.2.2",
+    "@types/seedrandom": "^3.0.2",
+    "@types/yargs": "^17.0.22",
+    "@typescript-eslint/eslint-plugin": "^5.38.0",
+    "@typescript-eslint/parser": "^5.38.0",
+    "del-cli": "^5.0.0",
+    "eslint": "^8.23.1",
+    "eslint-config-cesium": "^9.0.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-node": "^11.1.0",
+    "jasmine": "^4.3.0",
+    "mkdirp": "^1.0.4",
+    "nyc": "^15.1.0",
+    "prettier": "2.7.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.3"
+  },
+
   "scripts": {
     "about:start": "echo 'Start the tools, as a TypeScript command line application'",
     "about:eslint": "echo 'Perform linting of the source code. This may modify the source files.'",
@@ -73,3 +91,7 @@
     "package": "npm run package-clean && npm run package-prepare && npm run package-copy && npm pack"
   }
 }
+
+
+
+

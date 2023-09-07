@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2021",
-    "outDir": "build",
+    "outDir": "./build",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -18,9 +18,19 @@
       "es2021"
     ],
     "paths": {
-      "*": [ "./src/*.d.ts"]
+      "*": [ "./src/*.d.ts"],
     },
   },
   "include": ["src" ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "references": [
+    {
+      "path": "./packages/all/tsconfig.json"
+    },
+    {
+      "path": "./packages/cli/tsconfig.json"
+    }
+  ]
+
+
 }

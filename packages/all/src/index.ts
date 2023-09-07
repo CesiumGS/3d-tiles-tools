@@ -117,3 +117,29 @@ export * from "./traversal/SubtreeModels";
 export * from "./traversal/TilesetTraverser";
 export * from "./traversal/TraversedTile";
 export * from "./traversal/TraversalCallback";
+
+
+
+// These are not required for the validator
+
+export * from "./logging/Loggers";
+
+export * from "./tilesets/Tilesets";
+
+export *  from "./tileFormats/TileFormats";
+export *  from "./tileFormats/TileDataLayouts";
+
+export *  from "./contentProcessing/ContentOps";
+export *  from "./contentProcessing/GltfUtilities";
+
+export *  from "./contentTypes/ContentDataTypes";
+
+export *  from "./pipelines/PipelineExecutor";
+export *  from "./pipelines/Pipelines";
+
+export *  from "./migration/TileFormatsMigration";
+
+export *  from "./tilesetProcessing/TilesetConverter";
+
+export *  from "./tilesetProcessing/TilesetJsonCreator";
+
