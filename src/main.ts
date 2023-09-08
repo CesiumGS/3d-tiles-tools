@@ -2,7 +2,7 @@ import yargs from "yargs/yargs";
 import { DeveloperError } from "./base/DeveloperError";
 
 import { Loggers } from "./logging/Loggers";
-const logger = Loggers.get("CLI");
+let logger = Loggers.get("CLI");
 
 import { ToolsMain } from "./ToolsMain";
 
@@ -76,6 +76,21 @@ function parseToolArgs(a: string[]) {
         alias: "force",
         default: false,
         description: "Output can be overwritten if it already exists.",
+        global: true,
+        type: "boolean",
+      },
+      logLevel: {
+        default: "info",
+        description:
+          "The log level. Valid values are 'trace', 'debug', 'info', " +
+          "'warn', 'error', 'fatal', and 'silent'",
+        global: true,
+        type: "string",
+      },
+      logJson: {
+        default: false,
+        description:
+          "Whether log messages should be printed as JSON instead of pretty-printing",
         global: true,
         type: "boolean",
       },
@@ -305,6 +320,33 @@ async function run() {
   if (!parsedToolArgs) {
     return;
   }
+
+  const logJson = parsedToolArgs.logJson;
+  if (logJson === true) {
+    const prettyPrint = false;
+    Loggers.initDefaultLogger(prettyPrint);
+    logger = Loggers.get("CLI");
+  }
+
+  const logLevel = parsedToolArgs.logLevel;
+  if (logLevel !== undefined) {
+    const validLogLevels = [
+      "trace",
+      "debug",
+      "info",
+      "warn",
+      "error",
+      "fatal",
+      "silent",
+    ];
+    if (validLogLevels.includes(logLevel)) {
+      Loggers.setLevel(logLevel);
+    } else {
+      logger.warn(`Invalid log level: ${logLevel}`);
+      Loggers.setLevel("info");
+    }
+  }
+
   logger.trace("Parsed command line arguments:");
   logger.trace(parsedToolArgs);
 

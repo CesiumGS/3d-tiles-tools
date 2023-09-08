@@ -21,6 +21,9 @@ If you want to work directly with a clone of the Git repository, see [Developer 
 |`-i`, `--input`|Input file or directory| Yes|
 |`-o`, `--output`|Output file or directory |Yes|
 |`-f`, `--force`|Overwrite output if it exists|No, default `false`|
+|`--logLevel`|The log level. Valid values are `trace`, `debug`, `info`, `warn`, `error`, `fatal`, and `silent` |No, default `info`|
+|`--logJson`|Print log messages as JSON instead of pretty-printed|No, default `false`|
+
 
 ### Command line tools for tilesets
 

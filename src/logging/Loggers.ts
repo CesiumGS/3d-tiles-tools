@@ -7,12 +7,13 @@ export class Loggers {
   /**
    * A mapping from names to logger instances
    */
-  private static readonly allLoggers: { [key: string]: Logger } = {};
+  private static allLoggers: { [key: string]: Logger } = {};
 
   /**
    * The default (root) logger
    */
-  private static readonly defaultLogger = Loggers.createDefaultLogger(
+  private static defaultLogger = Loggers.createDefaultLogger(
+    true,
     true,
     undefined
   );
@@ -28,11 +29,12 @@ export class Loggers {
    */
   private static createDefaultLogger(
     toConsole?: boolean,
+    prettyPrint?: boolean,
     logFilePath?: string
   ): Logger {
-    const consoleLogLevel = process.env.LOG_LEVEL || "trace";
-    const fileLogLevel = process.env.LOG_LEVEL || "trace";
-    const globalLogLevel = process.env.LOG_LEVEL || "trace";
+    const consoleLogLevel = "info";
+    const fileLogLevel = "trace";
+    const globalLogLevel = "trace";
 
     const transportTargetOptionsList: TransportTargetOptions[] = [];
 
@@ -40,7 +42,7 @@ export class Loggers {
     if (toConsole !== false) {
       const consoleTargetOptions = {
         level: consoleLogLevel,
-        target: "pino-pretty",
+        target: prettyPrint ? "pino-pretty" : "pino/file",
         options: {},
       };
       transportTargetOptionsList.push(consoleTargetOptions);
@@ -99,6 +101,29 @@ export class Loggers {
       return name;
     }
     return loggerName;
+  }
+
+  /**
+   * Initialize the default logger.
+   *
+   * This is supposed to be called at application startup (from the
+   * command line), and creates the logger that all loggers will be
+   * children of.
+   *
+   * @param prettyPrint - Whether the logger should be pretty-printing
+   * to the console
+   */
+  static initDefaultLogger(prettyPrint?: boolean) {
+    const toConsole = true;
+    const logFilePath = undefined;
+    const newDefaultLogger = Loggers.createDefaultLogger(
+      toConsole,
+      prettyPrint,
+      logFilePath
+    );
+    Loggers.defaultLogger = newDefaultLogger;
+    Loggers.allLoggers = {};
+    Loggers.allLoggers[""] = newDefaultLogger;
   }
 
   /**
