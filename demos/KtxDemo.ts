@@ -13,7 +13,6 @@ async function convertImageFileEtc1s() {
     compressionLevel: 2,
     qualityLevel: 128,
     transferFunction: "SRGB",
-    //debug: true,
   };
 
   console.log("Converting " + inputFileName);
@@ -37,7 +36,6 @@ async function convertImageFileUastc() {
     rdo_d: 8192,
     zstd: 1,
     transferFunction: "SRGB",
-    debug: true,
   };
 
   console.log("Converting " + inputFileName);
@@ -73,7 +71,7 @@ async function convertImageData() {
 
 async function runDemo() {
   await convertImageFileEtc1s();
-  //await convertImageFileUastc();
+  await convertImageFileUastc();
   await convertImageData();
 }
 
