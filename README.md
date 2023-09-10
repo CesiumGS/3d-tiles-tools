@@ -71,17 +71,40 @@ Additional command line options:
 
 | Flag | Description | Required |
 | ---- | ----------- | -------- |
+|`--targetVersion`|The target version to upgrade to. May be `1.0` or `1.1`.| No. Default: `1.0` |
 |`--options`|All arguments past this flag are consumed by gltf-pipeline.| No |
 
-The exact behavior of the upgrade operation is not yet specified. But when B3DM- and I3DM tile content in the input tileset uses glTF 1.0 assets, then the upgrade step will try to upgrade these assets to glTF 2.0.
+By default, this will upgrade legacy tilesets to comply to the 3D Tiles 1.0 specification.
 
-> Implementation Note:
->
-> The upgrade command also tries to upgrade glTF assets that are embedded into B3DM or I3DM tiles. Internally, this is achieved by processing the GLB data with [`gltf-pipeline`](https://github.com/CesiumGS/gltf-pipeline/). This upgrade will include the attempt to convert glTF 1.0 assets into glTF 2.0 assets. And it will include the attempt to convert materials that are given with the `KHR_technique_webgl` extension into PBR materials. Options that are given after the `--options` parameter are passed to `gltf-pipeline`. These options may include the names of uniform variables that should indicate whether a certain texture is used as the "base color" texture of a PRB material. For example, when a tileset contains B3DM or I3DM data that contains GLB with the `KHR_technique_webgl` extension where the uniform names `u_diff_tex` and `u_diffuse` indicate that a texture should be a base color texture, then the command line
+These upgrades include:
+
+- The asset version will be set to `'1.0'`.
+- Tile content that uses a `url` will be upgraded to use `uri`.
+- The `refine` value will be converted to be in all-uppercase.
+- glTF 1.0 models in B3DM or I3DM will be upgraded to glTF 2.0.
+
+> Implementation note:
+> 
+> Internally, the conversion of glTF 1.0 assets into glTF 2.0 assets is performed by processing the GLB data with [`gltf-pipeline`](https://github.com/CesiumGS/gltf-pipeline/). This will include the attempt to convert materials that are given with the `KHR_technique_webgl` extension into PBR materials. Options that are given after the `--options` parameter are passed to `gltf-pipeline`. These options may include the names of uniform variables that should indicate whether a certain texture is used as the "base color" texture of a PRB material. For example, when a tileset contains B3DM or I3DM data that contains GLB with the `KHR_technique_webgl` extension where the uniform names `u_diff_tex` and `u_diffuse` indicate that a texture should be a base color texture, then the command line
 > ```
 > npx 3d-tiles-tools upgrade -i ./input/tileset.json -o ./output/tileset.json --options --baseColorTextureNames u_diff_tex --baseColorTextureNames u_diffuse
 > ```
 > can be used.
+
+When `--targetVersion 1.1` is given, then this will upgrade legacy tilesets to comply to the 3D Tiles 1.1 specification, _including_ an attempt to convert PNTS, B3DM, and I3DM tile content into glTF assets. The upgrades then include:
+
+- The asset version will be set to `'1.1'`.
+- Tile content that uses a `url` will be upgraded to use `uri`.
+- The `refine` value will be converted to be in all-uppercase.
+- glTF 1.0 models in B3DM or I3DM will be upgraded to glTF 2.0.
+- The `3DTILES_content_gltf` extension declaration will be removed.
+- PNTS, B3DM, and I3DM content will be converted to glTF.
+
+> Implementation note:
+> 
+> The conversion of the legacy tile formats to glTF should be considered as a _preview feature_. There are corner cases where the conversion is not possible generically - for example, when I3DM tile content contains glTF data that contains _animations_. The conditions under which the conversion is possible may be specified more explicitly in the future. 
+
+
 
 
 #### convert
@@ -93,6 +116,12 @@ Convert between tilesets and tileset package formats.
 npx 3d-tiles-tools convert -i ./specs/data/TilesetOfTilesets/tileset.json -o ./output/TilesetOfTilesets.3tz
 ```
 
+Additional command line options:
+
+| Flag | Description | Required |
+| ---- | ----------- | -------- |
+|`--inputTilesetJsonFileName`|The name of the input file that should be considered to be the top-level tileset JSON file| No |
+
 The input- and output arguments for this command may be
 
 - The name of a directory that contains a `tileset.json` file (or the full path to a tileset JSON file)
@@ -100,6 +129,11 @@ The input- and output arguments for this command may be
 - The name of a `.3dtiles` file
 
 The input may also be a `.zip` file that contains a `tileset.json` file.
+
+When the input is a `.zip` file or a directory that contains multiple tileset JSON files, and none of them is called `tileset.json`, then the `--inputTilesetJsonFileName` argument can be used to define the JSON file that should be considered to be the top-level tileset JSON. For example, when there is an `ambiguous.zip` tile that does contain two JSON files called `tilesetA.json` and `tilesetB.json`, the following command can be used to designate `tilesetA.json` as the top-level tileset JSON file:
+```
+npx 3d-tiles-tools convert -i ./specs/data/convert/ambiguous.zip -o ./output/ambiguous.3tz --inputTilesetJsonFileName tilesetA.json
+```
 
 #### databaseToTileset
 

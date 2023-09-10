@@ -7,6 +7,8 @@ import { ReadablePointCloud } from "./ReadablePointCloud";
 /**
  * Implementation of a `ReadablePointCloud` where the
  * attribute values may be set directly.
+ *
+ * @internal
  */
 export class DefaultPointCloud implements ReadablePointCloud {
   /**

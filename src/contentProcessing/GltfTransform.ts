@@ -2,13 +2,16 @@ import draco3d from "draco3d";
 
 import { Transform } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
-import { KHRONOS_EXTENSIONS } from "@gltf-transform/extensions";
+import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
 
-import { EXTMeshFeatures } from "../gltfMetadata/EXTMeshFeatures";
-import { EXTStructuralMetadata } from "../gltfMetadata/EXTStructuralMetadata";
+import { EXTStructuralMetadata } from "../gltfExtensions/EXTStructuralMetadata";
+import { EXTMeshFeatures } from "../gltfExtensions/EXTMeshFeatures";
+import { EXTInstanceFeatures } from "../gltfExtensions/EXTInstanceFeatures";
 
 /**
  * Utilities for using glTF-Transform in the 3D Tiles tools
+ *
+ * @internal
  */
 export class GltfTransform {
   /**
@@ -21,8 +24,9 @@ export class GltfTransform {
    * Returns the `gltf-transform` `NodeIO` instance, preconfigured
    * for the use in the 3D Tiles Tools.
    *
-   * (E.g. it will be configured to handle the Khronos extensions,
-   * EXT_mesh_features, and have a draco encoder/decoder)
+   * (E.g. it will be configured to handle the all extensions that
+   * are known in glTF-Transform, as well as EXT_mesh_features and
+   * EXT_structural_metadata, and have a draco encoder/decoder)
    *
    * @returns - The `NodeIO` instance
    */
@@ -31,16 +35,17 @@ export class GltfTransform {
       return GltfTransform.io;
     }
     const io = new NodeIO();
-    io.registerExtensions(KHRONOS_EXTENSIONS).registerDependencies({
+    io.registerExtensions(ALL_EXTENSIONS).registerDependencies({
       "draco3d.decoder": await draco3d.createDecoderModule(),
       "draco3d.encoder": await draco3d.createEncoderModule(),
     });
-    // Note: The order of these calls matters. The EXTMeshFeatures depend
-    // on the EXTStructuralMetadata, because the EXTMeshFeatures may
-    // refer to PropertyTable objects via their FeatureId. So the
-    // EXTStructuralMetadata has to be read first.
+    // Note: The order of these calls matters. The EXTMeshFeatures and
+    // EXTInstanceFeatures depend on the EXTStructuralMetadata, because
+    // they may refer to PropertyTable objects via their FeatureId.
+    // So the EXTStructuralMetadata has to be read first.
     io.registerExtensions([EXTStructuralMetadata]);
     io.registerExtensions([EXTMeshFeatures]);
+    io.registerExtensions([EXTInstanceFeatures]);
     GltfTransform.io = io;
     return io;
   }

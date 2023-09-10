@@ -1,0 +1,29 @@
+{
+  "asset": {
+    "version": "1.1"
+  },
+  "geometricError": 4096,
+  "root": {
+    "boundingVolume": {
+      "box": [
+        1215013.369315262,
+        -4736318.923572363,
+        4081608.292171861,
+        105.34341248765122,
+        0,
+        0,
+        0,
+        -84.88524048496038,
+        0,
+        0,
+        0,
+        77.50599225633778
+      ]
+    },
+    "geometricError": 512,
+    "content": {
+      "uri": "instancedOrientation.i3dm"
+    },
+    "refine": "ADD"
+  }
+}

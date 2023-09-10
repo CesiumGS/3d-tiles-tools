@@ -78,12 +78,30 @@ function parseToolArgs(a: string[]) {
     })
     .command(
       "convert",
-      "Convert between tilesets and tileset package formats. " +
-        "The input and output can be paths to tileset JSON files, " +
-        "'.3tz', or '.3dtiles' files.",
+      "Convert between tilesets and tileset package formats.\n" +
+        "The input and output can be one of the following:\n" +
+        "- The path of a tileset JSON file\n" +
+        "- The path of a directory that contains a 'tileset.json' file\n" +
+        "- The path of a '.3tz' file\n" +
+        "- The path of a '.3dtiles' file\n" +
+        "\n" +
+        "The input can also be the path of a ZIP file that contains the " +
+        "tileset data. The tileset JSON file in this ZIP is determined " +
+        "by the 'inputTilesetJsonFileName', which is 'tileset.json' by " +
+        "default.",
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
+        inputTilesetJsonFileName: {
+          description:
+            "The name of the tileset JSON file in the input. " +
+            "This is only required when the input is a ZIP file that " +
+            "contains a tileset JSON file that is not called 'tileset.json'.",
+          default: "tileset.json",
+          global: true,
+          normalize: true,
+          type: "string",
+        },
       }
     )
     .command(
@@ -190,7 +208,7 @@ function parseToolArgs(a: string[]) {
     )
     .command(
       "upgrade",
-      "Upgrades legacy tilests to comply to the 3D Tiles specification.\n\n" +
+      "Upgrades legacy tilesets to comply to the 3D Tiles specification.\n\n" +
         "By default, this will upgrade legacy tilesets to comply to 3D Tiles 1.0. " +
         "These upgrades include:\n" +
         "- The asset version will be set to '1.0'\n" +
@@ -203,7 +221,7 @@ function parseToolArgs(a: string[]) {
         "- Content that uses a 'url' will be upgraded to use 'uri'.\n" +
         "- The 'refine' value will be converted to be in all-uppercase.\n" +
         "- The '3DTILES_content_gltf' extension declaration will be removed.\n" +
-        "- PNTS and B3DM content will be converted to glTF.\n" +
+        "- PNTS, B3DM, and I3DM content will be converted to glTF.\n" +
         "\n",
       {
         i: inputStringDefinition,
@@ -240,10 +258,20 @@ function parseToolArgs(a: string[]) {
       "Unpack a tileset database to a tileset folder. (Deprecated - use 'convert' instead)",
       { i: inputStringDefinition, o: outputStringDefinition }
     )
+    .command(
+      "createTilesetJson",
+      "Creates a 'tileset.json' file that just refers to given GLB tile content files. " +
+        "If the input is a single file, then this will result in a single (root) tile with " +
+        "the input file as its tile content. If the input is a directory, then all files" +
+        "with '.glb' file extension in this directory will be used as tile content, " +
+        "recursively.",
+      { i: inputStringDefinition, o: outputStringDefinition }
+    )
     .demandCommand(1)
     .strict();
 
-  return args.argv as any;
+  const result = args.argv as any;
+  return result;
 }
 
 /**
@@ -273,9 +301,11 @@ console.log("Parsed command line arguments:");
 console.log(parsedToolArgs);
 //*/
 
-const command = parsedToolArgs._[0];
-
 async function run() {
+  if (!parsedToolArgs) {
+    return;
+  }
+  const command = parsedToolArgs._[0];
   console.time("Total");
   await runCommand(command, parsedToolArgs, optionArgs);
   console.timeEnd("Total");
@@ -325,14 +355,19 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
     console.log(
       `The 'tilesetToDatabase' command is deprecated. Use 'convert' instead.`
     );
-    await ToolsMain.convert(input, output, force);
+    await ToolsMain.convert(input, undefined, output, force);
   } else if (command === "databaseToTileset") {
     console.log(
       `The 'databaseToTileset' command is deprecated. Use 'convert' instead.`
     );
-    await ToolsMain.convert(input, output, force);
+    await ToolsMain.convert(input, undefined, output, force);
   } else if (command === "convert") {
-    await ToolsMain.convert(input, output, force);
+    await ToolsMain.convert(
+      input,
+      toolArgs.inputTilesetJsonFileName,
+      output,
+      force
+    );
   } else if (command === "combine") {
     await ToolsMain.combine(input, output, force);
   } else if (command === "upgrade") {
@@ -349,6 +384,8 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
     await ToolsMain.pipeline(input, force);
   } else if (command === "analyze") {
     ToolsMain.analyze(input, output, force);
+  } else if (command === "createTilesetJson") {
+    await ToolsMain.createTilesetJson(input, output, force);
   } else {
     throw new DeveloperError(`Invalid command: ${command}`);
   }

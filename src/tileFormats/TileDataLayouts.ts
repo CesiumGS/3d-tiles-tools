@@ -7,6 +7,8 @@ import { TileFormatError } from "./TileFormatError";
  *
  * A "block" can be the feature- and batch table JSON and binary,
  * as well as the payload.
+ *
+ * @internal
  */
 export interface TileDataBlockLayout {
   start: number;
@@ -17,6 +19,8 @@ export interface TileDataBlockLayout {
 /**
  * An interface describing the layout of tile data (B3DM,
  * I3DM and PNTS)
+ *
+ * @internal
  */
 export interface TileDataLayout {
   magic: string;

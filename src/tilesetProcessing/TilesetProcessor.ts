@@ -19,6 +19,8 @@ import { TilesetProcessorContexts } from "./TilesetProcessorContexts";
  * Subclasses can access the `TilesetProcessorContext`, which
  * contains the parsed tileset and its schema, and can offer
  * predefined sets of more specialized operations.
+ *
+ * @internal
  */
 export abstract class TilesetProcessor {
   /**
@@ -247,9 +249,7 @@ export abstract class TilesetProcessor {
    * @param key - The key (file name)
    * @returns The object containing the entry and its type
    */
-  private async fetchSourceEntry(
-    key: string
-  ): Promise<TilesetEntry | undefined> {
+  async fetchSourceEntry(key: string): Promise<TilesetEntry | undefined> {
     const context = this.getContext();
     const tilesetSource = context.tilesetSource;
 

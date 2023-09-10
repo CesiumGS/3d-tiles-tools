@@ -9,6 +9,8 @@ import { Table } from "./Table";
  *
  * Instances of this interface can be read from buffers
  * with methods in the `TileFormats` class.
+ *
+ * @internal
  */
 export interface TileData {
   /**

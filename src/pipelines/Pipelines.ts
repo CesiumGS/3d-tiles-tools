@@ -6,6 +6,8 @@ import { TilesetStages } from "./TilesetStages";
 
 /**
  * Methods to create `Pipeline` objects from JSON input.
+ *
+ * @internal
  */
 export class Pipelines {
   /**

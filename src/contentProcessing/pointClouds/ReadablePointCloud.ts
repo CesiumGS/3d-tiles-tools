@@ -20,6 +20,8 @@
  * methods are only convenience wrappers around the low-level
  * `getAttributeValues` method, implementing the conversion
  * into `number[]` arrays as stated above.
+ *
+ * @internal
  */
 export interface ReadablePointCloud {
   /**

@@ -4,6 +4,7 @@ import path from "path";
 import { Paths } from "./base/Paths";
 import { DeveloperError } from "./base/DeveloperError";
 import { Buffers } from "./base/Buffers";
+import { Iterables } from "./base/Iterables";
 
 import { Tilesets } from "./tilesets/Tilesets";
 
@@ -11,19 +12,18 @@ import { TileFormats } from "./tileFormats/TileFormats";
 import { TileDataLayouts } from "./tileFormats/TileDataLayouts";
 
 import { ContentOps } from "./contentProcessing/ContentOps";
-import { GltfUtilities } from "./contentProcessing/GtlfUtilities";
+import { GltfUtilities } from "./contentProcessing/GltfUtilities";
 
 import { ContentDataTypes } from "./contentTypes/ContentDataTypes";
 
 import { PipelineExecutor } from "./pipelines/PipelineExecutor";
 import { Pipelines } from "./pipelines/Pipelines";
 
-import { ZipToPackage } from "./packages/ZipToPackage";
-
-import { TilesetSources } from "./tilesetData/TilesetSources";
-import { TilesetTargets } from "./tilesetData/TilesetTargets";
-
 import { TileFormatsMigration } from "./migration/TileFormatsMigration";
+
+import { TilesetConverter } from "./tilesetProcessing/TilesetConverter";
+
+import { TilesetJsonCreator } from "./tilesetProcessing/TilesetJsonCreator";
 
 /**
  * Functions that directly correspond to the command line functionality.
@@ -249,7 +249,7 @@ export class ToolsMain {
       const n = compositeTileData.innerTileBuffers.length;
       for (let i = 0; i < n; i++) {
         const innerTileDataBuffer = compositeTileData.innerTileBuffers[i];
-        const innerTileBaseName = inputBaseName + ".inner[" + i + "]";
+        const innerTileBaseName = `${inputBaseName}.inner[${i}]`;
         ToolsMain.analyzeInternal(
           innerTileBaseName,
           innerTileDataBuffer,
@@ -347,26 +347,19 @@ export class ToolsMain {
     await PipelineExecutor.executePipeline(pipeline, force);
   }
 
-  static async convert(input: string, output: string, force: boolean) {
+  static async convert(
+    input: string,
+    inputTilesetJsonFileName: string | undefined,
+    output: string,
+    force: boolean
+  ) {
     ToolsMain.ensureCanWrite(output, force);
-    const inputExtension = path.extname(input).toLowerCase();
-
-    if (inputExtension === ".zip") {
-      await ZipToPackage.convert(input, output, force);
-    } else {
-      const tilesetSource = TilesetSources.createAndOpen(input);
-      const tilesetTarget = TilesetTargets.createAndBegin(output, force);
-
-      const keys = tilesetSource.getKeys();
-      for (const key of keys) {
-        const content = tilesetSource.getValue(key);
-        if (content) {
-          tilesetTarget.addEntry(key, content);
-        }
-      }
-      tilesetSource.close();
-      await tilesetTarget.end();
-    }
+    await TilesetConverter.convert(
+      input,
+      inputTilesetJsonFileName,
+      output,
+      force
+    );
   }
 
   static async combine(input: string, output: string, force: boolean) {
@@ -401,6 +394,44 @@ export class ToolsMain {
     const pipelineJson = JSON.parse(pipelineJsonBuffer.toString());
     const pipeline = Pipelines.createPipeline(pipelineJson);
     await PipelineExecutor.executePipeline(pipeline, force);
+  }
+
+  static async createTilesetJson(
+    inputName: string,
+    output: string,
+    force: boolean
+  ) {
+    ToolsMain.ensureCanWrite(output, force);
+    let baseDir = inputName;
+    let contentUris = [];
+    if (!Paths.isDirectory(inputName)) {
+      baseDir = path.dirname(inputName);
+      const contentUri = path.basename(inputName);
+      contentUris = [contentUri];
+    } else {
+      const recurse = true;
+      const allFiles = Iterables.overFiles(inputName, recurse);
+      /*
+      const glbFiles = Iterables.filter(allFiles, (fileName: string) =>
+        Paths.hasExtension(fileName, ".glb")
+      );
+      contentUris = [...glbFiles].map((fileName: string) =>
+        Paths.relativize(inputName, fileName)
+      );
+      */
+      contentUris = [...allFiles].map((fileName: string) =>
+        Paths.relativize(inputName, fileName)
+      );
+    }
+    console.log("Creating tileset.json with content URIs: ", contentUris);
+    const tileset = await TilesetJsonCreator.createTilesetFromContents(
+      baseDir,
+      contentUris
+    );
+    const tilesetJsonString = JSON.stringify(tileset, null, 2);
+    const outputDirectory = path.dirname(output);
+    Paths.ensureDirectoryExists(outputDirectory);
+    fs.writeFileSync(output, Buffer.from(tilesetJsonString));
   }
 
   /**

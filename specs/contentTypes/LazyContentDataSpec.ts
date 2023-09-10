@@ -17,7 +17,7 @@ function createTestResourceResolver(): ResourceResolver {
 }
 
 describe("LazyContentData", function () {
-  it("does not read data at construction", function () {
+  it("does not read data at construction", async function () {
     const resourceResolver = createTestResourceResolver();
     const resolveDataSpy = spyOn(
       resourceResolver,
@@ -32,7 +32,7 @@ describe("LazyContentData", function () {
     expect(resolveDataSpy).toHaveBeenCalledTimes(0);
     expect(resolveDataPartialSpy).toHaveBeenCalledTimes(0);
 
-    contentData.exists();
+    await contentData.exists();
     expect(resolveDataSpy).toHaveBeenCalledTimes(0);
     expect(resolveDataPartialSpy).toHaveBeenCalledTimes(1);
     expect(resolveDataPartialSpy).toHaveBeenCalledWith(

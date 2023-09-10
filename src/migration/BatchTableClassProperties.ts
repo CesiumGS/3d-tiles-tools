@@ -2,11 +2,13 @@ import { ClassProperty } from "../structure/Metadata/ClassProperty";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
 
-import { TileTableData } from "./TileTableData";
+import { TileTableData } from "../tileTableData/TileTableData";
 import { TypeDetection } from "./TypeDetection";
 
 /**
  * Methods to create `ClassProperty` objects from batch table properties.
+ *
+ * @internal
  */
 export class BatchTableClassProperties {
   /**

@@ -4,6 +4,8 @@ import { DeveloperError } from "../../base/DeveloperError";
 
 /**
  * Hilbert Order helper functions.
+ *
+ * @internal
  */
 export class HilbertOrder {
   /**

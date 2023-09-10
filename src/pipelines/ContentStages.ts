@@ -5,6 +5,8 @@ import { ContentStage } from "./ContentStage";
 
 /**
  * Methods to create `ContentStage` objects
+ *
+ * @internal
  */
 export class ContentStages {
   /**

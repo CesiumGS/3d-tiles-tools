@@ -2,6 +2,8 @@ import { PropertyTableModel } from "./PropertyTableModel";
 
 /**
  * Utility methods related to `PropertyTableModel` instances
+ *
+ * @internal
  */
 export class PropertyTableModels {
   /**

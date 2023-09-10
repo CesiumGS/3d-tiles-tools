@@ -8,6 +8,8 @@ import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 
 /**
  * Methods to create `TilesetStage` objects.
+ *
+ * @internal
  */
 export class TilesetStages {
   /**

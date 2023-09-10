@@ -1,5 +1,29 @@
 [
   {
+    "name": "@gltf-transform/core",
+    "license": [
+      "MIT"
+    ],
+    "version": "3.3.1",
+    "url": "https://www.npmjs.com/package/@gltf-transform/core"
+  },
+  {
+    "name": "@gltf-transform/extensions",
+    "license": [
+      "MIT"
+    ],
+    "version": "3.3.1",
+    "url": "https://www.npmjs.com/package/@gltf-transform/extensions"
+  },
+  {
+    "name": "@gltf-transform/functions",
+    "license": [
+      "MIT"
+    ],
+    "version": "3.3.1",
+    "url": "https://www.npmjs.com/package/@gltf-transform/functions"
+  },
+  {
     "name": "archiver",
     "license": [
       "MIT"
@@ -24,12 +48,36 @@
     "url": "https://www.npmjs.com/package/cesium"
   },
   {
+    "name": "draco3d",
+    "license": [
+      "Apache-2.0"
+    ],
+    "version": "1.5.6",
+    "url": "https://www.npmjs.com/package/draco3d"
+  },
+  {
+    "name": "draco3dgltf",
+    "license": [
+      "Apache-2.0"
+    ],
+    "version": "1.5.6",
+    "url": "https://www.npmjs.com/package/draco3dgltf"
+  },
+  {
     "name": "gltf-pipeline",
     "license": [
       "Apache-2.0"
     ],
     "version": "4.1.0",
     "url": "https://www.npmjs.com/package/gltf-pipeline"
+  },
+  {
+    "name": "gltfpack",
+    "license": [
+      "MIT"
+    ],
+    "version": "0.19.1",
+    "url": "https://www.npmjs.com/package/gltfpack"
   },
   {
     "name": "minimist",
@@ -54,6 +102,14 @@
     ],
     "version": "3.0.5",
     "url": "https://www.npmjs.com/package/seedrandom"
+  },
+  {
+    "name": "sharp",
+    "license": [
+      "Apache-2.0"
+    ],
+    "version": "0.32.1",
+    "url": "https://www.npmjs.com/package/sharp"
   },
   {
     "name": "yargs",

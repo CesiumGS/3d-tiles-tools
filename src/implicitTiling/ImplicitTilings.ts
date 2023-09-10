@@ -157,19 +157,17 @@ export class ImplicitTilings {
    */
   static createString(coordinates: TreeCoordinates): string {
     if (coordinates instanceof QuadtreeCoordinates) {
-      const quadtreeCoordinates = coordinates as QuadtreeCoordinates;
-      const level = quadtreeCoordinates.level;
-      const x = quadtreeCoordinates.x;
-      const y = quadtreeCoordinates.y;
+      const level = coordinates.level;
+      const x = coordinates.x;
+      const y = coordinates.y;
       const result = `at[${level}][${x},${y}]`;
       return result;
     }
     if (coordinates instanceof OctreeCoordinates) {
-      const octreeCoordinates = coordinates as OctreeCoordinates;
-      const level = octreeCoordinates.level;
-      const x = octreeCoordinates.x;
-      const y = octreeCoordinates.y;
-      const z = octreeCoordinates.z;
+      const level = coordinates.level;
+      const x = coordinates.x;
+      const y = coordinates.y;
+      const z = coordinates.z;
       const result = `at[${level}][${x},${y},${z}]`;
       return result;
     }

@@ -3,6 +3,8 @@ import { DracoError } from "./DracoError";
 /**
  * Ported from CesiumJS 'ComponentDataType', ONLY for the use
  * in the draco package.
+ *
+ * @internal
  */
 export class ComponentDatatype {
   /**

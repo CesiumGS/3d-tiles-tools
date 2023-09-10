@@ -6,6 +6,8 @@ import { NumberTypeDescriptions } from "./NumberTypeDescriptions";
  *
  * This is used for detecting the type of values that are given
  * in batch table JSON.
+ *
+ * @internal
  */
 export class TypeDetection {
   /**

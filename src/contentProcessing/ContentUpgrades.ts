@@ -1,4 +1,4 @@
-import { GltfUtilities } from "../contentProcessing/GtlfUtilities";
+import { GltfUtilities } from "./GltfUtilities";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 
@@ -9,6 +9,8 @@ import { TileFormats } from "../tileFormats/TileFormats";
  * the contained GLB should be upgraded from glTF 1.0 to glTF 2.0
  * with `gltf-pipeline`. (Specifically: This does not change the
  * type of the data itself)
+ *
+ * @internal
  */
 export class ContentUpgrades {
   /**

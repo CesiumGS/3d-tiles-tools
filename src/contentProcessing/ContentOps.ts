@@ -1,4 +1,4 @@
-import { GltfUtilities } from "./GtlfUtilities";
+import { GltfUtilities } from "./GltfUtilities";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 
@@ -13,6 +13,8 @@ import { TileFormats } from "../tileFormats/TileFormats";
  * functionalities (like `b3dmToGlb`), as well as serving
  * as building blocks for the tileset content processing
  * in pipelines.
+ *
+ * @internal
  */
 export class ContentOps {
   /**

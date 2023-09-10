@@ -5,6 +5,8 @@
  *
  * The exact set of options (and how they may eventually
  * be exposed to the user) still have to be decided.
+ *
+ * @internal
  */
 export type TilesetUpgradeOptions = {
   // Options for the general upgrade process
@@ -37,4 +39,8 @@ export type TilesetUpgradeOptions = {
   // Whether attempts should be made to convert B3DM files to GLB
   // with metadata
   upgradeB3dmToGlb: boolean;
+
+  // Whether attempts should be made to convert I3DM files to GLB
+  // with metadata
+  upgradeI3dmToGlb: boolean;
 };

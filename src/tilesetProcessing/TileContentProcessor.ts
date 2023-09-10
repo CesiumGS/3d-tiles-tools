@@ -15,6 +15,8 @@
  * `ContentDataTypes` strings, or `undefined` if the type
  * could not be determined.
  * @returns The processed tile content
+ *
+ * @internal
  */
 export type TileContentProcessor = (
   content: Buffer,

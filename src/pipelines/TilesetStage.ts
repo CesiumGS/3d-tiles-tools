@@ -7,6 +7,8 @@ import { Stage } from "./Stage";
  *
  * Instances of this class are created with `TilesetStages`
  * and executed with a `TilesetStageExecutor`.
+ *
+ * @internal
  */
 export interface TilesetStage extends Stage {
   /**

@@ -16,7 +16,7 @@ import { AvailabilityInfo } from "../implicitTiling/AvailabilityInfo";
 import { SubtreeMetadataModel } from "./SubtreeMetadataModel";
 
 /**
- * Methods to create `SubtreeMetadataModel` instances
+ * Methods to create `SubtreeMetadataModel` instances.
  *
  * @internal
  */
@@ -24,12 +24,28 @@ export class SubtreeMetadataModels {
   /**
    * Creates a `SubtreeMetadataModel` from the given data.
    *
-   * TODO Maybe add some proper comment here...
+   * This method receives...
+   * - the `BinarySubtreeData` that contains the data that was read
+   *   from a `subtree` file
+   * - the `SubtreeInfo` that was already created from this binary
+   *   data and the implicit tiling information, and which provides
+   *   information about the tile- and content availability
+   * - the actual metadata `Schema`
+   *
+   * It will create the `SubtreeMetadataModel`, which is a convenience
+   * layer around the binary representation of the metadata that is
+   * contained in the subtree: It contains...
+   * - one `PropertyTableModel` for accessing the metadata that
+   *   is associated with the available tiles
+   * - one or more `PropertyTableModel` instances for accessing the
+   *   metadata that is associated with each of the 'contents'
+   *   that are available in the subtree
    *
    * @param binarySubtreeData - The `BinarySubtreeData`
    * @param subtreeInfo - The `SubtreeInfo`
    * @param schema - The metadata `Schema`
    * @returns The `SubtreeMetadataModel`
+   * @throws MetadataError If the input was structurally invalid
    */
   static create(
     binarySubtreeData: BinarySubtreeData,
