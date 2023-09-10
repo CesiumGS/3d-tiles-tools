@@ -12,8 +12,8 @@ import { KtxEtc1sOptions } from "../ktx/KtxEtc1sOptions";
 import { KtxUastcOptions } from "../ktx/KtxUastcOptions";
 import { KtxOptions } from "../ktx/KtxOptions";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("contentProcessing");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("contentProcessing");
 
 /**
  * Methods to process textures in glTF assets (specifically,

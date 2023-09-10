@@ -8,8 +8,8 @@ import { KtxEtc1sOptions } from "./KtxEtc1sOptions";
 import { KtxUastcOptions } from "./KtxUastcOptions";
 import { KtxError } from "./KtxError";
 
-import { LoggerFactory } from "../logging/LoggerFactory";
-const logger = LoggerFactory("KTX");
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("KTX");
 
 /**
  * Utility class for converting images into KTX2 format.
