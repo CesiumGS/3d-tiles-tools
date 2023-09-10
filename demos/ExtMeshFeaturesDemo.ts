@@ -37,13 +37,16 @@ async function createExampleDocument(): Promise<Document> {
   featureIdFromAttribute.setFeatureCount(new Set(ids).size);
   featureIdFromAttribute.setAttribute(attributeNumber);
 
-  // Create an image with integer values that serve as feature IDs
+  // Create an image with integer values that serve as feature IDs.
+  // The IDs are in the range (0...255) here, and therefore written
+  // into the channel with index `3`, i.e. the alpha channel of the
+  // RGBA pixels.
   const sizeX = 3;
   const sizeY = 3;
-  const pixels = NdArray(new Uint8Array(sizeX * sizeY), [sizeX, sizeY]);
+  const pixels = NdArray(new Uint8Array(sizeX * sizeY), [sizeX, sizeY, 4]);
   for (let x = 0; x < pixels.shape[0]; x++) {
     for (let y = 0; y < pixels.shape[1]; y++) {
-      pixels.set(x, y, x * sizeY + y);
+      pixels.set(x, y, 3, x * sizeY + y);
     }
   }
   const image = await savePixels(pixels, "image/png");
