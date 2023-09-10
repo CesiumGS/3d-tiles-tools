@@ -187,6 +187,32 @@ Extracts the glb models from a cmpt tile. If multiple models are found a number 
 npx 3d-tiles-tools cmptToGlb -i ./specs/data/composite.cmpt -o ./output/extracted.glb
 ```
 
+
+#### convertB3dmToGlb
+
+Convert a b3dm file into a glTF asset that uses glTF extensions to represent the batch- and feature table information.
+
+```
+npx 3d-tiles-tools convertB3dmToGlb -i ./data/example.b3dm -o ./data/example.glb
+```
+
+#### convertPntsToGlb
+
+Convert a pnts file into a glTF asset that uses glTF extensions to represent the point properties and batch- and feature table information.
+
+```
+npx 3d-tiles-tools convertPntsToGlb -i ./data/example.pnts -o ./data/example.glb
+```
+
+#### convertI3dmToGlb
+
+Convert an i3dm file into a glTF asset that uses glTF extensions to represent the batch- and feature table information. This conversion may be lossy if the GLB of the input i3dm contains animations.
+
+```
+npx 3d-tiles-tools convertI3dmToGlb -i ./data/example.i3dm -o ./data/example.glb
+```
+
+
 #### optimizeB3dm
 
 Optimize a b3dm using [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md). 
