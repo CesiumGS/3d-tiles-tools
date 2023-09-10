@@ -8,9 +8,9 @@ import { NodeIO } from "@gltf-transform/core";
 import { savePixels } from "ndarray-pixels";
 import NdArray from "ndarray";
 
-import { EXTMeshFeatures } from "../src/gltfMetadata/EXTMeshFeatures";
-import { MeshFeaturesUtils } from "../src/gltfMetadata/MeshFeaturesUtils";
-import { FeatureId } from "../src/gltfMetadata/MeshFeatures";
+import { EXTMeshFeatures } from "../src/gltfExtensions/EXTMeshFeatures";
+import { MeshFeaturesUtils } from "../src/gltfExtensions/MeshFeaturesUtils";
+import { FeatureId } from "../src/gltfExtensions/MeshFeatures";
 
 /**
  * Create a primitive that represents a unit square
