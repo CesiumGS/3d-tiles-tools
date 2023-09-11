@@ -74,7 +74,7 @@ export class Iterables {
    * @param include - The include predicate
    * @returns The filtered iterable
    */
-  static filterWIthIndex<T>(
+  static filterWithIndex<T>(
     iterable: Iterable<T>,
     include: (element: T, index: number) => boolean
   ): Iterable<T> {

@@ -16,7 +16,7 @@ describe("Iterables", function () {
 
   it("filterWithIndex filters the right elements", function () {
     const input = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    const result = Iterables.filterWIthIndex(
+    const result = Iterables.filterWithIndex(
       input,
       (v: number, i: number) => i % 3 != 2
     );

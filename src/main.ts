@@ -142,6 +142,22 @@ function parseToolArgs(a: string[]) {
       }
     )
     .command(
+      "i3dmToGlb",
+      "Extract the binary glTF asset from the input i3dm.",
+      {
+        i: inputStringDefinition,
+        o: outputStringDefinition,
+      }
+    )
+    .command(
+      "cmptToGlb",
+      "Extract the binary glTF assets from the input cmpt.",
+      {
+        i: inputStringDefinition,
+        o: outputStringDefinition,
+      }
+    )
+    .command(
       "convertB3dmToGlb",
       "Convert a b3dm file into a glTF asset that uses glTF extensions to " +
         "represent the batch- and feature table information",
@@ -160,16 +176,10 @@ function parseToolArgs(a: string[]) {
       }
     )
     .command(
-      "i3dmToGlb",
-      "Extract the binary glTF asset from the input i3dm.",
-      {
-        i: inputStringDefinition,
-        o: outputStringDefinition,
-      }
-    )
-    .command(
-      "cmptToGlb",
-      "Extract the binary glTF assets from the input cmpt.",
+      "convertI3dmToGlb",
+      "Convert an i3dm file into a glTF asset that uses glTF extensions to " +
+        "represent the batch- and feature table information. This conversion " +
+        "may be lossy if the GLB of the input i3dm contains animations.",
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
@@ -376,14 +386,16 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
 
   if (command === "b3dmToGlb") {
     await ToolsMain.b3dmToGlb(input, output, force);
-  } else if (command === "convertB3dmToGlb") {
-    await ToolsMain.convertB3dmToGlb(input, output, force);
-  } else if (command === "convertPntsToGlb") {
-    await ToolsMain.convertPntsToGlb(input, output, force);
   } else if (command === "i3dmToGlb") {
     await ToolsMain.i3dmToGlb(input, output, force);
   } else if (command === "cmptToGlb") {
     await ToolsMain.cmptToGlb(input, output, force);
+  } else if (command === "convertB3dmToGlb") {
+    await ToolsMain.convertB3dmToGlb(input, output, force);
+  } else if (command === "convertPntsToGlb") {
+    await ToolsMain.convertPntsToGlb(input, output, force);
+  } else if (command === "convertI3dmToGlb") {
+    await ToolsMain.convertI3dmToGlb(input, output, force);
   } else if (command === "glbToB3dm") {
     await ToolsMain.glbToB3dm(input, output, force);
   } else if (command === "glbToI3dm") {

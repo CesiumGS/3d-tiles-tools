@@ -9,3 +9,4 @@ specs/data/
 tsconfig.json
 .prettierrc.json
 ThirdParty.json
+src/ktx/external/basis_encoder.js

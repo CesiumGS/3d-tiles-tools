@@ -7,21 +7,21 @@ import { GltfTransform } from "../contentProcessing/GltfTransform";
 
 /**
  * Methods to create `TileContentProcessor` instances that
- * process GLB data with `gltf-transform`.
+ * process GLB data with `gltf-Transform`.
  *
  * @internal
  */
 export class TileContentProcessorsGltfTransform {
   /**
    * Creates a `TileContentProcessor` that processes each GLB
-   * tile content with `gltf-transform`.
+   * tile content with `gltf-Transform`.
    *
    * It will process each tile content that has the content
    * type `ContentDataTypes.CONTENT_TYPE_GLB`, by calling
-   * the `gltf-transform` 'transform' method with the
+   * the `gltf-Transform` 'transform' method with the
    * input content data, applying the given transforms.
    *
-   * @param transforms - The `gltf-transform` `Transform` instances
+   * @param transforms - The `gltf-Transform` `Transform` instances
    * @returns The `TileContentProcessor`
    */
   static create(...transforms: Transform[]): TileContentProcessor {
