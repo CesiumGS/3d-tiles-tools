@@ -20,6 +20,9 @@ import { PropertyModel } from "../metadata/PropertyModel";
 import { BinaryPropertyTableModel } from "../metadata/binary/BinaryPropertyTableModel";
 import { BinaryPropertyTableBuilder } from "../metadata/binary/BinaryPropertyTableBuilder";
 
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("migration");
+
 /**
  * Methods to transfer information from (legacy) batch table data
  * into glTF assets, using the `EXT_structural_metadata` extension.
@@ -61,12 +64,12 @@ export class TileTableDataToStructuralMetadata {
       return;
     }
 
-    //*/
-    if (TileFormatsMigration.DEBUG_LOG) {
-      console.log("Schema:");
-      console.log(JSON.stringify(metadataSchema, null, 2));
+    if (
+      TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&
+      logger.isLevelEnabled("trace")
+    ) {
+      logger.trace("Schema:\n" + JSON.stringify(metadataSchema, null, 2));
     }
-    //*/
 
     // Obtain the (single) Metadata class and its name
     const classes = metadataSchema.classes || {};
@@ -111,16 +114,16 @@ export class TileTableDataToStructuralMetadata {
       numRows
     );
 
-    //*/
-    if (TileFormatsMigration.DEBUG_LOG) {
-      console.log("Property table from batch table:");
+    if (
+      TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&
+      logger.isLevelEnabled("trace")
+    ) {
       const s = PropertyTableModels.createString(
         batchTablePropertyTableModel,
         10
       );
-      console.log(s);
+      logger.trace("Property table from batch table:\n" + s);
     }
-    //*/
 
     // Create the `EXT_structural_metadata` object for the mesh primitive
     const meshPrimitiveStructuralMetadata =
@@ -192,12 +195,12 @@ export class TileTableDataToStructuralMetadata {
       return undefined;
     }
 
-    //*/
-    if (TileFormatsMigration.DEBUG_LOG) {
-      console.log("Schema:");
-      console.log(JSON.stringify(metadataSchema, null, 2));
+    if (
+      TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&
+      logger.isLevelEnabled("trace")
+    ) {
+      logger.trace("Schema:\n" + JSON.stringify(metadataSchema, null, 2));
     }
-    //*/
 
     // Obtain the (single) Metadata class and its name
     const classes = metadataSchema.classes || {};
@@ -237,16 +240,16 @@ export class TileTableDataToStructuralMetadata {
       numRows
     );
 
-    //*/
-    if (TileFormatsMigration.DEBUG_LOG) {
-      console.log("Property table from batch table:");
+    if (
+      TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&
+      logger.isLevelEnabled("trace")
+    ) {
       const s = PropertyTableModels.createString(
         batchTablePropertyTableModel,
         10
       );
-      console.log(s);
+      logger.trace("Property table from batch table:\n" + s);
     }
-    //*/
 
     // Build a `BinaryPropertyTable` by obtaining the property
     // values from the batch table and putting them into a
@@ -282,14 +285,14 @@ export class TileTableDataToStructuralMetadata {
     // into an `EXT_structural_metadata` property table
     const binaryPropertyTable = b.build();
 
-    //*/
-    if (TileFormatsMigration.DEBUG_LOG) {
+    if (
+      TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&
+      logger.isLevelEnabled("trace")
+    ) {
       const m = new BinaryPropertyTableModel(binaryPropertyTable);
       const s = PropertyTableModels.createString(m);
-      console.log("Creating structural metadata property table from");
-      console.log(s);
+      logger.trace("Creating structural metadata property table from:\n" + s);
     }
-    //*/
 
     const structualMetadataPropertyTable =
       StructuralMetadataPropertyTables.create(

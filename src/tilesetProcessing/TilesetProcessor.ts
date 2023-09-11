@@ -9,6 +9,9 @@ import { TilesetEntryProcessor } from "./TilesetEntryProcessor";
 import { TilesetProcessorContext } from "./TilesetProcessorContext";
 import { TilesetProcessorContexts } from "./TilesetProcessorContexts";
 
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("tilesetProcessing");
+
 /**
  * A base class for classes that can process tilesets.
  *
@@ -24,37 +27,9 @@ import { TilesetProcessorContexts } from "./TilesetProcessorContexts";
  */
 export abstract class TilesetProcessor {
   /**
-   * A function that will receive log messages
-   */
-  private readonly logCallback: (message: any) => void;
-
-  /**
    * The context that was created in `begin`
    */
   private context: TilesetProcessorContext | undefined;
-
-  /**
-   * Creates a new instance
-   *
-   * @param quiet - Whether log messages should be omitted
-   */
-  constructor(quiet?: boolean) {
-    if (quiet !== true) {
-      this.logCallback = (message: any) => console.log(message);
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-      this.logCallback = (message: any) => {};
-    }
-  }
-
-  /**
-   * Internal method to just call the log callback
-   *
-   * @param message - The message
-   */
-  protected log(message: any): void {
-    this.logCallback(message);
-  }
 
   /**
    * Returns the `TilesetProcessorContext` that contains all
@@ -193,7 +168,7 @@ export abstract class TilesetProcessor {
       this.markAsProcessed(sourceKey);
       const message = `No ${sourceKey} found in input`;
       //throw new TilesetError(message);
-      console.warn(message);
+      logger.warn(message);
       return;
     }
     const targetEntry = await this.processEntryInternal(
@@ -232,11 +207,11 @@ export abstract class TilesetProcessor {
       sourceEntry.value
     );
 
-    this.log(`Processing source: ${sourceEntry.key} with type ${type}`);
+    logger.debug(`Processing source: ${sourceEntry.key} with type ${type}`);
 
     const targetEntry = await entryProcessor(sourceEntry, type);
 
-    this.log(`        to target: ${targetEntry?.key}`);
+    logger.debug(`        to target: ${targetEntry?.key}`);
 
     return targetEntry;
   }
@@ -256,7 +231,7 @@ export abstract class TilesetProcessor {
     const sourceKey = key;
     const sourceValue = tilesetSource.getValue(sourceKey);
     if (!sourceValue) {
-      console.warn("No input found for " + sourceKey);
+      logger.warn(`No input found for ${sourceKey}`);
       return undefined;
     }
     const sourceEntry: TilesetEntry = {

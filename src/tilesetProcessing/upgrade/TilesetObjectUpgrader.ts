@@ -7,6 +7,9 @@ import { Extensions } from "../../tilesets/Extensions";
 
 import { TilesetUpgradeOptions } from "./TilesetUpgradeOptions";
 
+import { Loggers } from "../../logging/Loggers";
+const logger = Loggers.get("upgrade");
+
 /**
  * A class for "upgrading" the `Tileset` object that was parsed from
  * a tileset JSON, from a previous version to a more recent version.
@@ -16,11 +19,6 @@ import { TilesetUpgradeOptions } from "./TilesetUpgradeOptions";
  */
 export class TilesetObjectUpgrader {
   /**
-   * A function that will receive log messages during the upgrade process
-   */
-  private readonly logCallback: (message: any) => void;
-
-  /**
    * The options for the upgrade.
    */
   private readonly upgradeOptions: TilesetUpgradeOptions;
@@ -29,14 +27,9 @@ export class TilesetObjectUpgrader {
    * Creates a new instance
    *
    * @param upgradeOptions - The `UpgradeOptions`
-   * @param logCallback - The log callback
    */
-  constructor(
-    upgradeOptions: TilesetUpgradeOptions,
-    logCallback: (message: any) => void
-  ) {
+  constructor(upgradeOptions: TilesetUpgradeOptions) {
     this.upgradeOptions = upgradeOptions;
-    this.logCallback = logCallback;
   }
 
   /**
@@ -46,22 +39,22 @@ export class TilesetObjectUpgrader {
    */
   async upgradeTilesetObject(tileset: Tileset): Promise<void> {
     if (this.upgradeOptions.upgradedAssetVersionNumber) {
-      this.logCallback(`Upgrading asset version number`);
+      logger.debug(`Upgrading asset version number`);
       this.upgradeAssetVersionNumber(
         tileset,
         this.upgradeOptions.upgradedAssetVersionNumber
       );
     }
     if (this.upgradeOptions.upgradeRefineCase) {
-      this.logCallback(`Upgrading refine to be in uppercase`);
+      logger.debug(`Upgrading refine to be in uppercase`);
       await this.upgradeRefineValues(tileset);
     }
     if (this.upgradeOptions.upgradeContentUrlToUri) {
-      this.logCallback(`Upgrading content.url to content.uri`);
+      logger.debug(`Upgrading content.url to content.uri`);
       await this.upgradeEachContentUrlToUri(tileset);
     }
     if (this.upgradeOptions.upgradeContentGltfExtensionDeclarations) {
-      this.logCallback(`Upgrading extension declarations`);
+      logger.debug(`Upgrading extension declarations`);
       Extensions.removeExtensionUsed(tileset, "3DTILES_content_gltf");
     }
   }
@@ -75,7 +68,7 @@ export class TilesetObjectUpgrader {
    */
   private upgradeAssetVersionNumber(tileset: Tileset, targetVersion: string) {
     if (tileset.asset.version !== targetVersion) {
-      this.logCallback(
+      logger.trace(
         `  Upgrading asset version from ${tileset.asset.version} to ${targetVersion}`
       );
       tileset.asset.version = targetVersion;
@@ -121,7 +114,7 @@ export class TilesetObjectUpgrader {
     }
     const legacyContent = content as any;
     if (legacyContent.url) {
-      this.logCallback(
+      logger.trace(
         `  Renaming 'url' property for content ${legacyContent.url} to 'uri'`
       );
       content.uri = legacyContent.url;
@@ -129,7 +122,7 @@ export class TilesetObjectUpgrader {
       return;
     }
     // This should never be the case:
-    this.logCallback(
+    logger.warn(
       "  The content does not have a 'uri' property (and no legacy 'url' property)"
     );
   }
@@ -147,7 +140,7 @@ export class TilesetObjectUpgrader {
       if (tile.refine && tile.refine !== "ADD" && tile.refine !== "REPLACE") {
         const oldValue = tile.refine;
         const newValue = oldValue.toUpperCase();
-        this.logCallback(
+        logger.trace(
           `  Renaming 'refine' value from ${oldValue} to ${newValue}`
         );
         tile.refine = newValue;

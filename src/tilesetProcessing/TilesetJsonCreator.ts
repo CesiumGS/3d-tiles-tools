@@ -28,6 +28,9 @@ import { TileTableData } from "../tileTableData/TileTableData";
 import { TileTableDataI3dm } from "../tileTableData/TileTableDataI3dm";
 import { VecMath } from "../tileTableData/VecMath";
 
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("tilesetProcessing");
+
 const DEFAULT_LEAF_GEOMETRIC_ERROR = 512;
 const DEFAULT_TILESET_GEOMETRIC_ERROR = 4096;
 
@@ -122,12 +125,10 @@ export class TilesetJsonCreator {
       externalGlbResolver
     );
     if (!boundingBox) {
-      console.warn(
-        "WARNING: Content data type of " + contentUri + " is not supported."
-      );
+      logger.warn(`Content data type of ${contentUri} is not supported.`);
       return undefined;
     }
-    console.log(
+    logger.debug(
       `Bounding box for ${contentUri} is ` +
         `${boundingBox.min} ... ${boundingBox.max}`
     );
@@ -299,7 +300,7 @@ export class TilesetJsonCreator {
     if (!unionBoundingBox) {
       unionBoundingBox = BoundingVolumes.createUnitCubeBoundingBox();
     }
-    console.log(
+    logger.debug(
       `Union bounding box is ` +
         `${unionBoundingBox.min} ... ${unionBoundingBox.max}`
     );
@@ -520,7 +521,7 @@ export class TilesetJsonCreator {
       if (!innerBoundingBox) {
         continue;
       }
-      console.log(
+      logger.debug(
         `  Inner bounding box for CMPT is ` +
           `${innerBoundingBox.min} ... ${innerBoundingBox.max}`
       );
@@ -598,7 +599,7 @@ export class TilesetJsonCreator {
       const bounds = getBounds(scene);
       return bounds;
     }
-    console.warn("No scenes found in glTF - using unit bounding box");
+    logger.warn("No scenes found in glTF - using unit bounding box");
     return BoundingVolumes.createUnitCubeBoundingBox();
   }
 }

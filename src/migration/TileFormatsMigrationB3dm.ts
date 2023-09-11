@@ -7,9 +7,16 @@ import { GltfTransform } from "../contentProcessing/GltfTransform";
 import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 
 import { TileTableData } from "../tileTableData/TileTableData";
+
 import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
 import { TileTableDataToMeshFeatures } from "./TileTableDataToMeshFeatures";
 import { TileFormatsMigration } from "./TileFormatsMigration";
+
+import { InstanceFeaturesUtils } from "../gltfExtensions/InstanceFeaturesUtils";
+import { StructuralMetadataUtils } from "../gltfExtensions/StructuralMetadataUtils";
+
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("migration");
 
 /**
  * Methods for converting B3DM tile data into GLB
@@ -32,22 +39,20 @@ export class TileFormatsMigrationB3dm {
     const featureTable = tileData.featureTable.json as B3dmFeatureTable;
     const featureTableBinary = tileData.featureTable.binary;
 
-    //*/
-    if (TileFormatsMigration.DEBUG_LOG) {
-      console.log("Batch table");
-      console.log(JSON.stringify(batchTable, null, 2));
-
-      console.log("Feature table");
-      console.log(JSON.stringify(featureTable, null, 2));
+    if (
+      TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&
+      logger.isLevelEnabled("trace")
+    ) {
+      logger.trace("Batch table:\n" + JSON.stringify(batchTable, null, 2));
+      logger.trace("Feature table:\n" + JSON.stringify(featureTable, null, 2));
     }
-    //*/
 
     // If the B3DM contained glTF 1.0 data, try to upgrade it
     // with the gltf-pipeline first
     let glbBuffer = tileData.payload;
     const gltfVersion = GltfUtilities.getGltfVersion(glbBuffer);
     if (gltfVersion < 2.0) {
-      console.log("Found glTF 1.0 - upgrading to glTF 2.0 with gltf-pipeline");
+      logger.info("Found glTF 1.0 - upgrading to glTF 2.0 with gltf-pipeline");
       glbBuffer = await GltfUtilities.upgradeGlb(glbBuffer, undefined);
       glbBuffer = await GltfUtilities.replaceCesiumRtcExtension(glbBuffer);
     }
@@ -100,15 +105,23 @@ export class TileFormatsMigrationB3dm {
       }
     }
 
-    // Create the GLB buffer
-    //*/
-    if (TileFormatsMigration.DEBUG_LOG) {
-      console.log("JSON document");
+    if (
+      TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&
+      logger.isLevelEnabled("trace")
+    ) {
       const jsonDocument = await io.writeJSON(document);
-      console.log(JSON.stringify(jsonDocument.json, null, 2));
+      const json = jsonDocument.json;
+      logger.trace("Output glTF JSON:\n" + JSON.stringify(json, null, 2));
+      logger.trace("Metadata information:");
+      logger.trace(
+        InstanceFeaturesUtils.createInstanceFeaturesInfoString(document)
+      );
+      logger.trace(
+        StructuralMetadataUtils.createStructuralMetadataInfoString(document)
+      );
     }
-    //*/
 
+    // Create the GLB buffer
     const glb = await io.writeBinary(document);
     return Buffer.from(glb);
   }

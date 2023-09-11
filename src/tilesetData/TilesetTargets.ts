@@ -8,6 +8,9 @@ import { TilesetError } from "./TilesetError";
 import { TilesetTargetFs } from "./TilesetTargetFs";
 import { TilesetEntry } from "./TilesetEntry";
 
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("tilesetData");
+
 /**
  * Methods related to `TilesetTarget` instances
  *
@@ -64,7 +67,7 @@ export class TilesetTargets {
     if (extension === "") {
       return new TilesetTargetFs();
     }
-    console.log("Unknown target type: " + extension);
+    logger.error("Unknown target type: " + extension);
     return undefined;
   }
 

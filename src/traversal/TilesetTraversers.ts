@@ -18,6 +18,9 @@ import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 import { TilesetSource3tz } from "../packages/TilesetSource3tz";
 import { Paths } from "../base/Paths";
 
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("traversal");
+
 /**
  * Internal utility methods for tileset traversal, used for
  * the `TilesetTraverser` implementation.
@@ -153,7 +156,7 @@ export class TilesetTraversers {
       try {
         externalTilesetSource.open(absoluteUri);
       } catch (e) {
-        console.warn(
+        logger.warn(
           `Could not open external tileset from ${absoluteUri} - ignoring`
         );
         return undefined;

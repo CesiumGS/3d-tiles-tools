@@ -8,6 +8,9 @@ import { Tilesets } from "../tilesets/Tilesets";
 
 import { ZipToPackage } from "../packages/ZipToPackage";
 
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("tilesetProcessing");
+
 /**
  * Methods for converting tilesets between different storage formats.
  * (i.e. the file system, or 3D Tiles archives/packages).
@@ -77,7 +80,7 @@ export class TilesetConverter {
         if (key === inputTilesetJsonFileName) {
           inputTilesetJsonFileNameWasFound = true;
           if (inputTilesetJsonFileName !== outputTilesetJsonFileName) {
-            console.log(
+            logger.debug(
               `Storing ${inputTilesetJsonFileName} from ${input} ` +
                 `as ${outputTilesetJsonFileName} in ${output}`
             );

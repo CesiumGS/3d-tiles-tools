@@ -26,15 +26,6 @@ import { TilesetProcessor } from "./TilesetProcessor";
  */
 export class TilesetDataProcessor extends TilesetProcessor {
   /**
-   * Creates a new instance
-   *
-   * @param quiet - Whether log messages should be omitted
-   */
-  constructor(quiet?: boolean) {
-    super(quiet);
-  }
-
-  /**
    * Applies the given entry processor to each `TilesetEntry` that
    * has not yet been processed
    *

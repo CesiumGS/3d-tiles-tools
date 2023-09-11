@@ -463,7 +463,7 @@ export class BinaryPropertyTables {
     return [...values];
   }
 
-  private static flattenFully(values: any): any {
+  private static flattenFully(values: any): any[] {
     let result = values;
     if (Array.isArray(result)) {
       result = [];
@@ -522,7 +522,7 @@ export class BinaryPropertyTables {
     const encoder = new TextEncoder();
     const strings = BinaryPropertyTables.flattenFully(values);
     const length = strings.length;
-    const offsets = new Array(length + 1);
+    const offsets = Array<number>(length + 1);
     let offset = 0;
     for (let i = 0; i < length; ++i) {
       offsets[i] = offset;
@@ -538,7 +538,7 @@ export class BinaryPropertyTables {
     offsetType: string | undefined
   ) {
     const length = values.length;
-    const offsets = new Array(length + 1);
+    const offsets = Array<number>(length + 1);
     let offset = 0;
     for (let i = 0; i < length; ++i) {
       offsets[i] = offset;

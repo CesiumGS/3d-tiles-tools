@@ -22,6 +22,9 @@ import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 
 import { Paths } from "../base/Paths";
 
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("tilesetProcessing");
+
 /**
  * Implementation of a `TilesetProcessor` that offers methods for
  * common operations on tileset data.
@@ -52,12 +55,11 @@ export class BasicTilesetProcessor extends TilesetProcessor {
   /**
    * Creates a new instance
    *
-   * @param quiet - Whether log messages should be omitted
    * @param processExternalTilesets - Whether external tilesets
    * should be processed.
    */
-  constructor(quiet?: boolean, processExternalTilesets?: boolean) {
-    super(quiet);
+  constructor(processExternalTilesets?: boolean) {
+    super();
     if (processExternalTilesets === undefined) {
       this.processExternalTilesets = true;
     } else {
@@ -503,8 +505,8 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     uriProcessor: (uri: string) => string,
     entryProcessor: TilesetEntryProcessor
   ): Promise<TilesetEntry> {
-    console.log(
-      "Processing external tileset " + externalTilesetSourceEntry.key
+    logger.debug(
+      `Processing external tileset ${externalTilesetSourceEntry.key}`
     );
 
     // Parse the external tileset from the given entry
@@ -531,8 +533,8 @@ export class BasicTilesetProcessor extends TilesetProcessor {
       value: targetTilesetJsonBuffer,
     };
 
-    console.log(
-      "Processing external tileset " + externalTilesetSourceEntry.key + " DONE"
+    logger.debug(
+      `Processing external tileset ${externalTilesetSourceEntry.key} DONE`
     );
 
     return externalTilesetTargetEntry;

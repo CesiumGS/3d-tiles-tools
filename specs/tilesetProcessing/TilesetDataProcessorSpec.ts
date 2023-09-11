@@ -12,7 +12,6 @@ const basicOutput = outputRoot + "basicProcessing";
 const implicitInput = "./specs/data/tilesetProcessing/implicitProcessing";
 const implicitOutput = outputRoot + "implicitProcessing";
 
-const quiet = true;
 const overwrite = true;
 
 describe("TilesetDataProcessor", function () {
@@ -21,7 +20,7 @@ describe("TilesetDataProcessor", function () {
   });
 
   it("processAllEntries processes all entries exactly once for explicit tilesets", async function () {
-    const tilesetProcessor = new TilesetDataProcessor(quiet);
+    const tilesetProcessor = new TilesetDataProcessor();
     await tilesetProcessor.begin(basicInput, basicOutput, overwrite);
     const specEntryProcessor = new SpecEntryProcessor();
     await tilesetProcessor.processAllEntries(specEntryProcessor.processEntry);
@@ -57,7 +56,7 @@ describe("TilesetDataProcessor", function () {
   });
 
   it("processAllEntries processes all entries exactly once for implicit tilesets", async function () {
-    const tilesetProcessor = new TilesetDataProcessor(quiet);
+    const tilesetProcessor = new TilesetDataProcessor();
     await tilesetProcessor.begin(implicitInput, implicitOutput, overwrite);
     const specEntryProcessor = new SpecEntryProcessor();
     await tilesetProcessor.processAllEntries(specEntryProcessor.processEntry);

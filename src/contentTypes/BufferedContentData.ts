@@ -5,6 +5,9 @@ import { Buffers } from "../base/Buffers";
 
 import { ContentData } from "./ContentData";
 
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("tilesetProcessing");
+
 /**
  * Implementation of the `ContentData` interface that stores
  * the full content data in a buffer.
@@ -33,7 +36,7 @@ export class BufferedContentData implements ContentData {
     try {
       data = fs.readFileSync(uri);
     } catch (error) {
-      console.warn(`Could not read content data from ${uri}`);
+      logger.warn(`Could not read content data from ${uri}`);
     }
     return new BufferedContentData(uri, data);
   }

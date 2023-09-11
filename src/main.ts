@@ -1,11 +1,15 @@
 import yargs from "yargs/yargs";
-
 import { DeveloperError } from "./base/DeveloperError";
+
+import { Loggers } from "./logging/Loggers";
+let logger = Loggers.get("CLI");
 
 import { ToolsMain } from "./ToolsMain";
 
 // Split the arguments that are intended for the tools
-// and the `--options` arguments
+// and the `--options` arguments. Everything behind
+// the `--options` will be passed to downstream
+// calls (e.g. calls to `gltf-pipeline`)
 const optionsIndex = process.argv.indexOf("--options");
 let toolArgs;
 let optionArgs: string[];
@@ -72,6 +76,21 @@ function parseToolArgs(a: string[]) {
         alias: "force",
         default: false,
         description: "Output can be overwritten if it already exists.",
+        global: true,
+        type: "boolean",
+      },
+      logLevel: {
+        default: "info",
+        description:
+          "The log level. Valid values are 'trace', 'debug', 'info', " +
+          "'warn', 'error', 'fatal', and 'silent'",
+        global: true,
+        type: "string",
+      },
+      logJson: {
+        default: false,
+        description:
+          "Whether log messages should be printed as JSON instead of pretty-printing",
         global: true,
         type: "boolean",
       },
@@ -287,6 +306,8 @@ function parseToolArgs(a: string[]) {
 function parseOptionArgs(a: string[]) {
   const args = yargs(a);
   const v = args.argv as any;
+  delete v["_"];
+  delete v["$0"];
   if (v.draco) {
     v.dracoOptions = v.draco;
   }
@@ -295,20 +316,45 @@ function parseOptionArgs(a: string[]) {
 
 const parsedToolArgs = parseToolArgs(toolArgs);
 
-// Debug output for "Why? Args!"
-/*/
-console.log("Parsed command line arguments:");
-console.log(parsedToolArgs);
-//*/
-
 async function run() {
   if (!parsedToolArgs) {
     return;
   }
+
+  const logJson = parsedToolArgs.logJson;
+  if (logJson === true) {
+    const prettyPrint = false;
+    Loggers.initDefaultLogger(prettyPrint);
+    logger = Loggers.get("CLI");
+  }
+
+  const logLevel = parsedToolArgs.logLevel;
+  if (logLevel !== undefined) {
+    const validLogLevels = [
+      "trace",
+      "debug",
+      "info",
+      "warn",
+      "error",
+      "fatal",
+      "silent",
+    ];
+    if (validLogLevels.includes(logLevel)) {
+      Loggers.setLevel(logLevel);
+    } else {
+      logger.warn(`Invalid log level: ${logLevel}`);
+      Loggers.setLevel("info");
+    }
+  }
+
+  logger.trace("Parsed command line arguments:");
+  logger.trace(parsedToolArgs);
+
   const command = parsedToolArgs._[0];
-  console.time("Total");
+  const beforeMs = performance.now();
   await runCommand(command, parsedToolArgs, optionArgs);
-  console.timeEnd("Total");
+  const afterMs = performance.now();
+  logger.info(`Total: ${(afterMs - beforeMs).toFixed(3)} ms`);
 }
 
 async function runCommand(command: string, toolArgs: any, optionArgs: any) {
@@ -318,14 +364,13 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   const tilesOnly = toolArgs.tilesOnly;
   const parsedOptionArgs = parseOptionArgs(optionArgs);
 
-  /*/
-  console.log("command " + command);
-  console.log("inputs " + inputs);
-  console.log("output " + output);
-  console.log("force " + force);
-  console.log("optionArgs ", optionArgs);
-  console.log("parsedOptionArgs ", parsedOptionArgs);
-  //*/
+  logger.trace(`Command line call:`);
+  logger.trace(`  command: ${command}`);
+  logger.trace(`  inputs: ${inputs}`);
+  logger.trace(`  output: ${output}`);
+  logger.trace(`  force: ${force}`);
+  logger.trace(`  optionArgs: ${optionArgs}`);
+  logger.trace(`  parsedOptionArgs: ${JSON.stringify(parsedOptionArgs)}`);
 
   const input = inputs[inputs.length - 1];
 
@@ -352,12 +397,12 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   } else if (command === "ungzip") {
     await ToolsMain.ungzip(input, output, force);
   } else if (command === "tilesetToDatabase") {
-    console.log(
+    logger.info(
       `The 'tilesetToDatabase' command is deprecated. Use 'convert' instead.`
     );
     await ToolsMain.convert(input, undefined, output, force);
   } else if (command === "databaseToTileset") {
-    console.log(
+    logger.info(
       `The 'databaseToTileset' command is deprecated. Use 'convert' instead.`
     );
     await ToolsMain.convert(input, undefined, output, force);
@@ -395,7 +440,7 @@ async function runChecked() {
   try {
     await run();
   } catch (e: any) {
-    console.log(`${e}`);
+    logger.error(e);
   }
 }
 

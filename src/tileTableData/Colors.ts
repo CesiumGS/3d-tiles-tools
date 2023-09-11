@@ -69,7 +69,7 @@ export class Colors {
 
   // From CesiumJS AttributeCompression
   private static normalizedStandardRGBAToNormalizedLinearRGBA(srgb: number[]) {
-    const linear = new Array(4);
+    const linear = Array<number>(4);
     linear[3] = srgb[3];
 
     for (let i = 0; i < 3; i++) {
@@ -106,7 +106,7 @@ export class Colors {
     const red = value >> 11;
     const green = (value >> 5) & mask6;
     const blue = value & mask5;
-    const result: number[] = Array(4);
+    const result = Array<number>(4);
     result[0] = red * normalize5;
     result[1] = green * normalize6;
     result[2] = blue * normalize5;

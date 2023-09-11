@@ -29,6 +29,9 @@ import { EXTInstanceFeatures } from "../gltfExtensions/EXTInstanceFeatures";
 import { InstanceFeaturesUtils } from "../gltfExtensions/InstanceFeaturesUtils";
 import { StructuralMetadataUtils } from "../gltfExtensions/StructuralMetadataUtils";
 
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("migration");
+
 /**
  * Methods for converting I3DM tile data into GLB
  *
@@ -60,15 +63,13 @@ export class TileFormatsMigrationI3dm {
 
     const numInstances = featureTable.INSTANCES_LENGTH;
 
-    //*/
-    if (TileFormatsMigration.DEBUG_LOG) {
-      console.log("Batch table");
-      console.log(JSON.stringify(batchTable, null, 2));
-
-      console.log("Feature table");
-      console.log(JSON.stringify(featureTable, null, 2));
+    if (
+      TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&
+      logger.isLevelEnabled("trace")
+    ) {
+      logger.trace("Batch table:\n" + JSON.stringify(batchTable, null, 2));
+      logger.trace("Feature table:\n" + JSON.stringify(featureTable, null, 2));
     }
-    //*/
 
     // Obtain the GLB buffer for the tile data. With `gltfFormat===1`, it
     // is stored directly as the payload. Otherwise (with `gltfFormat===0`)
@@ -101,13 +102,14 @@ export class TileFormatsMigrationI3dm {
     const root = document.getRoot();
     root.getAsset().generator = "glTF-Transform";
 
-    //*/
-    if (TileFormatsMigration.DEBUG_LOG) {
-      console.log("Input glTF JSON");
+    if (
+      TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&
+      logger.isLevelEnabled("trace")
+    ) {
       const jsonDocument = await io.writeJSON(document);
-      console.log(JSON.stringify(jsonDocument.json, null, 2));
+      const json = jsonDocument.json;
+      logger.trace("Input glTF JSON:\n" + JSON.stringify(json, null, 2));
     }
-    //*/
 
     // Flatten all nodes in the glTF asset. This will collapse
     // all nodes to essentially be "root nodes" in the scene.
@@ -331,21 +333,21 @@ export class TileFormatsMigrationI3dm {
     // the glTF.
     TileFormatsMigration.applyRtcCenter(document, positionsCenter);
 
-    //*/
-    if (TileFormatsMigration.DEBUG_LOG) {
-      console.log("JSON document");
+    if (
+      TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&
+      logger.isLevelEnabled("trace")
+    ) {
       const jsonDocument = await io.writeJSON(document);
-      console.log(JSON.stringify(jsonDocument.json, null, 2));
-
-      console.log("Metadata information:");
-      console.log(
+      const json = jsonDocument.json;
+      logger.trace("Output glTF JSON:\n" + JSON.stringify(json, null, 2));
+      logger.trace("Metadata information:");
+      logger.trace(
         InstanceFeaturesUtils.createInstanceFeaturesInfoString(document)
       );
-      console.log(
+      logger.trace(
         StructuralMetadataUtils.createStructuralMetadataInfoString(document)
       );
     }
-    //*/
 
     // Create the GLB buffer
     const glb = await io.writeBinary(document);

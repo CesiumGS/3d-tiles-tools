@@ -10,6 +10,9 @@ import { TilesetError } from "./TilesetError";
 import { TilesetSource } from "./TilesetSource";
 import { TilesetSourceFs } from "./TilesetSourceFs";
 
+import { Loggers } from "../logging/Loggers";
+const logger = Loggers.get("tilesetData");
+
 /**
  * Methods related to `TilesetSource` instances
  *
@@ -64,7 +67,7 @@ export class TilesetSources {
     if (extension === "") {
       return new TilesetSourceFs();
     }
-    console.log("Unknown tileset source type: " + extension);
+    logger.error("Unknown tileset source type: " + extension);
     return undefined;
   }
 

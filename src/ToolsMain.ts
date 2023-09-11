@@ -25,6 +25,9 @@ import { TilesetConverter } from "./tilesetProcessing/TilesetConverter";
 
 import { TilesetJsonCreator } from "./tilesetProcessing/TilesetJsonCreator";
 
+import { Loggers } from "./logging/Loggers";
+const logger = Loggers.get("CLI");
+
 /**
  * Functions that directly correspond to the command line functionality.
  *
@@ -41,36 +44,73 @@ import { TilesetJsonCreator } from "./tilesetProcessing/TilesetJsonCreator";
  */
 export class ToolsMain {
   static async b3dmToGlb(input: string, output: string, force: boolean) {
+    logger.debug(`Executing b3dmToGlb`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const inputTileData = TileFormats.readTileData(inputBuffer);
     const outputBuffer = inputTileData.payload;
     fs.writeFileSync(output, outputBuffer);
+
+    logger.debug(`Executing b3dmToGlb DONE`);
   }
   static async convertB3dmToGlb(input: string, output: string, force: boolean) {
+    logger.debug(`Executing convertB3dmToGlb`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const outputBuffer = await TileFormatsMigration.convertB3dmToGlb(
       inputBuffer
     );
     fs.writeFileSync(output, outputBuffer);
+
+    logger.debug(`Executing convertB3dmToGlb DONE`);
   }
   static async convertPntsToGlb(input: string, output: string, force: boolean) {
+    logger.debug(`Executing convertPntsToGlb`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const outputBuffer = await TileFormatsMigration.convertPntsToGlb(
       inputBuffer
     );
     fs.writeFileSync(output, outputBuffer);
+
+    logger.debug(`Executing convertPntsToGlb DONE`);
   }
   static async i3dmToGlb(input: string, output: string, force: boolean) {
-    return ToolsMain.b3dmToGlb(input, output, force);
+    logger.debug(`Executing i3dmToGlb`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
+    ToolsMain.ensureCanWrite(output, force);
+    const inputBuffer = fs.readFileSync(input);
+    const inputTileData = TileFormats.readTileData(inputBuffer);
+    const outputBuffer = inputTileData.payload;
+    fs.writeFileSync(output, outputBuffer);
+
+    logger.debug(`Executing i3dmToGlb DONE`);
   }
   static async cmptToGlb(input: string, output: string, force: boolean) {
+    logger.debug(`Executing cmptToGlb`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
     const inputBuffer = fs.readFileSync(input);
     const glbBuffers = TileFormats.extractGlbBuffers(inputBuffer);
     const glbsLength = glbBuffers.length;
-    const glbPaths = new Array(glbsLength);
+    const glbPaths = Array<string>(glbsLength);
     if (glbsLength === 0) {
       throw new DeveloperError(`No glbs found in ${input}.`);
     } else if (glbsLength === 1) {
@@ -91,22 +131,38 @@ export class ToolsMain {
       );
       fs.writeFileSync(glbPath, upgradedOutputBuffer);
     }
+
+    logger.debug(`Executing cmptToGlb DONE`);
   }
   static async glbToB3dm(input: string, output: string, force: boolean) {
+    logger.debug(`Executing glbToB3dm`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const outputTileData =
       TileFormats.createDefaultB3dmTileDataFromGlb(inputBuffer);
     const outputBuffer = TileFormats.createTileDataBuffer(outputTileData);
     fs.writeFileSync(output, outputBuffer);
+
+    logger.debug(`Executing glbToB3dm DONE`);
   }
   static async glbToI3dm(input: string, output: string, force: boolean) {
+    logger.debug(`Executing glbToI3dm`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const outputTileData =
       TileFormats.createDefaultI3dmTileDataFromGlb(inputBuffer);
     const outputBuffer = TileFormats.createTileDataBuffer(outputTileData);
     fs.writeFileSync(output, outputBuffer);
+
+    logger.debug(`Executing glbToI3dm DONE`);
   }
   static async optimizeB3dm(
     input: string,
@@ -114,6 +170,12 @@ export class ToolsMain {
     force: boolean,
     options: any
   ) {
+    logger.debug(`Executing optimizeB3dm`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+    logger.debug(`  options: ${JSON.stringify(options)}`);
+
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const outputBuffer = await ContentOps.optimizeB3dmBuffer(
@@ -121,6 +183,8 @@ export class ToolsMain {
       options
     );
     fs.writeFileSync(output, outputBuffer);
+
+    logger.debug(`Executing optimizeB3dm DONE`);
   }
   static async optimizeI3dm(
     input: string,
@@ -128,6 +192,12 @@ export class ToolsMain {
     force: boolean,
     options: any
   ) {
+    logger.debug(`Executing optimizeI3dm`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+    logger.debug(`  options: ${JSON.stringify(options)}`);
+
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const outputBuffer = await ContentOps.optimizeI3dmBuffer(
@@ -135,6 +205,8 @@ export class ToolsMain {
       options
     );
     fs.writeFileSync(output, outputBuffer);
+
+    logger.debug(`Executing optimizeI3dm DONE`);
   }
 
   static analyze(
@@ -142,8 +214,8 @@ export class ToolsMain {
     outputDirectoryName: string,
     force: boolean
   ) {
-    console.log(`Analyzing ${inputFileName}`);
-    console.log(`writing results to ${outputDirectoryName}`);
+    logger.info(`Analyzing ${inputFileName}`);
+    logger.info(`writing results to ${outputDirectoryName}`);
 
     const inputBaseName = path.basename(inputFileName);
     const inputBuffer = fs.readFileSync(inputFileName);
@@ -153,6 +225,7 @@ export class ToolsMain {
       outputDirectoryName,
       force
     );
+    logger.info(`Analyzing ${inputFileName} DONE`);
   }
   static analyzeInternal(
     inputBaseName: string,
@@ -179,10 +252,10 @@ export class ToolsMain {
         return;
       }
       if (!ToolsMain.canWrite(fileName, force)) {
-        console.log(`Cannot write ${fileName}`);
+        logger.error(`Cannot write ${fileName}`);
         return;
       }
-      console.log(`Writing ${fileName}`);
+      logger.info(`Writing ${fileName}`);
       fs.writeFileSync(fileName, Buffer.from(jsonString));
     };
 
@@ -194,10 +267,10 @@ export class ToolsMain {
         return;
       }
       if (!ToolsMain.canWrite(fileName, force)) {
-        console.log(`Cannot write ${fileName}`);
+        logger.error(`Cannot write ${fileName}`);
         return;
       }
-      console.log(`Writing ${fileName}`);
+      logger.info(`Writing ${fileName}`);
       fs.writeFileSync(fileName, buffer);
     };
 
@@ -374,6 +447,13 @@ export class ToolsMain {
     targetVersion: string,
     gltfUpgradeOptions: any
   ) {
+    logger.debug(`Executing upgrade`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+    logger.debug(`  targetVersion: ${targetVersion}`);
+    logger.debug(`  gltfUpgradeOptions: ${JSON.stringify(gltfUpgradeOptions)}`);
+
     ToolsMain.ensureCanWrite(output, force);
     await Tilesets.upgrade(
       input,
@@ -382,18 +462,33 @@ export class ToolsMain {
       targetVersion,
       gltfUpgradeOptions
     );
+
+    logger.debug(`Executing upgrade DONE`);
   }
 
   static async merge(inputs: string[], output: string, force: boolean) {
+    logger.debug(`Executing merge`);
+    logger.debug(`  inputs: ${inputs}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
     ToolsMain.ensureCanWrite(output, force);
     await Tilesets.merge(inputs, output, force);
+
+    logger.debug(`Executing merge DONE`);
   }
 
   static async pipeline(input: string, force: boolean) {
+    logger.debug(`Executing pipeline`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  force: ${force}`);
+
     const pipelineJsonBuffer = fs.readFileSync(input);
     const pipelineJson = JSON.parse(pipelineJsonBuffer.toString());
     const pipeline = Pipelines.createPipeline(pipelineJson);
     await PipelineExecutor.executePipeline(pipeline, force);
+
+    logger.debug(`Executing pipeline DONE`);
   }
 
   static async createTilesetJson(
@@ -401,6 +496,11 @@ export class ToolsMain {
     output: string,
     force: boolean
   ) {
+    logger.debug(`Executing createTilesetJson`);
+    logger.debug(`  inputName: ${inputName}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
     ToolsMain.ensureCanWrite(output, force);
     let baseDir = inputName;
     let contentUris = [];
@@ -411,19 +511,11 @@ export class ToolsMain {
     } else {
       const recurse = true;
       const allFiles = Iterables.overFiles(inputName, recurse);
-      /*
-      const glbFiles = Iterables.filter(allFiles, (fileName: string) =>
-        Paths.hasExtension(fileName, ".glb")
-      );
-      contentUris = [...glbFiles].map((fileName: string) =>
-        Paths.relativize(inputName, fileName)
-      );
-      */
       contentUris = [...allFiles].map((fileName: string) =>
         Paths.relativize(inputName, fileName)
       );
     }
-    console.log("Creating tileset.json with content URIs: ", contentUris);
+    logger.info("Creating tileset.json with content URIs: ", contentUris);
     const tileset = await TilesetJsonCreator.createTilesetFromContents(
       baseDir,
       contentUris
@@ -432,6 +524,8 @@ export class ToolsMain {
     const outputDirectory = path.dirname(output);
     Paths.ensureDirectoryExists(outputDirectory);
     fs.writeFileSync(output, Buffer.from(tilesetJsonString));
+
+    logger.debug(`Executing createTilesetJson DONE`);
   }
 
   /**
