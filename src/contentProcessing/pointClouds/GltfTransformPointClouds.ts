@@ -52,7 +52,7 @@ export class GltfTransformPointClouds {
    *
    * When `mayRequireAlpha` is `false`, then a point cloud with RGB colors
    * and an OPAQUE alpha mode material will be created.
-   * Otherwise, the implementation will still check thea ctual colors: If
+   * Otherwise, the implementation will still check thea actual colors: If
    * any of them has a non-1.0 alpha component, then it will create a
    * point cloud with a BLEND alpha mode material and RGBA colors.
    *
@@ -129,7 +129,7 @@ export class GltfTransformPointClouds {
         colorAccessor.setType(Accessor.Type.VEC3);
 
         // Filter out the 'A' components from the RGBA values
-        const colorsRGB = Iterables.filterWIthIndex(
+        const colorsRGB = Iterables.filterWithIndex(
           colors,
           (e: number, i: number) => i % 4 !== 3
         );
