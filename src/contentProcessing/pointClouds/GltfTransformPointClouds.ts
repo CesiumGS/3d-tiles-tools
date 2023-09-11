@@ -1,4 +1,5 @@
 import { Document } from "@gltf-transform/core";
+import { Logger } from "@gltf-transform/core";
 import { Accessor } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 import { Buffer as GltfBuffer } from "@gltf-transform/core";
@@ -309,6 +310,10 @@ export class GltfTransformPointClouds {
     }
     const khrMeshQuantization = document.createExtension(KHRMeshQuantization);
     khrMeshQuantization.setRequired(true);
+    // The 'quantize' transform internally calls 'prune' and 'dedup',
+    // with the 'INFO' log level. Set the log level to 'WARN' here
+    // to prevent this output.
+    document.setLogger(new Logger(Logger.Verbosity.WARN));
     await document.transform(quantize(options));
   }
 }

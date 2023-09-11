@@ -120,7 +120,7 @@ export class TileFormatsMigrationI3dm {
       clearNodeParent(node);
       clearNodeTransform(node);
     }
-    document.setLogger(new Logger(Logger.Verbosity.SILENT));
+    document.setLogger(new Logger(Logger.Verbosity.WARN));
     await document.transform(prune());
 
     // Insert a single root node above the "flatteded" nodes
