@@ -21,6 +21,9 @@ If you want to work directly with a clone of the Git repository, see [Developer 
 |`-i`, `--input`|Input file or directory| Yes|
 |`-o`, `--output`|Output file or directory |Yes|
 |`-f`, `--force`|Overwrite output if it exists|No, default `false`|
+|`--logLevel`|The log level. Valid values are `trace`, `debug`, `info`, `warn`, `error`, `fatal`, and `silent` |No, default `info`|
+|`--logJson`|Print log messages as JSON instead of pretty-printed|No, default `false`|
+
 
 ### Command line tools for tilesets
 
@@ -183,6 +186,32 @@ Extracts the glb models from a cmpt tile. If multiple models are found a number 
 ```
 npx 3d-tiles-tools cmptToGlb -i ./specs/data/composite.cmpt -o ./output/extracted.glb
 ```
+
+
+#### convertB3dmToGlb
+
+Convert a b3dm file into a glTF asset that uses glTF extensions to represent the batch- and feature table information.
+
+```
+npx 3d-tiles-tools convertB3dmToGlb -i ./data/example.b3dm -o ./data/example.glb
+```
+
+#### convertPntsToGlb
+
+Convert a pnts file into a glTF asset that uses glTF extensions to represent the point properties and batch- and feature table information.
+
+```
+npx 3d-tiles-tools convertPntsToGlb -i ./data/example.pnts -o ./data/example.glb
+```
+
+#### convertI3dmToGlb
+
+Convert an i3dm file into a glTF asset that uses glTF extensions to represent the batch- and feature table information. This conversion may be lossy if the GLB of the input i3dm contains animations.
+
+```
+npx 3d-tiles-tools convertI3dmToGlb -i ./data/example.i3dm -o ./data/example.glb
+```
+
 
 #### optimizeB3dm
 

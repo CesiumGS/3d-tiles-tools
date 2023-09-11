@@ -1,4 +1,5 @@
 import { Document } from "@gltf-transform/core";
+import { Logger } from "@gltf-transform/core";
 import { Accessor } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 import { Buffer as GltfBuffer } from "@gltf-transform/core";
@@ -51,7 +52,7 @@ export class GltfTransformPointClouds {
    *
    * When `mayRequireAlpha` is `false`, then a point cloud with RGB colors
    * and an OPAQUE alpha mode material will be created.
-   * Otherwise, the implementation will still check thea ctual colors: If
+   * Otherwise, the implementation will still check thea actual colors: If
    * any of them has a non-1.0 alpha component, then it will create a
    * point cloud with a BLEND alpha mode material and RGBA colors.
    *
@@ -128,7 +129,7 @@ export class GltfTransformPointClouds {
         colorAccessor.setType(Accessor.Type.VEC3);
 
         // Filter out the 'A' components from the RGBA values
-        const colorsRGB = Iterables.filterWIthIndex(
+        const colorsRGB = Iterables.filterWithIndex(
           colors,
           (e: number, i: number) => i % 4 !== 3
         );
@@ -309,6 +310,10 @@ export class GltfTransformPointClouds {
     }
     const khrMeshQuantization = document.createExtension(KHRMeshQuantization);
     khrMeshQuantization.setRequired(true);
+    // The 'quantize' transform internally calls 'prune' and 'dedup',
+    // with the 'INFO' log level. Set the log level to 'WARN' here
+    // to prevent this output.
+    document.setLogger(new Logger(Logger.Verbosity.WARN));
     await document.transform(quantize(options));
   }
 }

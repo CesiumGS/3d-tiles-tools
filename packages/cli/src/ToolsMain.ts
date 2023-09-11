@@ -87,6 +87,33 @@ export class ToolsMain {
 
     logger.debug(`Executing convertPntsToGlb DONE`);
   }
+
+  static async convertI3dmToGlb(input: string, output: string, force: boolean) {
+    logger.debug(`Executing convertI3dmToGlb`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
+    ToolsMain.ensureCanWrite(output, force);
+    const inputBuffer = fs.readFileSync(input);
+
+    // Prepare the resolver for external GLBs in I3DM
+    const baseDir = path.dirname(input);
+    const externalGlbResolver = async (
+      uri: string
+    ): Promise<Buffer | undefined> => {
+      const externalGlbUri = path.resolve(baseDir, uri);
+      return fs.readFileSync(externalGlbUri);
+    };
+    const outputBuffer = await TileFormatsMigration.convertI3dmToGlb(
+      inputBuffer,
+      externalGlbResolver
+    );
+    fs.writeFileSync(output, outputBuffer);
+
+    logger.debug(`Executing convertI3dmToGlb DONE`);
+  }
+
   static async i3dmToGlb(input: string, output: string, force: boolean) {
     logger.debug(`Executing i3dmToGlb`);
     logger.debug(`  input: ${input}`);

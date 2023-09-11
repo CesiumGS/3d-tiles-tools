@@ -1,11 +1,8 @@
 import yargs from "yargs/yargs";
+import { DeveloperError } from "./base/DeveloperError";
 
-import { DeveloperError } from "@3d-tiles-tools/all";
-
-
-
-import { Loggers } from "@3d-tiles-tools/all";
-const logger = Loggers.get("CLI");
+import { Loggers } from "./logging/Loggers";
+let logger = Loggers.get("CLI");
 
 import { ToolsMain } from "./ToolsMain";
 
@@ -82,6 +79,21 @@ function parseToolArgs(a: string[]) {
         global: true,
         type: "boolean",
       },
+      logLevel: {
+        default: "info",
+        description:
+          "The log level. Valid values are 'trace', 'debug', 'info', " +
+          "'warn', 'error', 'fatal', and 'silent'",
+        global: true,
+        type: "string",
+      },
+      logJson: {
+        default: false,
+        description:
+          "Whether log messages should be printed as JSON instead of pretty-printing",
+        global: true,
+        type: "boolean",
+      },
     })
     .command(
       "convert",
@@ -130,6 +142,22 @@ function parseToolArgs(a: string[]) {
       }
     )
     .command(
+      "i3dmToGlb",
+      "Extract the binary glTF asset from the input i3dm.",
+      {
+        i: inputStringDefinition,
+        o: outputStringDefinition,
+      }
+    )
+    .command(
+      "cmptToGlb",
+      "Extract the binary glTF assets from the input cmpt.",
+      {
+        i: inputStringDefinition,
+        o: outputStringDefinition,
+      }
+    )
+    .command(
       "convertB3dmToGlb",
       "Convert a b3dm file into a glTF asset that uses glTF extensions to " +
         "represent the batch- and feature table information",
@@ -148,16 +176,10 @@ function parseToolArgs(a: string[]) {
       }
     )
     .command(
-      "i3dmToGlb",
-      "Extract the binary glTF asset from the input i3dm.",
-      {
-        i: inputStringDefinition,
-        o: outputStringDefinition,
-      }
-    )
-    .command(
-      "cmptToGlb",
-      "Extract the binary glTF assets from the input cmpt.",
+      "convertI3dmToGlb",
+      "Convert an i3dm file into a glTF asset that uses glTF extensions to " +
+        "represent the batch- and feature table information. This conversion " +
+        "may be lossy if the GLB of the input i3dm contains animations.",
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
@@ -308,6 +330,33 @@ async function run() {
   if (!parsedToolArgs) {
     return;
   }
+
+  const logJson = parsedToolArgs.logJson;
+  if (logJson === true) {
+    const prettyPrint = false;
+    Loggers.initDefaultLogger(prettyPrint);
+    logger = Loggers.get("CLI");
+  }
+
+  const logLevel = parsedToolArgs.logLevel;
+  if (logLevel !== undefined) {
+    const validLogLevels = [
+      "trace",
+      "debug",
+      "info",
+      "warn",
+      "error",
+      "fatal",
+      "silent",
+    ];
+    if (validLogLevels.includes(logLevel)) {
+      Loggers.setLevel(logLevel);
+    } else {
+      logger.warn(`Invalid log level: ${logLevel}`);
+      Loggers.setLevel("info");
+    }
+  }
+
   logger.trace("Parsed command line arguments:");
   logger.trace(parsedToolArgs);
 
@@ -337,14 +386,16 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
 
   if (command === "b3dmToGlb") {
     await ToolsMain.b3dmToGlb(input, output, force);
-  } else if (command === "convertB3dmToGlb") {
-    await ToolsMain.convertB3dmToGlb(input, output, force);
-  } else if (command === "convertPntsToGlb") {
-    await ToolsMain.convertPntsToGlb(input, output, force);
   } else if (command === "i3dmToGlb") {
     await ToolsMain.i3dmToGlb(input, output, force);
   } else if (command === "cmptToGlb") {
     await ToolsMain.cmptToGlb(input, output, force);
+  } else if (command === "convertB3dmToGlb") {
+    await ToolsMain.convertB3dmToGlb(input, output, force);
+  } else if (command === "convertPntsToGlb") {
+    await ToolsMain.convertPntsToGlb(input, output, force);
+  } else if (command === "convertI3dmToGlb") {
+    await ToolsMain.convertI3dmToGlb(input, output, force);
   } else if (command === "glbToB3dm") {
     await ToolsMain.glbToB3dm(input, output, force);
   } else if (command === "glbToI3dm") {
