@@ -2,17 +2,17 @@ import { Document } from "@gltf-transform/core";
 import { Mesh } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 
-import { Class } from "./StructuralMetadata";
-import { ClassProperty } from "./StructuralMetadata";
-import { MeshPrimitiveStructuralMetadata } from "./StructuralMetadata";
-import { PropertyAttribute } from "./StructuralMetadata";
-import { PropertyAttributeProperty } from "./StructuralMetadata";
-import { PropertyTable } from "./StructuralMetadata";
-import { PropertyTableProperty } from "./StructuralMetadata";
-import { PropertyTexture } from "./StructuralMetadata";
-import { PropertyTextureProperty } from "./StructuralMetadata";
-import { Schema } from "./StructuralMetadata";
-import { StructuralMetadata } from "./StructuralMetadata";
+import { Class } from "@3d-tiles-tools/gltf-extensions";
+import { ClassProperty } from "@3d-tiles-tools/gltf-extensions";
+import { MeshPrimitiveStructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
+import { PropertyAttribute } from "@3d-tiles-tools/gltf-extensions";
+import { PropertyAttributeProperty } from "@3d-tiles-tools/gltf-extensions";
+import { PropertyTable } from "@3d-tiles-tools/gltf-extensions";
+import { PropertyTableProperty } from "@3d-tiles-tools/gltf-extensions";
+import { PropertyTexture } from "@3d-tiles-tools/gltf-extensions";
+import { PropertyTextureProperty } from "@3d-tiles-tools/gltf-extensions";
+import { Schema } from "@3d-tiles-tools/gltf-extensions";
+import { StructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
 
 import { StringBuilder } from "./StringBuilder";
 

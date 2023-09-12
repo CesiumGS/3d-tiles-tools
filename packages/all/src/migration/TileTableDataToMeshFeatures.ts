@@ -4,8 +4,8 @@ import { Accessor } from "@gltf-transform/core";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
 
-import { EXTMeshFeatures } from "../gltfExtensions/EXTMeshFeatures";
-import { FeatureId } from "../gltfExtensions/MeshFeatures";
+import { EXTMeshFeatures } from "@3d-tiles-tools/gltf-extensions";
+import { MeshFeatureId } from "@3d-tiles-tools/gltf-extensions";
 
 import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("migration");
@@ -33,7 +33,7 @@ export class TileTableDataToMeshFeatures {
   static convertBatchIdToMeshFeatures(
     document: Document,
     primitive: Primitive
-  ): FeatureId {
+  ): MeshFeatureId {
     let batchIdAttribute = primitive.getAttribute("_BATCHID");
     if (!batchIdAttribute) {
       batchIdAttribute = primitive.getAttribute("BATCHID");

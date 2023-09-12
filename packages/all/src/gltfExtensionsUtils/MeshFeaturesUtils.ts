@@ -2,8 +2,8 @@ import { Document } from "@gltf-transform/core";
 import { Mesh } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 
-import { FeatureId } from "./MeshFeatures";
-import { MeshFeatures } from "./MeshFeatures";
+import { MeshFeatureId } from "@3d-tiles-tools/gltf-extensions";
+import { MeshFeatures } from "@3d-tiles-tools/gltf-extensions";
 
 import { StringBuilder } from "./StringBuilder";
 
@@ -89,7 +89,7 @@ export class MeshFeaturesUtils {
 
   private static createFeatureIdString(
     sb: StringBuilder,
-    featureId: FeatureId
+    featureId: MeshFeatureId
   ) {
     sb.addLine("featureCount: ", featureId.getFeatureCount());
     sb.addLine("attribute: ", featureId.getAttribute());

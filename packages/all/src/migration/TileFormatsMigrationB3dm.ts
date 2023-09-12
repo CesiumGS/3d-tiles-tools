@@ -12,8 +12,8 @@ import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMe
 import { TileTableDataToMeshFeatures } from "./TileTableDataToMeshFeatures";
 import { TileFormatsMigration } from "./TileFormatsMigration";
 
-import { InstanceFeaturesUtils } from "../gltfExtensions/InstanceFeaturesUtils";
-import { StructuralMetadataUtils } from "../gltfExtensions/StructuralMetadataUtils";
+import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils";
+import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils";
 
 import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("migration");

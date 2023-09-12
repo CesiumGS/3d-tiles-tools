@@ -26,6 +26,12 @@
       "path": "./packages/structure/tsconfig.json"
     },
     {
+      "path": "./packages/gltf-extensions/tsconfig.json"
+    },
+    {
+      "path": "./packages/ktx/tsconfig.json"
+    },
+    {
       "path": "./packages/all/tsconfig.json"
     },
     {

@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const BASIS = require("./external/basis_encoder.js");
 
-import { DeveloperError } from "../base/DeveloperError";
+import { KtxError } from "./KtxError";
 
 /**
  * A thin wrapper around the basis encoder. This class and its documentation are created from
@@ -39,12 +39,12 @@ export class BasisEncoder {
    * Creates a new instance of a basis encoder.
    *
    * @returns The encoder object
-   * @throws If the object can not be instantiated
+   * @throws KtxError If the object can not be instantiated
    */
   static async create(): Promise<BasisEncoder> {
     await this.ensureBasisEncoderImplInitialized();
     if (!BasisEncoder.BasisEncoderImpl) {
-      throw new DeveloperError("Could not initialize BasisEncoder");
+      throw new KtxError("Could not initialize BasisEncoder");
     }
     const impl = new BasisEncoder.BasisEncoderImpl();
     return new BasisEncoder(impl);

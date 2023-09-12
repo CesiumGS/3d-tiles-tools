@@ -4,9 +4,9 @@ import { Transform } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
 import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
 
-import { EXTStructuralMetadata } from "../gltfExtensions/EXTStructuralMetadata";
-import { EXTMeshFeatures } from "../gltfExtensions/EXTMeshFeatures";
-import { EXTInstanceFeatures } from "../gltfExtensions/EXTInstanceFeatures";
+import { EXTStructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
+import { EXTMeshFeatures } from "@3d-tiles-tools/gltf-extensions";
+import { EXTInstanceFeatures } from "@3d-tiles-tools/gltf-extensions";
 
 /**
  * Utilities for using glTF-Transform in the 3D Tiles tools

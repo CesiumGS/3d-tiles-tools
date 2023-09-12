@@ -7,10 +7,10 @@ import { listTextureSlots } from "@gltf-transform/functions";
 
 import { KHRTextureBasisu } from "@gltf-transform/extensions";
 
-import { KtxUtility } from "../ktx/KtxUtility";
-import { KtxEtc1sOptions } from "../ktx/KtxEtc1sOptions";
-import { KtxUastcOptions } from "../ktx/KtxUastcOptions";
-import { KtxOptions } from "../ktx/KtxOptions";
+import { KtxUtility } from "@3d-tiles-tools/ktx";
+import { KtxEtc1sOptions } from "@3d-tiles-tools/ktx";
+import { KtxUastcOptions } from "@3d-tiles-tools/ktx";
+import { KtxOptions } from "@3d-tiles-tools/ktx";
 
 import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("contentProcessing");

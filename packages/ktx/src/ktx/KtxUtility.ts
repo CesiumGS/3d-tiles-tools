@@ -8,9 +8,6 @@ import { KtxEtc1sOptions } from "./KtxEtc1sOptions";
 import { KtxUastcOptions } from "./KtxUastcOptions";
 import { KtxError } from "./KtxError";
 
-import { Loggers } from "../logging/Loggers";
-const logger = Loggers.get("KTX");
-
 /**
  * Utility class for converting images into KTX2 format.
  */
@@ -131,10 +128,10 @@ export class KtxUtility {
     // reasonable, with a factor of `* 2` to be safe...
     const basisData = new Uint8Array(imageWidth * imageHeight * 4 * 2);
 
-    logger.debug(`Encoding ${imageWidth}x${imageHeight} pixels to KTX`);
-    if (logger.isLevelEnabled("trace")) {
-      logger.trace(`Encoding options: ${JSON.stringify(options)}`);
-    }
+    //logger.debug(`Encoding ${imageWidth}x${imageHeight} pixels to KTX`);
+    //if (logger.isLevelEnabled("trace")) {
+    //  logger.trace(`Encoding options: ${JSON.stringify(options)}`);
+    //}
 
     const resultSize = basisEncoder.encode(basisData);
     if (resultSize === 0) {
@@ -143,7 +140,7 @@ export class KtxUtility {
 
     const result = Buffer.from(basisData.subarray(0, resultSize));
 
-    logger.debug(`Encoding ${imageWidth}x${imageHeight} pixels to KTX DONE`);
+    //logger.debug(`Encoding ${imageWidth}x${imageHeight} pixels to KTX DONE`);
 
     return result;
   }

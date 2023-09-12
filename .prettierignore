@@ -8,4 +8,4 @@
 src/**/*.ts
 specs/data/
 packages/**/build/
-packages/all/src/ktx/external/basis_encoder.js
+packages/ktx/src/ktx/external/basis_encoder.js

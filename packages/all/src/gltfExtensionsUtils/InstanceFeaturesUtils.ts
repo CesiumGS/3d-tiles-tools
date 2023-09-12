@@ -4,8 +4,9 @@ import { Node } from "@gltf-transform/core";
 import { InstancedMesh } from "@gltf-transform/extensions";
 
 import { StringBuilder } from "./StringBuilder";
-import { InstanceFeatures } from "./InstanceFeatures";
-import { FeatureId } from "./InstanceFeatures";
+
+import { InstanceFeatures } from "@3d-tiles-tools/gltf-extensions";
+import { InstanceFeatureId } from "@3d-tiles-tools/gltf-extensions";
 
 /**
  * Utilities related to the glTF `EXT_instance_features` extension.
@@ -91,7 +92,7 @@ export class InstanceFeaturesUtils {
 
   private static createFeatureIdString(
     sb: StringBuilder,
-    featureId: FeatureId,
+    featureId: InstanceFeatureId,
     meshGpuInstancing: InstancedMesh
   ) {
     sb.addLine("featureCount: ", featureId.getFeatureCount());

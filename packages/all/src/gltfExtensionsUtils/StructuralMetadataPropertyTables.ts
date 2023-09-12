@@ -1,9 +1,9 @@
 import { MetadataError } from "../metadata/MetadataError";
 import { BinaryPropertyTable } from "../metadata/binary/BinaryPropertyTable";
 
-import { EXTStructuralMetadata } from "./EXTStructuralMetadata";
-import { PropertyTablePropertyOffsetType } from "./EXTStructuralMetadata";
-import { PropertyTable } from "./StructuralMetadata";
+import { EXTStructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
+import { PropertyTablePropertyOffsetType } from "@3d-tiles-tools/gltf-extensions";
+import { PropertyTable } from "@3d-tiles-tools/gltf-extensions";
 
 /**
  * Methods for creating `PropertyTable` objects for the glTF-Transform

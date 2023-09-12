@@ -25,9 +25,10 @@ import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMe
 import { TileTableDataI3dm } from "../tileTableData/TileTableDataI3dm";
 import { TileTableData } from "../tileTableData/TileTableData";
 
-import { EXTInstanceFeatures } from "../gltfExtensions/EXTInstanceFeatures";
-import { InstanceFeaturesUtils } from "../gltfExtensions/InstanceFeaturesUtils";
-import { StructuralMetadataUtils } from "../gltfExtensions/StructuralMetadataUtils";
+import { EXTInstanceFeatures } from "@3d-tiles-tools/gltf-extensions";
+
+import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils";
+import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils";
 
 import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("migration");

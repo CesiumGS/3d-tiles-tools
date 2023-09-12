@@ -16,9 +16,10 @@ import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMe
 import { BatchTables } from "../tileTableData/BatchTables";
 import { Ids } from "./Ids";
 
-import { MeshFeatures } from "../gltfExtensions/MeshFeatures";
-import { InstanceFeaturesUtils } from "../gltfExtensions/InstanceFeaturesUtils";
-import { StructuralMetadataUtils } from "../gltfExtensions/StructuralMetadataUtils";
+import { MeshFeatures } from "@3d-tiles-tools/gltf-extensions";
+
+import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils";
+import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils";
 
 import { PropertyModel } from "../metadata/PropertyModel";
 import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";

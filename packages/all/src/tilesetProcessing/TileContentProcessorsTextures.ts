@@ -1,7 +1,7 @@
 import { TileContentProcessor } from "./TileContentProcessor";
 
-import { KtxEtc1sOptions } from "../ktx/KtxEtc1sOptions";
-import { KtxUastcOptions } from "../ktx/KtxUastcOptions";
+import { KtxEtc1sOptions } from "@3d-tiles-tools/ktx";
+import { KtxUastcOptions } from "@3d-tiles-tools/ktx";
 import { TileContentProcessorsGltfTransform } from "./TileContentProcessorsGltfTransform";
 import { GltfTransformTextures } from "../contentProcessing/GltfTransformTextures";
 

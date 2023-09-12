@@ -9,7 +9,7 @@ import { QuantizeOptions } from "@gltf-transform/functions";
 
 import { KHRMeshQuantization } from "@gltf-transform/extensions";
 
-import { EXTMeshFeatures } from "../../gltfExtensions/EXTMeshFeatures";
+import { EXTMeshFeatures } from "@3d-tiles-tools/gltf-extensions";
 
 import { Iterables } from "../../base/Iterables";
 
