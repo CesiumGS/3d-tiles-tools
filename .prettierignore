@@ -2,11 +2,10 @@
 !src/**/
 !demos/**/
 !specs/**/
+!packages/**/
 !**/*.js
 !**/*.ts
-!**/*.json
+src/**/*.ts
 specs/data/
-tsconfig.json
-.prettierrc.json
-ThirdParty.json
-src/ktx/external/basis_encoder.js
+packages/**/build/
+packages/all/src/ktx/external/basis_encoder.js
