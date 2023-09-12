@@ -1,7 +1,7 @@
-import { ClassProperty } from "../structure/Metadata/ClassProperty";
-import { MetadataClass } from "../structure/Metadata/MetadataClass";
-import { Schema } from "../structure/Metadata/Schema";
-import { BatchTable } from "../structure/TileFormats/BatchTable";
+import { ClassProperty } from "@3d-tiles-tools/structure";
+import { MetadataClass } from "@3d-tiles-tools/structure";
+import { Schema } from "@3d-tiles-tools/structure";
+import { BatchTable } from "@3d-tiles-tools/structure";
 
 import { BatchTableClassProperties } from "./BatchTableClassProperties";
 import { Ids } from "./Ids";

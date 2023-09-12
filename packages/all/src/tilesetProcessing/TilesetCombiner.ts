@@ -3,9 +3,9 @@ import path from "path";
 import { Paths } from "../base/Paths";
 import { DeveloperError } from "../base/DeveloperError";
 
-import { Tileset } from "../structure/Tileset";
-import { Tile } from "../structure/Tile";
-import { Content } from "../structure/Content";
+import { Tileset } from "@3d-tiles-tools/structure";
+import { Tile } from "@3d-tiles-tools/structure";
+import { Content } from "@3d-tiles-tools/structure";
 
 import { TilesetSource } from "../tilesetData/TilesetSource";
 import { TilesetTarget } from "../tilesetData/TilesetTarget";

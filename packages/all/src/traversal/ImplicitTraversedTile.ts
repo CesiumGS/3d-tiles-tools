@@ -6,9 +6,9 @@ import { TraversedTile } from "./TraversedTile";
 import { SubtreeModel } from "./SubtreeModel";
 import { SubtreeModels } from "./SubtreeModels";
 
-import { Tile } from "../structure/Tile";
-import { Content } from "../structure/Content";
-import { TileImplicitTiling } from "../structure/TileImplicitTiling";
+import { Tile } from "@3d-tiles-tools/structure";
+import { Content } from "@3d-tiles-tools/structure";
+import { TileImplicitTiling } from "@3d-tiles-tools/structure";
 
 import { TreeCoordinates } from "../spatial/TreeCoordinates";
 

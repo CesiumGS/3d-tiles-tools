@@ -4,9 +4,9 @@ import { DefaultMetadataEntityModel } from "./DefaultMetadataEntityModel";
 import { MetadataEntityModel } from "./MetadataEntityModel";
 import { MetadataError } from "./MetadataError";
 
-import { Schema } from "../structure/Metadata/Schema";
-import { MetadataEntity } from "../structure/MetadataEntity";
-import { MetadataClass } from "../structure/Metadata/MetadataClass";
+import { Schema } from "@3d-tiles-tools/structure";
+import { MetadataEntity } from "@3d-tiles-tools/structure";
+import { MetadataClass } from "@3d-tiles-tools/structure";
 
 /**
  * Methods related to `MetadataEntityModel` instances.

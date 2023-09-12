@@ -25,16 +25,6 @@
   "workspaces": [
     "packages/*"
   ],
-  "dependencies": {
-    "@3d-tiles-tools/cli": "^0.3.0",
-    "@3d-tiles-tools/all": "^0.3.0"
-  }  ,
-  "devDependencies": {
-    "@3d-tiles-tools/cli": "^0.3.0",
-    "@3d-tiles-tools/all": "^0.3.0"
-  }  ,
-  "main": "./build/index.js",
-  "types": "./build/index.d.ts",
   "scripts": {
     "about:start": "echo 'Start the tools, as a TypeScript command line application'",
     "about:eslint": "echo 'Perform linting of the source code. This may modify the source files.'",
@@ -55,8 +45,7 @@
     "about:package": "echo 'Prepare a package that can then be published on NPM'",
     "start": "npx ts-node src/main.ts",
     "eslint": "eslint \"./**/*.ts\" --cache",
-    "build": "npx tsc && npm run build-copy",
-    "build-copy": "npx copyfiles --flat ./src/ktx/external/basis_encoder.wasm build/ktx/external",
+    "build": "tsc --build --verbose",
     "test": "ts-node node_modules/jasmine/bin/jasmine --config=specs/jasmine.json",
     "coverage": "nyc npm run test",
     "prettier-check": "prettier --check \"**/*\"",

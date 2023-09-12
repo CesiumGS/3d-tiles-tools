@@ -5,7 +5,7 @@ import { GLTF } from "@gltf-transform/core";
 
 import { Iterables } from "../base/Iterables";
 
-import { ClassProperty } from "../structure/Metadata/ClassProperty";
+import { ClassProperty } from "@3d-tiles-tools/structure";
 
 import { PropertyModel } from "../metadata/PropertyModel";
 import { PropertyModels } from "../metadata/PropertyModels";

@@ -13,9 +13,9 @@ import { SubtreeInfos } from "../implicitTiling/SubtreeInfos";
 
 import { TreeCoordinates } from "../spatial/TreeCoordinates";
 
-import { Subtree } from "../structure/Subtree";
-import { TileImplicitTiling } from "../structure/TileImplicitTiling";
-import { Schema } from "../structure/Metadata/Schema";
+import { Subtree } from "@3d-tiles-tools/structure";
+import { TileImplicitTiling } from "@3d-tiles-tools/structure";
+import { Schema } from "@3d-tiles-tools/structure";
 
 import { SubtreeModel } from "./SubtreeModel";
 import { SubtreeMetadataModels } from "./SubtreeMetadataModels";

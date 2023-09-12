@@ -1,5 +1,6 @@
 import { PropertyTableModel } from "../metadata/PropertyTableModel";
-import { Schema } from "../structure/Metadata/Schema";
+
+import { Schema } from "@3d-tiles-tools/structure";
 
 /**
  * An interface summarizing the metadata that may be associated

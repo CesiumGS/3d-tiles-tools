@@ -4,10 +4,10 @@ import { PropertyModels } from "../metadata/PropertyModels";
 import { NumericBuffers } from "../metadata/binary/NumericBuffers";
 import { NumericPropertyModel } from "../metadata/binary/NumericPropertyModel";
 
-import { BatchTableBinaryBodyReference } from "../structure/TileFormats/BatchTableBinaryBodyReference";
-import { BinaryBodyOffset } from "../structure/TileFormats/BinaryBodyOffset";
-import { I3dmFeatureTable } from "../structure/TileFormats/I3dmFeatureTable";
-import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
+import { BatchTableBinaryBodyReference } from "@3d-tiles-tools/structure";
+import { BinaryBodyOffset } from "@3d-tiles-tools/structure";
+import { I3dmFeatureTable } from "@3d-tiles-tools/structure";
+import { PntsFeatureTable } from "@3d-tiles-tools/structure";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
 

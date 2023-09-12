@@ -1,4 +1,4 @@
-import { Tile } from "../structure/Tile";
+import { Tile } from "@3d-tiles-tools/structure";
 
 /**
  * A function that can be passed to `Tiles.traverseExplicit`.

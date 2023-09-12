@@ -9,8 +9,8 @@ import { EXTMeshGPUInstancing } from "@gltf-transform/extensions";
 
 import { Iterables } from "../base/Iterables";
 
-import { BatchTable } from "../structure/TileFormats/BatchTable";
-import { I3dmFeatureTable } from "../structure/TileFormats/I3dmFeatureTable";
+import { BatchTable } from "@3d-tiles-tools/structure";
+import { I3dmFeatureTable } from "@3d-tiles-tools/structure";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 import { TileFormatError } from "../tileFormats/TileFormatError";

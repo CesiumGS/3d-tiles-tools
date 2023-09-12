@@ -1,8 +1,8 @@
 import { defined } from "../base/defined";
 
-import { Tile } from "../structure/Tile";
-import { Content } from "../structure/Content";
-import { Schema } from "../structure/Metadata/Schema";
+import { Tile } from "@3d-tiles-tools/structure";
+import { Content } from "@3d-tiles-tools/structure";
+import { Schema } from "@3d-tiles-tools/structure";
 
 import { MetadataEntityModel } from "../metadata/MetadataEntityModel";
 import { MetadataEntityModels } from "../metadata/MetadataEntityModels";

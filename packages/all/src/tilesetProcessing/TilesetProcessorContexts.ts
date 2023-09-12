@@ -3,7 +3,7 @@ import path from "path";
 import { TilesetSources } from "../tilesetData/TilesetSources";
 import { TilesetTargets } from "../tilesetData/TilesetTargets";
 
-import { Tileset } from "../structure/Tileset";
+import { Tileset } from "@3d-tiles-tools/structure";
 
 import { TilesetProcessing } from "./TilesetProcessing";
 import { TilesetProcessorContext } from "./TilesetProcessorContext";

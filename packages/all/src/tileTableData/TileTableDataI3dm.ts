@@ -1,6 +1,6 @@
 import { Iterables } from "../base/Iterables";
 
-import { I3dmFeatureTable } from "../structure/TileFormats/I3dmFeatureTable";
+import { I3dmFeatureTable } from "@3d-tiles-tools/structure";
 
 import { TileTableData } from "./TileTableData";
 import { VecMath } from "./VecMath";

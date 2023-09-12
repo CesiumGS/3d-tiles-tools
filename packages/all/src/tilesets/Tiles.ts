@@ -1,5 +1,6 @@
-import { Content } from "../structure/Content";
-import { Tile } from "../structure/Tile";
+import { Content } from "@3d-tiles-tools/structure";
+import { Tile } from "@3d-tiles-tools/structure";
+
 import { Contents } from "./Contents";
 import { TileTraversalCallback } from "./TileTraversalCallback";
 

@@ -1,6 +1,6 @@
-import { Tile } from "../../structure/Tile";
-import { Tileset } from "../../structure/Tileset";
-import { Content } from "../../structure/Content";
+import { Tile } from "@3d-tiles-tools/structure";
+import { Tileset } from "@3d-tiles-tools/structure";
+import { Content } from "@3d-tiles-tools/structure";
 
 import { Tiles } from "../../tilesets/Tiles";
 import { Extensions } from "../../tilesets/Extensions";

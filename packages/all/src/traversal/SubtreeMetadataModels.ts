@@ -1,6 +1,6 @@
 import { defined } from "../base/defined";
 
-import { Schema } from "../structure/Metadata/Schema";
+import { Schema } from "@3d-tiles-tools/structure";
 
 import { MetadataError } from "../metadata/MetadataError";
 import { MetadataUtilities } from "../metadata/MetadataUtilities";

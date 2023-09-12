@@ -8,8 +8,8 @@ import { MetadataError } from "../MetadataError";
 import { PropertyModel } from "../PropertyModel";
 import { PropertyTableModel } from "../PropertyTableModel";
 
-import { ClassProperty } from "../../structure/Metadata/ClassProperty";
-import { PropertyTableProperty } from "../../structure/PropertyTableProperty";
+import { ClassProperty } from "@3d-tiles-tools/structure";
+import { PropertyTableProperty } from "@3d-tiles-tools/structure";
 
 /**
  * Implementation of the `PropertyTableModel` interface that is backed

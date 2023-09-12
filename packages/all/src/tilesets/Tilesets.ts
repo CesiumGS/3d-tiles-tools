@@ -1,7 +1,8 @@
 import path from "path";
 import { ContentDataTypeChecks } from "../contentTypes/ContentDataTypeChecks";
 import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
-import { Tileset } from "../structure/Tileset";
+
+import { Tileset } from "@3d-tiles-tools/structure";
 
 import { TilesetCombiner } from "../tilesetProcessing/TilesetCombiner";
 import { TilesetMerger } from "../tilesetProcessing/TilesetMerger";

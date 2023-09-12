@@ -7,7 +7,7 @@ import { PropertyTable } from "../gltfExtensions/StructuralMetadata";
 import { StructuralMetadata } from "../gltfExtensions/StructuralMetadata";
 import { StructuralMetadataPropertyTables } from "../gltfExtensions/StructuralMetadataPropertyTables";
 
-import { BatchTable } from "../structure/TileFormats/BatchTable";
+import { BatchTable } from "@3d-tiles-tools/structure";
 
 import { BatchTableSchemas } from "./BatchTableSchemas";
 import { BatchTablePropertyTableModels } from "./BatchTablePropertyTableModels";

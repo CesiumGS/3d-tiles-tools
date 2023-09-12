@@ -1,4 +1,4 @@
-import { ClassProperty } from "../structure/Metadata/ClassProperty";
+import { ClassProperty } from "@3d-tiles-tools/structure";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
 

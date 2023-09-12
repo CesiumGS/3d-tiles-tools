@@ -1,5 +1,5 @@
-import { Schema } from "../structure/Metadata/Schema";
-import { Tileset } from "../structure/Tileset";
+import { Schema } from "@3d-tiles-tools/structure";
+import { Tileset } from "@3d-tiles-tools/structure";
 
 import { TilesetSource } from "../tilesetData/TilesetSource";
 import { TilesetTarget } from "../tilesetData/TilesetTarget";

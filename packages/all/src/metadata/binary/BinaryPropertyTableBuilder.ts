@@ -1,13 +1,13 @@
 import { BinaryBufferData } from "../../binary/BinaryBufferData";
 import { BinaryBuffers } from "../../binary/BinaryBuffers";
-import { ClassProperty } from "../../structure/Metadata/ClassProperty";
 
-import { MetadataClass } from "../../structure/Metadata/MetadataClass";
-import { Schema } from "../../structure/Metadata/Schema";
-import { PropertyTable } from "../../structure/PropertyTable";
-import { PropertyTableProperty } from "../../structure/PropertyTableProperty";
+import { ClassProperty } from "@3d-tiles-tools/structure";
+import { MetadataClass } from "@3d-tiles-tools/structure";
+import { Schema } from "@3d-tiles-tools/structure";
+import { PropertyTable } from "@3d-tiles-tools/structure";
+import { PropertyTableProperty } from "@3d-tiles-tools/structure";
+
 import { MetadataError } from "../MetadataError";
-
 import { MetadataUtilities } from "../MetadataUtilities";
 import { BinaryPropertyTable } from "./BinaryPropertyTable";
 import { BinaryPropertyTables } from "./BinaryPropertyTables";

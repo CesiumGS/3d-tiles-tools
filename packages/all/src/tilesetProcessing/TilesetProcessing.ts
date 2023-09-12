@@ -1,7 +1,7 @@
 import { Buffers } from "../base/Buffers";
 
-import { Tileset } from "../structure/Tileset";
-import { Schema } from "../structure/Metadata/Schema";
+import { Tileset } from "@3d-tiles-tools/structure";
+import { Schema } from "@3d-tiles-tools/structure";
 
 import { TilesetError } from "../tilesetData/TilesetError";
 

@@ -1,7 +1,7 @@
 import { BinaryBufferData } from "../binary/BinaryBufferData";
 import { BinaryBufferStructure } from "../binary/BinaryBufferStructure";
 
-import { Subtree } from "../structure/Subtree";
+import { Subtree } from "@3d-tiles-tools/structure";
 
 /**
  * An interface summarizing the binary data that is associated

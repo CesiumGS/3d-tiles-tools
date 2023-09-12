@@ -1,7 +1,7 @@
 import { Buffers } from "../base/Buffers";
-import { B3dmFeatureTable } from "../structure/TileFormats/B3dmFeatureTable";
-import { BatchTable } from "../structure/TileFormats/BatchTable";
-import { I3dmFeatureTable } from "../structure/TileFormats/I3dmFeatureTable";
+import { B3dmFeatureTable } from "@3d-tiles-tools/structure";
+import { BatchTable } from "@3d-tiles-tools/structure";
+import { I3dmFeatureTable } from "@3d-tiles-tools/structure";
 
 import { CompositeTileData } from "./CompositeTileData";
 import { TileData } from "./TileData";

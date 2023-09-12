@@ -1,5 +1,5 @@
-import { BatchTable } from "../structure/TileFormats/BatchTable";
-import { B3dmFeatureTable } from "../structure/TileFormats/B3dmFeatureTable";
+import { BatchTable } from "@3d-tiles-tools/structure";
+import { B3dmFeatureTable } from "@3d-tiles-tools/structure";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 

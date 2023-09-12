@@ -1,5 +1,5 @@
-import { BufferObject } from "../structure/BufferObject";
-import { BufferView } from "../structure/BufferView";
+import { BufferObject } from "@3d-tiles-tools/structure";
+import { BufferView } from "@3d-tiles-tools/structure";
 
 /**
  * A basic class holding information about the structure of

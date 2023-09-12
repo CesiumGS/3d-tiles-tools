@@ -4,8 +4,8 @@ import { PropertyModel } from "./PropertyModel";
 import { PropertyTableModel } from "./PropertyTableModel";
 import { TableMetadataEntityModel } from "./TableMetadataEntityModel";
 
-import { PropertyTableProperty } from "../structure/PropertyTableProperty";
-import { ClassProperty } from "../structure/Metadata/ClassProperty";
+import { PropertyTableProperty } from "@3d-tiles-tools/structure";
+import { ClassProperty } from "@3d-tiles-tools/structure";
 
 /**
  * Implementation of a `PropertyTableModel` that is backed by

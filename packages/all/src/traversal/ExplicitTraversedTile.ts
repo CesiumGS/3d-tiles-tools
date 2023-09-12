@@ -4,11 +4,11 @@ import { TraversedTile } from "./TraversedTile";
 import { ExplicitTraversedTiles } from "./ExplicitTraversedTiles";
 import { MetadataSemanticOverrides } from "./MetadataSemanticOverrides";
 
-import { Tile } from "../structure/Tile";
-import { Content } from "../structure/Content";
-import { TileImplicitTiling } from "../structure/TileImplicitTiling";
-import { MetadataEntity } from "../structure/MetadataEntity";
-import { Schema } from "../structure/Metadata/Schema";
+import { Tile } from "@3d-tiles-tools/structure";
+import { Content } from "@3d-tiles-tools/structure";
+import { TileImplicitTiling } from "@3d-tiles-tools/structure";
+import { MetadataEntity } from "@3d-tiles-tools/structure";
+import { Schema } from "@3d-tiles-tools/structure";
 
 import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
 

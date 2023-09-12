@@ -1,4 +1,4 @@
-import { Content } from "../structure/Content";
+import { Content } from "@3d-tiles-tools/structure";
 
 import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("tilesets");

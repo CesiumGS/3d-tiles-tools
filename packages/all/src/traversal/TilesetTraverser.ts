@@ -1,7 +1,8 @@
 import { ResourceResolver } from "../io/ResourceResolver";
 
-import { Tileset } from "../structure/Tileset";
-import { Schema } from "../structure/Metadata/Schema";
+import { Tileset } from "@3d-tiles-tools/structure";
+import { Schema } from "@3d-tiles-tools/structure";
+import { Tile } from "@3d-tiles-tools/structure";
 
 import { TraversedTile } from "./TraversedTile";
 import { ExplicitTraversedTile } from "./ExplicitTraversedTile";
@@ -9,7 +10,6 @@ import { TraversalCallback } from "./TraversalCallback";
 import { TilesetTraversers } from "./TilesetTraversers";
 
 import { DeveloperError } from "../base/DeveloperError";
-import { Tile } from "../structure/Tile";
 
 /**
  * A collection of configuration options for the traversal.

@@ -1,9 +1,9 @@
 import path from "path";
 
-import { Tile } from "../structure/Tile";
-import { Tileset } from "../structure/Tileset";
-import { Content } from "../structure/Content";
-import { Schema } from "../structure/Metadata/Schema";
+import { Tile } from "@3d-tiles-tools/structure";
+import { Tileset } from "@3d-tiles-tools/structure";
+import { Content } from "@3d-tiles-tools/structure";
+import { Schema } from "@3d-tiles-tools/structure";
 
 import { TilesetSourceResourceResolver } from "../io/TilesetSourceResourceResolver";
 

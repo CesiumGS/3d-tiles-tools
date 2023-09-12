@@ -9,14 +9,13 @@ import { BinaryBuffers } from "../../binary/BinaryBuffers";
 import { MetadataUtilities } from "../MetadataUtilities";
 import { MetadataError } from "../MetadataError";
 
-import { PropertyTable } from "../../structure/PropertyTable";
-import { PropertyTableProperty } from "../../structure/PropertyTableProperty";
-
-import { Schema } from "../../structure/Metadata/Schema";
-import { MetadataClass } from "../../structure/Metadata/MetadataClass";
-import { ClassProperty } from "../../structure/Metadata/ClassProperty";
-import { EnumValue } from "../../structure/Metadata/EnumValue";
-import { MetadataEnum } from "../../structure/Metadata/MetadataEnum";
+import { PropertyTable } from "@3d-tiles-tools/structure";
+import { PropertyTableProperty } from "@3d-tiles-tools/structure";
+import { Schema } from "@3d-tiles-tools/structure";
+import { MetadataClass } from "@3d-tiles-tools/structure";
+import { ClassProperty } from "@3d-tiles-tools/structure";
+import { EnumValue } from "@3d-tiles-tools/structure";
+import { MetadataEnum } from "@3d-tiles-tools/structure";
 
 /**
  * Methods to create `BinaryPropertyTable` instances from individual

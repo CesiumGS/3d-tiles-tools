@@ -14,16 +14,17 @@
     "declaration": true,
     "declarationMap": true,
     "allowJs": true,
-    "lib": [
-      "es2021"
-    ],
+    "lib": ["es2021"],
     "paths": {
-      "*": [ "./src/*.d.ts"],
-    },
+      "*": ["./src/*.d.ts"]
+    }
   },
-  "include": ["src" ],
+  "include": ["src"],
   "exclude": ["node_modules"],
   "references": [
+    {
+      "path": "./packages/structure/tsconfig.json"
+    },
     {
       "path": "./packages/all/tsconfig.json"
     },
@@ -31,6 +32,4 @@
       "path": "./packages/cli/tsconfig.json"
     }
   ]
-
-
 }

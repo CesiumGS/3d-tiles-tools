@@ -3,8 +3,8 @@ import path from "path";
 import { ResourceResolver } from "../io/ResourceResolver";
 import { TilesetSourceResourceResolver } from "../io/TilesetSourceResourceResolver";
 
-import { Tileset } from "../structure/Tileset";
-import { Schema } from "../structure/Metadata/Schema";
+import { Tileset } from "@3d-tiles-tools/structure";
+import { Schema } from "@3d-tiles-tools/structure";
 
 import { TraversedTile } from "./TraversedTile";
 import { ExplicitTraversedTile } from "./ExplicitTraversedTile";

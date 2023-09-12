@@ -5,8 +5,8 @@ import { ExplicitTraversedTile } from "./ExplicitTraversedTile";
 import { ImplicitTraversedTile } from "./ImplicitTraversedTile";
 import { SubtreeModels } from "./SubtreeModels";
 
-import { TileImplicitTiling } from "../structure/TileImplicitTiling";
-import { Schema } from "../structure/Metadata/Schema";
+import { TileImplicitTiling } from "@3d-tiles-tools/structure";
+import { Schema } from "@3d-tiles-tools/structure";
 
 import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError";
 import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";

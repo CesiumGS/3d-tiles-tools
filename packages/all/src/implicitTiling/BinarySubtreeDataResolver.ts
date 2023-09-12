@@ -6,7 +6,7 @@ import { BinaryBufferDataResolver } from "../binary/BinaryBufferDataResolver";
 import { BinaryBufferStructure } from "../binary/BinaryBufferStructure";
 import { BinaryDataError } from "../binary/BinaryDataError";
 
-import { Subtree } from "../structure/Subtree";
+import { Subtree } from "@3d-tiles-tools/structure";
 
 import { BinarySubtreeData } from "./BinarySubtreeData";
 import { ImplicitTilingError } from "./ImplicitTilingError";

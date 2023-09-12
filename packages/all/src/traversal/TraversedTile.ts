@@ -1,5 +1,6 @@
-import { Tile } from "../structure/Tile";
-import { Content } from "../structure/Content";
+import { Tile } from "@3d-tiles-tools/structure";
+import { Content } from "@3d-tiles-tools/structure";
+
 import { ResourceResolver } from "../io/ResourceResolver";
 
 /**

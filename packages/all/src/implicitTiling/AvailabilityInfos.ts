@@ -6,8 +6,8 @@ import { ConstantAvailabilityInfo } from "./ConstantAvailabilityInfo";
 import { ImplicitTilings } from "./ImplicitTilings";
 import { ImplicitTilingError } from "./ImplicitTilingError";
 
-import { Availability } from "../structure/Availability";
-import { TileImplicitTiling } from "../structure/TileImplicitTiling";
+import { Availability } from "@3d-tiles-tools/structure";
+import { TileImplicitTiling } from "@3d-tiles-tools/structure";
 
 /**
  * Methods for creating `AvailabilityInfo` instances

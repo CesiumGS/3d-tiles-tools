@@ -1,8 +1,8 @@
 import { PropertyModel } from "./PropertyModel";
 import { MetadataEntityModel } from "./MetadataEntityModel";
 
-import { ClassProperty } from "../structure/Metadata/ClassProperty";
-import { PropertyTableProperty } from "../structure/PropertyTableProperty";
+import { ClassProperty } from "@3d-tiles-tools/structure";
+import { PropertyTableProperty } from "@3d-tiles-tools/structure";
 
 /**
  * A basic interface for a property table

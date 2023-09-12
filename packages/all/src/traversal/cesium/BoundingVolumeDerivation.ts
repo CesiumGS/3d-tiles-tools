@@ -1,12 +1,11 @@
 import { Cartesian3, Math as CesiumMath, Matrix3, Rectangle } from "cesium";
 import { defined } from "../../base/defined";
 
-import { BoundingVolume } from "../../structure/BoundingVolume";
+import { BoundingVolume } from "@3d-tiles-tools/structure";
+import { BoundingVolumeS2 } from "@3d-tiles-tools/structure";
 
 import { HilbertOrder } from "./HilbertOrder";
 import { S2Cell } from "./S2Cell";
-
-import { BoundingVolumeS2 } from "../../structure/extensions/BoundingVolumeS2";
 
 /**
  * Methods to derive bounding volumes of implicit tiles.

@@ -1,7 +1,7 @@
 import { Iterables } from "../../base/Iterables";
 
-import { PntsFeatureTable } from "../../structure/TileFormats/PntsFeatureTable";
-import { BatchTable } from "../../structure/TileFormats/BatchTable";
+import { PntsFeatureTable } from "@3d-tiles-tools/structure";
+import { BatchTable } from "@3d-tiles-tools/structure";
 
 import { DefaultPointCloud } from "./DefaultPointCloud";
 import { ReadablePointCloud } from "./ReadablePointCloud";

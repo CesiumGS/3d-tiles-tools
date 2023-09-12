@@ -1,6 +1,6 @@
 import { Iterables } from "../base/Iterables";
 
-import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
+import { PntsFeatureTable } from "@3d-tiles-tools/structure";
 
 import { TileTableData } from "./TileTableData";
 import { AttributeCompression } from "./AttributeCompression";

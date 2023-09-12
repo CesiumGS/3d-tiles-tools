@@ -5,8 +5,8 @@ import { AvailabilityInfos } from "./AvailabilityInfos";
 import { BinarySubtreeData } from "./BinarySubtreeData";
 import { BinarySubtreeDataResolver } from "./BinarySubtreeDataResolver";
 
-import { Subtree } from "../structure/Subtree";
-import { TileImplicitTiling } from "../structure/TileImplicitTiling";
+import { Subtree } from "@3d-tiles-tools/structure";
+import { TileImplicitTiling } from "@3d-tiles-tools/structure";
 
 /**
  * Methods to create `SubtreeInfo` instances.

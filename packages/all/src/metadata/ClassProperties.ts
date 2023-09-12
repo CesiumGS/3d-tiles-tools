@@ -3,7 +3,7 @@ import { defined } from "../base/defined";
 import { MetadataTypes } from "./MetadataTypes";
 import { MetadataComponentTypes } from "./MetadataComponentTypes";
 
-import { ClassProperty } from "../structure/Metadata/ClassProperty";
+import { ClassProperty } from "@3d-tiles-tools/structure";
 
 /**
  * Utility methods related to `ClassProperty` objects

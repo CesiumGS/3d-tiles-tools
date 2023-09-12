@@ -1,5 +1,5 @@
-import { BatchTable } from "../structure/TileFormats/BatchTable";
-import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
+import { BatchTable } from "@3d-tiles-tools/structure";
+import { PntsFeatureTable } from "@3d-tiles-tools/structure";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 

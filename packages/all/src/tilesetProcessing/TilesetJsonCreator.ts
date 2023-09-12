@@ -3,13 +3,13 @@ import path from "path";
 
 import { getBounds } from "@gltf-transform/core";
 
-import { Tile } from "../structure/Tile";
-import { Tileset } from "../structure/Tileset";
-import { BoundingVolume } from "../structure/BoundingVolume";
-import { BatchTable } from "../structure/TileFormats/BatchTable";
-import { PntsFeatureTable } from "../structure/TileFormats/PntsFeatureTable";
-import { B3dmFeatureTable } from "../structure/TileFormats/B3dmFeatureTable";
-import { I3dmFeatureTable } from "../structure/TileFormats/I3dmFeatureTable";
+import { Tile } from "@3d-tiles-tools/structure";
+import { Tileset } from "@3d-tiles-tools/structure";
+import { BoundingVolume } from "@3d-tiles-tools/structure";
+import { BatchTable } from "@3d-tiles-tools/structure";
+import { PntsFeatureTable } from "@3d-tiles-tools/structure";
+import { B3dmFeatureTable } from "@3d-tiles-tools/structure";
+import { I3dmFeatureTable } from "@3d-tiles-tools/structure";
 
 import { GltfTransform } from "../contentProcessing/GltfTransform";
 import { PntsPointClouds } from "../contentProcessing/pointClouds/PntsPointClouds";

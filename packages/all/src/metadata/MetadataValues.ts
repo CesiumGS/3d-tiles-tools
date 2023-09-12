@@ -1,6 +1,6 @@
 import { defined } from "../base/defined";
 
-import { ClassProperty } from "../structure/Metadata/ClassProperty";
+import { ClassProperty } from "@3d-tiles-tools/structure";
 
 import { MetadataComponentTypes } from "./MetadataComponentTypes";
 import { ArrayValues } from "./ArrayValues";

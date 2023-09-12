@@ -1,4 +1,4 @@
-import { BatchTable } from "../structure/TileFormats/BatchTable";
+import { BatchTable } from "@3d-tiles-tools/structure";
 
 /**
  * Internal uutility methods related to the migration of batch tables
