@@ -1,6 +1,7 @@
 import path from "path";
-import { ContentDataTypeChecks } from "../contentTypes/ContentDataTypeChecks";
-import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
+
+import { ContentDataTypeChecks } from "@3d-tiles-tools/base";
+import { ContentDataTypes } from "@3d-tiles-tools/base";
 
 import { Tileset } from "@3d-tiles-tools/structure";
 

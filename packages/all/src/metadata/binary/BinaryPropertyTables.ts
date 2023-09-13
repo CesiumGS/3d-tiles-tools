@@ -1,10 +1,9 @@
-import { defined } from "../../base/defined";
-import { defaultValue } from "../../base/defaultValue";
+import { defined } from "@3d-tiles-tools/base";
+import { defaultValue } from "@3d-tiles-tools/base";
+import { BinaryBufferData } from "@3d-tiles-tools/base";
+import { BinaryBuffers } from "@3d-tiles-tools/base";
 
 import { BinaryPropertyTable } from "./BinaryPropertyTable";
-
-import { BinaryBufferData } from "../../binary/BinaryBufferData";
-import { BinaryBuffers } from "../../binary/BinaryBuffers";
 
 import { MetadataUtilities } from "../MetadataUtilities";
 import { MetadataError } from "../MetadataError";

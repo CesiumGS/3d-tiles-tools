@@ -1,6 +1,6 @@
 import GltfPipeline from "gltf-pipeline";
 
-import { Buffers } from "../base/Buffers";
+import { Buffers } from "@3d-tiles-tools/base";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
 

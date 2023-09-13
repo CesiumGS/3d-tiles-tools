@@ -4,9 +4,10 @@ import { Decoder } from "draco3d";
 import { DecoderModule } from "draco3d";
 import { Mesh } from "draco3d";
 
+import { Buffers } from "@3d-tiles-tools/base";
+
 import { DracoError } from "./DracoError";
 import { ComponentDatatype } from "./ComponentDataType";
-import { Buffers } from "../../base/Buffers";
 import { AttributeInfo } from "./AttributeInfo";
 import { QuantizationInfo } from "./QuantizationInfo";
 import { DracoDecoderResult } from "./DracoDecoderResult";

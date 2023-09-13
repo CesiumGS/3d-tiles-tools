@@ -1,3 +1,5 @@
+import { Loggers } from "@3d-tiles-tools/base";
+
 import { Tile } from "@3d-tiles-tools/structure";
 import { Tileset } from "@3d-tiles-tools/structure";
 import { Content } from "@3d-tiles-tools/structure";
@@ -7,7 +9,6 @@ import { Extensions } from "../../tilesets/Extensions";
 
 import { TilesetUpgradeOptions } from "./TilesetUpgradeOptions";
 
-import { Loggers } from "../../logging/Loggers";
 const logger = Loggers.get("upgrade");
 
 /**

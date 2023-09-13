@@ -1,6 +1,6 @@
-import { defined } from "../base/defined";
-
-import { ResourceResolver } from "../io/ResourceResolver";
+import { defined } from "@3d-tiles-tools/base";
+import { TreeCoordinates } from "@3d-tiles-tools/base";
+import { ResourceResolver } from "@3d-tiles-tools/base";
 
 import { TraversedTile } from "./TraversedTile";
 import { SubtreeModel } from "./SubtreeModel";
@@ -9,8 +9,6 @@ import { SubtreeModels } from "./SubtreeModels";
 import { Tile } from "@3d-tiles-tools/structure";
 import { Content } from "@3d-tiles-tools/structure";
 import { TileImplicitTiling } from "@3d-tiles-tools/structure";
-
-import { TreeCoordinates } from "../spatial/TreeCoordinates";
 
 import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError";
 import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";

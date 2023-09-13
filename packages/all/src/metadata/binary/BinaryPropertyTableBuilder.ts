@@ -1,5 +1,5 @@
-import { BinaryBufferData } from "../../binary/BinaryBufferData";
-import { BinaryBuffers } from "../../binary/BinaryBuffers";
+import { BinaryBufferData } from "@3d-tiles-tools/base";
+import { BinaryBuffers } from "@3d-tiles-tools/base";
 
 import { ClassProperty } from "@3d-tiles-tools/structure";
 import { MetadataClass } from "@3d-tiles-tools/structure";

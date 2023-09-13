@@ -5,7 +5,7 @@ import { Matrix4 } from "cesium";
 import { Cartesian3 } from "cesium";
 import { Quaternion } from "cesium";
 
-import { DeveloperError } from "../base/DeveloperError";
+import { DeveloperError } from "@3d-tiles-tools/base";
 
 /**
  * Vector math utility functions.

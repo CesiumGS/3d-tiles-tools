@@ -2,10 +2,11 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
+import { Loggers } from "@3d-tiles-tools/base";
+
 import { Pipeline } from "./Pipeline";
 import { TilesetStageExecutor } from "./TilesetStageExecutor";
 
-import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("pipeline");
 
 /**

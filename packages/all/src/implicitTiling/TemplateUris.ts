@@ -1,5 +1,5 @@
-import { OctreeCoordinates } from "../spatial/OctreeCoordinates";
-import { QuadtreeCoordinates } from "../spatial/QuadtreeCoordinates";
+import { OctreeCoordinates } from "@3d-tiles-tools/base";
+import { QuadtreeCoordinates } from "@3d-tiles-tools/base";
 
 /**
  * Method related to template URIs for implicit tiling.

@@ -9,6 +9,7 @@
     "@3d-tiles-tools/structure": "^0.3.0",
     "@3d-tiles-tools/ktx": "^0.3.0",
     "@3d-tiles-tools/gltf-extensions": "^0.3.0",
+    "@3d-tiles-tools/base": "^0.3.0",
     "@gltf-transform/core": "^3.2.1",
     "@gltf-transform/extensions": "^3.2.1",
     "@gltf-transform/functions": "^3.2.1",

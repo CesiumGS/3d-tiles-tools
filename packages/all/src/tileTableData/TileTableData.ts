@@ -1,13 +1,14 @@
-import { Iterables } from "../base/Iterables";
-import { PropertyModel } from "../metadata/PropertyModel";
-import { PropertyModels } from "../metadata/PropertyModels";
-import { NumericBuffers } from "../metadata/binary/NumericBuffers";
-import { NumericPropertyModel } from "../metadata/binary/NumericPropertyModel";
+import { Iterables } from "@3d-tiles-tools/base";
 
 import { BatchTableBinaryBodyReference } from "@3d-tiles-tools/structure";
 import { BinaryBodyOffset } from "@3d-tiles-tools/structure";
 import { I3dmFeatureTable } from "@3d-tiles-tools/structure";
 import { PntsFeatureTable } from "@3d-tiles-tools/structure";
+
+import { PropertyModel } from "../metadata/PropertyModel";
+import { PropertyModels } from "../metadata/PropertyModels";
+import { NumericBuffers } from "../metadata/binary/NumericBuffers";
+import { NumericPropertyModel } from "../metadata/binary/NumericPropertyModel";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
 

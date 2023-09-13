@@ -5,7 +5,11 @@ import { Tileset } from "@3d-tiles-tools/structure";
 import { Content } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
 
-import { TilesetSourceResourceResolver } from "../io/TilesetSourceResourceResolver";
+import { ContentDataTypes } from "@3d-tiles-tools/base";
+import { Paths } from "@3d-tiles-tools/base";
+import { Loggers } from "@3d-tiles-tools/base";
+
+import { TilesetSourceResourceResolver } from "../tilesetData/TilesetSourceResourceResolver";
 
 import { Tiles } from "../tilesets/Tiles";
 
@@ -18,11 +22,6 @@ import { TraversalCallback } from "../traversal/TraversalCallback";
 
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
 
-import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
-
-import { Paths } from "../base/Paths";
-
-import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("tilesetProcessing");
 
 /**

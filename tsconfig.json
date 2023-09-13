@@ -32,6 +32,9 @@
       "path": "./packages/ktx/tsconfig.json"
     },
     {
+      "path": "./packages/base/tsconfig.json"
+    },
+    {
       "path": "./packages/all/tsconfig.json"
     },
     {

@@ -1,6 +1,8 @@
 import { BatchTable } from "@3d-tiles-tools/structure";
 import { B3dmFeatureTable } from "@3d-tiles-tools/structure";
 
+import { Loggers } from "@3d-tiles-tools/base";
+
 import { TileFormats } from "../tileFormats/TileFormats";
 
 import { GltfTransform } from "../contentProcessing/GltfTransform";
@@ -15,7 +17,6 @@ import { TileFormatsMigration } from "./TileFormatsMigration";
 import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils";
 import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils";
 
-import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("migration");
 
 /**

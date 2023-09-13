@@ -1,6 +1,6 @@
 // Relevant functions ported from https://github.com/CesiumGS/cesium/blob/4b333bc145fa9f7aed0c7ad7e0f46cb001a94ddd/Source/Core/S2Cell.js
 
-import { DeveloperError } from "../../base/DeveloperError";
+import { DeveloperError } from "@3d-tiles-tools/base";
 
 /**
  * Functions related to S2 cells

@@ -1,5 +1,7 @@
 import path from "path";
 
+import { Loggers } from "@3d-tiles-tools/base";
+
 import { TilesetTarget3tz } from "../packages/TilesetTarget3tz";
 import { TilesetTarget3dtiles } from "../packages/TilesetTarget3dtiles";
 
@@ -8,7 +10,6 @@ import { TilesetError } from "./TilesetError";
 import { TilesetTargetFs } from "./TilesetTargetFs";
 import { TilesetEntry } from "./TilesetEntry";
 
-import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("tilesetData");
 
 /**

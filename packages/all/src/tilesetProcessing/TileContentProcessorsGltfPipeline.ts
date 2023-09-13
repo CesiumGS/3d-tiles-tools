@@ -1,6 +1,7 @@
 import GltfPipeline from "gltf-pipeline";
 
-import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
+import { ContentDataTypes } from "@3d-tiles-tools/base";
+
 import { TileContentProcessor } from "./TileContentProcessor";
 
 /**

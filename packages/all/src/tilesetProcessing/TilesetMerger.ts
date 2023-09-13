@@ -1,16 +1,14 @@
 import path from "path";
 
-import {
-  BoundingSphere,
-  Cartesian3,
-  OrientedBoundingBox,
-  Matrix3,
-  Matrix4,
-  Rectangle,
-} from "cesium";
+import { BoundingSphere } from "cesium";
+import { Cartesian3 } from "cesium";
+import { OrientedBoundingBox } from "cesium";
+import { Matrix3 } from "cesium";
+import { Matrix4 } from "cesium";
+import { Rectangle } from "cesium";
 
-import { Paths } from "../base/Paths";
-import { DeveloperError } from "../base/DeveloperError";
+import { Paths } from "@3d-tiles-tools/base";
+import { DeveloperError } from "@3d-tiles-tools/base";
 
 import { Tileset } from "@3d-tiles-tools/structure";
 import { Tile } from "@3d-tiles-tools/structure";

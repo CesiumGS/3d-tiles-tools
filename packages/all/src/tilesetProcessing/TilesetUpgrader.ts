@@ -1,7 +1,7 @@
-import { Paths } from "../base/Paths";
-import { DeveloperError } from "../base/DeveloperError";
-
-import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
+import { Paths } from "@3d-tiles-tools/base";
+import { DeveloperError } from "@3d-tiles-tools/base";
+import { Loggers } from "@3d-tiles-tools/base";
+import { ContentDataTypes } from "@3d-tiles-tools/base";
 
 import { Tileset } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
@@ -17,7 +17,6 @@ import { TilesetEntry } from "../tilesetData/TilesetEntry";
 
 import { TileFormatsMigration } from "../migration/TileFormatsMigration";
 
-import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("upgrade");
 
 /**

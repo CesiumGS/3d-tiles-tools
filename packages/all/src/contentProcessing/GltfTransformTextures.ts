@@ -12,7 +12,8 @@ import { KtxEtc1sOptions } from "@3d-tiles-tools/ktx";
 import { KtxUastcOptions } from "@3d-tiles-tools/ktx";
 import { KtxOptions } from "@3d-tiles-tools/ktx";
 
-import { Loggers } from "../logging/Loggers";
+import { Loggers } from "@3d-tiles-tools/base";
+
 const logger = Loggers.get("contentProcessing");
 
 /**

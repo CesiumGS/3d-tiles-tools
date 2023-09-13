@@ -1,21 +1,19 @@
 import path from "path";
 
-import { defined } from "../base/defined";
-import { Buffers } from "../base/Buffers";
+import { defined } from "@3d-tiles-tools/base";
+import { Buffers } from "@3d-tiles-tools/base";
+import { ResourceResolver } from "@3d-tiles-tools/base";
+import { TreeCoordinates } from "@3d-tiles-tools/base";
 
-import { ResourceResolver } from "../io/ResourceResolver";
+import { Subtree } from "@3d-tiles-tools/structure";
+import { TileImplicitTiling } from "@3d-tiles-tools/structure";
+import { Schema } from "@3d-tiles-tools/structure";
 
 import { BinarySubtreeData } from "../implicitTiling/BinarySubtreeData";
 import { BinarySubtreeDataResolver } from "../implicitTiling/BinarySubtreeDataResolver";
 import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError";
 import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
 import { SubtreeInfos } from "../implicitTiling/SubtreeInfos";
-
-import { TreeCoordinates } from "../spatial/TreeCoordinates";
-
-import { Subtree } from "@3d-tiles-tools/structure";
-import { TileImplicitTiling } from "@3d-tiles-tools/structure";
-import { Schema } from "@3d-tiles-tools/structure";
 
 import { SubtreeModel } from "./SubtreeModel";
 import { SubtreeMetadataModels } from "./SubtreeMetadataModels";

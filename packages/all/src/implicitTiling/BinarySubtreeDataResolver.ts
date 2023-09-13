@@ -1,10 +1,8 @@
-import { Buffers } from "../base/Buffers";
-
-import { ResourceResolver } from "../io/ResourceResolver";
-
-import { BinaryBufferDataResolver } from "../binary/BinaryBufferDataResolver";
-import { BinaryBufferStructure } from "../binary/BinaryBufferStructure";
-import { BinaryDataError } from "../binary/BinaryDataError";
+import { Buffers } from "@3d-tiles-tools/base";
+import { ResourceResolver } from "@3d-tiles-tools/base";
+import { BinaryBufferDataResolver } from "@3d-tiles-tools/base";
+import { BinaryBufferStructure } from "@3d-tiles-tools/base";
+import { BinaryDataError } from "@3d-tiles-tools/base";
 
 import { Subtree } from "@3d-tiles-tools/structure";
 

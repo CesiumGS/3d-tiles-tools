@@ -1,4 +1,4 @@
-import { DeveloperError } from "../base/DeveloperError";
+import { DeveloperError } from "@3d-tiles-tools/base";
 
 import { Pipeline } from "./Pipeline";
 import { TilesetStage } from "./TilesetStage";

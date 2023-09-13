@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
 
-import { Paths } from "../base/Paths";
-import { Iterables } from "../base/Iterables";
+import { Paths } from "@3d-tiles-tools/base";
+import { Iterables } from "@3d-tiles-tools/base";
 
 import { TilesetSource } from "./TilesetSource";
 import { TilesetError } from "./TilesetError";

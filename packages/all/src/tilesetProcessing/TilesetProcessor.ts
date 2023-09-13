@@ -1,6 +1,6 @@
-import { DeveloperError } from "../base/DeveloperError";
-
-import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
+import { DeveloperError } from "@3d-tiles-tools/base";
+import { Loggers } from "@3d-tiles-tools/base";
+import { ContentDataTypeRegistry } from "@3d-tiles-tools/base";
 
 import { TilesetError } from "../tilesetData/TilesetError";
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
@@ -9,7 +9,6 @@ import { TilesetEntryProcessor } from "./TilesetEntryProcessor";
 import { TilesetProcessorContext } from "./TilesetProcessorContext";
 import { TilesetProcessorContexts } from "./TilesetProcessorContexts";
 
-import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("tilesetProcessing");
 
 /**

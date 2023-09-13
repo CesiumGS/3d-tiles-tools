@@ -1,7 +1,14 @@
 import path from "path";
 
-import { ResourceResolver } from "../io/ResourceResolver";
-import { TilesetSourceResourceResolver } from "../io/TilesetSourceResourceResolver";
+import { Paths } from "@3d-tiles-tools/base";
+import { Loggers } from "@3d-tiles-tools/base";
+import { DataError } from "@3d-tiles-tools/base";
+import { LazyContentData } from "@3d-tiles-tools/base";
+import { ContentDataTypeRegistry } from "@3d-tiles-tools/base";
+import { ContentDataTypes } from "@3d-tiles-tools/base";
+import { ResourceResolver } from "@3d-tiles-tools/base";
+
+import { TilesetSourceResourceResolver } from "../tilesetData/TilesetSourceResourceResolver";
 
 import { Tileset } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
@@ -9,16 +16,7 @@ import { Schema } from "@3d-tiles-tools/structure";
 import { TraversedTile } from "./TraversedTile";
 import { ExplicitTraversedTile } from "./ExplicitTraversedTile";
 
-import { DataError } from "../base/DataError";
-
-import { LazyContentData } from "../contentTypes/LazyContentData";
-import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
-import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
-
 import { TilesetSource3tz } from "../packages/TilesetSource3tz";
-import { Paths } from "../base/Paths";
-
-import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("traversal");
 
 /**

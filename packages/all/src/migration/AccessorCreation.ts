@@ -3,7 +3,7 @@ import { TypedArray } from "@gltf-transform/core";
 import { Accessor } from "@gltf-transform/core";
 import { GLTF } from "@gltf-transform/core";
 
-import { Iterables } from "../base/Iterables";
+import { Iterables } from "@3d-tiles-tools/base";
 
 import { ClassProperty } from "@3d-tiles-tools/structure";
 

@@ -1,8 +1,8 @@
-import { TreeCoordinates } from "../spatial/TreeCoordinates";
-import { Quadtrees } from "../spatial/Quadtrees";
-import { QuadtreeCoordinates } from "../spatial/QuadtreeCoordinates";
-import { Octrees } from "../spatial/Octrees";
-import { OctreeCoordinates } from "../spatial/OctreeCoordinates";
+import { TreeCoordinates } from "@3d-tiles-tools/base";
+import { Quadtrees } from "@3d-tiles-tools/base";
+import { QuadtreeCoordinates } from "@3d-tiles-tools/base";
+import { Octrees } from "@3d-tiles-tools/base";
+import { OctreeCoordinates } from "@3d-tiles-tools/base";
 
 import { TemplateUris } from "./TemplateUris";
 import { ImplicitTilingError } from "./ImplicitTilingError";

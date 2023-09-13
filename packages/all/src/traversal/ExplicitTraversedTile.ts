@@ -1,14 +1,14 @@
-import { ResourceResolver } from "../io/ResourceResolver";
-
-import { TraversedTile } from "./TraversedTile";
-import { ExplicitTraversedTiles } from "./ExplicitTraversedTiles";
-import { MetadataSemanticOverrides } from "./MetadataSemanticOverrides";
+import { ResourceResolver } from "@3d-tiles-tools/base";
 
 import { Tile } from "@3d-tiles-tools/structure";
 import { Content } from "@3d-tiles-tools/structure";
 import { TileImplicitTiling } from "@3d-tiles-tools/structure";
 import { MetadataEntity } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
+
+import { TraversedTile } from "./TraversedTile";
+import { ExplicitTraversedTiles } from "./ExplicitTraversedTiles";
+import { MetadataSemanticOverrides } from "./MetadataSemanticOverrides";
 
 import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
 

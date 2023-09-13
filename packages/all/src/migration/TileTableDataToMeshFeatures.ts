@@ -2,12 +2,13 @@ import { Document } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 import { Accessor } from "@gltf-transform/core";
 
-import { TileFormatError } from "../tileFormats/TileFormatError";
-
 import { EXTMeshFeatures } from "@3d-tiles-tools/gltf-extensions";
 import { MeshFeatureId } from "@3d-tiles-tools/gltf-extensions";
 
-import { Loggers } from "../logging/Loggers";
+import { Loggers } from "@3d-tiles-tools/base";
+
+import { TileFormatError } from "../tileFormats/TileFormatError";
+
 const logger = Loggers.get("migration");
 
 /**

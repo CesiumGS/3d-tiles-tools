@@ -14,9 +14,10 @@ import { I3dmFeatureTable } from "@3d-tiles-tools/structure";
 import { GltfTransform } from "../contentProcessing/GltfTransform";
 import { PntsPointClouds } from "../contentProcessing/pointClouds/PntsPointClouds";
 
-import { BufferedContentData } from "../contentTypes/BufferedContentData";
-import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
-import { ContentDataTypeRegistry } from "../contentTypes/ContentDataTypeRegistry";
+import { BufferedContentData } from "@3d-tiles-tools/base";
+import { ContentDataTypes } from "@3d-tiles-tools/base";
+import { ContentDataTypeRegistry } from "@3d-tiles-tools/base";
+import { Loggers } from "@3d-tiles-tools/base";
 
 import { TileFormats } from "../tileFormats/TileFormats";
 
@@ -28,7 +29,6 @@ import { TileTableData } from "../tileTableData/TileTableData";
 import { TileTableDataI3dm } from "../tileTableData/TileTableDataI3dm";
 import { VecMath } from "../tileTableData/VecMath";
 
-import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("tilesetProcessing");
 
 const DEFAULT_LEAF_GEOMETRIC_ERROR = 512;

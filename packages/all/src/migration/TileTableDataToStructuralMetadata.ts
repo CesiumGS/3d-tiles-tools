@@ -6,6 +6,8 @@ import { MeshPrimitiveStructuralMetadata } from "@3d-tiles-tools/gltf-extensions
 import { PropertyTable } from "@3d-tiles-tools/gltf-extensions";
 import { StructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
 
+import { Loggers } from "@3d-tiles-tools/base";
+
 import { StructuralMetadataPropertyTables } from "../gltfExtensionsUtils/StructuralMetadataPropertyTables";
 
 import { BatchTable } from "@3d-tiles-tools/structure";
@@ -21,7 +23,6 @@ import { PropertyModel } from "../metadata/PropertyModel";
 import { BinaryPropertyTableModel } from "../metadata/binary/BinaryPropertyTableModel";
 import { BinaryPropertyTableBuilder } from "../metadata/binary/BinaryPropertyTableBuilder";
 
-import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("migration");
 
 /**

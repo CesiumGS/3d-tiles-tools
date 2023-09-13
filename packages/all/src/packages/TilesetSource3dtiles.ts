@@ -1,7 +1,7 @@
 import { Database } from "better-sqlite3";
 import DatabaseConstructor from "better-sqlite3";
 
-import { Iterables } from "../base/Iterables";
+import { Iterables } from "@3d-tiles-tools/base";
 
 import { TilesetSource } from "../tilesetData/TilesetSource";
 import { TilesetError } from "../tilesetData/TilesetError";

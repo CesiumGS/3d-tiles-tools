@@ -1,9 +1,8 @@
-import { Paths } from "../base/Paths";
-import { Uris } from "../base/Uris";
+import { Paths } from "@3d-tiles-tools/base";
+import { Uris } from "@3d-tiles-tools/base";
+import { ResourceResolver } from "@3d-tiles-tools/base";
 
 import { TilesetSource } from "../tilesetData/TilesetSource";
-
-import { ResourceResolver } from "./ResourceResolver";
 
 /**
  * Implementation of a `ResourceResolver` based on a `TilesetSource`

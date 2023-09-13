@@ -1,6 +1,6 @@
 import { Transform } from "@gltf-transform/core";
 
-import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
+import { ContentDataTypes } from "@3d-tiles-tools/base";
 
 import { TileContentProcessor } from "./TileContentProcessor";
 import { GltfTransform } from "../contentProcessing/GltfTransform";

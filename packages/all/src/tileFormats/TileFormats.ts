@@ -1,4 +1,5 @@
-import { Buffers } from "../base/Buffers";
+import { Buffers } from "@3d-tiles-tools/base";
+
 import { B3dmFeatureTable } from "@3d-tiles-tools/structure";
 import { BatchTable } from "@3d-tiles-tools/structure";
 import { I3dmFeatureTable } from "@3d-tiles-tools/structure";

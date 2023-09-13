@@ -1,10 +1,10 @@
-import { defined } from "../base/defined";
+import { defined } from "@3d-tiles-tools/base";
+
+import { MetadataClass } from "@3d-tiles-tools/structure";
 
 import { MetadataEntityModel } from "./MetadataEntityModel";
 import { MetadataValues } from "./MetadataValues";
 import { MetadataError } from "./MetadataError";
-
-import { MetadataClass } from "@3d-tiles-tools/structure";
 
 /**
  * Default implementation of a `MetadataEntityModel` that is backed

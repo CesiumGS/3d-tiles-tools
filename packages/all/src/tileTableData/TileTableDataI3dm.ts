@@ -1,4 +1,4 @@
-import { Iterables } from "../base/Iterables";
+import { Iterables } from "@3d-tiles-tools/base";
 
 import { I3dmFeatureTable } from "@3d-tiles-tools/structure";
 

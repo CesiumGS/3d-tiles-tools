@@ -1,10 +1,10 @@
-import { defined } from "../base/defined";
-import { DeveloperError } from "../base/DeveloperError";
+import { defined } from "@3d-tiles-tools/base";
+import { DeveloperError } from "@3d-tiles-tools/base";
+import { ContentDataTypes } from "@3d-tiles-tools/base";
 
 import { ContentStage } from "./ContentStage";
 import { TilesetStage } from "./TilesetStage";
 import { ContentStages } from "./ContentStages";
-import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
 
 /**
  * Methods to create `TilesetStage` objects.

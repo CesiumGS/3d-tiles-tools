@@ -1,5 +1,5 @@
-import { BinaryBufferData } from "../binary/BinaryBufferData";
-import { BinaryBufferStructure } from "../binary/BinaryBufferStructure";
+import { BinaryBufferData } from "@3d-tiles-tools/base";
+import { BinaryBufferStructure } from "@3d-tiles-tools/base";
 
 import { Subtree } from "@3d-tiles-tools/structure";
 

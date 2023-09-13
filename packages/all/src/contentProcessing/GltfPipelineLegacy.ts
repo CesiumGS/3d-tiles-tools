@@ -1,4 +1,4 @@
-import { defaultValue } from "../base/defaultValue";
+import { defaultValue } from "@3d-tiles-tools/base";
 
 import { Cartesian3, defined, DeveloperError, Ellipsoid } from "cesium";
 import { Extensions } from "../tilesets/Extensions";

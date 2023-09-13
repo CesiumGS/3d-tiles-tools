@@ -1,4 +1,4 @@
-import { Buffers } from "../base/Buffers";
+import { Buffers } from "@3d-tiles-tools/base";
 
 import { Tileset } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";

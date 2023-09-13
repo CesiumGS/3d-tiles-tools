@@ -1,4 +1,4 @@
-import { defined } from "../base/defined";
+import { defined } from "@3d-tiles-tools/base";
 
 import { MetadataEntityModel } from "./MetadataEntityModel";
 import { MetadataValues } from "./MetadataValues";

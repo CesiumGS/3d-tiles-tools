@@ -1,7 +1,9 @@
 import path from "path";
 
-import { Paths } from "../base/Paths";
-import { DeveloperError } from "../base/DeveloperError";
+import { Paths } from "@3d-tiles-tools/base";
+import { DeveloperError } from "@3d-tiles-tools/base";
+import { ContentData } from "@3d-tiles-tools/base";
+import { BufferedContentData } from "@3d-tiles-tools/base";
 
 import { Tileset } from "@3d-tiles-tools/structure";
 import { Tile } from "@3d-tiles-tools/structure";
@@ -15,9 +17,6 @@ import { TilesetTargets } from "../tilesetData/TilesetTargets";
 
 import { Tiles } from "../tilesets/Tiles";
 import { Tilesets } from "../tilesets/Tilesets";
-
-import { ContentData } from "../contentTypes/ContentData";
-import { BufferedContentData } from "../contentTypes/BufferedContentData";
 
 /**
  * A class for combining external tileset of a given tileset, to

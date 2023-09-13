@@ -1,10 +1,10 @@
-import { BinaryBufferData } from "../../binary/BinaryBufferData";
-import { BinaryBufferStructure } from "../../binary/BinaryBufferStructure";
-
-import { BinaryEnumInfo } from "./BinaryEnumInfo";
+import { BinaryBufferData } from "@3d-tiles-tools/base";
+import { BinaryBufferStructure } from "@3d-tiles-tools/base";
 
 import { MetadataClass } from "@3d-tiles-tools/structure";
 import { PropertyTable } from "@3d-tiles-tools/structure";
+
+import { BinaryEnumInfo } from "./BinaryEnumInfo";
 
 /**
  * A basic structure summarizing the (raw) elements of a binary

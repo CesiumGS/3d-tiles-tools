@@ -1,6 +1,7 @@
 import path from "path";
 
-import { Iterables } from "../base/Iterables";
+import { Iterables } from "@3d-tiles-tools/base";
+import { Loggers } from "@3d-tiles-tools/base";
 
 import { TilesetSource3tz } from "../packages/TilesetSource3tz";
 import { TilesetSource3dtiles } from "../packages/TilesetSource3dtiles";
@@ -10,7 +11,6 @@ import { TilesetError } from "./TilesetError";
 import { TilesetSource } from "./TilesetSource";
 import { TilesetSourceFs } from "./TilesetSourceFs";
 
-import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("tilesetData");
 
 /**
@@ -80,7 +80,7 @@ export class TilesetSources {
    */
   static getEntries(tilesetSource: TilesetSource): Iterable<TilesetEntry> {
     const keys = tilesetSource.getKeys();
-    const entries = Iterables.map(keys, (k) => {
+    const entries = Iterables.map(keys, (k: string) => {
       const v = tilesetSource.getValue(k);
       if (!v) {
         throw new TilesetError(`No value found for key ${k}`);

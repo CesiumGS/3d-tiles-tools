@@ -1,4 +1,4 @@
-import { ResourceResolver } from "../io/ResourceResolver";
+import { ResourceResolver } from "@3d-tiles-tools/base";
 
 import { Tileset } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
@@ -9,7 +9,7 @@ import { ExplicitTraversedTile } from "./ExplicitTraversedTile";
 import { TraversalCallback } from "./TraversalCallback";
 import { TilesetTraversers } from "./TilesetTraversers";
 
-import { DeveloperError } from "../base/DeveloperError";
+import { DeveloperError } from "@3d-tiles-tools/base";
 
 /**
  * A collection of configuration options for the traversal.

@@ -1,5 +1,9 @@
-import { Cartesian3, Math as CesiumMath, Matrix3, Rectangle } from "cesium";
-import { defined } from "../../base/defined";
+import { Cartesian3 } from "cesium";
+import { Math as CesiumMath } from "cesium";
+import { Matrix3 } from "cesium";
+import { Rectangle } from "cesium";
+
+import { defined } from "@3d-tiles-tools/base";
 
 import { BoundingVolume } from "@3d-tiles-tools/structure";
 import { BoundingVolumeS2 } from "@3d-tiles-tools/structure";

@@ -1,4 +1,4 @@
-import { ResourceResolver } from "../io/ResourceResolver";
+import { ResourceResolver } from "@3d-tiles-tools/base";
 
 import { SubtreeInfo } from "./SubtreeInfo";
 import { AvailabilityInfos } from "./AvailabilityInfos";

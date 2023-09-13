@@ -7,7 +7,8 @@ import { prune } from "@gltf-transform/functions";
 
 import { EXTMeshGPUInstancing } from "@gltf-transform/extensions";
 
-import { Iterables } from "../base/Iterables";
+import { Loggers } from "@3d-tiles-tools/base";
+import { Iterables } from "@3d-tiles-tools/base";
 
 import { BatchTable } from "@3d-tiles-tools/structure";
 import { I3dmFeatureTable } from "@3d-tiles-tools/structure";
@@ -30,7 +31,6 @@ import { EXTInstanceFeatures } from "@3d-tiles-tools/gltf-extensions";
 import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils";
 import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils";
 
-import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("migration");
 
 /**

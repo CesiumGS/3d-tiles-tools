@@ -1,6 +1,8 @@
 import { BatchTable } from "@3d-tiles-tools/structure";
 import { PntsFeatureTable } from "@3d-tiles-tools/structure";
 
+import { Loggers } from "@3d-tiles-tools/base";
+
 import { TileFormats } from "../tileFormats/TileFormats";
 
 import { GltfTransform } from "../contentProcessing/GltfTransform";
@@ -24,7 +26,6 @@ import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetada
 import { PropertyModel } from "../metadata/PropertyModel";
 import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
 
-import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("migration");
 
 /**

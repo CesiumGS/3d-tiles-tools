@@ -1,4 +1,7 @@
-import { Buffers } from "../base/Buffers";
+import { Buffers } from "@3d-tiles-tools/base";
+import { ContentDataTypeChecks } from "@3d-tiles-tools/base";
+import { ContentDataTypes } from "@3d-tiles-tools/base";
+import { Loggers } from "@3d-tiles-tools/base";
 
 import { TilesetStage } from "./TilesetStage";
 import { ContentStageExecutor } from "./ContentStageExecutor";
@@ -10,12 +13,8 @@ import { TilesetUpgrader } from "../tilesetProcessing/TilesetUpgrader";
 import { TilesetCombiner } from "../tilesetProcessing/TilesetCombiner";
 import { TilesetDataProcessor } from "../tilesetProcessing/TilesetDataProcessor";
 
-import { ContentDataTypeChecks } from "../contentTypes/ContentDataTypeChecks";
-import { ContentDataTypes } from "../contentTypes/ContentDataTypes";
-
 import { TilesetEntry } from "../tilesetData/TilesetEntry";
 
-import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("pipeline");
 
 /**
