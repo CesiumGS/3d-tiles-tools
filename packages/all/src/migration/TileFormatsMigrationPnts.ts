@@ -23,8 +23,8 @@ import { MeshFeatures } from "@3d-tiles-tools/gltf-extensions";
 import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils";
 import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils";
 
-import { PropertyModel } from "../metadata/PropertyModel";
-import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
+import { PropertyModel } from "@3d-tiles-tools/metadata";
+import { DefaultPropertyModel } from "@3d-tiles-tools/metadata";
 
 const logger = Loggers.get("migration");
 

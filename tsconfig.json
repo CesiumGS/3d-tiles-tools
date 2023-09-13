@@ -35,6 +35,9 @@
       "path": "./packages/base/tsconfig.json"
     },
     {
+      "path": "./packages/metadata/tsconfig.json"
+    },
+    {
       "path": "./packages/all/tsconfig.json"
     },
     {

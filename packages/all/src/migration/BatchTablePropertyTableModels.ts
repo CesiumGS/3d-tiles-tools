@@ -2,10 +2,10 @@ import { TileTableData } from "../tileTableData/TileTableData";
 import { BatchTableClassProperties } from "./BatchTableClassProperties";
 import { Ids } from "./Ids";
 
-import { PropertyTableModel } from "../metadata/PropertyTableModel";
-import { PropertyModel } from "../metadata/PropertyModel";
-import { DefaultPropertyModel } from "../metadata/DefaultPropertyModel";
-import { DefaultPropertyTableModel } from "../metadata/DefaultPropertyTableModel";
+import { PropertyTableModel } from "@3d-tiles-tools/metadata";
+import { PropertyModel } from "@3d-tiles-tools/metadata";
+import { DefaultPropertyModel } from "@3d-tiles-tools/metadata";
+import { DefaultPropertyTableModel } from "@3d-tiles-tools/metadata";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
 

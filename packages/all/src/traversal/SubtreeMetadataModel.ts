@@ -1,4 +1,4 @@
-import { PropertyTableModel } from "../metadata/PropertyTableModel";
+import { PropertyTableModel } from "@3d-tiles-tools/metadata";
 
 import { Schema } from "@3d-tiles-tools/structure";
 

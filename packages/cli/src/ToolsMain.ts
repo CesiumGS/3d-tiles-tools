@@ -1,10 +1,12 @@
 import fs from "fs";
 import path from "path";
 
-import { Paths } from "@3d-tiles-tools/all";
-import { DeveloperError } from "@3d-tiles-tools/all";
-import { Buffers } from "@3d-tiles-tools/all";
-import { Iterables } from "@3d-tiles-tools/all";
+import { Paths } from "@3d-tiles-tools/base";
+import { DeveloperError } from "@3d-tiles-tools/base";
+import { Buffers } from "@3d-tiles-tools/base";
+import { Iterables } from "@3d-tiles-tools/base";
+import { ContentDataTypes } from "@3d-tiles-tools/base";
+import { Loggers } from "@3d-tiles-tools/base";
 
 import { Tilesets } from "@3d-tiles-tools/all";
 
@@ -13,8 +15,6 @@ import { TileDataLayouts } from "@3d-tiles-tools/all";
 
 import { ContentOps } from "@3d-tiles-tools/all";
 import { GltfUtilities } from "@3d-tiles-tools/all";
-
-import { ContentDataTypes } from "@3d-tiles-tools/all";
 
 import { PipelineExecutor } from "@3d-tiles-tools/all";
 import { Pipelines } from "@3d-tiles-tools/all";
@@ -25,7 +25,6 @@ import { TilesetConverter } from "@3d-tiles-tools/all";
 
 import { TilesetJsonCreator } from "@3d-tiles-tools/all";
 
-import { Loggers } from "@3d-tiles-tools/all";
 const logger = Loggers.get("CLI");
 
 /**

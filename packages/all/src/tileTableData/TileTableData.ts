@@ -5,10 +5,10 @@ import { BinaryBodyOffset } from "@3d-tiles-tools/structure";
 import { I3dmFeatureTable } from "@3d-tiles-tools/structure";
 import { PntsFeatureTable } from "@3d-tiles-tools/structure";
 
-import { PropertyModel } from "../metadata/PropertyModel";
-import { PropertyModels } from "../metadata/PropertyModels";
-import { NumericBuffers } from "../metadata/binary/NumericBuffers";
-import { NumericPropertyModel } from "../metadata/binary/NumericPropertyModel";
+import { PropertyModel } from "@3d-tiles-tools/metadata";
+import { PropertyModels } from "@3d-tiles-tools/metadata";
+import { NumericBuffers } from "@3d-tiles-tools/metadata";
+import { NumericPropertyModel } from "@3d-tiles-tools/metadata";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
 
@@ -292,7 +292,7 @@ export class TileTableData {
         length,
         componentType
       );
-      return resultValues.map((n) => Number(n));
+      return resultValues.map((n: number | bigint) => Number(n));
     }
     return property;
   }

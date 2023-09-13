@@ -31,26 +31,6 @@ export * from "./implicitTiling/SubtreeInfo";
 export * from "./implicitTiling/SubtreeInfos";
 export * from "./implicitTiling/TemplateUris";
 
-export * from "./metadata/ArrayValues";
-export * from "./metadata/ClassProperties";
-export * from "./metadata/DefaultMetadataEntityModel";
-export * from "./metadata/MetadataComponentTypes";
-export * from "./metadata/MetadataUtilities";
-export * from "./metadata/MetadataEntityModel";
-export * from "./metadata/MetadataEntityModels";
-export * from "./metadata/MetadataError";
-export * from "./metadata/MetadataTypes";
-export * from "./metadata/MetadataUtilities";
-export * from "./metadata/MetadataValues";
-export * from "./metadata/PropertyModel";
-export * from "./metadata/PropertyTableModel";
-
-export * from "./metadata/binary/BinaryPropertyTable";
-export * from "./metadata/binary/BinaryPropertyTables";
-export * from "./metadata/binary/BinaryPropertyTableModel";
-export * from "./metadata/binary/BinaryEnumInfo";
-export * from "./metadata/binary/NumericBuffers";
-
 export * from "./traversal/ExplicitTraversedTile";
 export * from "./traversal/ExplicitTraversedTiles";
 export * from "./traversal/ImplicitTraversedTile";

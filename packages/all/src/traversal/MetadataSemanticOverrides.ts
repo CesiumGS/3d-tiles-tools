@@ -2,8 +2,8 @@ import { Tile } from "@3d-tiles-tools/structure";
 import { Content } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
 
-import { MetadataEntityModel } from "../metadata/MetadataEntityModel";
-import { MetadataEntityModels } from "../metadata/MetadataEntityModels";
+import { MetadataEntityModel } from "@3d-tiles-tools/metadata";
+import { MetadataEntityModels } from "@3d-tiles-tools/metadata";
 
 import { SubtreeMetadataModel } from "./SubtreeMetadataModel";
 

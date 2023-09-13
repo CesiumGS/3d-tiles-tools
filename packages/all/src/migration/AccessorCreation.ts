@@ -7,8 +7,8 @@ import { Iterables } from "@3d-tiles-tools/base";
 
 import { ClassProperty } from "@3d-tiles-tools/structure";
 
-import { PropertyModel } from "../metadata/PropertyModel";
-import { PropertyModels } from "../metadata/PropertyModels";
+import { PropertyModel } from "@3d-tiles-tools/metadata";
+import { PropertyModels } from "@3d-tiles-tools/metadata";
 
 import { TileFormatError } from "../tileFormats/TileFormatError";
 

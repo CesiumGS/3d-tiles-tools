@@ -17,11 +17,11 @@ import { BatchTablePropertyTableModels } from "./BatchTablePropertyTableModels";
 import { AccessorCreation } from "./AccessorCreation";
 import { TileFormatsMigration } from "./TileFormatsMigration";
 
-import { PropertyTableModels } from "../metadata/PropertyTableModels";
-import { PropertyModels } from "../metadata/PropertyModels";
-import { PropertyModel } from "../metadata/PropertyModel";
-import { BinaryPropertyTableModel } from "../metadata/binary/BinaryPropertyTableModel";
-import { BinaryPropertyTableBuilder } from "../metadata/binary/BinaryPropertyTableBuilder";
+import { PropertyTableModels } from "@3d-tiles-tools/metadata";
+import { PropertyModels } from "@3d-tiles-tools/metadata";
+import { PropertyModel } from "@3d-tiles-tools/metadata";
+import { BinaryPropertyTableModel } from "@3d-tiles-tools/metadata";
+import { BinaryPropertyTableBuilder } from "@3d-tiles-tools/metadata";
 
 const logger = Loggers.get("migration");
 

@@ -1,5 +1,5 @@
-import { MetadataError } from "../metadata/MetadataError";
-import { BinaryPropertyTable } from "../metadata/binary/BinaryPropertyTable";
+import { MetadataError } from "@3d-tiles-tools/metadata";
+import { BinaryPropertyTable } from "@3d-tiles-tools/metadata";
 
 import { EXTStructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
 import { PropertyTablePropertyOffsetType } from "@3d-tiles-tools/gltf-extensions";

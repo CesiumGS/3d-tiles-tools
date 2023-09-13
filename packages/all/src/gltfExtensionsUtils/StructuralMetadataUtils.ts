@@ -2,6 +2,8 @@ import { Document } from "@gltf-transform/core";
 import { Mesh } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 
+import { BinaryPropertyModels } from "@3d-tiles-tools/metadata";
+
 import { Class } from "@3d-tiles-tools/gltf-extensions";
 import { ClassProperty } from "@3d-tiles-tools/gltf-extensions";
 import { MeshPrimitiveStructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
@@ -15,8 +17,6 @@ import { Schema } from "@3d-tiles-tools/gltf-extensions";
 import { StructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
 
 import { StringBuilder } from "./StringBuilder";
-
-import { BinaryPropertyModels } from "../metadata/binary/BinaryPropertyModels";
 
 /**
  * Utilities related to the glTF `EXT_structural_metadata` extension.

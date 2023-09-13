@@ -1,11 +1,10 @@
 import { Schema } from "@3d-tiles-tools/structure";
 
-import { MetadataError } from "../metadata/MetadataError";
-import { MetadataUtilities } from "../metadata/MetadataUtilities";
-import { PropertyTableModel } from "../metadata/PropertyTableModel";
-
-import { BinaryPropertyTable } from "../metadata/binary/BinaryPropertyTable";
-import { BinaryPropertyTableModel } from "../metadata/binary/BinaryPropertyTableModel";
+import { MetadataError } from "@3d-tiles-tools/metadata";
+import { MetadataUtilities } from "@3d-tiles-tools/metadata";
+import { PropertyTableModel } from "@3d-tiles-tools/metadata";
+import { BinaryPropertyTable } from "@3d-tiles-tools/metadata";
+import { BinaryPropertyTableModel } from "@3d-tiles-tools/metadata";
 
 import { BinarySubtreeData } from "../implicitTiling/BinarySubtreeData";
 import { SubtreeInfo } from "../implicitTiling/SubtreeInfo";
