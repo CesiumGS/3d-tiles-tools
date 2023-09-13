@@ -1,5 +1,3 @@
-import { defined } from "@3d-tiles-tools/base";
-
 import { AvailabilityInfo } from "./AvailabilityInfo";
 import { BufferAvailabilityInfo } from "./BufferAvailabilityInfo";
 import { ConstantAvailabilityInfo } from "./ConstantAvailabilityInfo";
@@ -75,13 +73,13 @@ export class AvailabilityInfos {
     length: number
   ): AvailabilityInfo {
     const constant = availability.constant;
-    if (defined(constant)) {
+    if (constant !== undefined) {
       const available = constant === 1;
       return new ConstantAvailabilityInfo(available, length);
     }
     // The bitstream MUST be defined when constant is undefined
     const bitstream = availability.bitstream;
-    if (!defined(bitstream)) {
+    if (bitstream === undefined) {
       throw new ImplicitTilingError(
         "The availability neither defines a constant nor a bitstream"
       );

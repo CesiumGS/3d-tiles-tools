@@ -1,8 +1,6 @@
 import fs from "fs";
 import zlib from "zlib";
 
-import { defined } from "@3d-tiles-tools/base";
-
 import { TilesetSource } from "../tilesetData/TilesetSource";
 import { TilesetError } from "../tilesetData/TilesetError";
 
@@ -44,7 +42,7 @@ export class TilesetSource3tz implements TilesetSource {
 
   /** {@inheritDoc TilesetSource.open} */
   open(fullInputName: string) {
-    if (defined(this.fd)) {
+    if (this.fd !== undefined) {
       throw new TilesetError("Source already opened");
     }
 
@@ -54,7 +52,7 @@ export class TilesetSource3tz implements TilesetSource {
 
   /** {@inheritDoc TilesetSource.getKeys} */
   getKeys(): Iterable<string> {
-    if (!defined(this.fd) || !this.zipIndex) {
+    if (this.fd === undefined || !this.zipIndex) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
     return TilesetSource3tz.createKeysIterable(this.fd, this.zipIndex);
@@ -79,7 +77,7 @@ export class TilesetSource3tz implements TilesetSource {
 
   /** {@inheritDoc TilesetSource.getValue} */
   getValue(key: string): Buffer | undefined {
-    if (!defined(this.fd) || !this.zipIndex) {
+    if (this.fd === undefined || !this.zipIndex) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
     const entry = ArchiveFunctions3tz.readEntry(this.fd, this.zipIndex, key);
@@ -96,7 +94,7 @@ export class TilesetSource3tz implements TilesetSource {
 
   /** {@inheritDoc TilesetSource.close} */
   close() {
-    if (!defined(this.fd) || !this.zipIndex) {
+    if (this.fd === undefined || !this.zipIndex) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
     fs.closeSync(this.fd);

@@ -1,5 +1,3 @@
-import { defined } from "@3d-tiles-tools/base";
-
 import { Schema } from "@3d-tiles-tools/structure";
 
 import { MetadataError } from "../metadata/MetadataError";
@@ -94,7 +92,7 @@ export class SubtreeMetadataModels {
     // Obtain the property table model that is pointed to
     // by subtree.tileMetadata
     let tileMetadataModel = undefined;
-    if (defined(subtree.tileMetadata)) {
+    if (subtree.tileMetadata !== undefined) {
       tileMetadataModel = propertyTableModels[subtree.tileMetadata];
       if (!tileMetadataModel) {
         throw new MetadataError(

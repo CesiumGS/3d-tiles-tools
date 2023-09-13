@@ -1,7 +1,5 @@
 import zlib from "zlib";
 
-import { defined } from "./defined";
-
 import { DataError } from "./DataError";
 
 /**
@@ -193,7 +191,7 @@ export class Buffers {
    * @returns The buffer
    */
   static getJsonBufferPadded(json: any, byteOffset?: number): Buffer {
-    if (!defined(json) || Object.keys(json).length === 0) {
+    if (json === undefined || Object.keys(json).length === 0) {
       return Buffer.alloc(0);
     }
     byteOffset = byteOffset ?? 0;

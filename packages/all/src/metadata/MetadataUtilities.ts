@@ -1,5 +1,3 @@
-import { defined } from "@3d-tiles-tools/base";
-
 import { Schema } from "@3d-tiles-tools/structure";
 import { ClassProperty } from "@3d-tiles-tools/structure";
 
@@ -108,7 +106,7 @@ export class MetadataUtilities {
       return [];
     }
     const enumType = classProperty.enumType;
-    if (!defined(enumType)) {
+    if (enumType === undefined) {
       return [];
     }
     const enums = schema.enums;
@@ -116,7 +114,7 @@ export class MetadataUtilities {
       return [];
     }
     const theEnum = enums[enumType];
-    if (!defined(theEnum)) {
+    if (theEnum === undefined) {
       return [];
     }
     const enumValues = theEnum.values;

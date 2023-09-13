@@ -1,4 +1,3 @@
-import { defined } from "@3d-tiles-tools/base";
 import { DeveloperError } from "@3d-tiles-tools/base";
 
 import { ContentStage } from "./ContentStage";
@@ -212,7 +211,7 @@ export class ContentStages {
     }
 
     const contentStage: ContentStage = contentStageJson;
-    if (!defined(contentStage.name)) {
+    if (contentStage.name === undefined) {
       throw new DeveloperError("The contentStage JSON does not define a name");
     }
     return contentStage;

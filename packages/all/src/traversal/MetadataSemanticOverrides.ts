@@ -1,5 +1,3 @@
-import { defined } from "@3d-tiles-tools/base";
-
 import { Tile } from "@3d-tiles-tools/structure";
 import { Content } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
@@ -194,7 +192,7 @@ export class MetadataSemanticOverrides {
 
     const semanticGeometricError =
       metadataEntityModel.getPropertyValueBySemantic("TILE_GEOMETRIC_ERROR");
-    if (defined(semanticGeometricError)) {
+    if (semanticGeometricError !== undefined) {
       tile.geometricError = semanticGeometricError;
     }
 
@@ -254,13 +252,13 @@ export class MetadataSemanticOverrides {
 
     const semanticUri =
       metadataEntityModel.getPropertyValueBySemantic("CONTENT_URI");
-    if (defined(semanticUri)) {
+    if (semanticUri !== undefined) {
       content.uri = semanticUri;
     }
 
     const semanticGroupId =
       metadataEntityModel.getPropertyValueBySemantic("CONTENT_GROUP_ID");
-    if (defined(semanticGroupId)) {
+    if (semanticGroupId !== undefined) {
       content.group = semanticGroupId;
     }
   }

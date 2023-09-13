@@ -1,4 +1,3 @@
-import { defined } from "@3d-tiles-tools/base";
 import { defaultValue } from "@3d-tiles-tools/base";
 import { BinaryBufferData } from "@3d-tiles-tools/base";
 import { BinaryBuffers } from "@3d-tiles-tools/base";
@@ -177,7 +176,7 @@ export class BinaryPropertyTables {
     };
 
     const isVariableLengthArray =
-      classProperty.array && !defined(classProperty.count);
+      classProperty.array && classProperty.count === undefined;
     if (isVariableLengthArray) {
       const arrayOffsetBuffer = BinaryPropertyTables.createArrayOffsetBuffer(
         values,
@@ -490,7 +489,7 @@ export class BinaryPropertyTables {
       return BinaryPropertyTables.createBooleanBuffer(flattenedValues);
     }
 
-    if (defined(enumType)) {
+    if (enumType !== undefined) {
       flattenedValues = BinaryPropertyTables.flattenFully(flattenedValues);
       const length = flattenedValues.length;
       const metadataEnums = schema.enums;

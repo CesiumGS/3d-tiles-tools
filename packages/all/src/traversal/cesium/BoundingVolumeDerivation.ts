@@ -3,8 +3,6 @@ import { Math as CesiumMath } from "cesium";
 import { Matrix3 } from "cesium";
 import { Rectangle } from "cesium";
 
-import { defined } from "@3d-tiles-tools/base";
-
 import { BoundingVolume } from "@3d-tiles-tools/structure";
 import { BoundingVolumeS2 } from "@3d-tiles-tools/structure";
 
@@ -169,7 +167,7 @@ export class BoundingVolumeDerivation {
       BoundingVolumeDerivation.scratchScaleFactors
     );
 
-    if (defined(z)) {
+    if (z !== undefined) {
       modelSpaceZ = -1 + (2 * z + 1) * tileScale;
       scaleFactors.z = tileScale;
     }
@@ -255,7 +253,7 @@ export class BoundingVolumeDerivation {
     // Height is only subdivided for octrees; It remains constant for quadtrees.
     let minimumHeight = rootMinimumHeight;
     let maximumHeight = rootMaximumHeight;
-    if (defined(z)) {
+    if (z !== undefined) {
       const childThickness =
         tileScale * (rootMaximumHeight - rootMinimumHeight);
       minimumHeight += z * childThickness;
@@ -306,7 +304,7 @@ export class BoundingVolumeDerivation {
     const cellId = S2Cell.fromFacePositionLevel(face, BigInt(position), level);
 
     let minHeight, maxHeight;
-    if (defined(z)) {
+    if (z !== undefined) {
       // In CesiumJS, this information was computed from
       // the "childIndex" that was passed along, i.e. this
       // is equivalent to the condition "childIndex < 4"

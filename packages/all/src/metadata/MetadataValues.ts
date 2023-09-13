@@ -1,5 +1,3 @@
-import { defined } from "@3d-tiles-tools/base";
-
 import { ClassProperty } from "@3d-tiles-tools/structure";
 
 import { MetadataComponentTypes } from "./MetadataComponentTypes";
@@ -48,12 +46,12 @@ export class MetadataValues {
   ): any {
     const noData = classProperty.noData;
     const defaultValue = classProperty.default;
-    if (defined(noData)) {
+    if (noData !== undefined) {
       if (ArrayValues.deepEquals(value, noData)) {
         return ArrayValues.deepClone(defaultValue);
       }
     }
-    if (!defined(value)) {
+    if (value === undefined) {
       return ArrayValues.deepClone(defaultValue);
     }
     value = ArrayValues.deepClone(value);
@@ -62,15 +60,15 @@ export class MetadataValues {
       const componentType = classProperty.componentType;
       value = MetadataValues.normalize(value, componentType);
     }
-    const offset = defined(offsetOverride)
-      ? offsetOverride
-      : classProperty.offset;
-    const scale = defined(scaleOverride) ? scaleOverride : classProperty.scale;
+    const offset =
+      offsetOverride !== undefined ? offsetOverride : classProperty.offset;
+    const scale =
+      scaleOverride !== undefined ? scaleOverride : classProperty.scale;
 
-    if (defined(scale)) {
+    if (scale !== undefined) {
       value = ArrayValues.deepMultiply(value, scale);
     }
-    if (defined(offset)) {
+    if (offset !== undefined) {
       value = ArrayValues.deepAdd(value, offset);
     }
     return value;

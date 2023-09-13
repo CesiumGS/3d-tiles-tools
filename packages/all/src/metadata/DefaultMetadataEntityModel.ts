@@ -1,5 +1,3 @@
-import { defined } from "@3d-tiles-tools/base";
-
 import { MetadataClass } from "@3d-tiles-tools/structure";
 
 import { MetadataEntityModel } from "./MetadataEntityModel";
@@ -51,7 +49,7 @@ export class DefaultMetadataEntityModel implements MetadataEntityModel {
   /** {@inheritDoc MetadataEntityModel.getPropertyValueBySemantic} */
   getPropertyValueBySemantic(semantic: string): any {
     const propertyId = this.semanticToPropertyId[semantic];
-    if (!defined(propertyId)) {
+    if (propertyId === undefined) {
       return undefined;
     }
     return this.getPropertyValue(propertyId);

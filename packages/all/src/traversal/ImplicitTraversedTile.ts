@@ -1,4 +1,3 @@
-import { defined } from "@3d-tiles-tools/base";
 import { TreeCoordinates } from "@3d-tiles-tools/base";
 import { ResourceResolver } from "@3d-tiles-tools/base";
 
@@ -335,7 +334,7 @@ export class ImplicitTraversedTile implements TraversedTile {
       const available = contentAvailabilityInfo.isAvailable(tileIndex);
       if (available) {
         const templateUri = this._root.asRawTile().content?.uri;
-        if (defined(templateUri)) {
+        if (templateUri !== undefined) {
           const contentUri = ImplicitTilings.substituteTemplateUri(
             this._implicitTiling.subdivisionScheme,
             templateUri,

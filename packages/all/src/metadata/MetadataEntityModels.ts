@@ -1,5 +1,3 @@
-import { defined } from "@3d-tiles-tools/base";
-
 import { DefaultMetadataEntityModel } from "./DefaultMetadataEntityModel";
 import { MetadataEntityModel } from "./MetadataEntityModel";
 import { MetadataError } from "./MetadataError";
@@ -93,7 +91,7 @@ export class MetadataEntityModels {
     if (classProperties) {
       for (const classPropertyId of Object.keys(classProperties)) {
         const property = classProperties[classPropertyId];
-        if (defined(property.semantic)) {
+        if (property.semantic !== undefined) {
           semanticToPropertyId[property.semantic] = classPropertyId;
         }
       }

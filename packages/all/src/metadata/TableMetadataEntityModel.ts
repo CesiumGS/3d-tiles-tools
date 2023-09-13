@@ -1,5 +1,3 @@
-import { defined } from "@3d-tiles-tools/base";
-
 import { MetadataEntityModel } from "./MetadataEntityModel";
 import { MetadataValues } from "./MetadataValues";
 import { MetadataError } from "./MetadataError";
@@ -30,13 +28,13 @@ export class TableMetadataEntityModel implements MetadataEntityModel {
   getPropertyValue(propertyId: string): any {
     const propertyTableModel = this.propertyTableModel;
     const classProperty = propertyTableModel.getClassProperty(propertyId);
-    if (!defined(classProperty)) {
+    if (classProperty === undefined) {
       const message = `The class does not define a property ${propertyId}`;
       throw new MetadataError(message);
     }
     const propertyTableProperty =
       propertyTableModel.getPropertyTableProperty(propertyId);
-    if (!defined(propertyTableProperty)) {
+    if (propertyTableProperty === undefined) {
       const message = `The property table does not define a property ${propertyId}`;
       throw new MetadataError(message);
     }
@@ -62,7 +60,7 @@ export class TableMetadataEntityModel implements MetadataEntityModel {
   /** {@inheritDoc MetadataEntityModel.getPropertyValueBySemantic} */
   getPropertyValueBySemantic(semantic: string): any {
     const propertyId = this.semanticToPropertyId[semantic];
-    if (!defined(propertyId)) {
+    if (propertyId === undefined) {
       return undefined;
     }
     return this.getPropertyValue(propertyId);

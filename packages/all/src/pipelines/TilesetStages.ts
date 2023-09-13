@@ -1,4 +1,3 @@
-import { defined } from "@3d-tiles-tools/base";
 import { DeveloperError } from "@3d-tiles-tools/base";
 import { ContentDataTypes } from "@3d-tiles-tools/base";
 
@@ -127,7 +126,7 @@ export class TilesetStages {
       return tilesetStage;
     }
 
-    if (!defined(tilesetStageJson.name)) {
+    if (tilesetStageJson.name === undefined) {
       throw new DeveloperError("The tilesetStage JSON does not define a name");
     }
 
