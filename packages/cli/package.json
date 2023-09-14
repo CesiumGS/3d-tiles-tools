@@ -10,11 +10,12 @@
     "3d-tiles-tools": "./build/main"
   },
   "dependencies": {
-    "@3d-tiles-tools/all": "^0.3.0",
+    "@3d-tiles-tools/base": "^0.3.0",
+    "@3d-tiles-tools/tilesets": "^0.3.0",
+    "@3d-tiles-tools/tools": "^0.3.0",
     "yargs": "^17.5.1"
   },
   "devDependencies": {
-    "@3d-tiles-tools/all": "^0.3.0",
     "@types/yargs": "^17.0.22"
   },
 

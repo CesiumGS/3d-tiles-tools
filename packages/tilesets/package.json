@@ -1,13 +1,18 @@
 {
-  "name": "@3d-tiles-tools/metadata",
+  "name": "@3d-tiles-tools/tilesets",
   "version": "0.3.0",
-  "description": "3D Tiles tools 3D Metadata implementation",
+  "description": "3D Tiles tools tileset representation",
   "type": "module",
   "source": "./src/index.ts",
   "types": "./build/index.d.ts",
   "dependencies": {
     "@3d-tiles-tools/structure": "^0.3.0",
-    "@3d-tiles-tools/base": "^0.3.0"
+    "@3d-tiles-tools/base": "^0.3.0",
+    "@3d-tiles-tools/metadata": "^0.3.0",
+    "archiver": "^5.3.1",
+    "better-sqlite3": "^8.0.1",
+    "cesium": "^1.103.0",
+    "node-stream-zip": "^1.15.0"
   },
   "devDependencies": {
     "typescript": "^4.8.3"

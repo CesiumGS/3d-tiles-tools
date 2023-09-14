@@ -38,7 +38,10 @@
       "path": "./packages/metadata/tsconfig.json"
     },
     {
-      "path": "./packages/all/tsconfig.json"
+      "path": "./packages/tilesets/tsconfig.json"
+    },
+    {
+      "path": "./packages/tools/tsconfig.json"
     },
     {
       "path": "./packages/cli/tsconfig.json"

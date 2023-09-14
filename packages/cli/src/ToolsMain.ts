@@ -8,22 +8,19 @@ import { Iterables } from "@3d-tiles-tools/base";
 import { ContentDataTypes } from "@3d-tiles-tools/base";
 import { Loggers } from "@3d-tiles-tools/base";
 
-import { Tilesets } from "@3d-tiles-tools/all";
+import { Tilesets } from "@3d-tiles-tools/tilesets";
 
-import { TileFormats } from "@3d-tiles-tools/all";
-import { TileDataLayouts } from "@3d-tiles-tools/all";
+import { TileFormats } from "@3d-tiles-tools/tilesets";
+import { TileDataLayouts } from "@3d-tiles-tools/tilesets";
 
-import { ContentOps } from "@3d-tiles-tools/all";
-import { GltfUtilities } from "@3d-tiles-tools/all";
-
-import { PipelineExecutor } from "@3d-tiles-tools/all";
-import { Pipelines } from "@3d-tiles-tools/all";
-
-import { TileFormatsMigration } from "@3d-tiles-tools/all";
-
-import { TilesetConverter } from "@3d-tiles-tools/all";
-
-import { TilesetJsonCreator } from "@3d-tiles-tools/all";
+import { ContentOps } from "@3d-tiles-tools/tools";
+import { GltfUtilities } from "@3d-tiles-tools/tools";
+import { PipelineExecutor } from "@3d-tiles-tools/tools";
+import { Pipelines } from "@3d-tiles-tools/tools";
+import { TileFormatsMigration } from "@3d-tiles-tools/tools";
+import { TilesetConverter } from "@3d-tiles-tools/tools";
+import { TilesetJsonCreator } from "@3d-tiles-tools/tools";
+import { TilesetOperations } from "@3d-tiles-tools/tools";
 
 const logger = Loggers.get("CLI");
 
@@ -463,7 +460,7 @@ export class ToolsMain {
 
   static async combine(input: string, output: string, force: boolean) {
     ToolsMain.ensureCanWrite(output, force);
-    await Tilesets.combine(input, output, force);
+    await TilesetOperations.combine(input, output, force);
   }
 
   static async upgrade(
@@ -481,7 +478,7 @@ export class ToolsMain {
     logger.debug(`  gltfUpgradeOptions: ${JSON.stringify(gltfUpgradeOptions)}`);
 
     ToolsMain.ensureCanWrite(output, force);
-    await Tilesets.upgrade(
+    await TilesetOperations.upgrade(
       input,
       output,
       force,
@@ -499,7 +496,7 @@ export class ToolsMain {
     logger.debug(`  force: ${force}`);
 
     ToolsMain.ensureCanWrite(output, force);
-    await Tilesets.merge(inputs, output, force);
+    await TilesetOperations.merge(inputs, output, force);
 
     logger.debug(`Executing merge DONE`);
   }

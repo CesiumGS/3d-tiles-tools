@@ -1,0 +1,36 @@
+{
+  "name": "@3d-tiles-tools/tools",
+  "version": "0.3.0",
+  "description": "3D Tiles tools main package",
+  "type": "module",
+  "source": "./src/index.ts",
+  "types": "./build/index.d.ts",
+  "dependencies": {
+    "@3d-tiles-tools/structure": "^0.3.0",
+    "@3d-tiles-tools/ktx": "^0.3.0",
+    "@3d-tiles-tools/gltf-extensions": "^0.3.0",
+    "@3d-tiles-tools/base": "^0.3.0",
+    "@3d-tiles-tools/metadata": "^0.3.0",
+    "@3d-tiles-tools/tilesets": "^0.3.0",
+    "@gltf-transform/core": "^3.2.1",
+    "@gltf-transform/extensions": "^3.2.1",
+    "@gltf-transform/functions": "^3.2.1",
+    "cesium": "^1.103.0",
+    "draco3d": "^1.5.6",
+    "gltf-pipeline": "^4.1.0",
+    "gltfpack": "^0.19.1"
+  },
+  "devDependencies": {
+    "@types/draco3d": "^1.4.2",
+    "typescript": "^4.8.3"
+  },
+
+  "scripts": {
+    "about:build": "echo 'Run the TypeScript compiler to generate the build output.'",
+    "build": "npx tsc"
+  }
+}
+
+
+
+
