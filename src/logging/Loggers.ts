@@ -32,9 +32,13 @@ export class Loggers {
     prettyPrint?: boolean,
     logFilePath?: string
   ): Logger {
-    const consoleLogLevel = "info";
+    // The default log level for the logger itself, which determines
+    // up to which level messages will be sent to the targets.
+    const globalLogLevel = "info";
+
+    // The log levels for the individual targets.
+    const consoleLogLevel = "trace";
     const fileLogLevel = "trace";
-    const globalLogLevel = "trace";
 
     const transportTargetOptionsList: TransportTargetOptions[] = [];
 
