@@ -117,3 +117,8 @@ export * from "./traversal/SubtreeModels";
 export * from "./traversal/TilesetTraverser";
 export * from "./traversal/TraversedTile";
 export * from "./traversal/TraversalCallback";
+
+// For glTF extension validation experiments
+
+export * from "./contentProcessing/GltfUtilities";
+export * from "./contentProcessing/GltfTransform";
