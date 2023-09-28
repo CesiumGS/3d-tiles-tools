@@ -102,6 +102,7 @@ export * from "./metadata/PropertyModel";
 export * from "./metadata/PropertyTableModel";
 
 export * from "./metadata/binary/BinaryPropertyTable";
+export * from "./metadata/binary/BinaryMetadata";
 export * from "./metadata/binary/BinaryPropertyTables";
 export * from "./metadata/binary/BinaryPropertyTableModel";
 export * from "./metadata/binary/BinaryEnumInfo";

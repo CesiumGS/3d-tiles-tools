@@ -1,5 +1,4 @@
 import { BinaryPropertyModels } from "./BinaryPropertyModels";
-import { BinaryPropertyTable } from "./BinaryPropertyTable";
 import { TableMetadataEntityModel } from "../TableMetadataEntityModel";
 
 import { MetadataEntityModel } from "../MetadataEntityModel";
@@ -10,6 +9,7 @@ import { PropertyTableModel } from "../PropertyTableModel";
 
 import { ClassProperty } from "../../structure/Metadata/ClassProperty";
 import { PropertyTableProperty } from "../../structure/PropertyTableProperty";
+import { BinaryPropertyTable } from "./BinaryPropertyTable";
 
 /**
  * Implementation of the `PropertyTableModel` interface that is backed
@@ -19,8 +19,8 @@ import { PropertyTableProperty } from "../../structure/PropertyTableProperty";
  */
 export class BinaryPropertyTableModel implements PropertyTableModel {
   /**
-   * The structure containing the raw data of the binary
-   * property table
+   * The structure containing the raw PropertyTable JSON object
+   * and binary data of the property table
    */
   private readonly binaryPropertyTable: BinaryPropertyTable;
 
@@ -43,26 +43,28 @@ export class BinaryPropertyTableModel implements PropertyTableModel {
 
     // Initialize the `PropertyModel` instances for
     // the property table properties
-    const propertyTable = this.binaryPropertyTable.propertyTable;
+    const propertyTable = binaryPropertyTable.propertyTable;
     const propertyTableProperties = propertyTable.properties;
     if (propertyTableProperties) {
       for (const propertyId of Object.keys(propertyTableProperties)) {
         const propertyModel = BinaryPropertyModels.createPropertyModel(
-          this.binaryPropertyTable,
+          binaryPropertyTable,
           propertyId
         );
         this.propertyIdToModel[propertyId] = propertyModel;
       }
     }
 
-    const metadataClass = binaryPropertyTable.metadataClass;
+    const binaryMetadata = binaryPropertyTable.binaryMetadata;
+    const metadataClass = binaryMetadata.metadataClass;
     this.semanticToPropertyId =
       MetadataEntityModels.computeSemanticToPropertyIdMapping(metadataClass);
   }
 
   /** {@inheritDoc PropertyTableModel.getMetadataEntityModel} */
   getMetadataEntityModel(index: number): MetadataEntityModel {
-    const propertyTable = this.binaryPropertyTable.propertyTable;
+    const binaryPropertyTable = this.binaryPropertyTable;
+    const propertyTable = binaryPropertyTable.propertyTable;
     const count = propertyTable.count;
     if (index < 0 || index >= count) {
       const message = `The index must be in [0,${count}), but is ${index}`;
@@ -85,7 +87,8 @@ export class BinaryPropertyTableModel implements PropertyTableModel {
   /** {@inheritDoc PropertyTableModel.getClassProperty} */
   getClassProperty(propertyId: string): ClassProperty | undefined {
     const binaryPropertyTable = this.binaryPropertyTable;
-    const metadataClass = binaryPropertyTable.metadataClass;
+    const binaryMetadata = binaryPropertyTable.binaryMetadata;
+    const metadataClass = binaryMetadata.metadataClass;
     const classProperties = metadataClass.properties;
     if (!classProperties) {
       return undefined;
@@ -111,6 +114,8 @@ export class BinaryPropertyTableModel implements PropertyTableModel {
   }
 
   getCount(): number {
-    return this.binaryPropertyTable.propertyTable.count;
+    const binaryPropertyTable = this.binaryPropertyTable;
+    const propertyTable = binaryPropertyTable.propertyTable;
+    return propertyTable.count;
   }
 }

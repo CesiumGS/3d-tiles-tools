@@ -67,7 +67,8 @@ export class StructuralMetadataPropertyTables {
 
     // Create all PropertyTablePropery objects, and put
     // them into the PropertyTable
-    const metadataClass = binaryPropertyTable.metadataClass;
+    const binaryMetadata = binaryPropertyTable.binaryMetadata;
+    const metadataClass = binaryMetadata.metadataClass;
     const classProperties = metadataClass.properties || {};
     const propertyNames = Object.keys(classProperties);
     for (const propertyName of propertyNames) {
@@ -124,7 +125,8 @@ export class StructuralMetadataPropertyTables {
     }
 
     // Obtain the required buffers from the binary data:
-    const binaryBufferData = binaryPropertyTable.binaryBufferData;
+    const binaryMetadata = binaryPropertyTable.binaryMetadata;
+    const binaryBufferData = binaryMetadata.binaryBufferData;
     const bufferViewsData = binaryBufferData.bufferViewsData;
 
     // Obtain the `values` buffer view data

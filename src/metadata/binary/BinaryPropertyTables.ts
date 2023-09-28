@@ -2,6 +2,7 @@ import { defined } from "../../base/defined";
 import { defaultValue } from "../../base/defaultValue";
 
 import { BinaryPropertyTable } from "./BinaryPropertyTable";
+import { BinaryMetadata } from "./BinaryMetadata";
 
 import { BinaryBufferData } from "../../binary/BinaryBufferData";
 import { BinaryBuffers } from "../../binary/BinaryBuffers";
@@ -267,7 +268,7 @@ export class BinaryPropertyTables {
     arrayOffsetType: string | undefined,
     stringOffsetType: string | undefined,
     metadataEnum: MetadataEnum | undefined
-  ): BinaryPropertyTable {
+  ): { propertyTable: PropertyTable; binaryMetadata: BinaryMetadata } {
     const schema = BinaryPropertyTables.createSchemaFromClassProperty(
       propertyName,
       classProperty,
@@ -367,12 +368,15 @@ export class BinaryPropertyTables {
 
     const binaryEnumInfo = MetadataUtilities.computeBinaryEnumInfo(schema);
 
-    const binaryPropertyTable: BinaryPropertyTable = {
+    const binaryMetadata: BinaryMetadata = {
       metadataClass: metadataClass,
-      propertyTable: propertyTable,
       binaryEnumInfo: binaryEnumInfo,
       binaryBufferStructure: binaryBufferStructure,
       binaryBufferData: binaryBufferData,
+    };
+    const binaryPropertyTable: BinaryPropertyTable = {
+      propertyTable: propertyTable,
+      binaryMetadata: binaryMetadata,
     };
     return binaryPropertyTable;
   }
