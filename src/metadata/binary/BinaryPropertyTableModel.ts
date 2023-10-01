@@ -71,10 +71,14 @@ export class BinaryPropertyTableModel implements PropertyTableModel {
       throw new MetadataError(message);
     }
     const semanticToPropertyId = this.semanticToPropertyId;
+    const binaryMetadata = binaryPropertyTable.binaryMetadata;
+    const binaryEnumInfo = binaryMetadata.binaryEnumInfo;
+    const enumValueValueNames = binaryEnumInfo.enumValueValueNames;
     const metadataEntityModel = new TableMetadataEntityModel(
       this,
       index,
-      semanticToPropertyId
+      semanticToPropertyId,
+      enumValueValueNames
     );
     return metadataEntityModel;
   }

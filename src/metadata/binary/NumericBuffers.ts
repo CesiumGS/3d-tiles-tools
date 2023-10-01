@@ -148,4 +148,21 @@ export class NumericBuffers {
     const array = [...typedArray];
     return array;
   }
+
+  /**
+   * Returns a boolean value from the specified buffer, at the specified
+   * bit index
+   *
+   * @param buffer - The buffer
+   * @param index - The bit index
+   * @returns The boolean value
+   */
+  static getBooleanFromBuffer(buffer: Buffer, index: number): boolean {
+    const byteIndex = Math.floor(index / 8);
+    const bitIndex = index % 8;
+    const byte = buffer.readUint8(byteIndex);
+    const bit = 1 << bitIndex;
+    const result = (byte & bit) !== 0;
+    return result;
+  }
 }

@@ -13,11 +13,13 @@ describe("metadata/MetadataEntityModel", function () {
       const testMetadataClass: MetadataClass = {
         properties: {},
       };
+      const testMetadataEnums = {};
       const entityJson = {
         testProperty: 1234,
       };
       const entity = MetadataEntityModels.createFromClass(
         testMetadataClass,
+        testMetadataEnums,
         entityJson
       );
       entity.getPropertyValue("testProperty");
@@ -34,11 +36,13 @@ describe("metadata/MetadataEntityModel", function () {
         },
       },
     };
+    const testMetadataEnums = {};
     const entityJson = {
       testProperty: undefined,
     };
     const entity = MetadataEntityModels.createFromClass(
       testMetadataClass,
+      testMetadataEnums,
       entityJson
     );
     const value = entity.getPropertyValue("testProperty");
@@ -56,15 +60,67 @@ describe("metadata/MetadataEntityModel", function () {
         },
       },
     };
+    const testMetadataEnums = {};
     const entityJson = {
       testProperty: 2345,
     };
     const entity = MetadataEntityModels.createFromClass(
       testMetadataClass,
+      testMetadataEnums,
       entityJson
     );
     const value = entity.getPropertyValue("testProperty");
     expect(value).toBe(1234);
+  });
+
+  it("obtains a default value for an enum noData value", function () {
+    const testMetadataClass: MetadataClass = {
+      properties: {
+        testProperty: {
+          type: "ENUM",
+          enumType: "testEnum",
+          noData: "TEST_NO_DATA_ENUM_VALUE",
+          default: "TEST_DEFAULT_ENUM_VALUE",
+        },
+      },
+    };
+    const testMetadataEnums = {
+      testEnum: {
+        valueType: "UINT8",
+        values: [
+          {
+            name: "TEST_NO_DATA_ENUM_VALUE",
+            value: 255,
+          },
+          {
+            name: "TEST_ENUM_VALUE_A",
+            value: 1,
+          },
+          {
+            name: "TEST_ENUM_VALUE_B",
+            value: 2,
+          },
+          {
+            name: "TEST_ENUM_VALUE_C",
+            value: 3,
+          },
+          {
+            name: "TEST_DEFAULT_ENUM_VALUE",
+            value: 4,
+          },
+        ],
+      },
+    };
+    const entityJson = {
+      testProperty: "TEST_NO_DATA_ENUM_VALUE",
+    };
+    const entity = MetadataEntityModels.createFromClass(
+      testMetadataClass,
+      testMetadataEnums,
+      entityJson
+    );
+    const value = entity.getPropertyValue("testProperty");
+    expect(value).toBe("TEST_DEFAULT_ENUM_VALUE");
   });
 
   it("obtains a value for a vec3 float32 value with offset in property definition", function () {
@@ -77,11 +133,13 @@ describe("metadata/MetadataEntityModel", function () {
         },
       },
     };
+    const testMetadataEnums = {};
     const entityJson = {
       testProperty: [3.0, 4.0, 5.0],
     };
     const entity = MetadataEntityModels.createFromClass(
       testMetadataClass,
+      testMetadataEnums,
       entityJson
     );
     const value = entity.getPropertyValue("testProperty");
@@ -99,11 +157,13 @@ describe("metadata/MetadataEntityModel", function () {
         },
       },
     };
+    const testMetadataEnums = {};
     const entityJson = {
       testProperty: [3.0, 4.0, 5.0],
     };
     const entity = MetadataEntityModels.createFromClass(
       testMetadataClass,
+      testMetadataEnums,
       entityJson
     );
     const value = entity.getPropertyValue("testProperty");
@@ -122,11 +182,13 @@ describe("metadata/MetadataEntityModel", function () {
         },
       },
     };
+    const testMetadataEnums = {};
     const entityJson = {
       testProperty: [3.0, 4.0, 5.0],
     };
     const entity = MetadataEntityModels.createFromClass(
       testMetadataClass,
+      testMetadataEnums,
       entityJson
     );
     const value = entity.getPropertyValue("testProperty");
@@ -148,8 +210,10 @@ describe("metadata/MetadataEntityModel", function () {
       testProperty: [3.0, 4.0, 5.0],
       scale: [2.0, 3.0, 4.0],
     };
+    const testMetadataEnums = {};
     const entity = MetadataEntityModels.createFromClass(
       testMetadataClass,
+      testMetadataEnums,
       entityJson
     );
     const value = entity.getPropertyValue("testProperty");
@@ -167,12 +231,14 @@ describe("metadata/MetadataEntityModel", function () {
         },
       },
     };
+    const testMetadataEnums = {};
     const entityJson = {
       testProperty: [3.0, 4.0, 5.0],
       offset: [1.0, 2.0, 3.0],
     };
     const entity = MetadataEntityModels.createFromClass(
       testMetadataClass,
+      testMetadataEnums,
       entityJson
     );
     const value = entity.getPropertyValue("testProperty");
@@ -190,12 +256,14 @@ describe("metadata/MetadataEntityModel", function () {
         },
       },
     };
+    const testMetadataEnums = {};
     const entityJson = {
       testProperty: [3.0, 4.0, 5.0],
       offset: [1.0, 2.0, 3.0],
     };
     const entity = MetadataEntityModels.createFromClass(
       testMetadataClass,
+      testMetadataEnums,
       entityJson
     );
     const value = entity.getPropertyValue("testProperty");
@@ -213,12 +281,14 @@ describe("metadata/MetadataEntityModel", function () {
         },
       },
     };
+    const testMetadataEnums = {};
     const entityJson = {
       testProperty: [3.0, 4.0, 5.0],
       scale: [2.0, 3.0, 4.0],
     };
     const entity = MetadataEntityModels.createFromClass(
       testMetadataClass,
+      testMetadataEnums,
       entityJson
     );
     const value = entity.getPropertyValue("testProperty");
@@ -237,6 +307,7 @@ describe("metadata/MetadataEntityModel", function () {
         },
       },
     };
+    const testMetadataEnums = {};
     const entityJson = {
       testProperty: [3.0, 4.0, 5.0],
       offset: [1.0, 2.0, 3.0],
@@ -244,6 +315,7 @@ describe("metadata/MetadataEntityModel", function () {
     };
     const entity = MetadataEntityModels.createFromClass(
       testMetadataClass,
+      testMetadataEnums,
       entityJson
     );
     const value = entity.getPropertyValue("testProperty");

@@ -94,4 +94,51 @@ export class MetadataValues {
     }
     return value;
   }
+
+  /**
+   * Processes the given "raw" value that was obtained for a metadata
+   * ENUM property in a numeric form (e.g. from a binary property
+   * table), and returns the processed value according to the type
+   * definition that is given by the given class property.
+   *
+   * If the type defines a `noData` value, and the given value
+   * is the `noData` value, then the `default` value of the type
+   * is returned.
+   *
+   * Otherwise, this will translate the numeric representation
+   * of the enum value into the string representation.
+   *
+   * @param classProperty - The `ClassProperty`
+   * @param offsetOverride -: An optional override for the
+   * `offset` of the `ClassProperty`. If this is defined, then
+   * it will be used instead of the one from the class property.
+   * @param scaleOverride -: An optional override for the
+   * `scale` of the `ClassProperty`. If this is defined, then
+   * it will be used instead of the one from the class property.
+   * @param value - The value
+   * @returns The processed value
+   */
+  static processNumericEnumValue(
+    classProperty: ClassProperty,
+    valueValueNames: { [key: number]: string },
+    value: number | number[]
+  ): any {
+    let stringValue;
+    if (Array.isArray(value)) {
+      stringValue = value.map((e: number) => valueValueNames[e]);
+    } else {
+      stringValue = valueValueNames[value];
+    }
+    const noData = classProperty.noData;
+    const defaultValue = classProperty.default;
+    if (defined(noData)) {
+      if (ArrayValues.deepEquals(stringValue, noData)) {
+        return ArrayValues.deepClone(defaultValue);
+      }
+    }
+    if (!defined(stringValue)) {
+      return ArrayValues.deepClone(defaultValue);
+    }
+    return stringValue;
+  }
 }

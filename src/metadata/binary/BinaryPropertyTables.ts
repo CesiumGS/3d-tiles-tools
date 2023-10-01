@@ -16,7 +16,6 @@ import { PropertyTableProperty } from "../../structure/PropertyTableProperty";
 import { Schema } from "../../structure/Metadata/Schema";
 import { MetadataClass } from "../../structure/Metadata/MetadataClass";
 import { ClassProperty } from "../../structure/Metadata/ClassProperty";
-import { EnumValue } from "../../structure/Metadata/EnumValue";
 import { MetadataEnum } from "../../structure/Metadata/MetadataEnum";
 
 /**
@@ -507,12 +506,13 @@ export class BinaryPropertyTables {
       if (!metadataEnum) {
         throw new MetadataError(`The schema does not define enum ${enumType}`);
       }
-      const valueNames = metadataEnum.values.map((v: EnumValue) => v.name);
+      const nameValues =
+        MetadataUtilities.computeMetadataEnumValueNameValues(metadataEnum);
       componentType = defaultValue(metadataEnum.valueType, "UINT16");
       for (let i = 0; i < length; ++i) {
         const valueName = flattenedValues[i];
-        const index = valueNames.indexOf(valueName);
-        flattenedValues[i] = index;
+        const valueValue = nameValues[valueName];
+        flattenedValues[i] = valueValue;
       }
     }
 

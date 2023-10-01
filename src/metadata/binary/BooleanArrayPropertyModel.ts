@@ -1,7 +1,7 @@
 import { PropertyModel } from "../PropertyModel";
 
 import { BinaryPropertyModels } from "./BinaryPropertyModels";
-import { BooleanPropertyModel } from "./BooleanPropertyModel";
+import { NumericBuffers } from "./NumericBuffers";
 
 /**
  * Implementation of a `PropertyModel` for boolean arrays
@@ -45,10 +45,7 @@ export class BooleanArrayPropertyModel implements PropertyModel {
     const result = Array<boolean>(arrayLength);
     for (let i = 0; i < arrayLength; i++) {
       const n = arrayOffset + i;
-      const element = BooleanPropertyModel.getBooleanFromBuffer(
-        valuesBuffer,
-        n
-      );
+      const element = NumericBuffers.getBooleanFromBuffer(valuesBuffer, n);
       result[i] = element;
     }
     return result;
