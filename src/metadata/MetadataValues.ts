@@ -109,12 +109,9 @@ export class MetadataValues {
    * of the enum value into the string representation.
    *
    * @param classProperty - The `ClassProperty`
-   * @param offsetOverride -: An optional override for the
-   * `offset` of the `ClassProperty`. If this is defined, then
-   * it will be used instead of the one from the class property.
-   * @param scaleOverride -: An optional override for the
-   * `scale` of the `ClassProperty`. If this is defined, then
-   * it will be used instead of the one from the class property.
+   * @param valueValueNames - The mapping from enum value values
+   * to enum value names for the enum type of the given class
+   * property.
    * @param value - The value
    * @returns The processed value
    */
