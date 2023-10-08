@@ -105,6 +105,7 @@ export * from "./metadata/binary/BinaryPropertyTable";
 export * from "./metadata/binary/BinaryMetadata";
 export * from "./metadata/binary/BinaryPropertyTables";
 export * from "./metadata/binary/BinaryPropertyTableModel";
+export * from "./metadata/binary/BinaryPropertyModels";
 export * from "./metadata/binary/BinaryEnumInfo";
 export * from "./metadata/binary/NumericBuffers";
 
