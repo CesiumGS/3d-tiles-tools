@@ -267,7 +267,7 @@ export class BinaryPropertyTables {
     arrayOffsetType: string | undefined,
     stringOffsetType: string | undefined,
     metadataEnum: MetadataEnum | undefined
-  ): { propertyTable: PropertyTable; binaryMetadata: BinaryMetadata } {
+  ): BinaryPropertyTable {
     const schema = BinaryPropertyTables.createSchemaFromClassProperty(
       propertyName,
       classProperty,
