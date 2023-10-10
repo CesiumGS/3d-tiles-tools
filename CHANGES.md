@@ -1,6 +1,20 @@
 Change Log
 ==========
 
+### 0.3.1 - 2023-10-10
+- Integrated a dedicated logging library (via [#61](https://github.com/CesiumGS/3d-tiles-tools/pull/61))
+  - By default, only few, informative messages are logged to the console
+  - There are additional command-line arguments:
+    - `--logLevel` can be used to set the log level (`trace`, `debug`, `info`, `warn`, `error`, `fatal`, and `silent`)
+    - `--logJson` to print log messages as JSON instead of pretty-printed
+- The `convertI3dmToGlb` functionality has been added to the CLI (in addition to the existing `convertB3dmToGlb` and `convertPntsToGlb`)
+- **Internal** restructuring (mainly for the use of the `3d-tiles-tools` in the `3d-tiles-validator`):
+  - Exposed and generalized `GltfUtilities`: It now offers a function `extractDataFromGlb` that returns the JSON- and binary buffer from arbitrary glTF 1.0 or 2.0 buffers
+  - Extracted a `BinaryMetadata` structure from the former `BinaryPropertyTable`
+  - The different representations of `ENUM` values (namely, as numbers or as strings) had not been handled correctly (via [#71](https://github.com/CesiumGS/3d-tiles-tools/issues/71))
+  - Internal fixes for KTX encoding (via [#40](https://github.com/CesiumGS/3d-tiles-tools/pull/40) - not yet part of a public functionality)
+
+
 ### 0.3.0 - 2023-08-30
 
 - Transparently decompress entries in `3tz` files when they are compressed with `DEFLATE` (via [#55](https://github.com/CesiumGS/3d-tiles-tools/pull/55))
