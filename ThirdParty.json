@@ -4,7 +4,7 @@
     "license": [
       "MIT"
     ],
-    "version": "3.3.1",
+    "version": "3.7.3",
     "url": "https://www.npmjs.com/package/@gltf-transform/core"
   },
   {
@@ -12,7 +12,7 @@
     "license": [
       "MIT"
     ],
-    "version": "3.3.1",
+    "version": "3.7.3",
     "url": "https://www.npmjs.com/package/@gltf-transform/extensions"
   },
   {
@@ -20,7 +20,7 @@
     "license": [
       "MIT"
     ],
-    "version": "3.3.1",
+    "version": "3.7.3",
     "url": "https://www.npmjs.com/package/@gltf-transform/functions"
   },
   {
@@ -28,7 +28,7 @@
     "license": [
       "MIT"
     ],
-    "version": "5.3.1",
+    "version": "5.3.2",
     "url": "https://www.npmjs.com/package/archiver"
   },
   {
@@ -36,7 +36,7 @@
     "license": [
       "MIT"
     ],
-    "version": "8.3.0",
+    "version": "8.7.0",
     "url": "https://www.npmjs.com/package/better-sqlite3"
   },
   {
@@ -44,7 +44,7 @@
     "license": [
       "Apache-2.0"
     ],
-    "version": "1.103.0",
+    "version": "1.110.0",
     "url": "https://www.npmjs.com/package/cesium"
   },
   {
@@ -96,6 +96,22 @@
     "url": "https://www.npmjs.com/package/node-stream-zip"
   },
   {
+    "name": "pino",
+    "license": [
+      "MIT"
+    ],
+    "version": "8.16.0",
+    "url": "https://www.npmjs.com/package/pino"
+  },
+  {
+    "name": "pino-pretty",
+    "license": [
+      "MIT"
+    ],
+    "version": "10.2.3",
+    "url": "https://www.npmjs.com/package/pino-pretty"
+  },
+  {
     "name": "seedrandom",
     "license": [
       "MIT"
@@ -108,7 +124,7 @@
     "license": [
       "Apache-2.0"
     ],
-    "version": "0.32.1",
+    "version": "0.32.6",
     "url": "https://www.npmjs.com/package/sharp"
   },
   {
@@ -116,7 +132,7 @@
     "license": [
       "MIT"
     ],
-    "version": "17.6.2",
+    "version": "17.7.2",
     "url": "https://www.npmjs.com/package/yargs"
   }
 ]
