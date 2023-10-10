@@ -219,8 +219,8 @@ export class GltfUtilities {
    * features that are specific for the GLB data that is part
    * of I3DM and B3DM. Details are not specified here.
    *
-   * @param glbBuffer The buffer containing the binary glTF.
-   * @param options Options specifying custom gltf-pipeline behavior.
+   * @param glbBuffer - The buffer containing the binary glTF.
+   * @param options - Options specifying custom gltf-pipeline behavior.
    * @returns A promise that resolves to the optimized binary glTF.
    */
   static async optimizeGlb(glbBuffer: Buffer, options: any): Promise<Buffer> {
@@ -243,7 +243,7 @@ export class GltfUtilities {
    * (above the former root nodes) that contain the RTC center as
    * their translation.
    *
-   * @param glbBuffer The buffer containing the binary glTF.
+   * @param glbBuffer - The buffer containing the binary glTF.
    * @returns A promise that resolves to the resulting binary glTF.
    */
   static async replaceCesiumRtcExtension(glbBuffer: Buffer) {

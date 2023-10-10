@@ -61,7 +61,7 @@ export class MetadataUtilities {
    * property, or the schema does not define enums, then
    * `undefined` is returned.
    *
-   * Otherwise, the `valueType´ of the respective enum is returned
+   * Otherwise, the `valueType` of the respective enum is returned
    * (defaulting to `UINT16` if it did not define one).
    *
    * @param schema - The metadata `Schema`
