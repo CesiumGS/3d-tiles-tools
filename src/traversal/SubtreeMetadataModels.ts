@@ -14,6 +14,7 @@ import { SubtreeInfo } from "../implicitTiling/SubtreeInfo";
 import { AvailabilityInfo } from "../implicitTiling/AvailabilityInfo";
 
 import { SubtreeMetadataModel } from "./SubtreeMetadataModel";
+import { BinaryMetadata } from "../metadata/binary/BinaryMetadata";
 
 /**
  * Methods to create `SubtreeMetadataModel` instances.
@@ -77,12 +78,15 @@ export class SubtreeMetadataModels {
         // Create the `BinaryPropertyTable` for each property table,
         // which contains everything that is required for creating
         // the binary PropertyTableModel
-        const binaryPropertyTable: BinaryPropertyTable = {
-          propertyTable: propertyTable,
+        const binaryMetadata: BinaryMetadata = {
           metadataClass: metadataClass,
           binaryEnumInfo: binaryEnumInfo,
           binaryBufferStructure: binaryBufferStructure,
           binaryBufferData: binaryBufferData,
+        };
+        const binaryPropertyTable: BinaryPropertyTable = {
+          propertyTable: propertyTable,
+          binaryMetadata: binaryMetadata,
         };
         const propertyTableModel = new BinaryPropertyTableModel(
           binaryPropertyTable

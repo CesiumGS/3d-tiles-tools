@@ -102,8 +102,10 @@ export * from "./metadata/PropertyModel";
 export * from "./metadata/PropertyTableModel";
 
 export * from "./metadata/binary/BinaryPropertyTable";
+export * from "./metadata/binary/BinaryMetadata";
 export * from "./metadata/binary/BinaryPropertyTables";
 export * from "./metadata/binary/BinaryPropertyTableModel";
+export * from "./metadata/binary/BinaryPropertyModels";
 export * from "./metadata/binary/BinaryEnumInfo";
 export * from "./metadata/binary/NumericBuffers";
 
@@ -117,3 +119,8 @@ export * from "./traversal/SubtreeModels";
 export * from "./traversal/TilesetTraverser";
 export * from "./traversal/TraversedTile";
 export * from "./traversal/TraversalCallback";
+
+// For glTF extension validation experiments
+
+export * from "./contentProcessing/GltfUtilities";
+export * from "./contentProcessing/GltfTransform";

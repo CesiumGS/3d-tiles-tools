@@ -17,21 +17,7 @@ export class BooleanPropertyModel implements PropertyModel {
   /** {@inheritDoc PropertyModel.getPropertyValue} */
   getPropertyValue(index: number): boolean {
     const valuesBuffer = this.valuesBuffer;
-    const result = BooleanPropertyModel.getBooleanFromBuffer(
-      valuesBuffer,
-      index
-    );
-    return result;
-  }
-
-  static getBooleanFromBuffer(buffer: Buffer, index: number): boolean {
-    const byteIndex = Math.floor(index / 8);
-    const bitIndex = index % 8;
-    const byte = Number(
-      NumericBuffers.getNumericFromBuffer(buffer, byteIndex, "UINT8")
-    );
-    const bit = 1 << bitIndex;
-    const result = (byte & bit) !== 0;
+    const result = NumericBuffers.getBooleanFromBuffer(valuesBuffer, index);
     return result;
   }
 }

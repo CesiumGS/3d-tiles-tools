@@ -7,6 +7,7 @@ import { MetadataError } from "./MetadataError";
 import { Schema } from "../structure/Metadata/Schema";
 import { MetadataEntity } from "../structure/MetadataEntity";
 import { MetadataClass } from "../structure/Metadata/MetadataClass";
+import { MetadataEnum } from "../structure/Metadata/MetadataEnum";
 
 /**
  * Methods related to `MetadataEntityModel` instances.
@@ -49,7 +50,11 @@ export class MetadataEntityModels {
       throw new MetadataError(`Schema does not contain class ${entity.class}`);
     }
     const entityProperties = entity.properties ?? {};
-    return this.createFromClass(metadataClass, entityProperties);
+    return this.createFromClass(
+      metadataClass,
+      schema.enums || {},
+      entityProperties
+    );
   }
 
   /**
@@ -59,11 +64,14 @@ export class MetadataEntityModels {
    * See the `create` method for details.
    *
    * @param metadataClass - The `MetadataClass`
+   * @param metadataEnums - The enum definitions from the schema, for
+   * the case that the class contains enum properties
    * @param entityProperties - The properties of the `MetadataEntity`
    * @returns The `MetadataEntityModel`
    */
   static createFromClass(
     metadataClass: MetadataClass,
+    metadataEnums: { [key: string]: MetadataEnum },
     entityProperties: { [key: string]: any }
   ) {
     // TODO This should not be done for each entity. The lookup

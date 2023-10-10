@@ -18,18 +18,19 @@ import { NumericBuffers } from "./NumericBuffers";
  */
 export class BinaryPropertyModels {
   /**
-   * Creates a `PropertyModel` for the specified property in
-   * the given `BinaryPropertyTable`.
+   * Creates a `PropertyModel` for the specified property in the
+   * given property table, based on the given binary metadata.
    *
    * This assumes that the input is structurally valid.
    *
    * This will determine the type of the property and access its
    * associated data (i.e. the required buffer views data) from
-   * the given `BinaryPropertyTable`. For each type of property,
+   * the given `BinaryMetadata`. For each type of property,
    * this will return a matching implementation of the
    * `PropertyModel` interface.
    *
-   * @param binaryPropertyTable - The `BinaryPropertyTable`
+   * @param propertyTable - The `PropertyTable`
+   * @param binaryMetadata - The `BinaryMetadata`
    * @param propertyId - The property ID
    * @returns The `PropertyModel`
    * @throws MetadataError If the input data is not structurally
@@ -51,7 +52,8 @@ export class BinaryPropertyModels {
     // check could be avoided.
 
     // Obtain the `ClassProperty`
-    const metadataClass = binaryPropertyTable.metadataClass;
+    const binaryMetadata = binaryPropertyTable.binaryMetadata;
+    const metadataClass = binaryMetadata.metadataClass;
     const classProperties = metadataClass.properties;
     if (!classProperties) {
       throw new MetadataError(`The class does not define any properties`);
@@ -79,7 +81,7 @@ export class BinaryPropertyModels {
     }
 
     // Obtain the required buffers from the binary data:
-    const binaryBufferData = binaryPropertyTable.binaryBufferData;
+    const binaryBufferData = binaryMetadata.binaryBufferData;
     const bufferViewsData = binaryBufferData.bufferViewsData;
 
     // Obtain the `values` buffer view data
@@ -107,7 +109,7 @@ export class BinaryPropertyModels {
     const enumType = classProperty.enumType;
     let enumValueType = undefined;
     if (enumType !== undefined) {
-      const binaryEnumInfo = binaryPropertyTable.binaryEnumInfo;
+      const binaryEnumInfo = binaryMetadata.binaryEnumInfo;
       const enumValueTypes = binaryEnumInfo.enumValueTypes;
       enumValueType = enumValueTypes[enumType] ?? "UINT16";
     }

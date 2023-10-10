@@ -9,7 +9,11 @@ import { ClassProperty } from "../structure/Metadata/ClassProperty";
 
 /**
  * Implementation of a `PropertyTableModel` that is backed by
- * `PropertyModel` instances
+ * `PropertyModel` instances.
+ *
+ * This implementation is only used internally, to represent
+ * data from batch tables, and does not support property
+ * semantics or enum types.
  *
  * @internal
  */
@@ -81,10 +85,12 @@ export class DefaultPropertyTableModel implements PropertyTableModel {
       throw new MetadataError(message);
     }
     const semanticToPropertyId = {};
+    const enumValueValueNames = {};
     const metadataEntityModel = new TableMetadataEntityModel(
       this,
       index,
-      semanticToPropertyId
+      semanticToPropertyId,
+      enumValueValueNames
     );
     return metadataEntityModel;
   }
