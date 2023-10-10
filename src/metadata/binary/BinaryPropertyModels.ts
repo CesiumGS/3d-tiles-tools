@@ -143,16 +143,16 @@ export class BinaryPropertyModels {
    * `BinaryPropertyTable` for a specific property.
    *
    * @param propertyId - The property ID
-   * @param type The type
-   * @param componentType The component type
-   * @param isArray Whether the property is an array
-   * @param count The count (array length)
-   * @param valuesBufferViewData The values data
-   * @param arrayOffsetsBufferViewData The array offsets data
-   * @param arrayOffsetType The array offsets type
-   * @param stringOffsetsBufferViewData The string offsets data
-   * @param stringOffsetType The string offsets type
-   * @param enumValueType The enum value type
+   * @param type - The type
+   * @param componentType - The component type
+   * @param isArray - Whether the property is an array
+   * @param count - The count (array length)
+   * @param valuesBufferViewData - The values data
+   * @param arrayOffsetsBufferViewData - The array offsets data
+   * @param arrayOffsetType - The array offsets type
+   * @param stringOffsetsBufferViewData - The string offsets data
+   * @param stringOffsetType - The string offsets type
+   * @param enumValueType - The enum value type
    * @returns The `PropertyModel`
    * @throws MetadataError if the given data is inconsistent
    */

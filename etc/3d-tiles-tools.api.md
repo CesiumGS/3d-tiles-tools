@@ -6,7 +6,9 @@
 
 /// <reference types="node" />
 
+import { NodeIO } from '@gltf-transform/core';
 import { PathLike } from 'fs';
+import { Transform } from '@gltf-transform/core';
 
 // @internal (undocumented)
 export class ArchiveFunctions3tz {
@@ -105,14 +107,34 @@ export interface BinaryEnumInfo {
     enumValueTypes: {
         [key: string]: string;
     };
+    enumValueValueNames: {
+        [key: string]: {
+            [key: number]: string;
+        };
+    };
 }
 
 // @internal
-export interface BinaryPropertyTable {
+export interface BinaryMetadata {
     binaryBufferData: BinaryBufferData;
     binaryBufferStructure: BinaryBufferStructure;
     binaryEnumInfo: BinaryEnumInfo;
     metadataClass: MetadataClass;
+}
+
+// @internal
+export class BinaryPropertyModels {
+    static computeSlice(index: number, offsetsBuffer: Buffer | undefined, offsetType: string, count: number | undefined): {
+        offset: number;
+        length: number;
+    };
+    static createPropertyModel(binaryPropertyTable: BinaryPropertyTable, propertyId: string): PropertyModel;
+    static createPropertyModelInternal(propertyId: string, type: string, componentType: string | undefined, isArray: boolean, count: number | undefined, valuesBufferViewData: Buffer, arrayOffsetsBufferViewData: Buffer | undefined, arrayOffsetType: string, stringOffsetsBufferViewData: Buffer | undefined, stringOffsetType: string, enumValueType: string | undefined): PropertyModel;
+}
+
+// @internal
+export interface BinaryPropertyTable {
+    binaryMetadata: BinaryMetadata;
     propertyTable: PropertyTable;
 }
 
@@ -302,6 +324,25 @@ export class FileResourceResolver implements ResourceResolver {
 }
 
 // @internal
+export class GltfTransform {
+    static getIO(): Promise<NodeIO>;
+    static process(inputGlb: Buffer, ...transforms: Transform[]): Promise<Buffer>;
+}
+
+// @internal
+export class GltfUtilities {
+    static extractDataFromGlb(glbBuffer: Buffer): {
+        jsonData: Buffer;
+        binData: Buffer;
+    };
+    static extractJsonFromGlb(glbBuffer: Buffer): Buffer;
+    static getGltfVersion(glbBuffer: Buffer): number;
+    static optimizeGlb(glbBuffer: Buffer, options: any): Promise<Buffer>;
+    static replaceCesiumRtcExtension(glbBuffer: Buffer): Promise<any>;
+    static upgradeGlb(glbBuffer: Buffer, options: any): Promise<Buffer>;
+}
+
+// @internal
 export interface Group extends MetadataEntity {
 }
 
@@ -364,7 +405,7 @@ export interface IndexEntry {
 // @internal
 export class Iterables {
     static filter<T>(iterable: Iterable<T>, include: (element: T) => boolean): Iterable<T>;
-    static filterWIthIndex<T>(iterable: Iterable<T>, include: (element: T, index: number) => boolean): Iterable<T>;
+    static filterWithIndex<T>(iterable: Iterable<T>, include: (element: T, index: number) => boolean): Iterable<T>;
     static flatten<T>(iterable: Iterable<T[]>): Iterable<T>;
     static map<S, T>(iterable: Iterable<S>, mapper: (element: S) => T): Iterable<T>;
     static overFiles(directory: string | PathLike, recurse: boolean): Iterable<string>;
@@ -443,7 +484,9 @@ export class MetadataEntityModels {
         [key: string]: string;
     };
     static create(schema: Schema, entity: MetadataEntity): MetadataEntityModel;
-    static createFromClass(metadataClass: MetadataClass, entityProperties: {
+    static createFromClass(metadataClass: MetadataClass, metadataEnums: {
+        [key: string]: MetadataEnum;
+    }, entityProperties: {
         [key: string]: any;
     }): DefaultMetadataEntityModel;
 }
@@ -494,16 +537,27 @@ export class MetadataTypes {
 // @internal
 export class MetadataUtilities {
     static computeBinaryEnumInfo(schema: Schema): BinaryEnumInfo;
+    static computeEnumValueType(schema: Schema, classProperty: ClassProperty): string | undefined;
+    static computeMetadataEnumValueNameValues(metadataEnum: MetadataEnum): {
+        [key: string]: number;
+    };
+    static computeMetadataEnumValueValueNames(metadataEnum: MetadataEnum): {
+        [key: number]: string;
+    };
     static obtainEnumValueNames(classProperty: ClassProperty, schema: Schema): string[];
 }
 
 // @internal
 export class MetadataValues {
+    static processNumericEnumValue(classProperty: ClassProperty, valueValueNames: {
+        [key: number]: string;
+    }, value: number | number[]): any;
     static processValue(classProperty: ClassProperty, offsetOverride: any, scaleOverride: any, value: any): any;
 }
 
 // @internal
 export class NumericBuffers {
+    static getBooleanFromBuffer(buffer: Buffer, index: number): boolean;
     static getNumericArrayFromBuffer(buffer: Buffer, index: number, arrayLength: number, componentType: string): (number | bigint)[];
     static getNumericBufferAsArray(buffer: Buffer, componentType: string): any;
     static getNumericFromBuffer(buffer: Buffer, index: number, componentType: string): number | bigint;
