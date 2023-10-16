@@ -73,6 +73,7 @@ export class TilesetUpgrader {
         upgradedAssetVersionNumber: "1.0",
         upgradeRefineCase: true,
         upgradeContentUrlToUri: true,
+        upgradeEmptyChildrenToUndefined: true,
 
         upgradeContentGltfExtensionDeclarations: false,
 
@@ -92,6 +93,8 @@ export class TilesetUpgrader {
         upgradedAssetVersionNumber: "1.1",
         upgradeRefineCase: true,
         upgradeContentUrlToUri: true,
+        upgradeEmptyChildrenToUndefined: true,
+
         upgradeContentGltfExtensionDeclarations: true,
 
         upgradeB3dmGltf1ToGltf2: false,

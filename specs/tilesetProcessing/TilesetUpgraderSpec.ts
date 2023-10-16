@@ -19,6 +19,8 @@ const unitBoundingBox = {
 //   (checked for both `content` and `contents`)
 // - The `extensionsUsed` and `extensionsRequired` should no
 //   longer contain `3DTILES_content_gltf`
+// - One tile has an empty 'children' array that should
+//   be removed
 const inputTilesetJsonRaw: unknown = {
   asset: {
     version: "0.0",
@@ -54,6 +56,11 @@ const inputTilesetJsonRaw: unknown = {
       {
         boundingVolume: unitBoundingBox,
         geometricError: 1.0,
+      },
+      {
+        boundingVolume: unitBoundingBox,
+        geometricError: 1.0,
+        children: [],
       },
     ],
   },
@@ -115,5 +122,18 @@ describe("TilesetUpgrader", function () {
 
     expect(tileset.extensionsUsed).not.toContain("3DTILES_content_gltf");
     expect(tileset.extensionsRequired).not.toContain("3DTILES_content_gltf");
+  });
+
+  it("removes an empty 'children' array", async function () {
+    const targetVersion = "1.1";
+    const tilesetUpgrader = new TilesetUpgrader(
+      targetVersion,
+      gltfUpgradeOptions
+    );
+
+    const tileset = JSON.parse(inputTilesetJsonString) as Tileset;
+    await tilesetUpgrader.upgradeTileset(tileset);
+
+    expect(tileset.root.children![2].children).toBeUndefined();
   });
 });
