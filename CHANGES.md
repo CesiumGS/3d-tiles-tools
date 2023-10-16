@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+### 0.?.? - 2023-mm-dd
+
+- The `upgrade` command is now removing empty `tile.children` arrays, setting the `children` to be `undefined` instead.
+
 ### 0.3.1 - 2023-10-10
 - Integrated a dedicated logging library (via [#61](https://github.com/CesiumGS/3d-tiles-tools/pull/61))
   - By default, only few, informative messages are logged to the console
