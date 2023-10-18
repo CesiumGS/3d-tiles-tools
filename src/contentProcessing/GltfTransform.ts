@@ -1,7 +1,11 @@
 import draco3d from "draco3d";
 
+import { MeshoptDecoder } from "meshoptimizer";
+import { MeshoptEncoder } from "meshoptimizer";
+
 import { Transform } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
+
 import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
 
 import { EXTStructuralMetadata } from "../gltfExtensions/EXTStructuralMetadata";
@@ -26,7 +30,8 @@ export class GltfTransform {
    *
    * (E.g. it will be configured to handle the all extensions that
    * are known in glTF-Transform, as well as EXT_mesh_features and
-   * EXT_structural_metadata, and have a draco encoder/decoder)
+   * EXT_structural_metadata, and have draco- and meshopt
+   * encoders/decoders)
    *
    * @returns - The `NodeIO` instance
    */
@@ -38,6 +43,8 @@ export class GltfTransform {
     io.registerExtensions(ALL_EXTENSIONS).registerDependencies({
       "draco3d.decoder": await draco3d.createDecoderModule(),
       "draco3d.encoder": await draco3d.createEncoderModule(),
+      "meshopt.decoder": MeshoptDecoder,
+      "meshopt.encoder": MeshoptEncoder,
     });
     // Note: The order of these calls matters. The EXTMeshFeatures and
     // EXTInstanceFeatures depend on the EXTStructuralMetadata, because
