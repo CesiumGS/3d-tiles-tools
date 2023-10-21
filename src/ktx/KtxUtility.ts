@@ -13,6 +13,8 @@ const logger = Loggers.get("KTX");
 
 /**
  * Utility class for converting images into KTX2 format.
+ *
+ * @internal
  */
 export class KtxUtility {
   /**
@@ -24,7 +26,7 @@ export class KtxUtility {
    *
    * @param inputFileName - The input file name
    * @param outputFileName - The output file name
-   * @param options The options for the KTX compression
+   * @param options - The options for the KTX compression
    * @throws KtxError If the input data could not be read or
    * encoded to KTX
    */
@@ -53,7 +55,7 @@ export class KtxUtility {
    * specified, but they include JPG and PNG.
    *
    * @param inputImageData - The input file name
-   * @param options The options for the KTX compression
+   * @param options - The options for the KTX compression
    * @returns The KTX compressed data
    * @throws KtxError If the input data could not be read or
    * encoded to KTX
@@ -87,10 +89,10 @@ export class KtxUtility {
    * Encode the given RGBA pixels with KTX, and reuturn the
    * result as a buffer.
    *
-   * @param imageWidth The image width
-   * @param imageHeight The image height
-   * @param rgbaPixels The pixels
-   * @param options The options for the KTX compression
+   * @param imageWidth - The image width
+   * @param imageHeight - The image height
+   * @param rgbaPixels - The pixels
+   * @param options - The options for the KTX compression
    * @returns The KTX data
    * @throws KtxError If the input data could not be
    * encoded to KTX

@@ -129,7 +129,7 @@ export class TileFormats {
    *
    * @param buffer - The buffer
    * @param tileDataLayout - The tile data layout
-   * @return The `TileData`
+   * @returns The `TileData`
    * @internal
    */
   static extractTileData(buffer: Buffer, tileDataLayout: TileDataLayout) {
@@ -225,7 +225,7 @@ export class TileFormats {
    * Implementation for `extractGlbBuffers`, called recursively.
    *
    * @param tileDataBuffer - The tile data buffer
-   * @param glbBuffers The array of GLB buffers
+   * @param glbBuffers - The array of GLB buffers
    */
   private static extractGlbBuffersInternal(
     tileDataBuffer: Buffer,

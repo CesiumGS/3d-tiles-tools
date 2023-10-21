@@ -60,7 +60,7 @@ export class TilesetJsonCreator {
    *
    * @param baseDir - The base directory against which the
    * content URIs are resolved
-   * @param contentUris The content URIs
+   * @param contentUris - The content URIs
    * @returns The tileset
    * @throws Error if content data could not be read
    */
@@ -99,7 +99,7 @@ export class TilesetJsonCreator {
    *
    * @param baseDir - The base directory against which the
    * content URI is resolved
-   * @param contentUri The content URI
+   * @param contentUri - The content URI
    * @returns The leaf tile
    * @throws Error if content data could not be read
    */
@@ -150,8 +150,8 @@ export class TilesetJsonCreator {
    * Computes the bounding box from the given content data.
    *
    * @param contentUri - The content URI
-   * @param data The content data
-   * @param externalGlbResolver The resolver for external GLBs in I3DMs
+   * @param data - The content data
+   * @param externalGlbResolver - The resolver for external GLBs in I3DMs
    * @returns The bounding box, or undefined if no bounding box could
    * be computed from the given content.
    * @throws Error if the I3DM referred to a GLB that could not be

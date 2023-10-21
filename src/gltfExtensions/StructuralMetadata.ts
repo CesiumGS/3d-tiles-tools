@@ -160,6 +160,11 @@ interface IMeshPrimitiveStructuralMetadata extends IProperty {
 // (See `MeshFeatures` for details about the concepts)
 //
 
+/**
+ * Main model class for `EXT_structural_metadata`
+ *
+ * @internal
+ */
 export class StructuralMetadata extends ExtensionProperty<IStructuralMetadata> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -225,6 +230,11 @@ export class StructuralMetadata extends ExtensionProperty<IStructuralMetadata> {
   }
 }
 
+/**
+ * Implementation of a metadata schema for `EXT_structural_metadata`
+ *
+ * @internal
+ */
 export class Schema extends ExtensionProperty<ISchema> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -299,6 +309,11 @@ export class Schema extends ExtensionProperty<ISchema> {
   }
 }
 
+/**
+ * Implementation of a metadata class for `EXT_structural_metadata`
+ *
+ * @internal
+ */
 export class Class extends ExtensionProperty<IClass> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -345,6 +360,11 @@ export class Class extends ExtensionProperty<IClass> {
   }
 }
 
+/**
+ * Implementation of a metadata class property for `EXT_structural_metadata`
+ *
+ * @internal
+ */
 export class ClassProperty extends ExtensionProperty<IClassProperty> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -471,6 +491,11 @@ export class ClassProperty extends ExtensionProperty<IClassProperty> {
   }
 }
 
+/**
+ * Implementation of a metadata enum for `EXT_structural_metadata`
+ *
+ * @internal
+ */
 export class Enum extends ExtensionProperty<IEnum> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -522,6 +547,11 @@ export class Enum extends ExtensionProperty<IEnum> {
   }
 }
 
+/**
+ * Implementation of a metadata enum value for `EXT_structural_metadata`
+ *
+ * @internal
+ */
 export class EnumValue extends ExtensionProperty<IEnumValue> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -560,6 +590,11 @@ export class EnumValue extends ExtensionProperty<IEnumValue> {
   }
 }
 
+/**
+ * Implementation of a property table for `EXT_structural_metadata`
+ *
+ * @internal
+ */
 export class PropertyTable extends ExtensionProperty<IPropertyTable> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -613,6 +648,11 @@ export class PropertyTable extends ExtensionProperty<IPropertyTable> {
   }
 }
 
+/**
+ * Implementation of a property table property for `EXT_structural_metadata`
+ *
+ * @internal
+ */
 export class PropertyTableProperty extends ExtensionProperty<IPropertyTableProperty> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -696,6 +736,11 @@ export class PropertyTableProperty extends ExtensionProperty<IPropertyTablePrope
   }
 }
 
+/**
+ * Implementation of a property texture for `EXT_structural_metadata`
+ *
+ * @internal
+ */
 export class PropertyTexture extends ExtensionProperty<IPropertyTexture> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -742,6 +787,11 @@ export class PropertyTexture extends ExtensionProperty<IPropertyTexture> {
   }
 }
 
+/**
+ * Implementation of a property texture property for `EXT_structural_metadata`
+ *
+ * @internal
+ */
 export class PropertyTextureProperty extends ExtensionProperty<IPropertyTextureProperty> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -812,6 +862,11 @@ export class PropertyTextureProperty extends ExtensionProperty<IPropertyTextureP
   }
 }
 
+/**
+ * Implementation of a property attribute for `EXT_structural_metadata`
+ *
+ * @internal
+ */
 export class PropertyAttribute extends ExtensionProperty<IPropertyAttribute> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -858,6 +913,11 @@ export class PropertyAttribute extends ExtensionProperty<IPropertyAttribute> {
   }
 }
 
+/**
+ * Implementation of a property attribute property for `EXT_structural_metadata`
+ *
+ * @internal
+ */
 export class PropertyAttributeProperty extends ExtensionProperty<IPropertyAttributeProperty> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -910,6 +970,11 @@ export class PropertyAttributeProperty extends ExtensionProperty<IPropertyAttrib
   }
 }
 
+/**
+ * Implementation of a metadata entity for `EXT_structural_metadata`
+ *
+ * @internal
+ */
 export class ElementStructuralMetadata extends ExtensionProperty<IElementStructuralMetadata> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -941,6 +1006,11 @@ export class ElementStructuralMetadata extends ExtensionProperty<IElementStructu
   }
 }
 
+/**
+ * Implementation of a structural metadata in a mesh primitive `EXT_structural_metadata`
+ *
+ * @internal
+ */
 export class MeshPrimitiveStructuralMetadata extends ExtensionProperty<IMeshPrimitiveStructuralMetadata> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;

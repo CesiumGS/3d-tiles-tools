@@ -22,8 +22,8 @@ export class TileTableDataI3dm {
    * from the given I3DM feature table data.
    *
    * @param featureTable - The feature table
-   * @param featureTableBinary The feature table binary
-   * @param numInstances The number of instances
+   * @param featureTableBinary - The feature table binary
+   * @param numInstances - The number of instances
    * @returns The matrices as an iterable over 16-element arrays
    */
   static createInstanceMatrices(
@@ -73,7 +73,7 @@ export class TileTableDataI3dm {
    * @param translations3D - The translations as 3-element arrays
    * @param rotationQuaternions - The rotations as 4-element arrays
    * @param scales3D - The scaling factors as 3-element arrays
-   * @param numInstances The number of elements
+   * @param numInstances - The number of elements
    * @returns The matrices
    */
   static createMatrices(
@@ -117,8 +117,8 @@ export class TileTableDataI3dm {
    * feature table).
    *
    * @param featureTable - The feature table
-   * @param featureTableBinary The feature table binary
-   * @param numInstances The number of instances
+   * @param featureTableBinary - The feature table binary
+   * @param numInstances - The number of instances
    * @returns The positions as an iterable over 3-element arrays
    */
   static createWorldPositions(
@@ -167,8 +167,8 @@ export class TileTableDataI3dm {
    * returned.
    *
    * @param featureTable - The feature table
-   * @param featureTableBinary The feature table binary
-   * @param numInstances The number of instances
+   * @param featureTableBinary - The feature table binary
+   * @param numInstances - The number of instances
    * @returns The rotation quaternions as an iterable over 4-element arrays
    */
   static createRotationQuaternions(

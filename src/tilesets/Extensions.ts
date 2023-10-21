@@ -21,7 +21,7 @@ export class Extensions {
    * that is the given extension name.
    *
    * @param extended - The object that may contain the extension
-   * @param extension The extension (i.e. its name as a string)
+   * @param extension - The extension (i.e. its name as a string)
    * @returns Whether the object contains the extension
    */
   static containsExtension(extended: Extended, extension: string) {
@@ -37,7 +37,7 @@ export class Extensions {
    * empty.
    *
    * @param extended - The extended object
-   * @param extension The extension (i.e. its name as a string)
+   * @param extension - The extension (i.e. its name as a string)
    */
   static removeExtension(extended: Extended, extension: string) {
     if (!extended.extensions) {

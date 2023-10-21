@@ -83,6 +83,11 @@ interface IFeatureIdTexture extends IProperty {
 // }
 // ```
 
+/**
+ * Main model class of `EXT_mesh_features`
+ *
+ * @internal
+ */
 export class MeshFeatures extends ExtensionProperty<IMeshFeatures> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -112,6 +117,11 @@ export class MeshFeatures extends ExtensionProperty<IMeshFeatures> {
   }
 }
 
+/**
+ * Implementation of a feature ID for `EXT_mesh_features`
+ *
+ * @internal
+ */
 export class FeatureId extends ExtensionProperty<IFeatureId> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -171,6 +181,11 @@ export class FeatureId extends ExtensionProperty<IFeatureId> {
   }
 }
 
+/**
+ * Implementation of a feature ID texture for `EXT_mesh_features`
+ *
+ * @internal
+ */
 export class FeatureIdTexture extends ExtensionProperty<IFeatureIdTexture> {
   static override EXTENSION_NAME = NAME;
 

@@ -12,6 +12,8 @@ import { DeveloperError } from "../base/DeveloperError";
  * You create this object, call the set() methods to fill in the parameters/source images/options, call encode(), and you get back a .basis or .KTX2 file.
  * You can call .encode() multiple times, changing the parameters/options in between calls.
  * By default this class encodes to .basis, but call setCreateKTX2File() with true to get .KTX2 files.
+ *
+ * @internal
  */
 export class BasisEncoder {
   /**
@@ -323,7 +325,7 @@ export class BasisEncoder {
 
   /**
    * Sets the mipmap filter to apply
-   * mip_filter must be < BASISU_MAX_RESAMPLER_FILTERS
+   * mip_filter must be less than BASISU_MAX_RESAMPLER_FILTERS
    * See the end of basisu_resample_filters.cpp: g_resample_filters[]
    *
    * @param mip_filter - The value

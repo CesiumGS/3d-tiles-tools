@@ -167,7 +167,7 @@ export class TileFormatsMigrationPnts {
    * attributes in the `EXT_structural_metadata` extension.
    *
    * @param pntsPointCloud - The point cloud that contains the PNTS data
-   * @param batchTable The batch table
+   * @param batchTable - The batch table
    * @returns The mapping
    */
   private static computeExternalProperties(

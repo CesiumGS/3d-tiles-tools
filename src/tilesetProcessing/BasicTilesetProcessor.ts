@@ -158,7 +158,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * The given tile is assumed to be an explicit tile in the
    * current tileset.
    *
-   * @param tile The tile where to start the traversal
+   * @param tile - The tile where to start the traversal
    * @param callback - The callback
    * @returns A promise that resolves when the process is finished
    * @throws DeveloperError If `begin` was not called yet

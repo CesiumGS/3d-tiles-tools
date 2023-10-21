@@ -178,9 +178,9 @@ export class GltfTransformTextures {
    *
    * The `KHR_texture_basisu` specification carries an implementation note:
    *
-   * > As a general rule, textures with color data should use ETC1S while
-   * > textures with non-color data (such as roughness-metallic or
-   * > normal maps) should use UASTC.
+   * "As a general rule, textures with color data should use ETC1S while
+   * textures with non-color data (such as roughness-metallic or
+   * normal maps) should use UASTC.""
    *
    * Based on this, this method returns `true` iff one of the "slots"
    * that the texture is associated with is `normalTexture`,

@@ -62,7 +62,7 @@ interface FeatureIdTextureDef extends GLTF.ITextureInfo {
  *
  * Properties:
  * - {@link MeshFeatures}
- * - {@link FeatureId}
+ * - {@link MeshFeaturesFeatureId}
  * - {@link FeatureIdTexture}
  *
  * ### Example
@@ -114,6 +114,8 @@ interface FeatureIdTextureDef extends GLTF.ITextureInfo {
  * // Write the document as JSON
  * const written = await io.writeJSON(document);
  * ```
+ *
+ * @internal
  */
 export class EXTMeshFeatures extends Extension {
   public override readonly extensionName = NAME;

@@ -69,7 +69,7 @@ export class TilesetCombiner {
    *
    * @param tilesetSourceName - The tileset source name
    * @param tilesetTargetName - The tileset target name
-   * @param overwrite Whether the target should be overwritten if
+   * @param overwrite - Whether the target should be overwritten if
    * it already exists
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError When the input could not be processed,
@@ -116,11 +116,11 @@ export class TilesetCombiner {
    * The caller is responsible for opening and closing the given
    * source and target.
    *
-   * @param tilesetSource The tileset source
-   * @param tilesetSourceJsonFileName The name of the top-level tileset in
+   * @param tilesetSource - The tileset source
+   * @param tilesetSourceJsonFileName - The name of the top-level tileset in
    * the given source (usually `tileset.json`).
-   * @param tilesetTarget The tileset target
-   * @param tilesetTargetJsonFileName The name of the top-level tileset in
+   * @param tilesetTarget - The tileset target
+   * @param tilesetTargetJsonFileName - The name of the top-level tileset in
    * the given target (usually `tileset.json`).
    * @returns A promise that resolves when the process is finished.
    * @throws TilesetError When the input tileset file can not be

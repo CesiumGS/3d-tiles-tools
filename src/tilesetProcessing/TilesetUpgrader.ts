@@ -118,7 +118,7 @@ export class TilesetUpgrader {
    *
    * @param tilesetSourceName - The tileset source name
    * @param tilesetTargetName - The tileset target name
-   * @param overwrite Whether the target should be overwritten if
+   * @param overwrite - Whether the target should be overwritten if
    * it already exists
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError When the input could not be processed,
@@ -156,7 +156,7 @@ export class TilesetUpgrader {
   /**
    * Perform the upgrade of the `Tileset` object, in place.
    *
-   * @param tileset The `Tileset` object
+   * @param tileset - The `Tileset` object
    */
   async upgradeTileset(tileset: Tileset) {
     const tilesetObjectUpgrader = new TilesetObjectUpgrader(
@@ -223,7 +223,7 @@ export class TilesetUpgrader {
    * Process the given tileset (content) entry, and return the result.
    *
    * @param sourceEntry - The source entry
-   * @param type The `ContentDataType` of the source entry
+   * @param type - The `ContentDataType` of the source entry
    * @returns The processed entry
    */
   private processEntry = async (
@@ -255,7 +255,7 @@ export class TilesetUpgrader {
    * Process the given tileset (content) entry, and return the result.
    *
    * @param sourceEntry - The source entry
-   * @param type The `ContentDataType` of the source entry
+   * @param type - The `ContentDataType` of the source entry
    * @returns The processed entry
    */
   private processEntryUnchecked = async (
