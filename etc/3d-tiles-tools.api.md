@@ -6,9 +6,32 @@
 
 /// <reference types="node" />
 
+import { Accessor } from '@gltf-transform/core';
+import { Database } from 'better-sqlite3';
+import { Document } from '@gltf-transform/core';
+import { Extension } from '@gltf-transform/core';
+import { ExtensionProperty } from '@gltf-transform/core';
+import { IProperty } from '@gltf-transform/core';
+import { Logger } from 'pino';
 import { NodeIO } from '@gltf-transform/core';
+import { Nullable } from '@gltf-transform/core';
 import { PathLike } from 'fs';
+import { Primitive } from '@gltf-transform/core';
+import { PropertyType } from '@gltf-transform/core';
+import { ReaderContext } from '@gltf-transform/core';
+import { Texture } from '@gltf-transform/core';
+import { TextureInfo } from '@gltf-transform/core';
 import { Transform } from '@gltf-transform/core';
+import { TypedArray } from '@gltf-transform/core';
+import { WriterContext } from '@gltf-transform/core';
+
+// @internal
+export class AccessorCreation {
+    static createAccessorArray(componentType: string, accessorValues: Iterable<number>): TypedArray;
+    static createAccessorFromProperty(document: Document, classProperty: ClassProperty, propertyModel: PropertyModel, numRows: number): Accessor;
+    static createAccessorFromValues(document: Document, classProperty: ClassProperty, accessorValues: Iterable<number>): Accessor;
+    static createAccessorValues(classProperty: ClassProperty, propertyModel: PropertyModel, numRows: number): Iterable<number>;
+}
 
 // @internal (undocumented)
 export class ArchiveFunctions3tz {
@@ -30,6 +53,11 @@ export class ArchiveFunctions3tz {
 }
 
 // @internal
+export class ArrayBuffers {
+    static fromBuffer(buffer: Buffer): ArrayBuffer;
+}
+
+// @internal
 export class ArrayValues {
     static anyDeepGreaterThan(a: any, b: any): boolean;
     static anyDeepLessThan(a: any, b: any): boolean;
@@ -48,6 +76,22 @@ export interface Asset extends RootProperty {
 }
 
 // @internal
+export class AttributeCompression {
+    static octDecode16(input: number[]): number[];
+    static octDecode8(input: number[]): number[];
+}
+
+// @internal
+export type AttributeInfo = {
+    componentsPerAttribute: number;
+    componentDatatype: string;
+    byteOffset: number;
+    byteStride: number;
+    normalized: boolean;
+    quantization?: QuantizationInfo;
+};
+
+// @internal
 export interface Availability extends RootProperty {
     availableCount?: number;
     bitstream?: number;
@@ -64,6 +108,113 @@ export interface AvailabilityInfo {
 export class AvailabilityInfos {
     static createChildSubtree(availability: Availability, bufferViewDatas: Buffer[], implicitTiling: TileImplicitTiling): AvailabilityInfo;
     static createTileOrContent(availability: Availability, bufferViewDatas: Buffer[], implicitTiling: TileImplicitTiling): AvailabilityInfo;
+}
+
+// @internal
+export interface B3dmFeatureTable extends FeatureTable {
+    BATCH_LENGTH: number;
+    RTC_CENTER?: BinaryBodyOffset | number[];
+}
+
+// @internal
+export class BasicTilesetProcessor extends TilesetProcessor {
+    constructor(processExternalTilesets?: boolean);
+    end(): Promise<void>;
+    forEachExplicitTile(callback: (tile: Tile) => Promise<void>): Promise<void>;
+    forEachTile(callback: TraversalCallback): Promise<void>;
+    forTileset(callback: (tileset: Tileset, schema: Schema | undefined) => Promise<Tileset>): Promise<void>;
+    processAllEntries(entryProcessor: TilesetEntryProcessor): Promise<void>;
+    processTileContentEntries(uriProcessor: (uri: string) => string, entryProcessor: TilesetEntryProcessor): Promise<void>;
+    static updateTileContent(tile: Tile, contentUris: string[]): void;
+}
+
+// @internal
+export class BasisEncoder {
+    static create(): Promise<BasisEncoder>;
+    encode(dst_basis_file_js_val: Uint8Array): any;
+    setCheckForAlpha(check_for_alpha_flag: boolean): any;
+    setCompressionLevel(comp_level: number): any;
+    setComputeStats(compute_stats_flag: boolean): any;
+    setCreateKTX2File(create_ktx2_file: boolean): any;
+    setDebug(debug_flag: boolean): any;
+    setEndpointRDOThresh(endpoint_rdo_thresh: number): any;
+    setForceAlpha(force_alpha_flag: boolean): any;
+    setKTX2SRGBTransferFunc(srgb_transfer_func: boolean): any;
+    setKTX2UASTCSupercompression(use_zstandard: boolean): any;
+    setMaxEndpointClusters(max_endpoint_clusters: number): any;
+    setMaxSelectorClusters(max_selector_clusters: number): any;
+    setMipFilter(mip_filter: number): any;
+    setMipGen(mip_gen_flag: boolean): any;
+    setMipRenormalize(mip_renormalize_flag: boolean): any;
+    setMipScale(mip_scale: number): any;
+    setMipSmallestDimension(mip_smallest_dimension: number): any;
+    setMipSRGB(mip_srgb_flag: boolean): any;
+    setMipWrapping(mip_wrapping_flag: boolean): any;
+    setNoEndpointRDO(no_endpoint_rdo_flag: boolean): any;
+    setNormalMap(): any;
+    setNoSelectorRDO(no_selector_rdo_flag: boolean): any;
+    setPackUASTCFlags(pack_uastc_flags: number): any;
+    setPerceptual(perceptual_flag: boolean): any;
+    setQualityLevel(quality_level: number): any;
+    setRDOUASTC(rdo_uastc: boolean): any;
+    setRDOUASTCDictSize(dict_size: number): any;
+    setRDOUASTCMaxAllowedRMSIncreaseRatio(rdo_uastc_max_allowed_rms_increase_ratio: number): any;
+    setRDOUASTCQualityScalar(rdo_quality: number): any;
+    setRDOUASTCSkipBlockRMSThresh(rdo_uastc_skip_block_rms_thresh: number): any;
+    setRenormalize(renormalize_flag: boolean): any;
+    setSelectorRDOThresh(selector_rdo_thresh: number): any;
+    setSliceSourceImage(slice_index: number, src_image_js_val: Uint8Array, width: number, height: number, src_image_is_png: boolean): any;
+    setSwizzle(r: number, g: number, b: number, a: number): any;
+    setTexType(tex_type: number): any;
+    setUASTC(uastc_flag: boolean): any;
+    setYFlip(y_flip_flag: boolean): any;
+}
+
+// @internal
+export interface BatchTable extends RootProperty {
+    // (undocumented)
+    [key: string]: BatchTableBinaryBodyReference | any[] | {
+        [key: string]: any;
+    } | undefined;
+}
+
+// @internal
+export interface BatchTableBinaryBodyReference extends RootProperty {
+    byteOffset: number;
+    componentType: string;
+    type: string;
+}
+
+// @internal
+export class BatchTableClassProperties {
+    static createClassProperty(batchTablePropertyName: string, batchTablePropertyValue: any): ClassProperty;
+}
+
+// @internal
+export class BatchTablePropertyTableModels {
+    static create(table: {
+        [key: string]: any;
+    }, binary: Buffer, externalProperties: {
+        [key: string]: PropertyModel;
+    }, numRows: number): PropertyTableModel;
+}
+
+// @internal
+export class BatchTables {
+    static obtainDracoProperties(batchTable: BatchTable): {
+        [key: string]: number;
+    };
+    static obtainDracoPropertyNames(batchTable: BatchTable): string[];
+}
+
+// @internal
+export class BatchTableSchemas {
+    static createSchema(identifier: string, batchTable: BatchTable): Schema | undefined;
+}
+
+// @internal
+export interface BinaryBodyOffset extends RootProperty {
+    byteOffset: number;
 }
 
 // @internal
@@ -139,6 +290,16 @@ export interface BinaryPropertyTable {
 }
 
 // @internal
+export class BinaryPropertyTableBuilder {
+    addProperties(properties: {
+        [key: string]: any[];
+    }): this;
+    addProperty(propertyName: string, propertyValues: any[]): this;
+    build(): BinaryPropertyTable;
+    static create(schema: Schema, propertyTableClass: string, propertyTableName: string): BinaryPropertyTableBuilder;
+}
+
+// @internal
 export class BinaryPropertyTableModel implements PropertyTableModel {
     constructor(binaryPropertyTable: BinaryPropertyTable);
     getClassProperty(propertyId: string): ClassProperty | undefined;
@@ -174,10 +335,80 @@ export class BinarySubtreeDataResolver {
 }
 
 // @internal
+export class BooleanArrayPropertyModel implements PropertyModel {
+    constructor(valuesBuffer: Buffer, arrayOffsetsBuffer: Buffer | undefined, arrayOffsetType: string, count: number | undefined);
+    getPropertyValue(index: number): boolean[];
+}
+
+// @internal
+export class BooleanPropertyModel implements PropertyModel {
+    constructor(valuesBuffer: Buffer);
+    getPropertyValue(index: number): boolean;
+}
+
+// @internal (undocumented)
+export type BoundingBox3D = {
+    min: Point3D;
+    max: Point3D;
+};
+
+// @internal
 export interface BoundingVolume extends RootProperty {
     box?: number[];
     region?: number[];
     sphere?: number[];
+}
+
+// @internal
+export class BoundingVolumes {
+    static computeBoundingBoxCorners(boundingBox: BoundingBox3D): Point3D[];
+    static computeBoundingBoxUnion(bb0: BoundingBox3D, bb1: BoundingBox3D): BoundingBox3D;
+    static createBoundingBoxForBoundingVolumeBox(boundingVolumeBox: number[]): BoundingBox3D;
+    static createBoundingVolumeBoxFromBoundingBox(boundingBox: BoundingBox3D): number[];
+    static createBoundingVolumeBoxFromGltfBoundingBox(boundingBox: BoundingBox3D): number[];
+    static createUnitCubeBoundingBox(): BoundingBox3D;
+    static createUnitCubeBoundingVolumeBox(): number[];
+    static max(p0: Point3D, p1: Point3D, result?: Point3D): Point3D;
+    static min(p0: Point3D, p1: Point3D, result?: Point3D): Point3D;
+    static translateBoundingBox(boundingBox: BoundingBox3D, translation: Point3D): {
+        min: Point3D;
+        max: Point3D;
+    };
+}
+
+// @internal
+export interface BoundingVolumeS2 extends RootProperty {
+    // (undocumented)
+    maximumHeight: number;
+    // (undocumented)
+    minimumHeight: number;
+    // (undocumented)
+    token: string;
+}
+
+// @internal
+export class BufferAvailabilityInfo implements AvailabilityInfo {
+    constructor(buffer: Buffer, length: number);
+    isAvailable(index: number): boolean;
+    get length(): number;
+}
+
+// @internal
+export class BufferedContentData implements ContentData {
+    constructor(uri: string, data: Buffer | null);
+    static create(uri: string): ContentData;
+    exists(): Promise<boolean>;
+    get extension(): string;
+    // Warning: (ae-unresolved-inheritdoc-reference) The @inheritDoc reference could not be resolved: No member was found with name "data"
+    //
+    // (undocumented)
+    getData(): Promise<Buffer | null>;
+    // Warning: (ae-unresolved-inheritdoc-reference) The @inheritDoc reference could not be resolved: No member was found with name "magic"
+    //
+    // (undocumented)
+    getMagic(): Promise<Buffer>;
+    getParsedObject(): Promise<any>;
+    get uri(): string;
 }
 
 // @internal
@@ -238,6 +469,47 @@ export interface ClassProperty extends RootProperty {
 }
 
 // @internal
+export type ClassPropertyComponentType = "INT8" | "UINT8" | "INT16" | "UINT16" | "INT32" | "UINT32" | "INT64" | "UINT64" | "FLOAT32" | "FLOAT64";
+
+// @internal
+export type ClassPropertyType = "SCALAR" | "VEC2" | "VEC3" | "VEC4" | "MAT2" | "MAT3" | "MAT4" | "STRING" | "BOOLEAN" | "ENUM";
+
+// @internal
+export class Colors {
+    static standardRGB565ToNormalizedLinearRGBA(input: number): number[];
+    static standardRGBAToNormalizedLinearRGBA(input: number[]): number[];
+    static standardRGBToNormalizedLinearRGBA(input: number[]): number[];
+}
+
+// @internal
+export class ComponentDatatype {
+    static readonly BYTE = 5120;
+    static readonly DOUBLE = 5130;
+    static readonly FLOAT = 5126;
+    static fromTypedArray(array: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array): number;
+    static getSizeInBytes(componentDatatype: number): number;
+    static readonly INT = 5124;
+    static readonly SHORT = 5122;
+    static toString(componentDatatype: number): "FLOAT" | "UNSIGNED_SHORT" | "BYTE" | "UNSIGNED_BYTE" | "SHORT" | "INT" | "UNSIGNED_INT" | "DOUBLE";
+    static readonly UNSIGNED_BYTE = 5121;
+    static readonly UNSIGNED_INT = 5125;
+    static readonly UNSIGNED_SHORT = 5123;
+}
+
+// @internal
+export interface CompositeTileData {
+    header: Header;
+    innerTileBuffers: Buffer[];
+}
+
+// @internal
+export class ConstantAvailabilityInfo implements AvailabilityInfo {
+    constructor(available: boolean, length: number);
+    isAvailable(index: number): boolean;
+    get length(): number;
+}
+
+// @internal
 export interface Content extends RootProperty {
     boundingVolume?: BoundingVolume;
     group?: number;
@@ -256,9 +528,92 @@ export interface ContentData {
 }
 
 // @internal
+export class ContentDataTypeChecks {
+    static createCheck(includedContentDataTypes: (string | undefined)[] | undefined, excludedContentDataTypes: (string | undefined)[] | undefined): (contentData: ContentData) => Promise<boolean>;
+    static createIncludedCheck(...contentDataTypes: string[]): (contentData: ContentData) => Promise<boolean>;
+    static createTypeCheck(includedContentDataTypes: (string | undefined)[] | undefined, excludedContentDataTypes: (string | undefined)[] | undefined): (contentDataType: string | undefined) => boolean;
+}
+
+// @internal
+export type ContentDataTypeEntry = {
+    predicate: (contentData: ContentData) => Promise<boolean>;
+    type: string;
+};
+
+// @internal
 export class ContentDataTypeRegistry {
     static findContentDataType(contentData: ContentData): Promise<string | undefined>;
     static findType(uri: string, data: Buffer): Promise<string | undefined>;
+}
+
+// @internal
+export class ContentDataTypes {
+    // (undocumented)
+    static readonly CONTENT_TYPE_3TZ = "CONTENT_TYPE_3TZ";
+    // (undocumented)
+    static readonly CONTENT_TYPE_B3DM = "CONTENT_TYPE_B3DM";
+    // (undocumented)
+    static readonly CONTENT_TYPE_CMPT = "CONTENT_TYPE_CMPT";
+    // (undocumented)
+    static readonly CONTENT_TYPE_GEOJSON = "CONTENT_TYPE_GEOJSON";
+    // (undocumented)
+    static readonly CONTENT_TYPE_GEOM = "CONTENT_TYPE_GEOM";
+    // (undocumented)
+    static readonly CONTENT_TYPE_GIF = "CONTENT_TYPE_GIF";
+    // (undocumented)
+    static readonly CONTENT_TYPE_GLB = "CONTENT_TYPE_GLB";
+    // (undocumented)
+    static readonly CONTENT_TYPE_GLTF = "CONTENT_TYPE_GLTF";
+    // (undocumented)
+    static readonly CONTENT_TYPE_I3DM = "CONTENT_TYPE_I3DM";
+    // (undocumented)
+    static readonly CONTENT_TYPE_JPEG = "CONTENT_TYPE_JPEG";
+    // (undocumented)
+    static readonly CONTENT_TYPE_PNG = "CONTENT_TYPE_PNG";
+    // (undocumented)
+    static readonly CONTENT_TYPE_PNTS = "CONTENT_TYPE_PNTS";
+    // (undocumented)
+    static readonly CONTENT_TYPE_SUBT = "CONTENT_TYPE_SUBT";
+    // (undocumented)
+    static readonly CONTENT_TYPE_TILESET = "CONTENT_TYPE_TILESET";
+    // (undocumented)
+    static readonly CONTENT_TYPE_VCTR = "CONTENT_TYPE_VCTR";
+}
+
+// @internal
+export class ContentError extends Error {
+    constructor(message: string);
+    // (undocumented)
+    toString: () => string;
+}
+
+// @internal
+export class ContentOps {
+    static b3dmToGlbBuffer(inputBuffer: Buffer): Buffer;
+    static cmptToGlbBuffers(inputBuffer: Buffer): Buffer[];
+    static glbToB3dmBuffer(inputBuffer: Buffer): Buffer;
+    static glbToI3dmBuffer(inputBuffer: Buffer): Buffer;
+    static i3dmToGlbBuffer(inputBuffer: Buffer): Buffer;
+    static optimizeB3dmBuffer(inputBuffer: Buffer, options: any): Promise<Buffer>;
+    static optimizeI3dmBuffer(inputBuffer: Buffer, options: any): Promise<Buffer>;
+}
+
+// @internal
+export class Contents {
+    static getUri(content: Content): string | undefined;
+}
+
+// @internal
+export class ContentUpgrades {
+    static upgradeB3dmGltf1ToGltf2(inputBuffer: Buffer, options: any): Promise<Buffer>;
+    static upgradeI3dmGltf1ToGltf2(inputBuffer: Buffer, options: any): Promise<Buffer>;
+}
+
+// @internal
+export class DataError extends Error {
+    constructor(message: string);
+    // (undocumented)
+    toString: () => string;
 }
 
 // @internal
@@ -268,6 +623,46 @@ export class DefaultMetadataEntityModel implements MetadataEntityModel {
     }, json: any);
     getPropertyValue(propertyId: string): any;
     getPropertyValueBySemantic(semantic: string): any;
+}
+
+// @internal
+export class DefaultPointCloud implements ReadablePointCloud {
+    addAttribute(name: string, type: string, componentType: string, attribute: Iterable<number>): void;
+    getAttributeComponentType(name: string): string | undefined;
+    getAttributes(): string[];
+    getAttributeType(name: string): string | undefined;
+    getAttributeValues(name: string): Iterable<number> | undefined;
+    getGlobalPosition(): [number, number, number] | undefined;
+    getNormalizedLinearColors(): Iterable<number[]> | undefined;
+    getNormalizedLinearGlobalColor(): [number, number, number, number] | undefined;
+    getNormals(): Iterable<number[]> | undefined;
+    getPositions(): Iterable<number[]>;
+    // (undocumented)
+    setGlobalPosition(globalPosition: [number, number, number] | undefined): void;
+    setNormalizedLinearColors(colors: Iterable<number[]>): void;
+    // (undocumented)
+    setNormalizedLinearGlobalColor(globalColor: [number, number, number, number] | undefined): void;
+    setNormals(normals: Iterable<number[]>): void;
+    setPositions(positions: Iterable<number[]>): void;
+}
+
+// @internal
+export class DefaultPropertyModel implements PropertyModel {
+    constructor(data: any[]);
+    getPropertyValue(index: number): any;
+}
+
+// @internal
+export class DefaultPropertyTableModel implements PropertyTableModel {
+    constructor(numRows: number);
+    addClassProperty(propertyId: string, classProperty: ClassProperty): void;
+    addPropertyModel(propertyId: string, propertyModel: PropertyModel): void;
+    getClassProperty(propertyId: string): ClassProperty | undefined;
+    getCount(): number;
+    getMetadataEntityModel(index: number): MetadataEntityModel;
+    getPropertyModel(propertyId: string): PropertyModel | undefined;
+    getPropertyNames(): string[];
+    getPropertyTableProperty(propertyId: string): PropertyTableProperty | undefined;
 }
 
 // @internal
@@ -284,11 +679,65 @@ export class DeveloperError extends Error {
 }
 
 // @internal
+export class DracoDecoder {
+    static create(): Promise<DracoDecoder>;
+    decodePointCloud(properties: {
+        [key: string]: number;
+    }, binary: Buffer): DracoDecoderResult;
+}
+
+// @internal
+export type DracoDecoderResult = {
+    [key: string]: {
+        attributeData: Buffer;
+        attributeInfo: AttributeInfo;
+    };
+};
+
+// @internal
+export class DracoError extends Error {
+    constructor(message: string);
+    // (undocumented)
+    toString: () => string;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IElementStructuralMetadata" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class ElementStructuralMetadata extends ExtensionProperty<IElementStructuralMetadata> {
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // Warning: (ae-forgotten-export) The symbol "NAME" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    extensionName: typeof NAME;
+    // (undocumented)
+    protected getDefaults(): Nullable<IElementStructuralMetadata>;
+    // (undocumented)
+    getIndex(): number;
+    // (undocumented)
+    getPropertyTable(): StructuralMetadataPropertyTable | null;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    parentTypes: [PropertyType.NODE];
+    // (undocumented)
+    propertyType: "ElementStructuralMetadata";
+    // (undocumented)
+    setIndex(index: number): this;
+    // (undocumented)
+    setPropertyTable(propertyTable: StructuralMetadataPropertyTable | null): this;
+}
+
+// @internal
 export interface EnumValue extends RootProperty {
     description?: string;
     name: string;
     value: number;
 }
+
+// @internal
+export type EnumValueType = "INT8" | "UINT8" | "INT16" | "UINT16" | "INT32" | "UINT32" | "INT64" | "UINT64";
 
 // @internal
 export class ExplicitTraversedTile implements TraversedTile {
@@ -316,6 +765,158 @@ export class ExplicitTraversedTiles {
 }
 
 // @internal
+export class Extensions {
+    static addExtensionRequired(extensible: Extensible, extension: string): void;
+    // Warning: (ae-forgotten-export) The symbol "Extensible" needs to be exported by the entry point index.d.ts
+    static addExtensionUsed(extensible: Extensible, extension: string): void;
+    // Warning: (ae-forgotten-export) The symbol "Extended" needs to be exported by the entry point index.d.ts
+    static containsExtension(extended: Extended, extension: string): boolean;
+    static removeExtension(extended: Extended, extension: string): void;
+    static removeExtensionRequired(extensible: Extensible, extension: string): void;
+    static removeExtensionUsed(extensible: Extensible, extension: string): void;
+}
+
+// @internal
+export class EXTInstanceFeatures extends Extension {
+    // (undocumented)
+    createFeatureId(): InstanceFeaturesFeatureId;
+    // (undocumented)
+    createInstanceFeatures(): InstanceFeatures;
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    readonly extensionName = "EXT_instance_features";
+    // (undocumented)
+    read(context: ReaderContext): this;
+    // (undocumented)
+    write(context: WriterContext): this;
+}
+
+// @internal
+export class EXTMeshFeatures extends Extension {
+    // (undocumented)
+    createFeatureId(): MeshFeaturesFeatureId;
+    // (undocumented)
+    createFeatureIdTexture(): FeatureIdTexture;
+    // (undocumented)
+    createMeshFeatures(): MeshFeatures;
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    readonly extensionName = "EXT_mesh_features";
+    // (undocumented)
+    read(context: ReaderContext): this;
+    // (undocumented)
+    write(context: WriterContext): this;
+}
+
+// @internal
+export class EXTStructuralMetadata extends Extension {
+    // (undocumented)
+    createClass(): StructuralMetadataClass;
+    // Warning: (ae-forgotten-export) The symbol "ClassDef" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    createClassFrom(classDef: ClassDef): StructuralMetadataClass;
+    // (undocumented)
+    createClassProperty(): StructuralMetadataClassProperty;
+    // Warning: (ae-forgotten-export) The symbol "ClassPropertyDef" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    createClassPropertyFrom(classPropertyDef: ClassPropertyDef): StructuralMetadataClassProperty;
+    // (undocumented)
+    createElementStructuralMetadata(): ElementStructuralMetadata;
+    // (undocumented)
+    createEnum(): StructuralMetadataEnum;
+    // Warning: (ae-forgotten-export) The symbol "EnumDef" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    createEnumFrom(enumDef: EnumDef): StructuralMetadataEnum;
+    // (undocumented)
+    createEnumValue(): StructuralMetadataEnumValue;
+    // Warning: (ae-forgotten-export) The symbol "EnumValueDef" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    createEnumValueFrom(enumValueDef: EnumValueDef): StructuralMetadataEnumValue;
+    // (undocumented)
+    createMeshPrimitiveStructuralMetadata(): MeshPrimitiveStructuralMetadata;
+    // (undocumented)
+    createPropertyAttribute(): StructuralMetadataPropertyAttribute;
+    // (undocumented)
+    createPropertyAttributeProperty(): StructuralMetadataPropertyAttributeProperty;
+    // (undocumented)
+    createPropertyTable(): StructuralMetadataPropertyTable;
+    // (undocumented)
+    createPropertyTableProperty(): StructuralMetadataPropertyTableProperty;
+    // (undocumented)
+    createPropertyTexture(): StructuralMetadataPropertyTexture;
+    // (undocumented)
+    createPropertyTextureProperty(): StructuralMetadataPropertyTextureProperty;
+    // (undocumented)
+    createSchema(): StructuralMetadataSchema;
+    // Warning: (ae-forgotten-export) The symbol "SchemaDef" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    createSchemaFrom(schemaDef: SchemaDef): StructuralMetadataSchema;
+    // (undocumented)
+    createStructuralMetadata(): StructuralMetadata;
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    readonly extensionName = "EXT_structural_metadata";
+    prewrite(context: WriterContext, propertyType: PropertyType): this;
+    // (undocumented)
+    readonly prewriteTypes: PropertyType[];
+    // (undocumented)
+    read(context: ReaderContext): this;
+    // (undocumented)
+    write(context: WriterContext): this;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IFeatureIdTexture" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class FeatureIdTexture extends ExtensionProperty<IFeatureIdTexture> {
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // Warning: (ae-forgotten-export) The symbol "NAME_3" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    extensionName: typeof NAME_3;
+    // (undocumented)
+    getChannels(): number[];
+    // (undocumented)
+    protected getDefaults(): Nullable<IFeatureIdTexture> & {
+        channels: number[];
+        texture: null;
+        textureInfo: TextureInfo;
+    };
+    // (undocumented)
+    getTexture(): Texture | null;
+    // (undocumented)
+    getTextureInfo(): TextureInfo | null;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    parentTypes: ["FeatureId"];
+    // (undocumented)
+    propertyType: "FeatureIdTexture";
+    // (undocumented)
+    setChannels(channels: number[]): this;
+    // (undocumented)
+    setTexture(texture: Texture | null): this;
+}
+
+// @internal
+export interface FeatureTable extends RootProperty {
+}
+
+// @internal
+export interface FeatureTableBinaryBodyReference extends BinaryBodyOffset {
+    componentType?: string;
+}
+
+// @internal
 export class FileResourceResolver implements ResourceResolver {
     constructor(basePath: string);
     derive(uri: string): ResourceResolver;
@@ -324,9 +925,65 @@ export class FileResourceResolver implements ResourceResolver {
 }
 
 // @internal
+export class GltfPack {
+    static process(inputGlb: Buffer, options: GltfPackOptions): Promise<Buffer>;
+}
+
+// @internal
+export type GltfPackOptions = Partial<{
+    c: boolean;
+    cc: boolean;
+    si: number;
+    sa: boolean;
+    slb: boolean;
+    vp: number;
+    vt: number;
+    vn: number;
+    vc: number;
+    vpi: boolean;
+    vpn: boolean;
+    vpf: boolean;
+    at: number;
+    ar: number;
+    as: number;
+    af: number;
+    ac: boolean;
+    kn: boolean;
+    km: boolean;
+    ke: boolean;
+    mm: boolean;
+    mi: boolean;
+    cf: boolean;
+    noq: boolean;
+}>;
+
+// @internal
+export class GltfPipelineLegacy {
+    // (undocumented)
+    static process(gltf: any): Promise<void>;
+}
+
+// @internal
 export class GltfTransform {
     static getIO(): Promise<NodeIO>;
     static process(inputGlb: Buffer, ...transforms: Transform[]): Promise<Buffer>;
+}
+
+// @internal
+export interface GltfTransformPointCloud {
+    document: Document;
+    primitive: Primitive;
+}
+
+// @internal
+export class GltfTransformPointClouds {
+    static applyQuantization(document: Document, quantizePositions: boolean, quantizeNormals: boolean): Promise<void>;
+    static build(readablePointCloud: ReadablePointCloud, mayRequireAlpha: boolean): GltfTransformPointCloud;
+}
+
+// @internal
+export class GltfTransformTextures {
+    static createTransformTexturesToKtx(etc1sOptions: KtxEtc1sOptions, uastcOptions: KtxUastcOptions): Transform;
 }
 
 // @internal
@@ -344,6 +1001,36 @@ export class GltfUtilities {
 
 // @internal
 export interface Group extends MetadataEntity {
+}
+
+// @internal
+export interface Header {
+    gltfFormat?: number;
+    magic: string;
+    version: number;
+}
+
+// @internal
+export interface I3dmFeatureTable extends FeatureTable {
+    BATCH_ID?: FeatureTableBinaryBodyReference;
+    EAST_NORTH_UP?: boolean;
+    INSTANCES_LENGTH: number;
+    NORMAL_RIGHT?: FeatureTableBinaryBodyReference;
+    NORMAL_RIGHT_OCT32P?: FeatureTableBinaryBodyReference;
+    NORMAL_UP?: FeatureTableBinaryBodyReference;
+    NORMAL_UP_OCT32P?: FeatureTableBinaryBodyReference;
+    POSITION?: FeatureTableBinaryBodyReference;
+    POSITION_QUANTIZED?: FeatureTableBinaryBodyReference;
+    QUANTIZED_VOLUME_OFFSET?: BinaryBodyOffset | number[];
+    QUANTIZED_VOLUME_SCALE?: BinaryBodyOffset | number[];
+    RTC_CENTER?: BinaryBodyOffset | number[];
+    SCALE?: FeatureTableBinaryBodyReference;
+    SCALE_NON_UNIFORM?: FeatureTableBinaryBodyReference;
+}
+
+// @internal
+export class Ids {
+    static sanitize(identifier: string): string;
 }
 
 // @internal
@@ -402,6 +1089,79 @@ export interface IndexEntry {
     offset: bigint;
 }
 
+// Warning: (ae-forgotten-export) The symbol "IInstanceFeatures" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class InstanceFeatures extends ExtensionProperty<IInstanceFeatures> {
+    // (undocumented)
+    addFeatureId(featureId: InstanceFeaturesFeatureId): this;
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // Warning: (ae-forgotten-export) The symbol "NAME_2" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    extensionName: typeof NAME_2;
+    // (undocumented)
+    protected getDefaults(): Nullable<IInstanceFeatures> & {
+        featureIds: never[];
+    };
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    listFeatureIds(): InstanceFeaturesFeatureId[];
+    // (undocumented)
+    parentTypes: [PropertyType.NODE];
+    // (undocumented)
+    propertyType: "InstanceFeatures";
+    // (undocumented)
+    removeFeatureId(featureId: InstanceFeaturesFeatureId): this;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IFeatureId" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class InstanceFeaturesFeatureId extends ExtensionProperty<IFeatureId> {
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME_2;
+    // Warning: (ae-forgotten-export) The symbol "FeatureIdAttribute" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    getAttribute(): FeatureIdAttribute;
+    // (undocumented)
+    protected getDefaults(): Nullable<IFeatureId>;
+    // (undocumented)
+    getFeatureCount(): number;
+    // (undocumented)
+    getLabel(): string;
+    // (undocumented)
+    getNullFeatureId(): number;
+    // (undocumented)
+    getPropertyTable(): StructuralMetadataPropertyTable | null;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    parentTypes: ["InstanceFeatures"];
+    // (undocumented)
+    propertyType: "FeatureId";
+    // (undocumented)
+    setAttribute(attribute: FeatureIdAttribute): this;
+    // (undocumented)
+    setFeatureCount(featureCount: number): this;
+    // (undocumented)
+    setLabel(label: string): this;
+    // (undocumented)
+    setNullFeatureId(nullFeatureId: number): this;
+    // (undocumented)
+    setPropertyTable(propertyTable: StructuralMetadataPropertyTable | null): this;
+}
+
+// @internal
+export class InstanceFeaturesUtils {
+    static createInstanceFeaturesInfoString(document: Document): string;
+}
+
 // @internal
 export class Iterables {
     static filter<T>(iterable: Iterable<T>, include: (element: T) => boolean): Iterable<T>;
@@ -413,6 +1173,42 @@ export class Iterables {
 }
 
 // @internal
+export class KtxError extends Error {
+    constructor(message: string);
+    // (undocumented)
+    toString: () => string;
+}
+
+// @internal
+export type KtxEtc1sOptions = Partial<{
+    compressionLevel: number;
+    qualityLevel: number;
+    transferFunction: "SRGB" | "LINEAR";
+}>;
+
+// @internal
+export type KtxOptions = KtxEtc1sOptions & KtxUastcOptions & {
+    uastc: boolean;
+    computeStats?: boolean;
+    debug?: boolean;
+};
+
+// @internal
+export type KtxUastcOptions = Partial<{
+    level: number;
+    rdo_l: number;
+    rdo_d: number;
+    zstd: number;
+    transferFunction: "SRGB" | "LINEAR";
+}>;
+
+// @internal
+export class KtxUtility {
+    static convertImageData(inputImageData: Buffer, options: KtxOptions | undefined): Promise<Buffer>;
+    static convertImageFile(inputFileName: string, outputFileName: string, options: KtxOptions | undefined): Promise<void>;
+}
+
+// @internal
 export class LazyContentData implements ContentData {
     constructor(uri: string, resourceResolver: ResourceResolver);
     exists(): Promise<boolean>;
@@ -421,6 +1217,121 @@ export class LazyContentData implements ContentData {
     getMagic(): Promise<Buffer>;
     getParsedObject(): Promise<any>;
     get uri(): string;
+}
+
+// @internal
+export class Loggers {
+    static get(loggerName?: string): Logger;
+    static initDefaultLogger(prettyPrint?: boolean): void;
+    static setLevel(level: string): void;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IMeshFeatures" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class MeshFeatures extends ExtensionProperty<IMeshFeatures> {
+    // (undocumented)
+    addFeatureId(featureId: MeshFeaturesFeatureId): this;
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME_3;
+    // (undocumented)
+    protected getDefaults(): Nullable<IMeshFeatures> & {
+        featureIds: never[];
+    };
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    listFeatureIds(): MeshFeaturesFeatureId[];
+    // (undocumented)
+    parentTypes: [PropertyType.PRIMITIVE];
+    // (undocumented)
+    propertyType: "MeshFeatures";
+    // (undocumented)
+    removeFeatureId(featureId: MeshFeaturesFeatureId): this;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IFeatureId_2" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class MeshFeaturesFeatureId extends ExtensionProperty<IFeatureId_2> {
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME_3;
+    // Warning: (ae-forgotten-export) The symbol "FeatureIdAttribute_2" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    getAttribute(): FeatureIdAttribute_2;
+    // (undocumented)
+    protected getDefaults(): Nullable<IFeatureId_2>;
+    // (undocumented)
+    getFeatureCount(): number;
+    // (undocumented)
+    getLabel(): string;
+    // (undocumented)
+    getNullFeatureId(): number;
+    // (undocumented)
+    getPropertyTable(): StructuralMetadataPropertyTable | null;
+    // (undocumented)
+    getTexture(): FeatureIdTexture | null;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    parentTypes: ["MeshFeatures"];
+    // (undocumented)
+    propertyType: "FeatureId";
+    // (undocumented)
+    setAttribute(attribute: FeatureIdAttribute_2): this;
+    // (undocumented)
+    setFeatureCount(featureCount: number): this;
+    // (undocumented)
+    setLabel(label: string): this;
+    // (undocumented)
+    setNullFeatureId(nullFeatureId: number): this;
+    // (undocumented)
+    setPropertyTable(propertyTable: StructuralMetadataPropertyTable | null): this;
+    // (undocumented)
+    setTexture(texture: FeatureIdTexture | null): this;
+}
+
+// @internal
+export class MeshFeaturesUtils {
+    static createMeshFeaturesInfoString(document: Document): string;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IMeshPrimitiveStructuralMetadata" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class MeshPrimitiveStructuralMetadata extends ExtensionProperty<IMeshPrimitiveStructuralMetadata> {
+    // (undocumented)
+    addPropertyAttribute(propertyAttribute: StructuralMetadataPropertyAttribute): this;
+    // (undocumented)
+    addPropertyTexture(propertyTexture: StructuralMetadataPropertyTexture): this;
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME;
+    // (undocumented)
+    protected getDefaults(): Nullable<IMeshPrimitiveStructuralMetadata> & {
+        propertyTextures: never[];
+        propertyAttributes: never[];
+    };
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    listPropertyAttributes(): StructuralMetadataPropertyAttribute[];
+    // (undocumented)
+    listPropertyTextures(): StructuralMetadataPropertyTexture[];
+    // (undocumented)
+    parentTypes: [PropertyType.PRIMITIVE];
+    // (undocumented)
+    propertyType: "MeshPrimitiveStructuralMetadata";
+    // (undocumented)
+    removePropertyAttribute(propertyAttribute: StructuralMetadataPropertyAttribute): this;
+    // (undocumented)
+    removePropertyTexture(propertyTexture: StructuralMetadataPropertyTexture): this;
 }
 
 // @internal
@@ -507,6 +1418,14 @@ export class MetadataError extends Error {
 }
 
 // @internal
+export class MetadataSemanticOverrides {
+    static applyExplicitContentMetadataSemanticOverrides(content: Content, schema: Schema): void;
+    static applyExplicitTileMetadataSemanticOverrides(tile: Tile, schema: Schema): void;
+    static applyImplicitContentMetadataSemanticOverrides(content: Content, contentSetIndex: number, tileIndex: number, subtreeMetadataModel: SubtreeMetadataModel): void;
+    static applyImplicitTileMetadataSemanticOverrides(tile: Tile, tileIndex: number, subtreeMetadataModel: SubtreeMetadataModel): void;
+}
+
+// @internal
 export class MetadataTypes {
     static allTypes: string[];
     // (undocumented)
@@ -556,11 +1475,34 @@ export class MetadataValues {
 }
 
 // @internal
+export class MortonOrder {
+    static encode2D(x: number, y: number): number;
+    static encode3D(x: number, y: number, z: number): number;
+}
+
+// @internal
+export class NumberTypeDescriptions {
+    static computeComponentType(value: number | bigint | number[] | bigint[] | number[][] | bigint[][]): string;
+}
+
+// @internal
+export class NumericArrayPropertyModel implements PropertyModel {
+    constructor(type: string, valuesBuffer: Buffer, componentType: string, arrayOffsetsBuffer: Buffer | undefined, arrayOffsetType: string, count: number | undefined);
+    getPropertyValue(index: number): (number | bigint | (number | bigint)[])[];
+}
+
+// @internal
 export class NumericBuffers {
     static getBooleanFromBuffer(buffer: Buffer, index: number): boolean;
     static getNumericArrayFromBuffer(buffer: Buffer, index: number, arrayLength: number, componentType: string): (number | bigint)[];
     static getNumericBufferAsArray(buffer: Buffer, componentType: string): any;
     static getNumericFromBuffer(buffer: Buffer, index: number, componentType: string): number | bigint;
+}
+
+// @internal
+export class NumericPropertyModel implements PropertyModel {
+    constructor(type: string, valuesBuffer: Buffer, componentType: string);
+    getPropertyValue(index: number): number | bigint | (number | bigint)[];
 }
 
 // @internal
@@ -602,6 +1544,35 @@ export class Paths {
 }
 
 // @internal
+export interface PntsFeatureTable extends FeatureTable {
+    BATCH_ID?: FeatureTableBinaryBodyReference;
+    BATCH_LENGTH?: number;
+    CONSTANT_RGBA?: BinaryBodyOffset | number[];
+    NORMAL?: FeatureTableBinaryBodyReference;
+    NORMAL_OCT16P?: FeatureTableBinaryBodyReference;
+    POINTS_LENGTH: number;
+    POSITION?: FeatureTableBinaryBodyReference;
+    POSITION_QUANTIZED?: FeatureTableBinaryBodyReference;
+    QUANTIZED_VOLUME_OFFSET?: BinaryBodyOffset | number[];
+    QUANTIZED_VOLUME_SCALE?: BinaryBodyOffset | number[];
+    RGB?: FeatureTableBinaryBodyReference;
+    RGB565?: FeatureTableBinaryBodyReference;
+    RGBA?: FeatureTableBinaryBodyReference;
+    RTC_CENTER?: BinaryBodyOffset | number[];
+}
+
+// @internal
+export class PntsPointClouds {
+    static create(featureTable: PntsFeatureTable, featureTableBinary: Buffer, batchTable: BatchTable): Promise<ReadablePointCloud>;
+    static hasOctEncodedNormals(featureTable: PntsFeatureTable): boolean;
+    static hasQuantizedPositions(featureTable: PntsFeatureTable): boolean;
+    static mayRequireAlpha(featureTable: PntsFeatureTable): boolean;
+}
+
+// @internal (undocumented)
+export type Point3D = [number, number, number];
+
+// @internal
 export interface Properties extends RootProperty {
     maximum: number;
     minimum: number;
@@ -610,6 +1581,13 @@ export interface Properties extends RootProperty {
 // @internal
 export interface PropertyModel {
     getPropertyValue(index: number): any;
+}
+
+// @internal
+export class PropertyModels {
+    static createIterable(propertyModel: PropertyModel, numElements: number): Iterable<any>;
+    static createNumericArrayIterable(propertyModel: PropertyModel, numElements: number): Iterable<number[]>;
+    static createNumericScalarIterable(propertyModel: PropertyModel, numElements: number): Iterable<number>;
 }
 
 // @internal
@@ -633,6 +1611,11 @@ export interface PropertyTableModel {
 }
 
 // @internal
+export class PropertyTableModels {
+    static createString(propertyTableModel: PropertyTableModel, maxRows?: number): string;
+}
+
+// @internal
 export interface PropertyTableProperty extends RootProperty {
     arrayOffsets?: number;
     arrayOffsetType?: string;
@@ -644,6 +1627,9 @@ export interface PropertyTableProperty extends RootProperty {
     stringOffsetType?: string;
     values: number;
 }
+
+// @internal
+export type PropertyTablePropertyOffsetType = "UINT8" | "UINT16" | "UINT32" | "UINT64";
 
 // @internal
 export class QuadtreeCoordinates implements TreeCoordinates {
@@ -668,6 +1654,27 @@ export class Quadtrees {
     static computeNumberOfNodesForLevels(levels: number): number;
     static coordinatesForLevel(level: number): Generator<QuadtreeCoordinates, void, unknown>;
     static isValid(c: QuadtreeCoordinates): boolean;
+}
+
+// @internal
+export type QuantizationInfo = {
+    quantizationBits: number;
+    minValues?: number[];
+    range?: number;
+    octEncoded: boolean;
+};
+
+// @internal
+export interface ReadablePointCloud {
+    getAttributeComponentType(name: string): string | undefined;
+    getAttributes(): string[];
+    getAttributeType(name: string): string | undefined;
+    getAttributeValues(name: string): Iterable<number> | undefined;
+    getGlobalPosition(): [number, number, number] | undefined;
+    getNormalizedLinearColors(): Iterable<number[]> | undefined;
+    getNormalizedLinearGlobalColor(): [number, number, number, number] | undefined;
+    getNormals(): Iterable<number[]> | undefined;
+    getPositions(): Iterable<number[]>;
 }
 
 // @internal
@@ -740,6 +1747,596 @@ export interface StatisticsClassProperty extends RootProperty {
 }
 
 // @internal
+export class StringArrayPropertyModel implements PropertyModel {
+    constructor(valuesBuffer: Buffer, arrayOffsetsBuffer: Buffer | undefined, arrayOffsetType: string, stringOffsetsBuffer: Buffer, stringOffsetType: string, count: number | undefined);
+    getPropertyValue(index: number): string[];
+}
+
+// @internal
+export class StringBuilder {
+    constructor();
+    // (undocumented)
+    addLine(...args: any[]): void;
+    // (undocumented)
+    decreaseIndent(): void;
+    // (undocumented)
+    increaseIndent(): void;
+    // (undocumented)
+    toString(): string;
+}
+
+// @internal
+export class StringPropertyModel implements PropertyModel {
+    constructor(valuesBuffer: Buffer, stringOffsetsBuffer: Buffer, stringOffsetType: string);
+    getPropertyValue(index: number): string;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IStructuralMetadata" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class StructuralMetadata extends ExtensionProperty<IStructuralMetadata> {
+    // (undocumented)
+    addPropertyAttribute(propertyAttribute: StructuralMetadataPropertyAttribute): this;
+    // (undocumented)
+    addPropertyTable(propertyTable: StructuralMetadataPropertyTable): this;
+    // (undocumented)
+    addPropertyTexture(propertyTexture: StructuralMetadataPropertyTexture): this;
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME;
+    // (undocumented)
+    protected getDefaults(): Nullable<IStructuralMetadata> & {
+        propertyTables: never[];
+        propertyTextures: never[];
+        propertyAttributes: never[];
+    };
+    // (undocumented)
+    getSchema(): StructuralMetadataSchema | null;
+    // (undocumented)
+    getSchemaUri(): string;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    listPropertyAttributes(): StructuralMetadataPropertyAttribute[];
+    // (undocumented)
+    listPropertyTables(): StructuralMetadataPropertyTable[];
+    // (undocumented)
+    listPropertyTextures(): StructuralMetadataPropertyTexture[];
+    // (undocumented)
+    parentTypes: [PropertyType.ROOT];
+    // (undocumented)
+    propertyType: "StructuralMetadata";
+    // (undocumented)
+    removePropertyAttribute(propertyAttribute: StructuralMetadataPropertyAttribute): this;
+    // (undocumented)
+    removePropertyTable(propertyTable: StructuralMetadataPropertyTable): this;
+    // (undocumented)
+    removePropertyTexture(propertyTexture: StructuralMetadataPropertyTexture): this;
+    // (undocumented)
+    setSchema(schema: StructuralMetadataSchema | null): this;
+    // (undocumented)
+    setSchemaUri(name: string): this;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IClass" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class StructuralMetadataClass extends ExtensionProperty<IClass> {
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME;
+    // (undocumented)
+    protected getDefaults(): Nullable<IClass> & {
+        properties: {};
+    };
+    // (undocumented)
+    getDescription(): string;
+    // (undocumented)
+    getObjectName(): string;
+    // (undocumented)
+    getProperty(key: string): StructuralMetadataClassProperty | null;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    listPropertyKeys(): string[];
+    // (undocumented)
+    listPropertyValues(): StructuralMetadataClassProperty[];
+    // (undocumented)
+    parentTypes: ["Schema"];
+    // (undocumented)
+    propertyType: "Class";
+    // (undocumented)
+    setDescription(description: string): this;
+    // (undocumented)
+    setObjectName(name: string): this;
+    // (undocumented)
+    setProperty(key: string, value: StructuralMetadataClassProperty | null): this;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IClassProperty" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class StructuralMetadataClassProperty extends ExtensionProperty<IClassProperty> {
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME;
+    // (undocumented)
+    getArray(): boolean;
+    // (undocumented)
+    getComponentType(): ClassPropertyComponentType;
+    // (undocumented)
+    getCount(): number;
+    // (undocumented)
+    getDefault(): any;
+    // (undocumented)
+    protected getDefaults(): Nullable<IClassProperty> & {
+        array: boolean;
+        normalized: boolean;
+        required: boolean;
+    };
+    // (undocumented)
+    getDescription(): string;
+    // (undocumented)
+    getEnumType(): string;
+    // (undocumented)
+    getMax(): any;
+    // (undocumented)
+    getMin(): any;
+    // (undocumented)
+    getNoData(): any;
+    // (undocumented)
+    getNormalized(): boolean;
+    // (undocumented)
+    getObjectName(): string;
+    // (undocumented)
+    getOffset(): any;
+    // (undocumented)
+    getRequired(): boolean;
+    // (undocumented)
+    getScale(): any;
+    // (undocumented)
+    getType(): ClassPropertyType;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    parentTypes: ["Class"];
+    // (undocumented)
+    propertyType: "ClassProperty";
+    // (undocumented)
+    setArray(array: boolean): this;
+    // (undocumented)
+    setComponentType(componentType: ClassPropertyComponentType): this;
+    // (undocumented)
+    setCount(count: number): this;
+    // (undocumented)
+    setDefault(defaultValue: any): this;
+    // (undocumented)
+    setDescription(description: string): this;
+    // (undocumented)
+    setEnumType(enumType: string): this;
+    // (undocumented)
+    setMax(max: any): this;
+    // (undocumented)
+    setMin(min: any): this;
+    // (undocumented)
+    setNoData(noData: any): this;
+    // (undocumented)
+    setNormalized(normalized: boolean): this;
+    // (undocumented)
+    setObjectName(name: string): this;
+    // (undocumented)
+    setOffset(offset: any): this;
+    // (undocumented)
+    setRequired(required: boolean): this;
+    // (undocumented)
+    setScale(scale: any): this;
+    // (undocumented)
+    setType(type: ClassPropertyType): this;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IEnum" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class StructuralMetadataEnum extends ExtensionProperty<IEnum> {
+    // (undocumented)
+    addEnumValue(enumValue: StructuralMetadataEnumValue): this;
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME;
+    // (undocumented)
+    protected getDefaults(): Nullable<IEnum> & {
+        valueType: string;
+        values: never[];
+    };
+    // (undocumented)
+    getDescription(): string;
+    // (undocumented)
+    getObjectName(): string;
+    // (undocumented)
+    getValueType(): EnumValueType;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    listValues(): StructuralMetadataEnumValue[];
+    // (undocumented)
+    parentTypes: ["Schema"];
+    // (undocumented)
+    propertyType: "Enum";
+    // (undocumented)
+    removeEnumValue(enumValue: StructuralMetadataEnumValue): this;
+    // (undocumented)
+    setDescription(description: string): this;
+    // (undocumented)
+    setObjectName(name: string): this;
+    // (undocumented)
+    setValueType(valueType: EnumValueType): this;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IEnumValue" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class StructuralMetadataEnumValue extends ExtensionProperty<IEnumValue> {
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME;
+    // (undocumented)
+    protected getDefaults(): Nullable<IEnumValue>;
+    // (undocumented)
+    getDescription(): string;
+    // (undocumented)
+    getObjectName(): string;
+    // (undocumented)
+    getValue(): number;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    parentTypes: ["Enum"];
+    // (undocumented)
+    propertyType: "EnumValue";
+    // (undocumented)
+    setDescription(description: string): this;
+    // (undocumented)
+    setObjectName(name: string): this;
+    // (undocumented)
+    setValue(value: number): this;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IPropertyAttribute" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class StructuralMetadataPropertyAttribute extends ExtensionProperty<IPropertyAttribute> {
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME;
+    // (undocumented)
+    getClass(): string;
+    // (undocumented)
+    protected getDefaults(): Nullable<IPropertyAttribute> & {
+        properties: {};
+    };
+    // (undocumented)
+    getObjectName(): string;
+    // (undocumented)
+    getProperty(key: string): StructuralMetadataPropertyAttributeProperty | null;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    listPropertyKeys(): string[];
+    // (undocumented)
+    listPropertyValues(): StructuralMetadataPropertyAttributeProperty[];
+    // (undocumented)
+    parentTypes: ["StructuralMetadata"];
+    // (undocumented)
+    propertyType: "PropertyAttribute";
+    // (undocumented)
+    setClass(_class: string): this;
+    // (undocumented)
+    setObjectName(name: string): this;
+    // (undocumented)
+    setProperty(key: string, value: StructuralMetadataPropertyAttributeProperty | null): this;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IPropertyAttributeProperty" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class StructuralMetadataPropertyAttributeProperty extends ExtensionProperty<IPropertyAttributeProperty> {
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME;
+    // (undocumented)
+    getAttribute(): string;
+    // (undocumented)
+    protected getDefaults(): Nullable<IPropertyAttributeProperty>;
+    // (undocumented)
+    getMax(): any;
+    // (undocumented)
+    getMin(): any;
+    // (undocumented)
+    getOffset(): any;
+    // (undocumented)
+    getScale(): any;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    parentTypes: ["PropertyAttribute"];
+    // (undocumented)
+    propertyType: "PropertyAttributeProperty";
+    // (undocumented)
+    setAttribute(attribute: string): this;
+    // (undocumented)
+    setMax(max: any): this;
+    // (undocumented)
+    setMin(min: any): this;
+    // (undocumented)
+    setOffset(offset: any): this;
+    // (undocumented)
+    setScale(scale: any): this;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IPropertyTable" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class StructuralMetadataPropertyTable extends ExtensionProperty<IPropertyTable> {
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME;
+    // (undocumented)
+    getClass(): string;
+    // (undocumented)
+    getCount(): number;
+    // (undocumented)
+    protected getDefaults(): Nullable<IPropertyTable> & {
+        properties: {};
+    };
+    // (undocumented)
+    getObjectName(): string;
+    // (undocumented)
+    getProperty(key: string): StructuralMetadataPropertyTableProperty | null;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    listPropertyKeys(): string[];
+    // (undocumented)
+    listPropertyValues(): StructuralMetadataPropertyTableProperty[];
+    // (undocumented)
+    parentTypes: ["StructuralMetadata"];
+    // (undocumented)
+    propertyType: "PropertyTable";
+    // (undocumented)
+    setClass(className: string): this;
+    // (undocumented)
+    setCount(count: number): this;
+    // (undocumented)
+    setObjectName(name: string): this;
+    // (undocumented)
+    setProperty(key: string, value: StructuralMetadataPropertyTableProperty | null): this;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IPropertyTableProperty" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class StructuralMetadataPropertyTableProperty extends ExtensionProperty<IPropertyTableProperty> {
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME;
+    // (undocumented)
+    getArrayOffsets(): Uint8Array | null;
+    // (undocumented)
+    getArrayOffsetType(): PropertyTablePropertyOffsetType;
+    // (undocumented)
+    protected getDefaults(): Nullable<IPropertyTableProperty> & {
+        arrayOffsetType: string;
+        stringOffsetType: string;
+    };
+    // (undocumented)
+    getMax(): any;
+    // (undocumented)
+    getMin(): any;
+    // (undocumented)
+    getOffset(): any;
+    // (undocumented)
+    getScale(): any;
+    // (undocumented)
+    getStringOffsets(): Uint8Array | null;
+    // (undocumented)
+    getStringOffsetType(): PropertyTablePropertyOffsetType;
+    // (undocumented)
+    getValues(): Uint8Array;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    parentTypes: ["PropertyTable"];
+    // (undocumented)
+    propertyType: "PropertyTableProperty";
+    // (undocumented)
+    setArrayOffsets(arrayOffsets: Uint8Array): this;
+    // (undocumented)
+    setArrayOffsetType(arrayOffsetType: PropertyTablePropertyOffsetType): this;
+    // (undocumented)
+    setMax(max: any): this;
+    // (undocumented)
+    setMin(min: any): this;
+    // (undocumented)
+    setOffset(offset: any): this;
+    // (undocumented)
+    setScale(scale: any): this;
+    // (undocumented)
+    setStringOffsets(stringOffsets: Uint8Array): this;
+    // (undocumented)
+    setStringOffsetType(stringOffsetType: PropertyTablePropertyOffsetType): this;
+    // (undocumented)
+    setValues(values: Uint8Array): this;
+}
+
+// @internal
+export class StructuralMetadataPropertyTables {
+    static create(extStructuralMetadata: EXTStructuralMetadata, binaryPropertyTable: BinaryPropertyTable): StructuralMetadataPropertyTable;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IPropertyTexture" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class StructuralMetadataPropertyTexture extends ExtensionProperty<IPropertyTexture> {
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME;
+    // (undocumented)
+    getClass(): string;
+    // (undocumented)
+    protected getDefaults(): Nullable<IPropertyTexture> & {
+        properties: {};
+    };
+    // (undocumented)
+    getObjectName(): string;
+    // (undocumented)
+    getProperty(key: string): StructuralMetadataPropertyTextureProperty | null;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    listPropertyKeys(): string[];
+    // (undocumented)
+    listPropertyValues(): StructuralMetadataPropertyTextureProperty[];
+    // (undocumented)
+    parentTypes: ["StructuralMetadata"];
+    // (undocumented)
+    propertyType: "PropertyTexture";
+    // (undocumented)
+    setClass(_class: string): this;
+    // (undocumented)
+    setObjectName(name: string): this;
+    // (undocumented)
+    setProperty(key: string, value: StructuralMetadataPropertyTextureProperty | null): this;
+}
+
+// Warning: (ae-forgotten-export) The symbol "IPropertyTextureProperty" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class StructuralMetadataPropertyTextureProperty extends ExtensionProperty<IPropertyTextureProperty> {
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME;
+    // (undocumented)
+    getChannels(): number[];
+    // (undocumented)
+    protected getDefaults(): Nullable<IPropertyTextureProperty> & {
+        channels: number[];
+        texture: null;
+        textureInfo: TextureInfo;
+    };
+    // (undocumented)
+    getMax(): any;
+    // (undocumented)
+    getMin(): any;
+    // (undocumented)
+    getOffset(): any;
+    // (undocumented)
+    getScale(): any;
+    // (undocumented)
+    getTexture(): Texture | null;
+    // (undocumented)
+    getTextureInfo(): TextureInfo | null;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    parentTypes: ["PropertyTexture"];
+    // (undocumented)
+    propertyType: "PropertyTextureProperty";
+    // (undocumented)
+    setChannels(channels: number[]): this;
+    // (undocumented)
+    setMax(max: any): this;
+    // (undocumented)
+    setMin(min: any): this;
+    // (undocumented)
+    setOffset(offset: any): this;
+    // (undocumented)
+    setScale(scale: any): this;
+    // (undocumented)
+    setTexture(texture: Texture | null): this;
+}
+
+// Warning: (ae-forgotten-export) The symbol "ISchema" needs to be exported by the entry point index.d.ts
+//
+// @internal
+export class StructuralMetadataSchema extends ExtensionProperty<ISchema> {
+    // (undocumented)
+    static EXTENSION_NAME: string;
+    // (undocumented)
+    extensionName: typeof NAME;
+    // (undocumented)
+    getClass(key: string): StructuralMetadataClass | null;
+    // (undocumented)
+    protected getDefaults(): Nullable<ISchema> & {
+        classes: {};
+        enums: {};
+    };
+    // (undocumented)
+    getDescription(): string;
+    // (undocumented)
+    getEnum(key: string): StructuralMetadataEnum | null;
+    // (undocumented)
+    getId(): string;
+    // (undocumented)
+    getObjectName(): string;
+    // (undocumented)
+    getVersion(): string;
+    // (undocumented)
+    protected init(): void;
+    // (undocumented)
+    listClassKeys(): string[];
+    // (undocumented)
+    listClassValues(): StructuralMetadataClass[];
+    // (undocumented)
+    listEnumKeys(): string[];
+    // (undocumented)
+    listEnumValues(): StructuralMetadataEnum[];
+    // (undocumented)
+    parentTypes: ["StructuralMetadata"];
+    // (undocumented)
+    propertyType: "Schema";
+    // (undocumented)
+    setClass(key: string, value: StructuralMetadataClass | null): this;
+    // (undocumented)
+    setDescription(description: string): this;
+    // (undocumented)
+    setEnum(key: string, value: StructuralMetadataEnum | null): this;
+    // (undocumented)
+    setId(name: string): this;
+    // (undocumented)
+    setObjectName(name: string): this;
+    // (undocumented)
+    setVersion(version: string): this;
+}
+
+// @internal
+export class StructuralMetadataUtils {
+    static createStructuralMetadataInfoString(document: Document): string;
+}
+
+// @internal
+export interface Style extends RootProperty {
+    color?: string | string[];
+    defines?: {
+        [key: string]: string;
+    };
+    meta?: {
+        [key: string]: string;
+    };
+    show?: string | string[];
+}
+
+// @internal
 export interface Subtree extends RootProperty {
     buffers?: BufferObject[];
     bufferViews?: BufferView[];
@@ -797,6 +2394,39 @@ export interface Subtrees extends RootProperty {
 }
 
 // @internal
+export interface Table {
+    binary: Buffer;
+    json: any;
+}
+
+// @internal
+export class TableMetadataEntityModel implements MetadataEntityModel {
+    constructor(propertyTableModel: PropertyTableModel, entityIndex: number, semanticToPropertyId: {
+        [key: string]: string;
+    }, enumValueValueNames: {
+        [key: string]: {
+            [key: number]: string;
+        };
+    });
+    getPropertyValue(propertyId: string): any;
+    getPropertyValueBySemantic(semantic: string): any;
+}
+
+// @internal
+export type TableStructure = {
+    name: string;
+    columns: {
+        name: string;
+        type: string;
+    }[];
+};
+
+// @internal
+export class TableStructureValidator {
+    static validate(db: Database, tableStructure: TableStructure): string | undefined;
+}
+
+// @internal
 export class TemplateUris {
     static substituteOctree(templateUri: string, coordinates: OctreeCoordinates): string;
     static substituteOctreeInternal(templateUri: string, level: number, x: number, y: number, z: number): string;
@@ -819,11 +2449,162 @@ export interface Tile extends RootProperty {
 }
 
 // @internal
+export class TileContentProcessing {
+    static process(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean, tileContentProcessor: TileContentProcessor): Promise<void>;
+}
+
+// @internal
+export type TileContentProcessor = (content: Buffer, type: string | undefined) => Promise<Buffer>;
+
+// @internal
+export class TileContentProcessors {
+    static concat(...tileContentProcessors: TileContentProcessor[]): TileContentProcessor;
+}
+
+// @internal
+export class TileContentProcessorsGltfpack {
+    static create(options: GltfPackOptions): TileContentProcessor;
+}
+
+// @internal
+export class TileContentProcessorsGltfPipeline {
+    static create(options: any): TileContentProcessor;
+}
+
+// @internal
+export class TileContentProcessorsGltfTransform {
+    static create(...transforms: Transform[]): TileContentProcessor;
+}
+
+// @internal
+export class TileContentProcessorsTextures {
+    static encodeToKtx(etc1sOptions: KtxEtc1sOptions, uastcOptions: KtxUastcOptions): TileContentProcessor;
+}
+
+// @internal
+export interface TileData {
+    batchTable: Table;
+    featureTable: Table;
+    header: Header;
+    payload: Buffer;
+}
+
+// @internal
+export interface TileDataBlockLayout {
+    // (undocumented)
+    end: number;
+    // (undocumented)
+    length: number;
+    // (undocumented)
+    start: number;
+}
+
+// @internal
+export interface TileDataLayout {
+    // (undocumented)
+    batchTableBinary: TileDataBlockLayout;
+    // (undocumented)
+    batchTableJson: TileDataBlockLayout;
+    // (undocumented)
+    byteLength: number;
+    // (undocumented)
+    featureTableBinary: TileDataBlockLayout;
+    // (undocumented)
+    featureTableJson: TileDataBlockLayout;
+    // (undocumented)
+    headerLength: number;
+    // (undocumented)
+    legacyBatchLength: number | undefined;
+    // (undocumented)
+    magic: string;
+    // (undocumented)
+    payload: TileDataBlockLayout;
+}
+
+// @internal
+export class TileDataLayouts {
+    // (undocumented)
+    static create(buffer: Buffer): TileDataLayout;
+}
+
+// @internal
+export class TileFormatError extends Error {
+    constructor(message: string);
+    // (undocumented)
+    toString: () => string;
+}
+
+// @internal
+export class TileFormats {
+    static createB3dmTileDataFromGlb(glbData: Buffer, featureTableJson: B3dmFeatureTable | undefined, featureTableBinary: Buffer | undefined, batchTableJson: BatchTable | undefined, batchTableBinary: Buffer | undefined): TileData;
+    static createCompositeTileData(tileDatas: TileData[]): CompositeTileData;
+    static createCompositeTileDataBuffer(compositeTileData: CompositeTileData): Buffer;
+    static createDefaultB3dmTileDataFromGlb(glbData: Buffer): TileData;
+    static createDefaultI3dmTileDataFromGlb(glbData: Buffer): TileData;
+    static createI3dmTileDataFromGlb(glbData: Buffer, featureTableJson: I3dmFeatureTable | undefined, featureTableBinary: Buffer | undefined, batchTableJson: BatchTable | undefined, batchTableBinary: Buffer | undefined): TileData;
+    static createTileDataBuffer(tileData: TileData): Buffer;
+    static extractGlbBuffers(tileDataBuffer: Buffer): Buffer[];
+    static extractTileData(buffer: Buffer, tileDataLayout: TileDataLayout): {
+        header: {
+            magic: string;
+            version: number;
+            gltfFormat: number | undefined;
+        };
+        featureTable: {
+            json: any;
+            binary: Buffer;
+        };
+        batchTable: {
+            json: any;
+            binary: Buffer;
+        };
+        payload: Buffer;
+    };
+    static isComposite(buffer: Buffer): boolean;
+    static readCompositeTileData(buffer: Buffer): CompositeTileData;
+    static readTileData(buffer: Buffer): TileData;
+}
+
+// @internal
+export class TileFormatsMigration {
+    static applyRtcCenter(document: Document, rtcCenter: number[]): void;
+    static convertB3dmToGlb(b3dmBuffer: Buffer): Promise<Buffer>;
+    static convertI3dmToGlb(i3dmBuffer: Buffer, externalGlbResolver: (uri: string) => Promise<Buffer | undefined>): Promise<Buffer>;
+    static convertPntsToGlb(pntsBuffer: Buffer): Promise<Buffer>;
+    // (undocumented)
+    static readonly DEBUG_LOG_FILE_CONTENT = false;
+    static makeSingleRoot(document: Document): void;
+}
+
+// @internal
+export class TileFormatsMigrationB3dm {
+    static convertB3dmToGlb(b3dmBuffer: Buffer): Promise<Buffer>;
+}
+
+// @internal
+export class TileFormatsMigrationI3dm {
+    static convertI3dmToGlb(i3dmBuffer: Buffer, externalGlbResolver: (uri: string) => Promise<Buffer | undefined>): Promise<Buffer>;
+}
+
+// @internal
+export class TileFormatsMigrationPnts {
+    static convertPntsToGlb(pntsBuffer: Buffer): Promise<Buffer>;
+}
+
+// @internal
 export interface TileImplicitTiling extends RootProperty {
     availableLevels: number;
     subdivisionScheme: string;
     subtreeLevels: number;
     subtrees: Subtrees;
+}
+
+// @internal
+export class Tiles {
+    static getContents(tile: Tile): Content[];
+    static getContentUris(tile: Tile): string[];
+    static setContents(tile: Tile, contents: Content[]): void;
+    static traverseExplicit(tile: Tile, callback: TileTraversalCallback): Promise<void>;
 }
 
 // @internal
@@ -844,16 +2625,119 @@ export interface Tileset extends RootProperty {
 }
 
 // @internal
+export class TilesetCombiner {
+    constructor(externalTilesetDetector: (contentData: ContentData) => Promise<boolean>);
+    combine(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<void>;
+}
+
+// @internal
+export class TilesetConverter {
+    static convert(input: string, inputTilesetJsonFileName: string | undefined, output: string, force: boolean): Promise<void>;
+}
+
+// @internal
+export class TilesetDataProcessor extends TilesetProcessor {
+    processAllEntries(entryProcessor: TilesetEntryProcessor): Promise<void>;
+}
+
+// @internal
 export interface TilesetEntry {
     key: string;
     value: Buffer;
 }
 
 // @internal
+export type TilesetEntryProcessor = (sourceEntry: TilesetEntry, type: string | undefined) => Promise<TilesetEntry | undefined>;
+
+// @internal
 export class TilesetError extends Error {
     constructor(message: string);
     // (undocumented)
     toString: () => string;
+}
+
+// @internal
+export class TilesetInMemory implements TilesetSource, TilesetTarget {
+    constructor();
+    addEntry(key: string, content: Buffer): void;
+    begin(fullOutputName: string, overwrite: boolean): void;
+    close(): void;
+    end(): Promise<void>;
+    getKeys(): string[];
+    getValue(key: string): Buffer | undefined;
+    open(fullInputName: string): void;
+}
+
+// @internal
+export class TilesetJsonCreator {
+    static createTilesetFromContents(baseDir: string, contentUris: string[]): Promise<Tileset>;
+}
+
+// @internal
+export class TilesetMerger {
+    constructor();
+    merge(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
+}
+
+// @internal
+export class TilesetObjectUpgrader {
+    constructor(upgradeOptions: TilesetUpgradeOptions);
+    upgradeTilesetObject(tileset: Tileset): Promise<void>;
+}
+
+// @internal
+export class TilesetProcessing {
+    static getSourceValue(tilesetSource: TilesetSource, key: string): Buffer;
+    static parseSourceValue<T>(tilesetSource: TilesetSource, key: string): T;
+    static resolveSchema(tilesetSource: TilesetSource, tileset: Tileset): Schema | undefined;
+}
+
+// @internal
+export abstract class TilesetProcessor {
+    begin(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    end(): Promise<void>;
+    fetchSourceEntry(key: string): Promise<TilesetEntry | undefined>;
+    protected getContext(): TilesetProcessorContext;
+    protected getTargetKey(sourceKey: string): string | undefined;
+    isProcessed(key: string): boolean;
+    markAsProcessed(key: string): void;
+    protected processAllEntriesInternal(entryProcessor: TilesetEntryProcessor): Promise<void>;
+    processEntry(sourceKey: string, entryProcessor: TilesetEntryProcessor): Promise<void>;
+    protected putTargetKey(sourceKey: string, targetKey: string): void;
+    storeTargetEntries(...targetEntries: TilesetEntry[]): void;
+}
+
+// @internal
+export interface TilesetProcessorContext {
+    processedKeys: {
+        [key: string]: boolean;
+    };
+    schema: Schema | undefined;
+    sourceTileset: Tileset;
+    targetKeys: {
+        [key: string]: string;
+    };
+    targetTileset: Tileset;
+    tilesetSource: TilesetSource;
+    tilesetSourceJsonFileName: string;
+    tilesetTarget: TilesetTarget;
+    tilesetTargetJsonFileName: string;
+}
+
+// @internal
+export class TilesetProcessorContexts {
+    static close(context: TilesetProcessorContext): Promise<void>;
+    static create(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<TilesetProcessorContext>;
+}
+
+// @internal
+export class Tilesets {
+    static areEqualPackages(tilesetPackageName0: string, tilesetPackageName1: string): boolean;
+    static combine(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    static determineTilesetJsonFileName(tilesetDataName: string): string;
+    static merge(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    static upgrade(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean, targetVersion: string, gltfUpgradeOptions: any): Promise<void>;
+    static upgradeTileset(tileset: Tileset, targetVersion: string): Promise<void>;
 }
 
 // @internal
@@ -955,6 +2839,93 @@ export class TilesetTraverser {
 }
 
 // @internal
+export class TilesetTraversers {
+    static createExternalTilesetRoots(baseUri: string, traversedTile: TraversedTile): Promise<TraversedTile[]>;
+    static resolveSchema(tileset: Tileset, resourceResolver: ResourceResolver): Promise<Schema | undefined>;
+}
+
+// @internal
+export type TilesetUpgradeOptions = {
+    upgradeExternalTilesets: boolean;
+    upgradedAssetVersionNumber: string;
+    upgradeRefineCase: boolean;
+    upgradeContentUrlToUri: boolean;
+    upgradeEmptyChildrenToUndefined: true;
+    upgradeContentGltfExtensionDeclarations: boolean;
+    upgradeB3dmGltf1ToGltf2: boolean;
+    upgradeI3dmGltf1ToGltf2: boolean;
+    upgradePntsToGlb: boolean;
+    upgradeB3dmToGlb: boolean;
+    upgradeI3dmToGlb: boolean;
+};
+
+// @internal
+export class TilesetUpgrader {
+    constructor(targetVersion: string, gltfUpgradeOptions: any);
+    upgrade(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    upgradeTileset(tileset: Tileset): Promise<void>;
+}
+
+// @internal
+export class TileTableData {
+    static convertLegacyComponentTypeToComponentType(legacyComponentType: string): "UINT16" | "INT8" | "UINT8" | "INT16" | "INT32" | "UINT32" | "FLOAT32" | "FLOAT64";
+    static convertLegacyTypeToType(legacyType: string): "SCALAR" | "VEC2" | "VEC3" | "VEC4";
+    static createBatchIdsFromBinary(binary: Buffer, byteOffset: number, legacyComponentType: string, numPoints: number): Iterable<number>;
+    static createNumericArrayIterable(legacyType: string, legacyComponentType: string, binary: Buffer, byteOffset: number, numElements: number): Iterable<number[]>;
+    static createNumericPropertyModel(legacyType: string, legacyComponentType: string, binary: Buffer, byteOffset: number): PropertyModel;
+    static createNumericScalarIterable(legacyType: string, legacyComponentType: string, binary: Buffer, byteOffset: number, numElements: number): Iterable<number>;
+    static createPositions(featureTable: PntsFeatureTable | I3dmFeatureTable, binary: Buffer, numPositions: number): Iterable<number[]>;
+    static createPositionsFromBinary(binary: Buffer, byteOffset: number, numPositions: number): Iterable<number[]>;
+    static isBatchTableBinaryBodyReference(p: any): p is BatchTableBinaryBodyReference;
+    static obtainBatchIdComponentType(featureTable: PntsFeatureTable | I3dmFeatureTable): string | undefined;
+    static obtainGlobalPosition(featureTable: PntsFeatureTable | I3dmFeatureTable, featureTableBinary: Buffer): [number, number, number] | undefined;
+    static obtainNumberArray(binary: Buffer, property: number[] | BinaryBodyOffset, length: number, componentType: string): number[];
+    static obtainQuantizationOffsetScale(featureTable: PntsFeatureTable | I3dmFeatureTable, featureTableBinary: Buffer): {
+        offset: number[];
+        scale: number[];
+    } | undefined;
+    static obtainRtcCenter(rtcCenter: BinaryBodyOffset | number[], binary: Buffer): [number, number, number];
+}
+
+// @internal
+export class TileTableDataI3dm {
+    static createBatchIds(featureTable: I3dmFeatureTable, binary: Buffer): Iterable<number> | undefined;
+    static createInstanceMatrices(featureTable: I3dmFeatureTable, featureTableBinary: Buffer, numInstances: number): number[][];
+    static createMatrices(translations3D: Iterable<number[]>, rotationQuaternions: Iterable<number[]> | undefined, scales3D: Iterable<number[]> | undefined, numInstances: number): number[][];
+    static createNormalsUp(featureTable: I3dmFeatureTable, binary: Buffer, numElements: number): Iterable<number[]> | undefined;
+    static createRotationQuaternions(featureTable: I3dmFeatureTable, featureTableBinary: Buffer, numInstances: number): Iterable<number[]> | undefined;
+    static createScales3D(featureTable: I3dmFeatureTable, featureTableBinary: Buffer, numInstances: number): Iterable<number[]> | undefined;
+    static createWorldPositions(featureTable: I3dmFeatureTable, featureTableBinary: Buffer, numInstances: number): Iterable<number[]>;
+}
+
+// @internal
+export class TileTableDataPnts {
+    static createBatchIds(featureTable: PntsFeatureTable, binary: Buffer): Iterable<number> | undefined;
+    static createColorsStandardRGBAFromBinary(binary: Buffer, byteOffset: number, numElements: number): Iterable<number[]>;
+    static createColorsStandardRGBFromBinary(binary: Buffer, byteOffset: number, numElements: number): Iterable<number[]>;
+    static createGlobalNormalizedLinearColor(featureTable: PntsFeatureTable, binary: Buffer): [number, number, number, number] | undefined;
+    static createNormalizedLinearColors(featureTable: PntsFeatureTable, binary: Buffer, numElements: number): Iterable<number[]> | undefined;
+    static createNormals(featureTable: PntsFeatureTable, binary: Buffer, numElements: number): Iterable<number[]> | undefined;
+    static createNormalsFromBinary(binary: Buffer, byteOffset: number, numElements: number): Iterable<number[]>;
+}
+
+// @internal
+export class TileTableDataToMeshFeatures {
+    static convertBatchIdToMeshFeatures(document: Document, primitive: Primitive): MeshFeaturesFeatureId;
+}
+
+// @internal
+export class TileTableDataToStructuralMetadata {
+    static assignPerPointProperties(document: Document, primitive: Primitive, batchTable: BatchTable, batchTableBinary: Buffer, externalProperties: {
+        [key: string]: PropertyModel;
+    }, numRows: number): void;
+    static convertBatchTableToPropertyTable(document: Document, batchTable: BatchTable, batchTableBinary: Buffer, numRows: number): StructuralMetadataPropertyTable | undefined;
+}
+
+// @internal
+export type TileTraversalCallback = (tilePath: Tile[]) => Promise<boolean>;
+
+// @internal
 export interface TraversalCallback {
     (traversedTile: TraversedTile): Promise<boolean>;
 }
@@ -992,6 +2963,14 @@ export interface TreeCoordinates {
 }
 
 // @internal
+export class TypeDetection {
+    static computeCommonArrayLegth(value: any[][]): number | undefined;
+    static computeCommonComponentType(array: number[] | bigint[] | number[][] | bigint[][]): string;
+    static computeCommonType(array: any[]): string | undefined;
+    static containsOnlyArrays(value: any[]): boolean;
+}
+
+// @internal
 export class UnzippingResourceResolver implements ResourceResolver {
     constructor(delegate: ResourceResolver);
     derive(uri: string): ResourceResolver;
@@ -1003,6 +2982,25 @@ export class UnzippingResourceResolver implements ResourceResolver {
 export class Uris {
     static isAbsoluteUri(uri: string): boolean;
     static isDataUri(uri: string): boolean;
+}
+
+// @internal
+export class VecMath {
+    static add(a: number[], b: number[], result?: number[]): number[];
+    static composeMatrixTRS(translation3D: number[], rotationQuaternion?: number[], scale3D?: number[]): number[];
+    static computeEastNorthUpMatrix4(positionPacked: number[]): number[];
+    static computeMean3D(points: Iterable<number[]>): number[];
+    static computeRotationQuaternions(upVectors: number[][], rightVectors: number[][]): number[][];
+    static createYupToZupPacked4(): number[];
+    static createZupToYupPacked4(): number[];
+    static decomposeMatrixTRS(matrix4Packed: number[]): {
+        t: number[];
+        r: number[];
+        s: number[];
+    };
+    static matrix4ToQuaternion(matrix4Packed: number[]): number[];
+    static multiplyAll4(matrices4Packed: number[][]): number[];
+    static subtract(a: number[], b: number[], result?: number[]): number[];
 }
 
 // @internal (undocumented)
@@ -1017,6 +3015,11 @@ export interface ZipLocalFileHeader {
     filename_size: number;
     // (undocumented)
     signature: number;
+}
+
+// @internal
+export class ZipToPackage {
+    static convert(inputFileName: string, inputTilesetJsonFileName: string, outputFileName: string, overwrite: boolean): Promise<void>;
 }
 
 // (No @packageDocumentation comment for this package)
