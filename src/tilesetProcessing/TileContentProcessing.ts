@@ -33,8 +33,7 @@ export class TileContentProcessing {
     overwrite: boolean,
     tileContentProcessor: TileContentProcessor
   ): Promise<void> {
-    const quiet = false;
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(
       tilesetSourceName,
       tilesetTargetName,
