@@ -139,6 +139,7 @@ export class KtxUtility {
     }
 
     const resultSize = basisEncoder.encode(basisData);
+    basisEncoder.delete();
     if (resultSize === 0) {
       throw new KtxError("Could not encode image data to KTX");
     }
