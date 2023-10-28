@@ -14,5 +14,5 @@ reviewed, and, if confirmed to be correct, be moved to the "golden" directory an
 
 A sandcastle for visually inspecting the outputs is added in `CreateTilesetJsonTestSandcastle.js`.
 When serving the output directory (i.e. the `./specs/data/createTilesetJson/output` directory) with a server,
-then this sandcastle allows selecing the different test cases.
+then this sandcastle allows selecting the different test cases.
 
