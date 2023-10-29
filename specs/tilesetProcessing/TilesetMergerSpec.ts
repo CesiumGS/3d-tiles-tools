@@ -15,7 +15,7 @@ const overwrite = true;
 
 describe("TilesetMerger", function () {
   afterEach(function () {
-    SpecHelpers.forceDeleteDirectory("./specs/data/output/mergeTilesets");
+    //SpecHelpers.forceDeleteDirectory("./specs/data/output/mergeTilesets");
   });
 
   it("merges tilesets into a single tileset", async function () {

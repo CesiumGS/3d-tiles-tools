@@ -10,7 +10,7 @@ const goldenDir = "./specs/data/createTilesetJson/golden/";
 
 describe("TilesetJsonCreator", function () {
   afterEach(function () {
-    SpecHelpers.forceDeleteDirectory(targetDir);
+    //SpecHelpers.forceDeleteDirectory(targetDir);
   });
 
   it("creates correct tileset JSON for batchedColors", async function () {
