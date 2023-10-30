@@ -39,6 +39,8 @@ export interface GltfTransformPointCloud {
 
 /**
  * Methods to create glTF representations of point clouds
+ *
+ * @internal
  */
 export class GltfTransformPointClouds {
   /**

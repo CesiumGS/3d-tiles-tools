@@ -72,8 +72,8 @@ export class PropertyTableModels {
    * representation of any value in the respective column)
    *
    * @param propertyTableModel - The `PropertyTableModel`
-   * @param propertyNames The property names
-   * @param rows The number of rows
+   * @param propertyNames - The property names
+   * @param rows - The number of rows
    * @returns The column widths
    */
   private static computeColumnWidths(

@@ -3,6 +3,11 @@ import { TransportTargetOptions } from "pino";
 import { Logger } from "pino";
 import { LoggerOptions } from "pino";
 
+/**
+ * Methods for creating and maintaining logger instances.
+ *
+ * @internal
+ */
 export class Loggers {
   /**
    * A mapping from names to logger instances

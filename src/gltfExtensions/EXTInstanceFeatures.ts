@@ -35,7 +35,9 @@ type FeatureIdAttributeDef = number;
  *
  * Properties:
  * - {@link InstanceFeatures}
- * - {@link FeatureId}
+ * - {@link InstanceFeaturesFeatureId}
+ *
+ * @internal
  */
 export class EXTInstanceFeatures extends Extension {
   public override readonly extensionName = NAME;

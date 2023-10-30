@@ -36,7 +36,7 @@ export class TilesetConverter {
    * contains a file that matches the required file for the output.
    *
    * @param input - The full input name
-   * @param inputTilesetJsonFileName The name of the tileset JSON file
+   * @param inputTilesetJsonFileName - The name of the tileset JSON file
    * in the input. When this is not given, then the name will either be
    * the file name of the input (if the input was a JSON file), or default
    * to 'tileset.json' (if the input was a directory or a tileset package)

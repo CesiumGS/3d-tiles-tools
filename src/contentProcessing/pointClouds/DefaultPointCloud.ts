@@ -75,8 +75,8 @@ export class DefaultPointCloud implements ReadablePointCloud {
    *
    * @param name - The name, e.g. `"POSITION"`
    * @param type - The type, e.g. `"VEC3"`
-   * @param componentType The component type, e.g. `"FLOAT32"`
-   * @param attribute The attribute values
+   * @param componentType - The component type, e.g. `"FLOAT32"`
+   * @param attribute - The attribute values
    */
   addAttribute(
     name: string,

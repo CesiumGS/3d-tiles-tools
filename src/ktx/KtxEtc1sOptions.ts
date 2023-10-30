@@ -1,5 +1,7 @@
 /**
  * A set of options for configuring KTX ETC1S compression in the `KtxUtility`
+ *
+ * @internal
  */
 export type KtxEtc1sOptions = Partial<{
   /**

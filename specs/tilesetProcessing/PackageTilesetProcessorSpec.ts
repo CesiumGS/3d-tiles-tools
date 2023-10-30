@@ -22,7 +22,6 @@ const implicitOutput = outputRoot + "implicitProcessing";
 const implicitOutput3tz = outputRoot + "implicitProcessing.3tz";
 const implicitOutput3dtiles = outputRoot + "implicitProcessing.3dtiles";
 
-const quiet = true;
 const overwrite = true;
 
 /**
@@ -35,7 +34,7 @@ describe("BasicTilesetProcessor on packages", function () {
   });
 
   it("writes basic from directories to 3TZ", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(basicInput, basicOutput3tz, overwrite);
     await tilesetProcessor.end();
 
@@ -47,7 +46,7 @@ describe("BasicTilesetProcessor on packages", function () {
   });
 
   it("writes basic from 3TZ to directories", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(basicInput3tz, basicOutput, overwrite);
     await tilesetProcessor.end();
 
@@ -59,7 +58,7 @@ describe("BasicTilesetProcessor on packages", function () {
   });
 
   it("writes basic from directories to 3DTILES", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(basicInput, basicOutput3dtiles, overwrite);
     await tilesetProcessor.end();
 
@@ -71,7 +70,7 @@ describe("BasicTilesetProcessor on packages", function () {
   });
 
   it("writes basic from 3DTILES to directories", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(basicInput3dtiles, basicOutput, overwrite);
     await tilesetProcessor.end();
 
@@ -83,7 +82,7 @@ describe("BasicTilesetProcessor on packages", function () {
   });
 
   it("writes implicit from directories to 3TZ", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(implicitInput, implicitOutput3tz, overwrite);
     await tilesetProcessor.end();
 
@@ -95,7 +94,7 @@ describe("BasicTilesetProcessor on packages", function () {
   });
 
   it("writes implicit from 3TZ to directories", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(implicitInput3tz, implicitOutput, overwrite);
     await tilesetProcessor.end();
 
@@ -107,7 +106,7 @@ describe("BasicTilesetProcessor on packages", function () {
   });
 
   it("writes implicit from directories to 3DTILES", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(
       implicitInput,
       implicitOutput3dtiles,
@@ -123,7 +122,7 @@ describe("BasicTilesetProcessor on packages", function () {
   });
 
   it("writes implicit from 3DTILES to directories", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(
       implicitInput3dtiles,
       implicitOutput,

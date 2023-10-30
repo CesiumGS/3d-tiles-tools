@@ -22,7 +22,6 @@ const externalInput = "./specs/data/tilesetProcessing/externalProcessing";
 const externalOutput =
   "./specs/data/output/tilesetProcessing/externalProcessing";
 
-const quiet = true;
 const overwrite = true;
 
 /**
@@ -36,7 +35,7 @@ describe("BasicTilesetProcessor on explicit input", function () {
   });
 
   it("forEachExplicitTile covers all explicit tiles", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(basicInput, basicOutput, overwrite);
 
     const actualContentUris: string[][] = [];
@@ -58,7 +57,7 @@ describe("BasicTilesetProcessor on explicit input", function () {
   });
 
   it("forEachTile covers all tiles", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(basicInput, basicOutput, overwrite);
 
     const actualContentUris: string[][] = [];
@@ -81,7 +80,7 @@ describe("BasicTilesetProcessor on explicit input", function () {
   });
 
   it("processTileContentEntries processes the tile content entries", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(basicInput, basicOutput, overwrite);
     const specEntryProcessor = new SpecEntryProcessor();
     await tilesetProcessor.processTileContentEntries(
@@ -118,7 +117,7 @@ describe("BasicTilesetProcessor on explicit input", function () {
   });
 
   it("processTileContentEntries processes the tile content entries for external tilesets", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(externalInput, externalOutput, overwrite);
     const specEntryProcessor = new SpecEntryProcessor();
     await tilesetProcessor.processTileContentEntries(
@@ -217,7 +216,7 @@ describe("BasicTilesetProcessor on explicit input", function () {
   });
 
   it("processTileContentEntries updates the content URIs", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(basicInput, basicOutput, overwrite);
     const specEntryProcessor = new SpecEntryProcessor();
     await tilesetProcessor.processTileContentEntries(
@@ -246,7 +245,7 @@ describe("BasicTilesetProcessor on explicit input", function () {
   });
 
   it("processTileContentEntries updates the tile contents", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(basicInput, basicOutput, overwrite);
 
     const inputTilesetJsonBuffer = fs.readFileSync(

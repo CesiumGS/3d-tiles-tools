@@ -28,6 +28,11 @@ type FeatureIdAttribute = number;
 // (See `MeshFeatures` for details about the concepts)
 //
 
+/**
+ * Main model class for `EXT_instance_features`
+ *
+ * @internal
+ */
 export class InstanceFeatures extends ExtensionProperty<IInstanceFeatures> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;
@@ -57,6 +62,11 @@ export class InstanceFeatures extends ExtensionProperty<IInstanceFeatures> {
   }
 }
 
+/**
+ * Implementation of a feature ID for `EXT_instance_features`
+ *
+ * @internal
+ */
 export class FeatureId extends ExtensionProperty<IFeatureId> {
   static override EXTENSION_NAME = NAME;
   public declare extensionName: typeof NAME;

@@ -53,8 +53,8 @@ export class BoundingVolumes {
   /**
    * Creates a boundingVolume.box from a given bounding box
    *
-   * @param boundingBox The bounding box
-   * @return The `boundingVolume.box`
+   * @param boundingBox - The bounding box
+   * @returns The `boundingVolume.box`
    */
   static createBoundingVolumeBoxFromBoundingBox(
     boundingBox: BoundingBox3D
@@ -98,13 +98,13 @@ export class BoundingVolumes {
    * https://github.com/CesiumGS/3d-tiles/tree/main/specification#box,
    * computed from the minimum- and maximum point of a box.
    *
-   * @param minX The minimum x
-   * @param minY The minimum y
-   * @param minZ The minimum z
-   * @param maxX The maximum x
-   * @param maxY The maximum y
-   * @param maxZ The maximum z
-   * @return The `boundingVolume.box`
+   * @param minX - The minimum x
+   * @param minY - The minimum y
+   * @param minZ - The minimum z
+   * @param maxX - The maximum x
+   * @param maxY - The maximum y
+   * @param maxZ - The maximum z
+   * @returns The `boundingVolume.box`
    */
   private static createBoundingVolumeBox(
     minX: number,
@@ -150,8 +150,8 @@ export class BoundingVolumes {
    * the given bounding box will be transformed with the
    * y-up-to-z-up transform.
    *
-   * @param boundingBox The bounding box
-   * @return The `boundingVolume.box`
+   * @param boundingBox - The bounding box
+   * @returns The `boundingVolume.box`
    */
   static createBoundingVolumeBoxFromGltfBoundingBox(
     boundingBox: BoundingBox3D
@@ -171,7 +171,7 @@ export class BoundingVolumes {
    * Create the BoundingBox3D for the given boundingVolume.box
    *
    * @param boundingVolumeBox - The bounding volume box
-   * @return The bounding box
+   * @returns The bounding box
    */
   static createBoundingBoxForBoundingVolumeBox(
     boundingVolumeBox: number[]

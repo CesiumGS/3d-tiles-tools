@@ -231,8 +231,7 @@ export class TilesetStageExecutor {
     overwrite: boolean
   ) {
     try {
-      const quiet = false;
-      const tilesetProcessor = new BasicTilesetProcessor(quiet);
+      const tilesetProcessor = new BasicTilesetProcessor();
       await tilesetProcessor.begin(currentInput, currentOutput, overwrite);
 
       const contentStages = tilesetStage.contentStages;

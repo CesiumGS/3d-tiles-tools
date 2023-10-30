@@ -1,5 +1,7 @@
 /**
  * A set of options for configuring KTX UASTC compression in the `KtxUtility`
+ *
+ * @internal
  */
 export type KtxUastcOptions = Partial<{
   /**

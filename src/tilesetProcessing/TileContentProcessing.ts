@@ -23,8 +23,8 @@ export class TileContentProcessing {
    *
    * @param tilesetSourceName - The name of the `TilesetSource`
    * @param tilesetTargetName - The name of the `TilesetTarget`
-   * @param overwrite Whether existing output may be overwritten
-   * @param tileContentProcessor The `TileContentProcessor`
+   * @param overwrite - Whether existing output may be overwritten
+   * @param tileContentProcessor - The `TileContentProcessor`
    * @returns A promise that resolves when the process is finished
    */
   static async process(
@@ -33,8 +33,7 @@ export class TileContentProcessing {
     overwrite: boolean,
     tileContentProcessor: TileContentProcessor
   ): Promise<void> {
-    const quiet = false;
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(
       tilesetSourceName,
       tilesetTargetName,

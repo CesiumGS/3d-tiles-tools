@@ -1,17 +1,22 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const BASIS = require("./external/basis_encoder.js");
 
-import { DeveloperError } from "../base/DeveloperError";
+import { KtxError } from "./KtxError";
 
 /**
  * A thin wrapper around the basis encoder. This class and its documentation are created from
  * https://github.com/BinomialLLC/basis_universal/blob/ad9386a4a1cf2a248f7bbd45f543a7448db15267/webgl/transcoder/basis_wrappers.cpp#L1702
+ * with the additional hint: The user has to call 'delete()' to free the resources that
+ * have been allocated by an instance, after the encoding is done. Attempting to call
+ * any other method after 'delete()' was called will cause an error to be thrown.
  *
  * Compression/encoding object.
  *
  * You create this object, call the set() methods to fill in the parameters/source images/options, call encode(), and you get back a .basis or .KTX2 file.
  * You can call .encode() multiple times, changing the parameters/options in between calls.
  * By default this class encodes to .basis, but call setCreateKTX2File() with true to get .KTX2 files.
+ *
+ * @internal
  */
 export class BasisEncoder {
   /**
@@ -44,25 +49,53 @@ export class BasisEncoder {
   static async create(): Promise<BasisEncoder> {
     await this.ensureBasisEncoderImplInitialized();
     if (!BasisEncoder.BasisEncoderImpl) {
-      throw new DeveloperError("Could not initialize BasisEncoder");
+      throw new KtxError("Could not initialize BasisEncoder");
     }
-    const impl = new BasisEncoder.BasisEncoderImpl();
-    return new BasisEncoder(impl);
+    const implementation = new BasisEncoder.BasisEncoderImpl();
+    return new BasisEncoder(implementation);
   }
 
   /**
    * The implementation object
    */
-  private readonly impl: any;
+  private implementation: any;
 
   /**
    * Private constructor. Instances are created by calling
    * the `create` function.
    *
-   * @param impl - The implementation object
+   * @param implementation - The implementation object
    */
-  private constructor(impl: any) {
-    this.impl = impl;
+  private constructor(implementation: any) {
+    this.implementation = implementation;
+  }
+
+  /**
+   * Private getter for the implementation object
+   *
+   * @throws KtxError If 'delete()' was already called.
+   */
+  private get impl(): NonNullable<any> {
+    if (!this.implementation) {
+      throw new KtxError(
+        `The BasisEncoder was already deleted. ` +
+          `Create a new instance for calling this method`
+      );
+    }
+    return this.implementation;
+  }
+
+  /**
+   * Delete all resources that have been allocated for this object.
+   *
+   * Attempting to call any method after 'delete()' has been called
+   * will cause a KtxError to be thrown.
+   */
+  delete() {
+    if (this.implementation) {
+      this.impl.delete();
+    }
+    delete this.implementation;
   }
 
   /**
@@ -323,7 +356,7 @@ export class BasisEncoder {
 
   /**
    * Sets the mipmap filter to apply
-   * mip_filter must be < BASISU_MAX_RESAMPLER_FILTERS
+   * mip_filter must be less than BASISU_MAX_RESAMPLER_FILTERS
    * See the end of basisu_resample_filters.cpp: g_resample_filters[]
    *
    * @param mip_filter - The value
