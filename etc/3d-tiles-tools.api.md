@@ -131,6 +131,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
 // @internal
 export class BasisEncoder {
     static create(): Promise<BasisEncoder>;
+    delete(): void;
     encode(dst_basis_file_js_val: Uint8Array): any;
     setCheckForAlpha(check_for_alpha_flag: boolean): any;
     setCompressionLevel(comp_level: number): any;
