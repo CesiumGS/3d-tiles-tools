@@ -258,47 +258,9 @@ export class ContentBoundingVolumes {
   private static async computeBoundingVolumeBoxFromGlb(
     glbBuffer: Buffer
   ): Promise<number[]> {
-    //return ContentBoundingVolumes.computeAxisAlignedBoundingVolumeBoxFromGlb(
-    //  glbBuffer
-    //);
     return ContentBoundingVolumes.computeOrientedBoundingVolumeBoxFromGlb(
       glbBuffer
     );
-  }
-
-  /**
-   * Computes the bounding volume box of the given glTF asset.
-   *
-   * This will compute the bounding volume box of the default scene
-   * (or the first scene of the asset). If there is no scene,
-   * then a warning will be printed, and a unit cube bounding
-   * box will be returned.
-   *
-   * @param glbBuffer - The buffer containing GLB data
-   * @returns A promise to the bounding volume box
-   */
-  private static async computeAxisAlignedBoundingVolumeBoxFromGlb(
-    glbBuffer: Buffer
-  ): Promise<number[]> {
-    const io = await GltfTransform.getIO();
-    const document = await io.readBinary(glbBuffer);
-    const root = document.getRoot();
-    let scene = root.getDefaultScene();
-    if (!scene) {
-      const scenes = root.listScenes();
-      if (scenes.length > 0) {
-        scene = scenes[0];
-      }
-    }
-    if (scene) {
-      const bounds = getBounds(scene);
-      // take y-up-to-z-up into account
-      const minZup = [bounds.min[0], -bounds.min[2], bounds.min[1]];
-      const maxZup = [bounds.max[0], -bounds.max[2], bounds.max[1]];
-      return BoundingVolumes.createBoundingVolumeBoxFromMinMax(minZup, maxZup);
-    }
-    logger.warn("No scenes found in glTF - using unit bounding box");
-    return BoundingVolumes.createUnitCubeBoundingVolumeBox();
   }
 
   /**
