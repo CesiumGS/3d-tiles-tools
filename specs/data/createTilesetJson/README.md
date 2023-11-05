@@ -3,6 +3,7 @@ Data for testing the `createTilesetJson` command.
 
 The tile content files in the `input` directory are copies of the corresponding files in the CesiumJS specs, 
 at https://github.com/CesiumGS/cesium/tree/08f28d46a5201ff49c211bc2bcbc6f254b275391/Specs/Data/Cesium3DTiles
+(except for `plane-ds-p-n-32x32.glb`, which is simple "diamond-square" plane in the xy-plane)
 
 The `TilesetJsonCreatorSpec.ts` tests are processing these inputs:
 

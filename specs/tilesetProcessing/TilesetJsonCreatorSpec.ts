@@ -127,4 +127,28 @@ describe("TilesetJsonCreator", function () {
       .toString();
     expect(outputJsonString).toEqual(goldenJsonString);
   });
+
+  it("creates correct tileset JSON for plane-ds-p-n-32x32", async function () {
+    const tilesetFileName = "plane-ds-p-n-32x32.json";
+    const contentUri = "plane-ds-p-n-32x32.glb";
+    const tileset = await TilesetJsonCreator.createTilesetFromContents(
+      sourceDir,
+      [contentUri]
+    );
+    const outputJsonString = JSON.stringify(tileset, null, 2);
+    Paths.ensureDirectoryExists(targetDir);
+    fs.writeFileSync(
+      Paths.resolve(targetDir, tilesetFileName),
+      outputJsonString
+    );
+    fs.copyFileSync(
+      Paths.resolve(sourceDir, contentUri),
+      Paths.resolve(targetDir, contentUri)
+    );
+    const goldenJsonString = fs
+      .readFileSync(Paths.resolve(goldenDir, tilesetFileName))
+      .toString();
+    expect(outputJsonString).toEqual(goldenJsonString);
+  });
+
 });

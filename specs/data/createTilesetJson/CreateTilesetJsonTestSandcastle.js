@@ -1,5 +1,5 @@
 const viewer = new Cesium.Viewer("cesiumContainer", {
-  globe: false
+  //globe: false
 });
 
 let currentTileset;
@@ -22,8 +22,10 @@ async function recreateTileset() {
       debugShowBoundingVolume: true,
     })
   );
+
+  if (currentTilesetName.startsWith("plane")) {
     const transform = Cesium.Transforms.eastNorthUpToFixedFrame(
-      Cesium.Cartesian3.fromDegrees(-75.152408, 39.946975, 0)
+      Cesium.Cartesian3.fromDegrees(-75.15232,39.94705, 0)
     );
     const scale = 1.0;
     const modelMatrix = Cesium.Matrix4.multiplyByUniformScale(
@@ -31,7 +33,8 @@ async function recreateTileset() {
       scale,
       new Cesium.Matrix4()
     );
-    //currentTileset.modelMatrix = modelMatrix;
+    currentTileset.modelMatrix = modelMatrix;
+  }
   
   if (doZoom) {
     const offset = new Cesium.HeadingPitchRange(
@@ -68,6 +71,7 @@ function createOptions() {
     createOption("instancedOrientation.json"),
     createOption("pointCloudQuantized.json"),
     createOption("pointCloudRGB.json"),
+    createOption("plane-ds-p-n-32x32.json"),
   ];
   return options;
 }
