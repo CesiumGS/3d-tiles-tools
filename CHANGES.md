@@ -1,9 +1,14 @@
 Change Log
 ==========
 
-### 0.?.? - 2023-mm-dd
+### 0.3.2 - 2023-11-01
 
-- The `upgrade` command is now removing empty `tile.children` arrays, setting the `children` to be `undefined` instead.
+- The `upgrade` command is now removing empty `tile.children` arrays, setting the `children` to be `undefined` instead (via [#73](https://github.com/CesiumGS/3d-tiles-tools/pull/73))
+- Fixed a bug that prevented the content of external tileset to be processed in certain operations ([#76](https://github.com/CesiumGS/3d-tiles-tools/issues/76))
+- Fixed a runtime error that could occur when encoding many textures to KTX ([#77](https://github.com/CesiumGS/3d-tiles-tools/issues/77))
+- **Internal**:
+  - Added `meshoptimizer` and registered the corresponding encoder/decoder in the preconfigured glTF-Transform IO instance that is used internally (via [#74](https://github.com/CesiumGS/3d-tiles-tools/pull/74))
+  - Exposed all classes (except for the `pipeline` classes) for **internal** use (via [#75](https://github.com/CesiumGS/3d-tiles-tools/pull/75))
 
 ### 0.3.1 - 2023-10-10
 - Integrated a dedicated logging library (via [#61](https://github.com/CesiumGS/3d-tiles-tools/pull/61))
