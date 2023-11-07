@@ -22,24 +22,7 @@ export class OrientedBoundingBoxes {
    * @returns The bounding volume box
    */
   static fromPoints(points: number[][]): number[] {
-    //return OrientedBoundingBoxes.fromPointsCesium(points);
     return OrientedBoundingBoxes.fromPointsDitoTs(points);
-  }
-
-  /**
-   * Implementation of 'fromPoints' based on CesiumJS
-   *
-   * @param points - The points, as 3-element arrays
-   * @returns The bounding volume box
-   */
-  static fromPointsCesium(points: number[][]): number[] {
-    const positions = points.map(
-      (p: number[]) => new Cartesian3(p[0], p[1], p[2])
-    );
-    const obb = OrientedBoundingBox.fromPoints(positions, undefined);
-    const result = Array<number>(12);
-    OrientedBoundingBox.pack(obb, result, 0);
-    return result;
   }
 
   /**
@@ -48,7 +31,7 @@ export class OrientedBoundingBoxes {
    * @param points - The points, as 3-element arrays
    * @returns The bounding volume box
    */
-  static fromPointsDitoTs(points: number[][]): number[] {
+  private static fromPointsDitoTs(points: number[][]): number[] {
     const attribute = {
       data: points.flat(),
       size: 3,
