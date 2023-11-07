@@ -1,7 +1,13 @@
-import { Cartesian3, Ellipsoid, Matrix4, Rectangle } from "cesium";
+import { Ellipsoid } from "cesium";
+import { Matrix4 } from "cesium";
+import { Cartesian3 } from "cesium";
+import { Rectangle } from "cesium";
 import { Matrix3 } from "cesium";
 import { OrientedBoundingBox } from "cesium";
+
 import { BoundingVolume } from "../structure/BoundingVolume";
+
+import { OrientedBoundingBoxes } from "./OrientedBoundingBoxes";
 
 /**
  * Utility methods for bounding volume computations.
@@ -24,19 +30,13 @@ export class BoundingVolumes {
   }
 
   /**
-   * Compute a tightly-fitting bounding volume box for the given points
+   * Compute a bounding volume box for the given points.
    *
    * @param points - The points, as 3-element arrays
    * @returns The bounding volume box
    */
   static createBoundingVolumeBoxFromPoints(points: number[][]) {
-    const positions = points.map(
-      (p: number[]) => new Cartesian3(p[0], p[1], p[2])
-    );
-    const obb = OrientedBoundingBox.fromPoints(positions);
-    const result = Array<number>(12);
-    OrientedBoundingBox.pack(obb, result, 0);
-    return result;
+    return OrientedBoundingBoxes.fromPoints(points);
   }
 
   /**
@@ -72,6 +72,7 @@ export class BoundingVolumes {
 
   /**
    * Creates a bounding volume box from the given minimum and maximum point
+   * of an axis-aligned bounding box.
    *
    * @param min - The minimum, as a 3-element array
    * @param max - The minimum, as a 3-element array
@@ -94,7 +95,8 @@ export class BoundingVolumes {
    * This is the center- and half-axis representation of the
    * `boundingVolume.box` that is described at
    * https://github.com/CesiumGS/3d-tiles/tree/main/specification#box,
-   * computed from the minimum- and maximum point of a box.
+   * computed from the minimum- and maximum point of an axis-aligned
+   * bounding box.
    *
    * @param minX - The minimum x
    * @param minY - The minimum y
@@ -194,7 +196,7 @@ export class BoundingVolumes {
    * @returns The bounding volume box
    */
   static computeBoundingVolumeBoxFromBoundingVolume(
-    boundingVolume: BoundingVolume,
+    boundingVolume: BoundingVolume
   ): number[] | undefined {
     if (boundingVolume.box) {
       return boundingVolume.box.slice();
@@ -206,7 +208,7 @@ export class BoundingVolumes {
     }
     if (boundingVolume.sphere) {
       return BoundingVolumes.computeBoundingVolumeBoxFromSphere(
-        boundingVolume.sphere,
+        boundingVolume.sphere
       );
     }
     return undefined;
@@ -238,9 +240,7 @@ export class BoundingVolumes {
    * @param sphere - The sphere, as a 4-element array (center+radius)
    * @returns - The bounding volume box
    */
-  private static computeBoundingVolumeBoxFromSphere(
-    sphere: number[]
-  ) {
+  private static computeBoundingVolumeBoxFromSphere(sphere: number[]) {
     const center = Cartesian3.unpack(sphere);
     const radius = sphere[3];
     const result = [

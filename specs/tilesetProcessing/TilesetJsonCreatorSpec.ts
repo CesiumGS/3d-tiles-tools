@@ -150,5 +150,4 @@ describe("TilesetJsonCreator", function () {
       .toString();
     expect(outputJsonString).toEqual(goldenJsonString);
   });
-
 });

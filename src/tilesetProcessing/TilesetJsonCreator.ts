@@ -152,7 +152,7 @@ export class TilesetJsonCreator {
    * If the tile does not have children, then this will return
    * a bounding volume box that is created from the bounding
    * volume of the given tile.
-   * 
+   *
    * Otherwise, it will compute the bounding volumes of the
    * children, transform each of them with the child transform,
    * and return the union of these transformed child bounding
@@ -176,12 +176,12 @@ export class TilesetJsonCreator {
 
   /**
    * Compute the bounding box for a tile with the given children.
-   * 
-   * This will compute the bounding volumes of the children, 
-   * transform each of them with the child transform, and 
+   *
+   * This will compute the bounding volumes of the children,
+   * transform each of them with the child transform, and
    * return the union of these transformed child bounding
    * volumes.
-   * 
+   *
    * @param children - The children
    * @returns The bounding volume box
    */
