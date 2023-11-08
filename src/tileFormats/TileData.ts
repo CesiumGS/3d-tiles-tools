@@ -36,6 +36,12 @@ export interface TileData {
    * `header.gltfFormat===0`, or binary glTF (GLB) data (if
    * `header.gltfFormat===1`.
    * For PNTS tile data, this will be an empty buffer.
+   *
+   * When the payload is GLB data, then it may include padding bytes
+   * that have been inserted to satisfy the alignment requirements
+   * of the tile data. The actual GLB data (without padding) may
+   * be obtained with the `TileFormats.extractGlbPayload` or
+   * `TileFormats.obtainGlbPayload` method.
    */
   payload: Buffer;
 }

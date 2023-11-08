@@ -1,4 +1,4 @@
-import { Node, PropertyType, Scene, getBounds } from "@gltf-transform/core";
+import { Node, PropertyType, Scene } from "@gltf-transform/core";
 
 import { GltfTransform } from "../contentProcessing/GltfTransform";
 import { PntsPointClouds } from "../contentProcessing/pointClouds/PntsPointClouds";
@@ -19,6 +19,7 @@ import { TileTableDataI3dm } from "../tileTableData/TileTableDataI3dm";
 import { BoundingVolumes } from "./BoundingVolumes";
 
 import { Loggers } from "../logging/Loggers";
+import { TileFormatError } from "../tileFormats/TileFormatError";
 const logger = Loggers.get("tilesetProcessing");
 
 /**
@@ -161,15 +162,14 @@ export class ContentBoundingVolumes {
     // is stored directly as the payload. Otherwise (with `gltfFormat===0`)
     // the payload is a URI that has to be resolved.
     const tileData = TileFormats.readTileData(i3dmBuffer);
-    let glbBuffer = undefined;
-    if (tileData.header.gltfFormat === 1) {
-      glbBuffer = tileData.payload;
-    } else {
-      const glbUri = tileData.payload.toString().replace(/\0/g, "");
-      glbBuffer = await externalGlbResolver(glbUri);
-      if (!glbBuffer) {
-        throw new Error(`Could not resolve external GLB from ${glbUri}`);
-      }
+    const glbBuffer = await TileFormats.obtainGlbPayload(
+      tileData,
+      externalGlbResolver
+    );
+    if (!glbBuffer) {
+      throw new TileFormatError(
+        `Could not resolve external GLB from I3DM file`
+      );
     }
 
     // Note: The approach here is to compute the bounding volume box
