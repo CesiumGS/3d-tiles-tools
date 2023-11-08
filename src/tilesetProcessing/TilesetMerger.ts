@@ -14,7 +14,6 @@ import { TilesetTargets } from "../tilesetData/TilesetTargets";
 
 import { Tilesets } from "../tilesets/Tilesets";
 import { BoundingVolumes } from "./BoundingVolumes";
-import { VecMath } from "../tileTableData/VecMath";
 
 /**
  * A class for merging multiple tilesets, to create a tileset that refers
