@@ -275,6 +275,64 @@ export class TileFormats {
   }
 
   /**
+   * Split the given (CMPT) tile data and return one buffer for each
+   * of its inner tiles.
+   *
+   * If the given tile data is not CMPT data, it is returned directly.
+   * If `recursive===true`, then any inner tile data that is encountered
+   * and that also is CMPT data will be split and its elements added
+   * to the list of results.
+   *
+   * @param tileDataBuffer - The tile data
+   * @param recursive - Whether the tile data should be split recursively
+   * @returns The inner tile data buffers
+   */
+  static async splitCmpt(
+    tileDataBuffer: Buffer,
+    recursive: boolean
+  ): Promise<Buffer[]> {
+    const resultBuffers: Buffer[] = [];
+    await TileFormats.splitCmptInternal(
+      tileDataBuffer,
+      recursive,
+      resultBuffers
+    );
+    return resultBuffers;
+  }
+
+  /**
+   * Internal implementation for `splitCmpt`, called recursively
+   *
+   * @param tileDataBuffer - The tile data
+   * @param recursive - Whether the tile data should be split recursively
+   * @returns resultBuffers - The inner tile data buffers
+   */
+  private static async splitCmptInternal(
+    tileDataBuffer: Buffer,
+    recursive: boolean,
+    resultBuffers: Buffer[]
+  ) {
+    const isComposite = TileFormats.isComposite(tileDataBuffer);
+    if (!isComposite) {
+      resultBuffers.push(tileDataBuffer);
+    } else {
+      const compositeTileData =
+        TileFormats.readCompositeTileData(tileDataBuffer);
+      if (!recursive) {
+        resultBuffers.push(...compositeTileData.innerTileBuffers);
+      } else {
+        for (const innerTileBuffer of compositeTileData.innerTileBuffers) {
+          await TileFormats.splitCmptInternal(
+            innerTileBuffer,
+            recursive,
+            resultBuffers
+          );
+        }
+      }
+    }
+  }
+
+  /**
    * Creates a Batched 3D Model (B3DM) `TileData` instance from
    * a buffer that is assumed to contain valid binary glTF (GLB)
    * data.

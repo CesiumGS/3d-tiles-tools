@@ -198,6 +198,30 @@ describe("TileFormats", function () {
     expect(outputGlbBuffer.length).toEqual(inputGlbBuffer.length);
   });
 
+  it("splits a composite with splitCmpt", async function () {
+    const p = "./specs/data/composite.cmpt";
+    const recursive = false;
+    const inputBuffer = fs.readFileSync(p);
+    const outputBuffers = await TileFormats.splitCmpt(inputBuffer, recursive);
+    expect(outputBuffers.length).toEqual(2);
+  });
+
+  it("splits a composite-of-composite into a single file with non-recursive splitCmpt", async function () {
+    const p = "./specs/data/compositeOfComposite.cmpt";
+    const recursive = false;
+    const inputBuffer = fs.readFileSync(p);
+    const outputBuffers = await TileFormats.splitCmpt(inputBuffer, recursive);
+    expect(outputBuffers.length).toEqual(1);
+  });
+
+  it("splits a composite-of-composite into a all 'leaf' tiles with recursive splitCmpt", async function () {
+    const p = "./specs/data/compositeOfComposite.cmpt";
+    const recursive = true;
+    const inputBuffer = fs.readFileSync(p);
+    const outputBuffers = await TileFormats.splitCmpt(inputBuffer, recursive);
+    expect(outputBuffers.length).toEqual(2);
+  });
+
   it("throws an error when trying to read tile data from a buffer that does not contain B3DM, I3DM, or PNTS", function () {
     const p = "./specs/data/contentTypes/content.cmpt";
     const tileDataBuffer = fs.readFileSync(p);

@@ -26,6 +26,8 @@ import { TilesetConverter } from "./tilesetProcessing/TilesetConverter";
 
 import { TilesetJsonCreator } from "./tilesetProcessing/TilesetJsonCreator";
 
+import { ContentDataTypeRegistry } from "./contentTypes/ContentDataTypeRegistry";
+
 import { Loggers } from "./logging/Loggers";
 const logger = Loggers.get("CLI");
 
@@ -166,6 +168,49 @@ export class ToolsMain {
 
     logger.debug(`Executing cmptToGlb DONE`);
   }
+
+  static async splitCmpt(
+    input: string,
+    output: string,
+    recursive: boolean,
+    force: boolean
+  ) {
+    logger.debug(`Executing splitCmpt`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  recursive: ${recursive}`);
+    logger.debug(`  force: ${force}`);
+
+    const inputBuffer = fs.readFileSync(input);
+    const outputBuffers = await TileFormats.splitCmpt(inputBuffer, recursive);
+    for (let i = 0; i < outputBuffers.length; i++) {
+      const outputBuffer = outputBuffers[i];
+      const prefix = Paths.replaceExtension(output, "");
+      const extension = await ToolsMain.determineFileExtension(outputBuffer);
+      const outputPath = `${prefix}_${i}.${extension}`;
+      ToolsMain.ensureCanWrite(outputPath, force);
+      fs.writeFileSync(outputPath, outputBuffer);
+    }
+
+    logger.debug(`Executing splitCmpt DONE`);
+  }
+
+  private static async determineFileExtension(data: Buffer): Promise<string> {
+    const type = await ContentDataTypeRegistry.findType("", data);
+    switch (type) {
+      case ContentDataTypes.CONTENT_TYPE_B3DM:
+        return "b3dm";
+      case ContentDataTypes.CONTENT_TYPE_I3DM:
+        return "i3dm";
+      case ContentDataTypes.CONTENT_TYPE_PNTS:
+        return "pnts";
+      case ContentDataTypes.CONTENT_TYPE_CMPT:
+        return "cmpt";
+    }
+    logger.warn("Could not determine type of inner tile");
+    return "UNKNOWN";
+  }
+
   static async glbToB3dm(input: string, output: string, force: boolean) {
     logger.debug(`Executing glbToB3dm`);
     logger.debug(`  input: ${input}`);
