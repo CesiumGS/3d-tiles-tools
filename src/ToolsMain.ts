@@ -10,6 +10,7 @@ import { Tilesets } from "./tilesets/Tilesets";
 
 import { TileFormats } from "./tileFormats/TileFormats";
 import { TileDataLayouts } from "./tileFormats/TileDataLayouts";
+import { TileFormatError } from "./tileFormats/TileFormatError";
 
 import { ContentOps } from "./contentProcessing/ContentOps";
 import { GltfUtilities } from "./contentProcessing/GltfUtilities";
@@ -24,6 +25,8 @@ import { TileFormatsMigration } from "./migration/TileFormatsMigration";
 import { TilesetConverter } from "./tilesetProcessing/TilesetConverter";
 
 import { TilesetJsonCreator } from "./tilesetProcessing/TilesetJsonCreator";
+
+import { ContentDataTypeRegistry } from "./contentTypes/ContentDataTypeRegistry";
 
 import { Loggers } from "./logging/Loggers";
 const logger = Loggers.get("CLI");
@@ -52,7 +55,7 @@ export class ToolsMain {
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const inputTileData = TileFormats.readTileData(inputBuffer);
-    const outputBuffer = inputTileData.payload;
+    const outputBuffer = TileFormats.extractGlbPayload(inputTileData);
     fs.writeFileSync(output, outputBuffer);
 
     logger.debug(`Executing b3dmToGlb DONE`);
@@ -98,13 +101,7 @@ export class ToolsMain {
     const inputBuffer = fs.readFileSync(input);
 
     // Prepare the resolver for external GLBs in I3DM
-    const baseDir = path.dirname(input);
-    const externalGlbResolver = async (
-      uri: string
-    ): Promise<Buffer | undefined> => {
-      const externalGlbUri = path.resolve(baseDir, uri);
-      return fs.readFileSync(externalGlbUri);
-    };
+    const externalGlbResolver = ToolsMain.createResolver(input);
     const outputBuffer = await TileFormatsMigration.convertI3dmToGlb(
       inputBuffer,
       externalGlbResolver
@@ -123,7 +120,17 @@ export class ToolsMain {
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const inputTileData = TileFormats.readTileData(inputBuffer);
-    const outputBuffer = inputTileData.payload;
+    // Prepare the resolver for external GLBs in I3DM
+    const externalGlbResolver = ToolsMain.createResolver(input);
+    const outputBuffer = await TileFormats.obtainGlbPayload(
+      inputTileData,
+      externalGlbResolver
+    );
+    if (!outputBuffer) {
+      throw new TileFormatError(
+        `Could not resolve external GLB from I3DM file`
+      );
+    }
     fs.writeFileSync(output, outputBuffer);
 
     logger.debug(`Executing i3dmToGlb DONE`);
@@ -135,7 +142,11 @@ export class ToolsMain {
     logger.debug(`  force: ${force}`);
 
     const inputBuffer = fs.readFileSync(input);
-    const glbBuffers = TileFormats.extractGlbBuffers(inputBuffer);
+    const externalGlbResolver = ToolsMain.createResolver(input);
+    const glbBuffers = await TileFormats.extractGlbBuffers(
+      inputBuffer,
+      externalGlbResolver
+    );
     const glbsLength = glbBuffers.length;
     const glbPaths = Array<string>(glbsLength);
     if (glbsLength === 0) {
@@ -152,15 +163,54 @@ export class ToolsMain {
       const glbPath = glbPaths[i];
       ToolsMain.ensureCanWrite(glbPath, force);
       const glbBuffer = glbBuffers[i];
-      const upgradedOutputBuffer = await GltfUtilities.upgradeGlb(
-        glbBuffer,
-        undefined
-      );
-      fs.writeFileSync(glbPath, upgradedOutputBuffer);
+      fs.writeFileSync(glbPath, glbBuffer);
     }
 
     logger.debug(`Executing cmptToGlb DONE`);
   }
+
+  static async splitCmpt(
+    input: string,
+    output: string,
+    recursive: boolean,
+    force: boolean
+  ) {
+    logger.debug(`Executing splitCmpt`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  recursive: ${recursive}`);
+    logger.debug(`  force: ${force}`);
+
+    const inputBuffer = fs.readFileSync(input);
+    const outputBuffers = await TileFormats.splitCmpt(inputBuffer, recursive);
+    for (let i = 0; i < outputBuffers.length; i++) {
+      const outputBuffer = outputBuffers[i];
+      const prefix = Paths.replaceExtension(output, "");
+      const extension = await ToolsMain.determineFileExtension(outputBuffer);
+      const outputPath = `${prefix}_${i}.${extension}`;
+      ToolsMain.ensureCanWrite(outputPath, force);
+      fs.writeFileSync(outputPath, outputBuffer);
+    }
+
+    logger.debug(`Executing splitCmpt DONE`);
+  }
+
+  private static async determineFileExtension(data: Buffer): Promise<string> {
+    const type = await ContentDataTypeRegistry.findType("", data);
+    switch (type) {
+      case ContentDataTypes.CONTENT_TYPE_B3DM:
+        return "b3dm";
+      case ContentDataTypes.CONTENT_TYPE_I3DM:
+        return "i3dm";
+      case ContentDataTypes.CONTENT_TYPE_PNTS:
+        return "pnts";
+      case ContentDataTypes.CONTENT_TYPE_CMPT:
+        return "cmpt";
+    }
+    logger.warn("Could not determine type of inner tile");
+    return "UNKNOWN";
+  }
+
   static async glbToB3dm(input: string, output: string, force: boolean) {
     logger.debug(`Executing glbToB3dm`);
     logger.debug(`  input: ${input}`);
@@ -553,6 +603,34 @@ export class ToolsMain {
     fs.writeFileSync(output, Buffer.from(tilesetJsonString));
 
     logger.debug(`Executing createTilesetJson DONE`);
+  }
+
+  /**
+   * Creates a function that can resolve URIs relative to
+   * the given input file.
+   *
+   * The function will resolve relative URIs against the
+   * base directory of the given input file name, and
+   * return the corresponding file data. If the data
+   * cannot be read, then the function will print an
+   * error message and return  `undefined`.
+   *
+   * @param input - The input file name
+   * @returns The resolver function
+   */
+  private static createResolver(
+    input: string
+  ): (uri: string) => Promise<Buffer | undefined> {
+    const baseDir = path.dirname(input);
+    const resolver = async (uri: string): Promise<Buffer | undefined> => {
+      const externalGlbUri = path.resolve(baseDir, uri);
+      try {
+        return fs.readFileSync(externalGlbUri);
+      } catch (error) {
+        logger.error(`Could not resolve ${uri} against ${baseDir}`);
+      }
+    };
+    return resolver;
   }
 
   /**

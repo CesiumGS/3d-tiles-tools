@@ -246,7 +246,7 @@ export class GltfUtilities {
    * @param glbBuffer - The buffer containing the binary glTF.
    * @returns A promise that resolves to the resulting binary glTF.
    */
-  static async replaceCesiumRtcExtension(glbBuffer: Buffer) {
+  static async replaceCesiumRtcExtension(glbBuffer: Buffer): Promise<Buffer> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const customStage = (gltf: any, options: any) => {
       GltfUtilities.replaceCesiumRtcExtensionInternal(gltf);

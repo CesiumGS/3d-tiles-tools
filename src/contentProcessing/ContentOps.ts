@@ -49,10 +49,15 @@ export class ContentOps {
    * to the results array, in unspecified order.
    *
    * @param inputBuffer - The input buffer
+   * @param externalGlbResolver - The function that will
+   * resolve external GLB references from I3DM files.
    * @returns The resulting buffers
    */
-  static cmptToGlbBuffers(inputBuffer: Buffer): Buffer[] {
-    return TileFormats.extractGlbBuffers(inputBuffer);
+  static async cmptToGlbBuffers(
+    inputBuffer: Buffer,
+    externalGlbResolver: (glbUri: string) => Promise<Buffer | undefined>
+  ): Promise<Buffer[]> {
+    return TileFormats.extractGlbBuffers(inputBuffer, externalGlbResolver);
   }
 
   /**

@@ -74,17 +74,14 @@ export class TileFormatsMigrationI3dm {
     // Obtain the GLB buffer for the tile data. With `gltfFormat===1`, it
     // is stored directly as the payload. Otherwise (with `gltfFormat===0`)
     // the payload is a URI that has to be resolved.
-    let glbBuffer = undefined;
-    if (tileData.header.gltfFormat === 1) {
-      glbBuffer = tileData.payload;
-    } else {
-      const glbUri = tileData.payload.toString().replace(/\0/g, "");
-      glbBuffer = await externalGlbResolver(glbUri);
-      if (!glbBuffer) {
-        throw new TileFormatError(
-          `Could not resolve external GLB from ${glbUri}`
-        );
-      }
+    let glbBuffer = await TileFormats.obtainGlbPayload(
+      tileData,
+      externalGlbResolver
+    );
+    if (!glbBuffer) {
+      throw new TileFormatError(
+        `Could not resolve external GLB from I3DM file`
+      );
     }
 
     // If the I3DM contained glTF 1.0 data, try to upgrade it

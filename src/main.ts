@@ -1,10 +1,10 @@
 import yargs from "yargs/yargs";
 import { DeveloperError } from "./base/DeveloperError";
 
+import { ToolsMain } from "./ToolsMain";
+
 import { Loggers } from "./logging/Loggers";
 let logger = Loggers.get("CLI");
-
-import { ToolsMain } from "./ToolsMain";
 
 // Split the arguments that are intended for the tools
 // and the `--options` arguments. Everything behind
@@ -155,6 +155,20 @@ function parseToolArgs(a: string[]) {
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
+      }
+    )
+    .command(
+      "splitCmpt",
+      "Split the input cmpt and write out its inner tiles.",
+      {
+        i: inputStringDefinition,
+        o: outputStringDefinition,
+        recursive: {
+          default: false,
+          description: "Recursively apply the command to inner CMPT tiles",
+          global: true,
+          type: "boolean",
+        },
       }
     )
     .command(
@@ -371,6 +385,7 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   const inputs: string[] = toolArgs.input;
   const output = toolArgs.output;
   const force = toolArgs.force;
+  const recursive = toolArgs.recursive;
   const tilesOnly = toolArgs.tilesOnly;
   const parsedOptionArgs = parseOptionArgs(optionArgs);
 
@@ -379,6 +394,7 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   logger.trace(`  inputs: ${inputs}`);
   logger.trace(`  output: ${output}`);
   logger.trace(`  force: ${force}`);
+  logger.trace(`  recursive: ${recursive}`);
   logger.trace(`  optionArgs: ${optionArgs}`);
   logger.trace(`  parsedOptionArgs: ${JSON.stringify(parsedOptionArgs)}`);
 
@@ -390,6 +406,8 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
     await ToolsMain.i3dmToGlb(input, output, force);
   } else if (command === "cmptToGlb") {
     await ToolsMain.cmptToGlb(input, output, force);
+  } else if (command === "splitCmpt") {
+    await ToolsMain.splitCmpt(input, output, recursive, force);
   } else if (command === "convertB3dmToGlb") {
     await ToolsMain.convertB3dmToGlb(input, output, force);
   } else if (command === "convertPntsToGlb") {
