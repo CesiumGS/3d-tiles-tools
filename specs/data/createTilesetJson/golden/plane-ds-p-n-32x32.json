@@ -1,0 +1,29 @@
+{
+  "asset": {
+    "version": "1.1"
+  },
+  "geometricError": 4096,
+  "root": {
+    "boundingVolume": {
+      "box": [
+        0.5,
+        -0.5,
+        0.02373488247394555,
+        0.5,
+        0,
+        0,
+        0,
+        0.5,
+        0,
+        0,
+        0,
+        0.12459570169448853
+      ]
+    },
+    "geometricError": 512,
+    "content": {
+      "uri": "plane-ds-p-n-32x32.glb"
+    },
+    "refine": "ADD"
+  }
+}
