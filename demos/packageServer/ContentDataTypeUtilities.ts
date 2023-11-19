@@ -1,7 +1,4 @@
 import { ContentDataTypes } from "../../src/contentTypes/ContentDataTypes";
-import { ContentDataTypeRegistry } from "../../src/contentTypes/ContentDataTypeRegistry";
-import { TilesetError } from "../../src/tilesetData/TilesetError";
-import { Paths } from "../../src/base/Paths";
 
 /**
  * Utility methods for determining default file extensions and MIME
