@@ -5,25 +5,25 @@
   "geometricError" : 4.0,
   "root" : {
     "boundingVolume" : {
-      "box" : [ 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5 ]
+      "box" : [ 0.5, -0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5 ]
     },
     "geometricError" : 2.0,
     "children": [
       {
         "boundingVolume" : {
-          "box" : [ 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5 ]
+          "box" : [ 0.5, -0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5 ]
         },
         "geometricError" : 1.0,
         "content": {
-          "uri": "tileC.b3dm"
+          "uri": "tileC.glb"
         }
       },  {
         "boundingVolume" : {
-          "box" : [ 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5 ]
+          "box" : [ 0.5, -0.5, 0.5, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5 ]
         },
         "geometricError" : 1.0,
         "content": {
-          "uri": "sub01/tileD.b3dm"
+          "uri": "sub01/tileD.glb"
         }
       }      
     ]
