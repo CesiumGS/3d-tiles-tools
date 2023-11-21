@@ -1,19 +1,20 @@
+import { defined } from "@3d-tiles-tools/base";
 import { defaultValue } from "@3d-tiles-tools/base";
+
 import { BinaryBufferData } from "@3d-tiles-tools/base";
 import { BinaryBuffers } from "@3d-tiles-tools/base";
-
-import { BinaryPropertyTable } from "./BinaryPropertyTable";
-
-import { MetadataUtilities } from "../MetadataUtilities";
-import { MetadataError } from "../MetadataError";
 
 import { PropertyTable } from "@3d-tiles-tools/structure";
 import { PropertyTableProperty } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
 import { MetadataClass } from "@3d-tiles-tools/structure";
 import { ClassProperty } from "@3d-tiles-tools/structure";
-import { EnumValue } from "@3d-tiles-tools/structure";
 import { MetadataEnum } from "@3d-tiles-tools/structure";
+
+import { BinaryPropertyTable } from "./BinaryPropertyTable";
+import { BinaryMetadata } from "./BinaryMetadata";
+import { MetadataUtilities } from "../MetadataUtilities";
+import { MetadataError } from "../MetadataError";
 
 /**
  * Methods to create `BinaryPropertyTable` instances from individual
@@ -176,7 +177,7 @@ export class BinaryPropertyTables {
     };
 
     const isVariableLengthArray =
-      classProperty.array && classProperty.count === undefined;
+      classProperty.array && !defined(classProperty.count);
     if (isVariableLengthArray) {
       const arrayOffsetBuffer = BinaryPropertyTables.createArrayOffsetBuffer(
         values,
@@ -364,12 +365,15 @@ export class BinaryPropertyTables {
 
     const binaryEnumInfo = MetadataUtilities.computeBinaryEnumInfo(schema);
 
-    const binaryPropertyTable: BinaryPropertyTable = {
+    const binaryMetadata: BinaryMetadata = {
       metadataClass: metadataClass,
-      propertyTable: propertyTable,
       binaryEnumInfo: binaryEnumInfo,
       binaryBufferStructure: binaryBufferStructure,
       binaryBufferData: binaryBufferData,
+    };
+    const binaryPropertyTable: BinaryPropertyTable = {
+      propertyTable: propertyTable,
+      binaryMetadata: binaryMetadata,
     };
     return binaryPropertyTable;
   }
@@ -489,7 +493,7 @@ export class BinaryPropertyTables {
       return BinaryPropertyTables.createBooleanBuffer(flattenedValues);
     }
 
-    if (enumType !== undefined) {
+    if (defined(enumType)) {
       flattenedValues = BinaryPropertyTables.flattenFully(flattenedValues);
       const length = flattenedValues.length;
       const metadataEnums = schema.enums;
@@ -500,12 +504,13 @@ export class BinaryPropertyTables {
       if (!metadataEnum) {
         throw new MetadataError(`The schema does not define enum ${enumType}`);
       }
-      const valueNames = metadataEnum.values.map((v: EnumValue) => v.name);
+      const nameValues =
+        MetadataUtilities.computeMetadataEnumValueNameValues(metadataEnum);
       componentType = defaultValue(metadataEnum.valueType, "UINT16");
       for (let i = 0; i < length; ++i) {
         const valueName = flattenedValues[i];
-        const index = valueNames.indexOf(valueName);
-        flattenedValues[i] = index;
+        const valueValue = nameValues[valueName];
+        flattenedValues[i] = valueValue;
       }
     }
 

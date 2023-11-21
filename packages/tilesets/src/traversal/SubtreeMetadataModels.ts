@@ -1,3 +1,5 @@
+import { defined } from "@3d-tiles-tools/base";
+
 import { Schema } from "@3d-tiles-tools/structure";
 
 import { MetadataError } from "@3d-tiles-tools/metadata";
@@ -5,6 +7,7 @@ import { MetadataUtilities } from "@3d-tiles-tools/metadata";
 import { PropertyTableModel } from "@3d-tiles-tools/metadata";
 import { BinaryPropertyTable } from "@3d-tiles-tools/metadata";
 import { BinaryPropertyTableModel } from "@3d-tiles-tools/metadata";
+import { BinaryMetadata } from "@3d-tiles-tools/metadata";
 
 import { BinarySubtreeData } from "../implicitTiling/BinarySubtreeData";
 import { SubtreeInfo } from "../implicitTiling/SubtreeInfo";
@@ -74,12 +77,15 @@ export class SubtreeMetadataModels {
         // Create the `BinaryPropertyTable` for each property table,
         // which contains everything that is required for creating
         // the binary PropertyTableModel
-        const binaryPropertyTable: BinaryPropertyTable = {
-          propertyTable: propertyTable,
+        const binaryMetadata: BinaryMetadata = {
           metadataClass: metadataClass,
           binaryEnumInfo: binaryEnumInfo,
           binaryBufferStructure: binaryBufferStructure,
           binaryBufferData: binaryBufferData,
+        };
+        const binaryPropertyTable: BinaryPropertyTable = {
+          propertyTable: propertyTable,
+          binaryMetadata: binaryMetadata,
         };
         const propertyTableModel = new BinaryPropertyTableModel(
           binaryPropertyTable
@@ -91,7 +97,7 @@ export class SubtreeMetadataModels {
     // Obtain the property table model that is pointed to
     // by subtree.tileMetadata
     let tileMetadataModel = undefined;
-    if (subtree.tileMetadata !== undefined) {
+    if (defined(subtree.tileMetadata)) {
       tileMetadataModel = propertyTableModels[subtree.tileMetadata];
       if (!tileMetadataModel) {
         throw new MetadataError(

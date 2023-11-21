@@ -1,93 +1,92 @@
-// NOTE: These types are only used in the TilesetJsonCreator
-// and should be considered an implementation detail.
+import { Ellipsoid } from "cesium";
+import { Matrix4 } from "cesium";
+import { Cartesian3 } from "cesium";
+import { Rectangle } from "cesium";
+import { Matrix3 } from "cesium";
+import { OrientedBoundingBox } from "cesium";
 
-// Basic, internal structures for bounding box computations
-/**
- * @internal
- */
-export type Point3D = [number, number, number];
+import { BoundingVolume } from "@3d-tiles-tools/structure";
 
-/**
- * @internal
- */
-export type BoundingBox3D = {
-  min: Point3D;
-  max: Point3D;
-};
+import { OrientedBoundingBoxes } from "./OrientedBoundingBoxes";
 
 /**
  * Utility methods for bounding volume computations.
  *
- * This class is only supposed to be used in the TilesetJsonCreator.
+ * This class is mainly supposed to be used in the TilesetJsonCreator.
  *
- * To reduce ambiguities, the term "bounding box" refers to actual
- * `BoundingBox3D` instances. The term "bounding volume box" refers
- * to the 12-element number arrays that are the `boundingVolume.box`.
+ * The term "bounding volume box" refers to the 12-element number
+ * arrays that are the `boundingVolume.box`.
  *
  * @internal
  */
 export class BoundingVolumes {
-  /**
-   * Creates a bounding box for the unit cube
-   *
-   * @returns The bounding box
-   */
-  static createUnitCubeBoundingBox(): BoundingBox3D {
-    return {
-      min: [0, 0, 0],
-      max: [1, 1, 1],
-    };
-  }
-
   /**
    * Creates a bounding volume box for the unit cube
    *
    * @returns The bounding volume box
    */
   static createUnitCubeBoundingVolumeBox(): number[] {
-    return BoundingVolumes.createBoundingVolumeBoxFromBoundingBox(
-      BoundingVolumes.createUnitCubeBoundingBox()
-    );
+    return [0.5, 0.5, 0.5, 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5];
   }
 
   /**
-   * Creates a boundingVolume.box from a given bounding box
+   * Compute a bounding volume box for the given points.
    *
-   * @param boundingBox The bounding box
-   * @return The `boundingVolume.box`
+   * @param points - The points, as 3-element arrays
+   * @returns The bounding volume box
    */
-  static createBoundingVolumeBoxFromBoundingBox(
-    boundingBox: BoundingBox3D
-  ): number[] {
-    return BoundingVolumes.createBoundingVolumeBox(
-      boundingBox.min[0],
-      boundingBox.min[1],
-      boundingBox.min[2],
-      boundingBox.max[0],
-      boundingBox.max[1],
-      boundingBox.max[2]
-    );
+  static createBoundingVolumeBoxFromPoints(points: number[][]) {
+    return OrientedBoundingBoxes.fromPoints(points);
   }
 
   /**
    * Computes an array containing the 8 corners of the given
-   * bounding box.
+   * bounding volume box.
    *
-   * @param boundingBox - The bounding box
-   * @returns The corners
+   * @param boundingVolumeBox - The bounding volume box
+   * @returns The corners, as 3-element arrays
    */
-  static computeBoundingBoxCorners(boundingBox: BoundingBox3D): Point3D[] {
-    const min = boundingBox.min;
-    const max = boundingBox.max;
-    const c0: Point3D = [min[0], min[1], min[2]];
-    const c1: Point3D = [max[0], min[1], min[2]];
-    const c2: Point3D = [min[0], max[1], min[2]];
-    const c3: Point3D = [max[0], max[1], min[2]];
-    const c4: Point3D = [min[0], min[1], max[2]];
-    const c5: Point3D = [max[0], min[1], max[2]];
-    const c6: Point3D = [min[0], max[1], max[2]];
-    const c7: Point3D = [max[0], max[1], max[2]];
-    return [c0, c1, c2, c3, c4, c5, c6, c7];
+  static computeBoundingVolumeBoxCorners(
+    boundingVolumeBox: number[]
+  ): number[][] {
+    const center = new Cartesian3(
+      boundingVolumeBox[0],
+      boundingVolumeBox[1],
+      boundingVolumeBox[2]
+    );
+    const halfAxes = Matrix3.fromArray(boundingVolumeBox, 3);
+
+    const orientedBoundingBox = new OrientedBoundingBox(center, halfAxes);
+    const cornerCartesians = orientedBoundingBox.computeCorners();
+    const cornerPoints: number[][] = [];
+    for (const cornerCartesian of cornerCartesians) {
+      const cornerPoint: number[] = [
+        cornerCartesian.x,
+        cornerCartesian.y,
+        cornerCartesian.z,
+      ];
+      cornerPoints.push(cornerPoint);
+    }
+    return cornerPoints;
+  }
+
+  /**
+   * Creates a bounding volume box from the given minimum and maximum point
+   * of an axis-aligned bounding box.
+   *
+   * @param min - The minimum, as a 3-element array
+   * @param max - The minimum, as a 3-element array
+   * @returns The bounding volume box
+   */
+  static createBoundingVolumeBoxFromMinMax(min: number[], max: number[]) {
+    return BoundingVolumes.createBoundingVolumeBox(
+      min[0],
+      min[1],
+      min[2],
+      max[0],
+      max[1],
+      max[2]
+    );
   }
 
   /**
@@ -96,15 +95,16 @@ export class BoundingVolumes {
    * This is the center- and half-axis representation of the
    * `boundingVolume.box` that is described at
    * https://github.com/CesiumGS/3d-tiles/tree/main/specification#box,
-   * computed from the minimum- and maximum point of a box.
+   * computed from the minimum- and maximum point of an axis-aligned
+   * bounding box.
    *
-   * @param minX The minimum x
-   * @param minY The minimum y
-   * @param minZ The minimum z
-   * @param maxX The maximum x
-   * @param maxY The maximum y
-   * @param maxZ The maximum z
-   * @return The `boundingVolume.box`
+   * @param minX - The minimum x
+   * @param minY - The minimum y
+   * @param minZ - The minimum z
+   * @param maxX - The maximum x
+   * @param maxY - The maximum y
+   * @param maxZ - The maximum z
+   * @returns The `boundingVolume.box`
    */
   private static createBoundingVolumeBox(
     minX: number,
@@ -144,191 +144,143 @@ export class BoundingVolumes {
   }
 
   /**
-   * Creates a boundingVolume.box from a given glTF bounding box.
-   *
-   * This will take into account the fact that a glTF asset with
-   * the given bounding box will be transformed with the
-   * y-up-to-z-up transform.
-   *
-   * @param boundingBox The bounding box
-   * @return The `boundingVolume.box`
-   */
-  static createBoundingVolumeBoxFromGltfBoundingBox(
-    boundingBox: BoundingBox3D
-  ): number[] {
-    // Take into account the y-up-to-z-up transform:
-    return BoundingVolumes.createBoundingVolumeBox(
-      boundingBox.min[0],
-      -boundingBox.min[2],
-      boundingBox.min[1],
-      boundingBox.max[0],
-      -boundingBox.max[2],
-      boundingBox.max[1]
-    );
-  }
-
-  /**
-   * Create the BoundingBox3D for the given boundingVolume.box
+   * Translate the given bounding volume box by the given amount
    *
    * @param boundingVolumeBox - The bounding volume box
-   * @return The bounding box
+   * @param translation - The translation, as a 3-element array
+   * @returns The translated bounding volume box
    */
-  static createBoundingBoxForBoundingVolumeBox(
-    boundingVolumeBox: number[]
-  ): BoundingBox3D {
-    // Ported from de.javagl:j3dtiles-common:0.0.1-SNAPSHOT
-    // even though this is not very elegant...
-
-    const cx = boundingVolumeBox[0];
-    const cy = boundingVolumeBox[1];
-    const cz = boundingVolumeBox[2];
-
-    let minX = Infinity;
-    let minY = Infinity;
-    let minZ = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-    let maxZ = -Infinity;
-    for (let i = 1; i < 4; i++) {
-      const dx = boundingVolumeBox[i * 3 + 0];
-      const dy = boundingVolumeBox[i * 3 + 1];
-      const dz = boundingVolumeBox[i * 3 + 2];
-
-      const x0 = cx + dx;
-      const y0 = cy + dy;
-      const z0 = cz + dz;
-
-      minX = Math.min(minX, x0);
-      minY = Math.min(minY, y0);
-      minZ = Math.min(minZ, z0);
-
-      maxX = Math.max(maxX, x0);
-      maxY = Math.max(maxY, y0);
-      maxZ = Math.max(maxZ, z0);
-
-      const x1 = cx - dx;
-      const y1 = cy - dy;
-      const z1 = cz - dz;
-
-      minX = Math.min(minX, x1);
-      minY = Math.min(minY, y1);
-      minZ = Math.min(minZ, z1);
-
-      maxX = Math.max(maxX, x1);
-      maxY = Math.max(maxY, y1);
-      maxZ = Math.max(maxZ, z1);
-    }
-    return {
-      min: [minX, minY, minZ],
-      max: [maxX, maxY, maxZ],
-    };
+  static translateBoundingVolumeBox(
+    boundingVolumeBox: number[],
+    translation: number[]
+  ): number[] {
+    const result = boundingVolumeBox.slice();
+    result[0] += translation[0];
+    result[1] += translation[1];
+    result[2] += translation[2];
+    return result;
   }
 
   /**
-   * Translate the given bounding box by the given amount
+   * Transforms the given bounding volume box with the given 4x4 transform
+   * matrix, and returns the result.
    *
-   * @param boundingBox - The bounding box
-   * @param translation - The translation
-   * @returns The translated bounding box
+   * @param boundingVolumeBox - The bounding volume box
+   * @param transform - The transform, as a 16-element array
+   * @returns The transformed bounding volume box
    */
-  static translateBoundingBox(
-    boundingBox: BoundingBox3D,
-    translation: Point3D
+  static transformBoundingVolumeBox(
+    boundingVolumeBox: number[],
+    transform: number[]
   ) {
-    return {
-      min: BoundingVolumes.add(boundingBox.min, translation),
-      max: BoundingVolumes.add(boundingBox.max, translation),
-    };
+    const matrix = Matrix4.unpack(transform);
+    const rotationScale = Matrix4.getMatrix3(matrix, new Matrix3());
+    const orientedBoundingBox = OrientedBoundingBox.unpack(
+      boundingVolumeBox,
+      0
+    );
+    const center = orientedBoundingBox.center;
+    const halfAxes = orientedBoundingBox.halfAxes;
+    Matrix4.multiplyByPoint(matrix, center, center);
+    Matrix3.multiply(rotationScale, halfAxes, halfAxes);
+    return OrientedBoundingBox.pack(orientedBoundingBox, Array<number>(12));
   }
 
   /**
-   * Computes the component-wise sum of the given points.
+   * Compute the bounding volume box from the given bounding volume
    *
-   * The result will be put into the given result point and
-   * returned. If the result point is not given, a new point
-   * will be returned.
+   * If the bounding volume does not contain a `box`, `region`, or `sphere`,
+   * then `undefined` will be returned.
    *
-   * @param p0 - The first point
-   * @param p1 - The second point
-   * @param result - The point that stores the result
-   * @returns The result
+   * @param boundingVolume - The bounding volume
+   * @returns The bounding volume box
    */
-  private static add(p0: Point3D, p1: Point3D, result?: Point3D): Point3D {
-    const x = p0[0] + p1[0];
-    const y = p0[1] + p1[1];
-    const z = p0[2] + p1[2];
-    if (!result) {
-      return [x, y, z];
+  static computeBoundingVolumeBoxFromBoundingVolume(
+    boundingVolume: BoundingVolume
+  ): number[] | undefined {
+    if (boundingVolume.box) {
+      return boundingVolume.box.slice();
     }
-    result[0] = x;
-    result[1] = y;
-    result[2] = z;
+    if (boundingVolume.region) {
+      return BoundingVolumes.computeBoundingVolumeBoxFromRegion(
+        boundingVolume.region
+      );
+    }
+    if (boundingVolume.sphere) {
+      return BoundingVolumes.computeBoundingVolumeBoxFromSphere(
+        boundingVolume.sphere
+      );
+    }
+    return undefined;
+  }
+
+  /**
+   * Compute a bounding volume box from the given bounding region,
+   * using the default WGS84 ellipsoid.
+   *
+   * @param region - The region, as a 6-element array
+   * @returns - The bounding volume box
+   */
+  private static computeBoundingVolumeBoxFromRegion(region: number[]) {
+    const rectangle = Rectangle.unpack(region, 0);
+    const minimumHeight = region[4];
+    const maximumHeight = region[5];
+    const orientedBoundingBox = OrientedBoundingBox.fromRectangle(
+      rectangle,
+      minimumHeight,
+      maximumHeight,
+      Ellipsoid.WGS84
+    );
+    return OrientedBoundingBox.pack(orientedBoundingBox, Array<12>());
+  }
+
+  /**
+   * Compute a bounding volume box from the given bounding sphere
+   *
+   * @param sphere - The sphere, as a 4-element array (center+radius)
+   * @returns - The bounding volume box
+   */
+  private static computeBoundingVolumeBoxFromSphere(sphere: number[]) {
+    const center = Cartesian3.unpack(sphere);
+    const radius = sphere[3];
+    const result = [
+      center.x,
+      center.y,
+      center.z,
+      center.x + radius,
+      center.y,
+      center.z,
+      center.x,
+      center.y + radius,
+      center.z,
+      center.x,
+      center.y,
+      center.z + radius,
+    ];
     return result;
   }
 
   /**
-   * Computes the component-wise minimum of the given points.
+   * Computes the union of the given boundingVolumeBoxes.
    *
-   * The result will be put into the given result point and
-   * returned. If the result point is not given, a new point
-   * will be returned.
+   * If the given array is empty, then then a unit cube bounding
+   * volume box will be returned.
    *
-   * @param p0 - The first point
-   * @param p1 - The second point
-   * @param result - The point that stores the result
-   * @returns The result
+   * @param boundingVolumeBoxes - The bounding volume boxes
+   * @returns The union volume box
    */
-  static min(p0: Point3D, p1: Point3D, result?: Point3D): Point3D {
-    const x = Math.min(p0[0], p1[0]);
-    const y = Math.min(p0[1], p1[1]);
-    const z = Math.min(p0[2], p1[2]);
-    if (!result) {
-      return [x, y, z];
+  static computeUnionBoundingVolumeBox(
+    boundingVolumeBoxes: Iterable<number[]>
+  ): number[] {
+    const corners: number[][] = [];
+    for (const boundingVolumeBox of boundingVolumeBoxes) {
+      const newCorners =
+        BoundingVolumes.computeBoundingVolumeBoxCorners(boundingVolumeBox);
+      corners.push(...newCorners);
     }
-    result[0] = x;
-    result[1] = y;
-    result[2] = z;
-    return result;
-  }
-  /**
-   * Computes the component-wise maximum of the given points.
-   *
-   * The result will be put into the given result point and
-   * returned. If the result point is not given, a new point
-   * will be returned.
-   *
-   * @param p0 - The first point
-   * @param p1 - The second point
-   * @param result - The point that stores the result
-   * @returns The result
-   */
-  static max(p0: Point3D, p1: Point3D, result?: Point3D): Point3D {
-    const x = Math.max(p0[0], p1[0]);
-    const y = Math.max(p0[1], p1[1]);
-    const z = Math.max(p0[2], p1[2]);
-    if (!result) {
-      return [x, y, z];
+    if (corners.length === 0) {
+      return BoundingVolumes.createUnitCubeBoundingVolumeBox();
     }
-    result[0] = x;
-    result[1] = y;
-    result[2] = z;
-    return result;
-  }
-
-  /**
-   * Computes the union of the given bounding boxes
-   *
-   * @param bb0 - The first bounding box
-   * @param bb1 - The second bounding box
-   * @returns The union
-   */
-  static computeBoundingBoxUnion(
-    bb0: BoundingBox3D,
-    bb1: BoundingBox3D
-  ): BoundingBox3D {
-    return {
-      min: BoundingVolumes.min(bb0.min, bb1.min),
-      max: BoundingVolumes.max(bb0.max, bb1.max),
-    };
+    return BoundingVolumes.createBoundingVolumeBoxFromPoints(corners);
   }
 }

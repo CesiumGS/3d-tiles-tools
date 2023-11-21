@@ -1,9 +1,10 @@
-import { DeveloperError } from "@3d-tiles-tools/base";
-import { defined } from "@3d-tiles-tools/base";
-import { defaultValue } from "@3d-tiles-tools/base";
-
 import { Cartesian3 } from "cesium";
 import { Ellipsoid } from "cesium";
+
+import { defined } from "@3d-tiles-tools/base";
+import { defaultValue } from "@3d-tiles-tools/base";
+import { DeveloperError } from "@3d-tiles-tools/base";
+
 import { Extensions } from "@3d-tiles-tools/tilesets";
 
 /**
@@ -36,7 +37,7 @@ export class GltfPipelineLegacy {
     const positionArray: number[] = [];
     const ellipsoid = defaultValue(options.ellipsoid, Ellipsoid.WGS84);
     let position = options.position;
-    if (!position) {
+    if (!defined(position)) {
       if (
         defined(options.longitude) &&
         defined(options.latitude) &&

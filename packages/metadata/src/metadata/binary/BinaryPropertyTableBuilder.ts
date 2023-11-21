@@ -8,12 +8,14 @@ import { PropertyTable } from "@3d-tiles-tools/structure";
 import { PropertyTableProperty } from "@3d-tiles-tools/structure";
 
 import { MetadataError } from "../MetadataError";
+
 import { MetadataUtilities } from "../MetadataUtilities";
+import { BinaryMetadata } from "./BinaryMetadata";
 import { BinaryPropertyTable } from "./BinaryPropertyTable";
 import { BinaryPropertyTables } from "./BinaryPropertyTables";
 
 /**
- * A class for building `BinaryPropertyModel` instances
+ * A class for building `BinaryPropertyTable` objects
  * from property values that are given as arrays.
  *
  * @internal
@@ -191,10 +193,10 @@ export class BinaryPropertyTableBuilder {
   }
 
   /**
-   * Build the `BinaryPropertyTable` from the data of all properties
+   * Build the property table from the data of all properties
    * that have been added.
    *
-   * @returns The `BinaryPropertyTable`
+   * @returns The property table
    * @throws MetadataError If no property values have been given
    * for any of the properties of the class that the table is
    * built for
@@ -233,12 +235,15 @@ export class BinaryPropertyTableBuilder {
     const binaryEnumInfo = MetadataUtilities.computeBinaryEnumInfo(this.schema);
 
     const metadataClass = this.getClass();
-    const binaryPropertyTable: BinaryPropertyTable = {
+    const binaryMetadata: BinaryMetadata = {
       metadataClass: metadataClass,
-      propertyTable: propertyTable,
       binaryEnumInfo: binaryEnumInfo,
       binaryBufferStructure: binaryBufferStructure,
       binaryBufferData: binaryBufferData,
+    };
+    const binaryPropertyTable: BinaryPropertyTable = {
+      propertyTable: propertyTable,
+      binaryMetadata: binaryMetadata,
     };
     return binaryPropertyTable;
   }

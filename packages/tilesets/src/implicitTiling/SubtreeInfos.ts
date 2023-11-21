@@ -1,12 +1,12 @@
 import { ResourceResolver } from "@3d-tiles-tools/base";
 
+import { Subtree } from "@3d-tiles-tools/structure";
+import { TileImplicitTiling } from "@3d-tiles-tools/structure";
+
 import { SubtreeInfo } from "./SubtreeInfo";
 import { AvailabilityInfos } from "./AvailabilityInfos";
 import { BinarySubtreeData } from "./BinarySubtreeData";
 import { BinarySubtreeDataResolver } from "./BinarySubtreeDataResolver";
-
-import { Subtree } from "@3d-tiles-tools/structure";
-import { TileImplicitTiling } from "@3d-tiles-tools/structure";
 
 /**
  * Methods to create `SubtreeInfo` instances.

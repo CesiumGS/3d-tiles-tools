@@ -1,5 +1,4 @@
 import { DeveloperError } from "@3d-tiles-tools/base";
-import { Loggers } from "@3d-tiles-tools/base";
 import { ContentDataTypeRegistry } from "@3d-tiles-tools/base";
 
 import { TilesetError } from "@3d-tiles-tools/tilesets";
@@ -9,6 +8,7 @@ import { TilesetEntryProcessor } from "./TilesetEntryProcessor";
 import { TilesetProcessorContext } from "./TilesetProcessorContext";
 import { TilesetProcessorContexts } from "./TilesetProcessorContexts";
 
+import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("tilesetProcessing");
 
 /**
@@ -52,7 +52,7 @@ export abstract class TilesetProcessor {
    *
    * @param tilesetSourceName - The tileset source name
    * @param tilesetTargetName - The tileset target name
-   * @param overwrite Whether the target should be overwritten if
+   * @param overwrite - Whether the target should be overwritten if
    * it already exists
    * @returns A promise that resolves when this processor has been
    * initialized
@@ -194,7 +194,7 @@ export abstract class TilesetProcessor {
    * the result.
    *
    * @param sourceEntry - The source entry
-   * @param entryProcessor The `TilesetEntryProcessor`
+   * @param entryProcessor - The `TilesetEntryProcessor`
    * @returns The target entry
    */
   private async processEntryInternal(

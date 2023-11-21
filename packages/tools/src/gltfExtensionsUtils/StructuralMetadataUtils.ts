@@ -2,19 +2,19 @@ import { Document } from "@gltf-transform/core";
 import { Mesh } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 
-import { BinaryPropertyModels } from "@3d-tiles-tools/metadata";
-
-import { Class } from "@3d-tiles-tools/gltf-extensions";
-import { ClassProperty } from "@3d-tiles-tools/gltf-extensions";
+import { StructuralMetadataClass as Class } from "@3d-tiles-tools/gltf-extensions";
+import { StructuralMetadataClassProperty as ClassProperty } from "@3d-tiles-tools/gltf-extensions";
 import { MeshPrimitiveStructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
-import { PropertyAttribute } from "@3d-tiles-tools/gltf-extensions";
-import { PropertyAttributeProperty } from "@3d-tiles-tools/gltf-extensions";
-import { PropertyTable } from "@3d-tiles-tools/gltf-extensions";
-import { PropertyTableProperty } from "@3d-tiles-tools/gltf-extensions";
-import { PropertyTexture } from "@3d-tiles-tools/gltf-extensions";
-import { PropertyTextureProperty } from "@3d-tiles-tools/gltf-extensions";
-import { Schema } from "@3d-tiles-tools/gltf-extensions";
+import { StructuralMetadataPropertyAttribute as PropertyAttribute } from "@3d-tiles-tools/gltf-extensions";
+import { StructuralMetadataPropertyAttributeProperty as PropertyAttributeProperty } from "@3d-tiles-tools/gltf-extensions";
+import { StructuralMetadataPropertyTable as PropertyTable } from "@3d-tiles-tools/gltf-extensions";
+import { StructuralMetadataPropertyTableProperty as PropertyTableProperty } from "@3d-tiles-tools/gltf-extensions";
+import { StructuralMetadataPropertyTexture as PropertyTexture } from "@3d-tiles-tools/gltf-extensions";
+import { StructuralMetadataPropertyTextureProperty as PropertyTextureProperty } from "@3d-tiles-tools/gltf-extensions";
+import { StructuralMetadataSchema as Schema } from "@3d-tiles-tools/gltf-extensions";
 import { StructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
+
+import { BinaryPropertyModels } from "@3d-tiles-tools/metadata";
 
 import { StringBuilder } from "./StringBuilder";
 

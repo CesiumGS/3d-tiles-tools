@@ -1,10 +1,13 @@
-import { DefaultMetadataEntityModel } from "./DefaultMetadataEntityModel";
-import { MetadataEntityModel } from "./MetadataEntityModel";
-import { MetadataError } from "./MetadataError";
+import { defined } from "@3d-tiles-tools/base";
 
 import { Schema } from "@3d-tiles-tools/structure";
 import { MetadataEntity } from "@3d-tiles-tools/structure";
 import { MetadataClass } from "@3d-tiles-tools/structure";
+import { MetadataEnum } from "@3d-tiles-tools/structure";
+
+import { DefaultMetadataEntityModel } from "./DefaultMetadataEntityModel";
+import { MetadataEntityModel } from "./MetadataEntityModel";
+import { MetadataError } from "./MetadataError";
 
 /**
  * Methods related to `MetadataEntityModel` instances.
@@ -47,7 +50,11 @@ export class MetadataEntityModels {
       throw new MetadataError(`Schema does not contain class ${entity.class}`);
     }
     const entityProperties = entity.properties ?? {};
-    return this.createFromClass(metadataClass, entityProperties);
+    return this.createFromClass(
+      metadataClass,
+      schema.enums || {},
+      entityProperties
+    );
   }
 
   /**
@@ -57,11 +64,14 @@ export class MetadataEntityModels {
    * See the `create` method for details.
    *
    * @param metadataClass - The `MetadataClass`
+   * @param metadataEnums - The enum definitions from the schema, for
+   * the case that the class contains enum properties
    * @param entityProperties - The properties of the `MetadataEntity`
    * @returns The `MetadataEntityModel`
    */
   static createFromClass(
     metadataClass: MetadataClass,
+    metadataEnums: { [key: string]: MetadataEnum },
     entityProperties: { [key: string]: any }
   ) {
     // TODO This should not be done for each entity. The lookup
@@ -91,7 +101,7 @@ export class MetadataEntityModels {
     if (classProperties) {
       for (const classPropertyId of Object.keys(classProperties)) {
         const property = classProperties[classPropertyId];
-        if (property.semantic !== undefined) {
+        if (defined(property.semantic)) {
           semanticToPropertyId[property.semantic] = classPropertyId;
         }
       }

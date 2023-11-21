@@ -1,13 +1,12 @@
 import path from "path";
 
+import { ContentDataTypes } from "@3d-tiles-tools/base";
+import { Paths } from "@3d-tiles-tools/base";
+
 import { Tile } from "@3d-tiles-tools/structure";
 import { Tileset } from "@3d-tiles-tools/structure";
 import { Content } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
-
-import { ContentDataTypes } from "@3d-tiles-tools/base";
-import { Paths } from "@3d-tiles-tools/base";
-import { Loggers } from "@3d-tiles-tools/base";
 
 import { TilesetSourceResourceResolver } from "@3d-tiles-tools/tilesets";
 import { Tiles } from "@3d-tiles-tools/tilesets";
@@ -19,6 +18,7 @@ import { TilesetEntry } from "@3d-tiles-tools/tilesets";
 import { TilesetProcessor } from "./TilesetProcessor";
 import { TilesetEntryProcessor } from "./TilesetEntryProcessor";
 
+import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("tilesetProcessing");
 
 /**
@@ -154,7 +154,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * The given tile is assumed to be an explicit tile in the
    * current tileset.
    *
-   * @param tile The tile where to start the traversal
+   * @param tile - The tile where to start the traversal
    * @param callback - The callback
    * @returns A promise that resolves when the process is finished
    * @throws DeveloperError If `begin` was not called yet

@@ -56,8 +56,8 @@ export class VecMath {
    * The vectors are given as 3-element arrays. The resulting
    * quaternions will be 4-element arrays.
    *
-   * @param upVectors The up-vectors
-   * @param rightVectors The right-vectors
+   * @param upVectors - The up-vectors
+   * @param rightVectors - The right-vectors
    * @returns The rotation quaternions
    */
   static computeRotationQuaternions(

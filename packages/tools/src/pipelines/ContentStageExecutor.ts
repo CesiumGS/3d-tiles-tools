@@ -2,7 +2,6 @@ import path from "path";
 import GltfPipeline from "gltf-pipeline";
 
 import { Paths } from "@3d-tiles-tools/base";
-import { Loggers } from "@3d-tiles-tools/base";
 import { ContentDataTypes } from "@3d-tiles-tools/base";
 
 import { TilesetEntry } from "@3d-tiles-tools/tilesets";
@@ -17,6 +16,7 @@ import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 import { ContentOps } from "../contentProcessing/ContentOps";
 import { TileFormatsMigration } from "../migration/TileFormatsMigration";
 
+import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("pipeline");
 
 /**

@@ -16,7 +16,7 @@ import { ClassProperty } from "../../src/structure/Metadata/ClassProperty";
  * - They check whether the elements of the input data and the
  *   values from the entity model are generically equal.
  */
-describe("metadata/PropertyTableModelSpec", function () {
+describe("metadata/PropertyTableModelsSpec", function () {
   const epsilon = 0.000001;
 
   it("correctly represents example_INT16_SCALAR", function () {

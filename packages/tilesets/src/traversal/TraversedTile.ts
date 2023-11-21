@@ -1,7 +1,7 @@
+import { ResourceResolver } from "@3d-tiles-tools/base";
+
 import { Tile } from "@3d-tiles-tools/structure";
 import { Content } from "@3d-tiles-tools/structure";
-
-import { ResourceResolver } from "@3d-tiles-tools/base";
 
 /**
  * An interface that summarizes context information for

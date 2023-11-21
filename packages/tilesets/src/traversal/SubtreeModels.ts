@@ -1,5 +1,6 @@
 import path from "path";
 
+import { defined } from "@3d-tiles-tools/base";
 import { Buffers } from "@3d-tiles-tools/base";
 import { ResourceResolver } from "@3d-tiles-tools/base";
 import { TreeCoordinates } from "@3d-tiles-tools/base";
@@ -57,7 +58,7 @@ export class SubtreeModels {
       implicitTiling.subtrees.uri,
       coordinates
     );
-    if (subtreeUri === undefined) {
+    if (!defined(subtreeUri)) {
       const message =
         `Could not substitute coordinates ${coordinates} in ` +
         `subtree template URI ${implicitTiling.subtrees.uri}`;

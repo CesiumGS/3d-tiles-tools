@@ -1,12 +1,12 @@
 import { ResourceResolver } from "@3d-tiles-tools/base";
 
+import { TileImplicitTiling } from "@3d-tiles-tools/structure";
+import { Schema } from "@3d-tiles-tools/structure";
+
 import { TraversedTile } from "./TraversedTile";
 import { ExplicitTraversedTile } from "./ExplicitTraversedTile";
 import { ImplicitTraversedTile } from "./ImplicitTraversedTile";
 import { SubtreeModels } from "./SubtreeModels";
-
-import { TileImplicitTiling } from "@3d-tiles-tools/structure";
-import { Schema } from "@3d-tiles-tools/structure";
 
 import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError";
 import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";

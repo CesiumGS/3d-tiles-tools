@@ -58,7 +58,7 @@ export class DracoDecoder {
    *
    * @param properties - The mapping from property names (like
    * `POSITION`) to IDs
-   * @param binary The binary data to to decode from
+   * @param binary - The binary data to to decode from
    * @returns The decoded data for each attribute, and information
    * about its structure
    * @throws DracoError If the data could not be decoded

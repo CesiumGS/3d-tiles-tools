@@ -58,7 +58,7 @@ export class ComponentDatatype {
   /**
    * Returns the size, in bytes, of the corresponding datatype.
    *
-   * @param componentDatatype The component datatype to get the size of.
+   * @param componentDatatype - The component datatype to get the size of.
    * @returns The size in bytes.
    *
    * @throws DracoError when componentDatatype is not a valid value.
@@ -135,7 +135,7 @@ export class ComponentDatatype {
   /**
    * Returns the string representation of the given data type.
    *
-   * @param componentDatatype The component datatype
+   * @param componentDatatype - The component datatype
    * @returns The string
    *
    * @throws DracoError when componentDatatype is not a valid value.

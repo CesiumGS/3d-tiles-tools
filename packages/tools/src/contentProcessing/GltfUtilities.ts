@@ -49,6 +49,149 @@ export class GltfUtilities {
   }
 
   /**
+   * Extract the JSON- and binary part from the given GLB buffer.
+   *
+   * The given buffer may contain glTF 2.0 binary data, or glTF 1.0
+   * binary data.
+   *
+   * Note that this does NOT convert the input data. It only extracts
+   * the data, as-it-is.
+   *
+   * @param glbBuffer - The buffer containing the GLB
+   * @returns The JSON- and binary data buffers
+   * @throws TileFormatError If the input does not contain valid GLB data.
+   */
+  static extractDataFromGlb(glbBuffer: Buffer): {
+    jsonData: Buffer;
+    binData: Buffer;
+  } {
+    const magic = Buffers.getMagicString(glbBuffer);
+    if (magic !== "glTF") {
+      throw new TileFormatError(
+        `Expected magic header to be 'gltf', but found ${magic}`
+      );
+    }
+    if (glbBuffer.length < 12) {
+      throw new TileFormatError(
+        `Expected at least 12 bytes, but only got ${glbBuffer.length}`
+      );
+    }
+    const length = glbBuffer.readUInt32LE(8);
+    if (length > glbBuffer.length) {
+      throw new TileFormatError(
+        `Header indicates ${length} bytes, but input has ${glbBuffer.length} bytes`
+      );
+    }
+    const version = glbBuffer.readUInt32LE(4);
+    if (version === 1) {
+      return GltfUtilities.extractDataFromGlb1(glbBuffer);
+    }
+    if (version === 2) {
+      return GltfUtilities.extractDataFromGlb2(glbBuffer);
+    }
+    throw new TileFormatError(`Expected version 1 or 2, but got ${version}`);
+  }
+
+  /**
+   * Internal method for `extractDataFromGlb`, covering glTF 1.0.
+   *
+   * @param glbBuffer - The buffer containing the GLB
+   * @returns The JSON- and binary data buffers
+   * @throws TileFormatError If the input does not contain valid GLB data.
+   */
+  private static extractDataFromGlb1(glbBuffer: Buffer): {
+    jsonData: Buffer;
+    binData: Buffer;
+  } {
+    if (glbBuffer.length < 20) {
+      throw new TileFormatError(
+        `Expected at least 20 bytes, but only got ${glbBuffer.length}`
+      );
+    }
+    const contentLength = glbBuffer.readUint32LE(12);
+    const contentFormat = glbBuffer.readUint32LE(16);
+    if (contentFormat !== 0) {
+      throw new TileFormatError(
+        `Expected content format to be 0, but found ${contentFormat}`
+      );
+    }
+    const contentStart = 20;
+    const contentEnd = contentStart + contentLength;
+    if (glbBuffer.length < contentEnd) {
+      throw new TileFormatError(
+        `Expected at least ${contentEnd} bytes, but only got ${glbBuffer.length}`
+      );
+    }
+    const contentData = glbBuffer.subarray(contentStart, contentEnd);
+
+    const bodyStart = 20 + contentLength;
+    const bodyEnd = glbBuffer.length;
+    const bodyData = glbBuffer.subarray(bodyStart, bodyEnd);
+    return {
+      jsonData: contentData,
+      binData: bodyData,
+    };
+  }
+
+  /**
+   * Internal method for `extractDataFromGlb`, covering glTF 2.0.
+   *
+   * @param glbBuffer - The buffer containing the GLB
+   * @returns The JSON- and binary data buffers
+   * @throws TileFormatError If the input does not contain valid GLB data.
+   */
+  private static extractDataFromGlb2(glbBuffer: Buffer) {
+    if (glbBuffer.length < 20) {
+      throw new TileFormatError(
+        `Expected at least 20 bytes, but only got ${glbBuffer.length}`
+      );
+    }
+
+    // Extract the JSON chunk data
+    const jsonChunkLength = glbBuffer.readUint32LE(12);
+    const jsonChunkType = glbBuffer.readUint32LE(16);
+    const expectedJsonChunkType = 0x4e4f534a; // ASCII string for "JSON"
+    if (jsonChunkType !== expectedJsonChunkType) {
+      throw new TileFormatError(
+        `Expected chunk type to be ${expectedJsonChunkType}, but found ${jsonChunkType}`
+      );
+    }
+    const jsonChunkStart = 20;
+    const jsonChunkEnd = jsonChunkStart + jsonChunkLength;
+    if (glbBuffer.length < jsonChunkEnd) {
+      throw new TileFormatError(
+        `Expected at least ${jsonChunkEnd} bytes, but only got ${glbBuffer.length}`
+      );
+    }
+    const jsonChunkData = glbBuffer.subarray(jsonChunkStart, jsonChunkEnd);
+
+    // Extract the BIN chunk data
+    const binChunkHeaderStart = jsonChunkEnd;
+    const binChunkLength = glbBuffer.readUint32LE(binChunkHeaderStart);
+    const binChunkType = glbBuffer.readUint32LE(binChunkHeaderStart + 4);
+    const expectedBinChunkType = 0x004e4942; // ASCII string for "BIN"
+    if (binChunkType !== expectedBinChunkType) {
+      throw new TileFormatError(
+        `Expected chunk type to be ${expectedBinChunkType}, but found ${binChunkType}`
+      );
+    }
+    const binChunkStart = binChunkHeaderStart + 8;
+    const binChunkEnd = binChunkStart + binChunkLength;
+    if (glbBuffer.length < binChunkEnd) {
+      throw new TileFormatError(
+        `Expected at least ${binChunkEnd} bytes, but only got ${glbBuffer.length}`
+      );
+    }
+
+    const binChunkData = glbBuffer.subarray(binChunkStart, binChunkEnd);
+
+    return {
+      jsonData: jsonChunkData,
+      binData: binChunkData,
+    };
+  }
+
+  /**
    * Extract the JSON part from the given GLB buffer and return it
    * as a buffer.
    *
@@ -63,72 +206,8 @@ export class GltfUtilities {
    * @throws TileFormatError If the input does not contain valid GLB data.
    */
   static extractJsonFromGlb(glbBuffer: Buffer): Buffer {
-    const magic = Buffers.getMagicString(glbBuffer);
-    if (magic !== "glTF") {
-      throw new TileFormatError(
-        `Expected magic header to be 'gltf', but found ${magic}`
-      );
-    }
-    if (glbBuffer.length < 12) {
-      throw new TileFormatError(
-        `Expected at least 12 bytes, but only got ${glbBuffer.length}`
-      );
-    }
-    const version = glbBuffer.readUInt32LE(4);
-    const length = glbBuffer.readUInt32LE(8);
-    if (length > glbBuffer.length) {
-      throw new TileFormatError(
-        `Header indicates ${length} bytes, but input has ${glbBuffer.length} bytes`
-      );
-    }
-    if (version === 1) {
-      if (glbBuffer.length < 20) {
-        throw new TileFormatError(
-          `Expected at least 20 bytes, but only got ${glbBuffer.length}`
-        );
-      }
-      const contentLength = glbBuffer.readUint32LE(12);
-      const contentFormat = glbBuffer.readUint32LE(16);
-      if (contentFormat !== 0) {
-        throw new TileFormatError(
-          `Expected content format to be 0, but found ${contentFormat}`
-        );
-      }
-      const contentStart = 20;
-      const contentEnd = contentStart + contentLength;
-      if (glbBuffer.length < contentEnd) {
-        throw new TileFormatError(
-          `Expected at least ${contentEnd} bytes, but only got ${glbBuffer.length}`
-        );
-      }
-      const contentData = glbBuffer.subarray(contentStart, contentEnd);
-      return contentData;
-    } else if (version === 2) {
-      if (glbBuffer.length < 20) {
-        throw new TileFormatError(
-          `Expected at least 20 bytes, but only got ${glbBuffer.length}`
-        );
-      }
-      const chunkLength = glbBuffer.readUint32LE(12);
-      const chunkType = glbBuffer.readUint32LE(16);
-      const jsonChunkType = 0x4e4f534a; // ASCII string for "JSON"
-      if (chunkType !== jsonChunkType) {
-        throw new TileFormatError(
-          `Expected chunk type to be ${jsonChunkType}, but found ${chunkType}`
-        );
-      }
-      const chunkStart = 20;
-      const chunkEnd = chunkStart + chunkLength;
-      if (glbBuffer.length < chunkEnd) {
-        throw new TileFormatError(
-          `Expected at least ${chunkEnd} bytes, but only got ${glbBuffer.length}`
-        );
-      }
-      const chunkData = glbBuffer.subarray(chunkStart, chunkEnd);
-      return chunkData;
-    } else {
-      throw new TileFormatError(`Expected version 1 or 2, but got ${version}`);
-    }
+    const data = GltfUtilities.extractDataFromGlb(glbBuffer);
+    return data.jsonData;
   }
 
   /**
@@ -139,8 +218,8 @@ export class GltfUtilities {
    * features that are specific for the GLB data that is part
    * of I3DM and B3DM. Details are not specified here.
    *
-   * @param glbBuffer The buffer containing the binary glTF.
-   * @param options Options specifying custom gltf-pipeline behavior.
+   * @param glbBuffer - The buffer containing the binary glTF.
+   * @param options - Options specifying custom gltf-pipeline behavior.
    * @returns A promise that resolves to the optimized binary glTF.
    */
   static async optimizeGlb(glbBuffer: Buffer, options: any): Promise<Buffer> {
@@ -163,10 +242,10 @@ export class GltfUtilities {
    * (above the former root nodes) that contain the RTC center as
    * their translation.
    *
-   * @param glbBuffer The buffer containing the binary glTF.
+   * @param glbBuffer - The buffer containing the binary glTF.
    * @returns A promise that resolves to the resulting binary glTF.
    */
-  static async replaceCesiumRtcExtension(glbBuffer: Buffer) {
+  static async replaceCesiumRtcExtension(glbBuffer: Buffer): Promise<Buffer> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const customStage = (gltf: any, options: any) => {
       GltfUtilities.replaceCesiumRtcExtensionInternal(gltf);

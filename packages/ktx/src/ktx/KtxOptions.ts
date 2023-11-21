@@ -3,6 +3,8 @@ import { KtxUastcOptions } from "./KtxUastcOptions";
 
 /**
  * A set of options for configuring KTX compression in the `KtxUtility`
+ *
+ * @internal
  */
 export type KtxOptions = KtxEtc1sOptions &
   KtxUastcOptions & {

@@ -1,5 +1,3 @@
-import { Loggers } from "@3d-tiles-tools/base";
-
 import { Tile } from "@3d-tiles-tools/structure";
 import { Tileset } from "@3d-tiles-tools/structure";
 import { Content } from "@3d-tiles-tools/structure";
@@ -9,6 +7,7 @@ import { Extensions } from "@3d-tiles-tools/tilesets";
 
 import { TilesetUpgradeOptions } from "./TilesetUpgradeOptions";
 
+import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("upgrade");
 
 /**
@@ -53,6 +52,10 @@ export class TilesetObjectUpgrader {
     if (this.upgradeOptions.upgradeContentUrlToUri) {
       logger.debug(`Upgrading content.url to content.uri`);
       await this.upgradeEachContentUrlToUri(tileset);
+    }
+    if (this.upgradeOptions.upgradeEmptyChildrenToUndefined) {
+      logger.debug(`Upgrading empty children arrays to be 'undefined'`);
+      await this.upgradeEmptyChildrenToUndefined(tileset);
     }
     if (this.upgradeOptions.upgradeContentGltfExtensionDeclarations) {
       logger.debug(`Upgrading extension declarations`);
@@ -126,6 +129,23 @@ export class TilesetObjectUpgrader {
     logger.warn(
       "  The content does not have a 'uri' property (and no legacy 'url' property)"
     );
+  }
+
+  /**
+   * Upgrade each empty 'children' in any tile by deleting them and
+   * causing the children to become 'undefined'
+   *
+   * @param tileset - The tileset
+   */
+  private async upgradeEmptyChildrenToUndefined(tileset: Tileset) {
+    const root = tileset.root;
+    await Tiles.traverseExplicit(root, async (tilePath: Tile[]) => {
+      const tile = tilePath[tilePath.length - 1];
+      if (tile.children !== undefined && tile.children.length === 0) {
+        delete tile.children;
+      }
+      return true;
+    });
   }
 
   /**

@@ -46,6 +46,8 @@ export interface TileDataLayout {
 /**
  * Methods to compute `TileDataLayout` instances from the information
  * that was read from the binary header.
+ *
+ * @internal
  */
 export class TileDataLayouts {
   static create(buffer: Buffer): TileDataLayout {

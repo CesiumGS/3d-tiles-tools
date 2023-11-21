@@ -13,7 +13,7 @@ export class TilesetOperations {
    *
    * @param tilesetSourceName - The tileset source name
    * @param tilesetTargetName - The tileset target name
-   * @param overwrite Whether the target should be overwritten if
+   * @param overwrite - Whether the target should be overwritten if
    * it already exists
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError When the input could not be processed,
@@ -40,7 +40,7 @@ export class TilesetOperations {
    *
    * @param tilesetSourceName - The tileset source name
    * @param tilesetTargetName - The tileset target name
-   * @param overwrite Whether the target should be overwritten if
+   * @param overwrite - Whether the target should be overwritten if
    * it already exists
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError When the input could not be processed,
@@ -60,7 +60,7 @@ export class TilesetOperations {
    *
    * @param tilesetSourceName - The tileset source name
    * @param tilesetTargetName - The tileset target name
-   * @param overwrite Whether the target should be overwritten if
+   * @param overwrite - Whether the target should be overwritten if
    * it already exists
    * @param targetVersion - The target version - 1.0 or 1.1
    * @param gltfUpgradeOptions - Options that may be passed

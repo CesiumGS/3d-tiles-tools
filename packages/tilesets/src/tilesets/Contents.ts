@@ -1,7 +1,6 @@
 import { Content } from "@3d-tiles-tools/structure";
 
 import { Loggers } from "@3d-tiles-tools/base";
-
 const logger = Loggers.get("tilesets");
 
 /**
@@ -18,7 +17,7 @@ export class Contents {
    * This should never return `undefined`, but may be due to
    * invalid input data.
    *
-   * @param content The `Content`
+   * @param content - The `Content`
    * @returns The URI, or `undefined`
    */
   static getUri(content: Content): string | undefined {

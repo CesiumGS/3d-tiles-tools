@@ -1,6 +1,6 @@
 import { Paths } from "@3d-tiles-tools/base";
 import { DeveloperError } from "@3d-tiles-tools/base";
-import { Loggers } from "@3d-tiles-tools/base";
+
 import { ContentDataTypes } from "@3d-tiles-tools/base";
 
 import { Tileset } from "@3d-tiles-tools/structure";
@@ -17,6 +17,7 @@ import { BasicTilesetProcessor } from "./BasicTilesetProcessor";
 
 import { TileFormatsMigration } from "../migration/TileFormatsMigration";
 
+import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("upgrade");
 
 /**
@@ -72,6 +73,7 @@ export class TilesetUpgrader {
         upgradedAssetVersionNumber: "1.0",
         upgradeRefineCase: true,
         upgradeContentUrlToUri: true,
+        upgradeEmptyChildrenToUndefined: true,
 
         upgradeContentGltfExtensionDeclarations: false,
 
@@ -91,6 +93,8 @@ export class TilesetUpgrader {
         upgradedAssetVersionNumber: "1.1",
         upgradeRefineCase: true,
         upgradeContentUrlToUri: true,
+        upgradeEmptyChildrenToUndefined: true,
+
         upgradeContentGltfExtensionDeclarations: true,
 
         upgradeB3dmGltf1ToGltf2: false,
@@ -114,7 +118,7 @@ export class TilesetUpgrader {
    *
    * @param tilesetSourceName - The tileset source name
    * @param tilesetTargetName - The tileset target name
-   * @param overwrite Whether the target should be overwritten if
+   * @param overwrite - Whether the target should be overwritten if
    * it already exists
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError When the input could not be processed,
@@ -152,7 +156,7 @@ export class TilesetUpgrader {
   /**
    * Perform the upgrade of the `Tileset` object, in place.
    *
-   * @param tileset The `Tileset` object
+   * @param tileset - The `Tileset` object
    */
   async upgradeTileset(tileset: Tileset) {
     const tilesetObjectUpgrader = new TilesetObjectUpgrader(
@@ -219,7 +223,7 @@ export class TilesetUpgrader {
    * Process the given tileset (content) entry, and return the result.
    *
    * @param sourceEntry - The source entry
-   * @param type The `ContentDataType` of the source entry
+   * @param type - The `ContentDataType` of the source entry
    * @returns The processed entry
    */
   private processEntry = async (
@@ -251,7 +255,7 @@ export class TilesetUpgrader {
    * Process the given tileset (content) entry, and return the result.
    *
    * @param sourceEntry - The source entry
-   * @param type The `ContentDataType` of the source entry
+   * @param type - The `ContentDataType` of the source entry
    * @returns The processed entry
    */
   private processEntryUnchecked = async (

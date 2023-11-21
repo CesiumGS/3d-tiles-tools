@@ -1,6 +1,7 @@
 import { ContentData } from "./ContentData";
 import { ContentDataTypes } from "./ContentDataTypes";
 import { ContentDataTypeEntry } from "./ContentDataTypeEntry";
+import { defined } from "../base/defined";
 import { DeveloperError } from "../base/DeveloperError";
 import { BufferedContentData } from "./BufferedContentData";
 
@@ -274,7 +275,7 @@ export class ContentDataTypeRegistry {
     if (!parsedObject.asset) {
       return false;
     }
-    if (parsedObject.geometricError !== undefined || parsedObject.root) {
+    if (defined(parsedObject.geometricError) || parsedObject.root) {
       return true;
     }
     return false;

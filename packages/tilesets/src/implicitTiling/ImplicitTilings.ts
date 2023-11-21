@@ -4,10 +4,10 @@ import { QuadtreeCoordinates } from "@3d-tiles-tools/base";
 import { Octrees } from "@3d-tiles-tools/base";
 import { OctreeCoordinates } from "@3d-tiles-tools/base";
 
+import { TileImplicitTiling } from "@3d-tiles-tools/structure";
+
 import { TemplateUris } from "./TemplateUris";
 import { ImplicitTilingError } from "./ImplicitTilingError";
-
-import { TileImplicitTiling } from "@3d-tiles-tools/structure";
 
 /**
  * Utility methods related to `TileImplicitTiling` instances.

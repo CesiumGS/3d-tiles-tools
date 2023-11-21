@@ -1,12 +1,5 @@
 import path from "path";
 
-import { BoundingSphere } from "cesium";
-import { Cartesian3 } from "cesium";
-import { OrientedBoundingBox } from "cesium";
-import { Matrix3 } from "cesium";
-import { Matrix4 } from "cesium";
-import { Rectangle } from "cesium";
-
 import { Paths } from "@3d-tiles-tools/base";
 import { DeveloperError } from "@3d-tiles-tools/base";
 
@@ -19,6 +12,8 @@ import { TilesetError } from "@3d-tiles-tools/tilesets";
 import { TilesetSources } from "@3d-tiles-tools/tilesets";
 import { TilesetTargets } from "@3d-tiles-tools/tilesets";
 import { Tilesets } from "@3d-tiles-tools/tilesets";
+
+import { BoundingVolumes } from "./BoundingVolumes";
 
 /**
  * A class for merging multiple tilesets, to create a tileset that refers
@@ -167,7 +162,7 @@ export class TilesetMerger {
 
     // Derive the information for the merged tileset
     const geometricError = TilesetMerger.getMergedGeometricError(tilesets);
-    const sphere = TilesetMerger.getMergedSphere(tilesets);
+    const box = TilesetMerger.getMergedBox(tilesets);
     const children = TilesetMerger.getChildren(
       tilesets,
       this.tilesetSourceIdentifiers,
@@ -180,7 +175,7 @@ export class TilesetMerger {
       geometricError: geometricError,
       root: {
         boundingVolume: {
-          sphere: sphere,
+          box: box,
         },
         refine: "ADD",
         geometricError: geometricError,
@@ -258,7 +253,8 @@ export class TilesetMerger {
   //========================================================================
   // The following functions are ported from the `merge-tilesets` branch
   // at https://github.com/CesiumGS/3d-tiles-tools/blob/d7e76e59022fc5e5aa4b848730ec9f8f4dea6d4e/tools/lib/mergeTilesets.js
-  // with slight modification of 'getChildren' for disambiguation...
+  // with slight modification of 'getChildren' for disambiguation
+  // and updates to compute bounding boxes instead of bounding spheres
 
   private static getChildren(
     tilesets: Tileset[],
@@ -280,7 +276,7 @@ export class TilesetMerger {
         uri: tilesetUrl,
       };
       children[i].boundingVolume = {
-        sphere: TilesetMerger.getBoundingSphere(tilesets[i]),
+        box: TilesetMerger.getBoundingBox(tilesets[i]),
       };
       delete children[i].children;
       delete children[i].transform;
@@ -297,94 +293,33 @@ export class TilesetMerger {
     return geometricError;
   }
 
-  private static getBoundingSphere(tileset: Tileset): number[] {
+  private static getBoundingBox(tileset: Tileset): number[] {
     const root = tileset.root;
-    let transform = Matrix4.IDENTITY;
-    if (root.transform) {
-      transform = Matrix4.fromArray(root.transform);
-    }
     const boundingVolume = root.boundingVolume;
-    let boundingSphere;
-    if (boundingVolume.sphere) {
-      boundingSphere = TilesetMerger.createBoundingSphereFromSphere(
-        boundingVolume.sphere,
-        transform
+    const boundingVolumeBox =
+      BoundingVolumes.computeBoundingVolumeBoxFromBoundingVolume(
+        boundingVolume
       );
-    } else if (boundingVolume.region) {
-      boundingSphere = TilesetMerger.createBoundingSphereFromRegion(
-        boundingVolume.region
-      );
-    } else if (boundingVolume.box) {
-      boundingSphere = TilesetMerger.createBoundingSphereFromBox(
-        boundingVolume.box,
-        transform
-      );
-    } else {
+    if (boundingVolumeBox === undefined) {
       throw new TilesetError("No bounding volume found in root tile");
     }
-    const center = boundingSphere.center;
-    const radius = boundingSphere.radius;
-    return [center.x, center.y, center.z, radius];
-  }
-
-  private static getMergedSphere(tilesets: Tileset[]): number[] {
-    const length = tilesets.length;
-    const boundingSpheres = Array<BoundingSphere>(length);
-    for (let i = 0; i < length; ++i) {
-      boundingSpheres[i] = BoundingSphere.unpack(
-        TilesetMerger.getBoundingSphere(tilesets[i])
-      );
+    if (root.transform === undefined) {
+      return boundingVolumeBox;
     }
-    const boundingSphere = BoundingSphere.fromBoundingSpheres(boundingSpheres);
-    const center = boundingSphere.center;
-    const radius = boundingSphere.radius;
-    return [center.x, center.y, center.z, radius];
-  }
-
-  private static createBoundingSphereFromBox(
-    box: number[],
-    transform: Matrix4
-  ): BoundingSphere {
-    let center = Cartesian3.fromElements(box[0], box[1], box[2]);
-    let halfAxes = Matrix3.fromArray(box, 3);
-
-    // Find the transformed center and halfAxes
-    center = Matrix4.multiplyByPoint(transform, center, center);
-    const rotationScale = Matrix4.getMatrix3(transform, new Matrix3());
-    halfAxes = Matrix3.multiply(rotationScale, halfAxes, halfAxes);
-
-    const orientedBoundingBox = new OrientedBoundingBox(center, halfAxes);
-    return BoundingSphere.fromOrientedBoundingBox(orientedBoundingBox);
-  }
-
-  private static createBoundingSphereFromRegion(
-    region: number[]
-  ): BoundingSphere {
-    const rectangle = Rectangle.unpack(region);
-    const minimumHeight = region[4];
-    const maximumHeight = region[5];
-
-    const orientedBoundingBox = OrientedBoundingBox.fromRectangle(
-      rectangle,
-      minimumHeight,
-      maximumHeight
+    return BoundingVolumes.transformBoundingVolumeBox(
+      boundingVolumeBox,
+      root.transform
     );
-    return BoundingSphere.fromOrientedBoundingBox(orientedBoundingBox);
   }
 
-  private static createBoundingSphereFromSphere(
-    sphere: number[],
-    transform: Matrix4
-  ): BoundingSphere {
-    let center = Cartesian3.fromElements(sphere[0], sphere[1], sphere[2]);
-    let radius = sphere[3];
-
-    // Find the transformed center and radius
-    center = Matrix4.multiplyByPoint(transform, center, center);
-    const scale = Matrix4.getScale(transform, new Cartesian3());
-    const uniformScale = Cartesian3.maximumComponent(scale);
-    radius *= uniformScale;
-
-    return new BoundingSphere(center, radius);
+  private static getMergedBox(tilesets: Tileset[]): number[] {
+    const length = tilesets.length;
+    const boundingBoxes = Array<number[]>(length);
+    for (let i = 0; i < length; ++i) {
+      boundingBoxes[i] = TilesetMerger.getBoundingBox(tilesets[i]);
+    }
+    const boundingBox =
+      BoundingVolumes.computeUnionBoundingVolumeBox(boundingBoxes);
+    return boundingBox;
   }
 }

@@ -23,6 +23,10 @@ export type TilesetUpgradeOptions = {
   // to `content.uri`
   upgradeContentUrlToUri: boolean;
 
+  // Whether empty `tile.children` arrays should
+  // be removed and become `undefined`
+  upgradeEmptyChildrenToUndefined: true;
+
   // Indicates whether the `3DTILES_content_gltf` extension
   // declaration should be removed, as part of an upgrade
   // to 1.1, where glTF is supported without an extension

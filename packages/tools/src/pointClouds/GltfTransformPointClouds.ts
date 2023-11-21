@@ -13,11 +13,11 @@ import { EXTMeshFeatures } from "@3d-tiles-tools/gltf-extensions";
 
 import { Iterables } from "@3d-tiles-tools/base";
 
-import { ReadablePointCloud } from "./ReadablePointCloud";
-
 import { TileFormatError } from "@3d-tiles-tools/tilesets";
 
 import { AccessorCreation } from "../migration/AccessorCreation";
+
+import { ReadablePointCloud } from "./ReadablePointCloud";
 
 /**
  * An internal interface representing a point cloud with
@@ -39,6 +39,8 @@ export interface GltfTransformPointCloud {
 
 /**
  * Methods to create glTF representations of point clouds
+ *
+ * @internal
  */
 export class GltfTransformPointClouds {
   /**

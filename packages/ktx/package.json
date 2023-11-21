@@ -6,7 +6,8 @@
   "source": "./src/index.ts",
   "types": "./build/index.d.ts",
   "dependencies": {
-    "sharp": "^0.32.1"    
+    "sharp": "^0.32.1",
+    "@3d-tiles-tools/base": "0.3.0"
   },
   "devDependencies": {
     "typescript": "^4.8.3"

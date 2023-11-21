@@ -1,22 +1,23 @@
 import path from "path";
 
-import { Paths } from "@3d-tiles-tools/base";
-import { Loggers } from "@3d-tiles-tools/base";
+import { ResourceResolver } from "@3d-tiles-tools/base";
 import { DataError } from "@3d-tiles-tools/base";
 import { LazyContentData } from "@3d-tiles-tools/base";
 import { ContentDataTypeRegistry } from "@3d-tiles-tools/base";
 import { ContentDataTypes } from "@3d-tiles-tools/base";
-import { ResourceResolver } from "@3d-tiles-tools/base";
-
-import { TilesetSourceResourceResolver } from "../tilesetData/TilesetSourceResourceResolver";
+import { Paths } from "@3d-tiles-tools/base";
 
 import { Tileset } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
+
+import { TilesetSourceResourceResolver } from "../tilesetData/TilesetSourceResourceResolver";
 
 import { TraversedTile } from "./TraversedTile";
 import { ExplicitTraversedTile } from "./ExplicitTraversedTile";
 
 import { TilesetSource3tz } from "../packages/TilesetSource3tz";
+
+import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("traversal");
 
 /**

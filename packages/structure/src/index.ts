@@ -19,14 +19,7 @@ export * from "./structure/Tile";
 export * from "./structure/TileImplicitTiling";
 export * from "./structure/Tileset";
 
-export * from "./structure/TileFormats/BatchTable";
-export * from "./structure/TileFormats/BatchTableBinaryBodyReference";
-export * from "./structure/TileFormats/BinaryBodyOffset";
-export * from "./structure/TileFormats/FeatureTable";
-export * from "./structure/TileFormats/FeatureTableBinaryBodyReference";
-export * from "./structure/TileFormats/B3dmFeatureTable";
-export * from "./structure/TileFormats/I3dmFeatureTable";
-export * from "./structure/TileFormats/PntsFeatureTable";
+export * from "./structure/extensions/BoundingVolumeS2";
 
 export * from "./structure/Metadata/ClassProperty";
 export * from "./structure/Metadata/EnumValue";
@@ -36,4 +29,11 @@ export * from "./structure/Metadata/Schema";
 
 export * from "./structure/Style/Style";
 
-export * from "./structure/extensions/BoundingVolumeS2";
+export * from "./structure/TileFormats/B3dmFeatureTable";
+export * from "./structure/TileFormats/BatchTable";
+export * from "./structure/TileFormats/BatchTableBinaryBodyReference";
+export * from "./structure/TileFormats/BinaryBodyOffset";
+export * from "./structure/TileFormats/FeatureTable";
+export * from "./structure/TileFormats/FeatureTableBinaryBodyReference";
+export * from "./structure/TileFormats/I3dmFeatureTable";
+export * from "./structure/TileFormats/PntsFeatureTable";

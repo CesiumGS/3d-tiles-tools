@@ -1,15 +1,19 @@
+import { PropertyTableProperty } from "@3d-tiles-tools/structure";
+import { ClassProperty } from "@3d-tiles-tools/structure";
+
 import { MetadataEntityModel } from "./MetadataEntityModel";
 import { MetadataError } from "./MetadataError";
 import { PropertyModel } from "./PropertyModel";
 import { PropertyTableModel } from "./PropertyTableModel";
 import { TableMetadataEntityModel } from "./TableMetadataEntityModel";
 
-import { PropertyTableProperty } from "@3d-tiles-tools/structure";
-import { ClassProperty } from "@3d-tiles-tools/structure";
-
 /**
  * Implementation of a `PropertyTableModel` that is backed by
- * `PropertyModel` instances
+ * `PropertyModel` instances.
+ *
+ * This implementation is only used internally, to represent
+ * data from batch tables, and does not support property
+ * semantics or enum types.
  *
  * @internal
  */
@@ -81,10 +85,12 @@ export class DefaultPropertyTableModel implements PropertyTableModel {
       throw new MetadataError(message);
     }
     const semanticToPropertyId = {};
+    const enumValueValueNames = {};
     const metadataEntityModel = new TableMetadataEntityModel(
       this,
       index,
-      semanticToPropertyId
+      semanticToPropertyId,
+      enumValueValueNames
     );
     return metadataEntityModel;
   }

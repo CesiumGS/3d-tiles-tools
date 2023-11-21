@@ -1,7 +1,6 @@
 import { Buffers } from "@3d-tiles-tools/base";
 import { ContentDataTypeChecks } from "@3d-tiles-tools/base";
 import { ContentDataTypes } from "@3d-tiles-tools/base";
-import { Loggers } from "@3d-tiles-tools/base";
 
 import { TilesetEntry } from "@3d-tiles-tools/tilesets";
 
@@ -15,6 +14,7 @@ import { TilesetUpgrader } from "../tilesetProcessing/TilesetUpgrader";
 import { TilesetCombiner } from "../tilesetProcessing/TilesetCombiner";
 import { TilesetDataProcessor } from "../tilesetProcessing/TilesetDataProcessor";
 
+import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("pipeline");
 
 /**
@@ -230,8 +230,7 @@ export class TilesetStageExecutor {
     overwrite: boolean
   ) {
     try {
-      const quiet = false;
-      const tilesetProcessor = new BasicTilesetProcessor(quiet);
+      const tilesetProcessor = new BasicTilesetProcessor();
       await tilesetProcessor.begin(currentInput, currentOutput, overwrite);
 
       const contentStages = tilesetStage.contentStages;

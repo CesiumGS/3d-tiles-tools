@@ -1,21 +1,12 @@
 import { Document } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 
-import { EXTStructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
-import { MeshPrimitiveStructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
-import { PropertyTable } from "@3d-tiles-tools/gltf-extensions";
-import { StructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
-
-import { Loggers } from "@3d-tiles-tools/base";
-
-import { StructuralMetadataPropertyTables } from "../gltfExtensionsUtils/StructuralMetadataPropertyTables";
-
 import { BatchTable } from "@3d-tiles-tools/structure";
 
-import { BatchTableSchemas } from "./BatchTableSchemas";
-import { BatchTablePropertyTableModels } from "./BatchTablePropertyTableModels";
-import { AccessorCreation } from "./AccessorCreation";
-import { TileFormatsMigration } from "./TileFormatsMigration";
+import { EXTStructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
+import { MeshPrimitiveStructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
+import { StructuralMetadataPropertyTable as PropertyTable } from "@3d-tiles-tools/gltf-extensions";
+import { StructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
 
 import { PropertyTableModels } from "@3d-tiles-tools/metadata";
 import { PropertyModels } from "@3d-tiles-tools/metadata";
@@ -23,6 +14,14 @@ import { PropertyModel } from "@3d-tiles-tools/metadata";
 import { BinaryPropertyTableModel } from "@3d-tiles-tools/metadata";
 import { BinaryPropertyTableBuilder } from "@3d-tiles-tools/metadata";
 
+import { StructuralMetadataPropertyTables } from "../gltfExtensionsUtils/StructuralMetadataPropertyTables";
+
+import { BatchTableSchemas } from "./BatchTableSchemas";
+import { BatchTablePropertyTableModels } from "./BatchTablePropertyTableModels";
+import { AccessorCreation } from "./AccessorCreation";
+import { TileFormatsMigration } from "./TileFormatsMigration";
+
+import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("migration");
 
 /**

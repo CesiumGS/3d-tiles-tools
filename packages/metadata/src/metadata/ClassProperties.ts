@@ -1,7 +1,9 @@
-import { MetadataTypes } from "./MetadataTypes";
-import { MetadataComponentTypes } from "./MetadataComponentTypes";
+import { defined } from "@3d-tiles-tools/base";
 
 import { ClassProperty } from "@3d-tiles-tools/structure";
+
+import { MetadataTypes } from "./MetadataTypes";
+import { MetadataComponentTypes } from "./MetadataComponentTypes";
 
 /**
  * Utility methods related to `ClassProperty` objects
@@ -28,7 +30,7 @@ export class ClassProperties {
       return false;
     }
     const componentType = property.componentType;
-    if (componentType === undefined) {
+    if (!defined(componentType)) {
       return false;
     }
     if (componentType === "FLOAT32" || componentType === "FLOAT64") {
@@ -36,7 +38,7 @@ export class ClassProperties {
     }
     if (MetadataComponentTypes.isIntegerComponentType(componentType)) {
       const normalized = property.normalized;
-      if (normalized === undefined) {
+      if (!defined(normalized)) {
         return false;
       }
       return normalized;
@@ -61,7 +63,7 @@ export class ClassProperties {
       return false;
     }
     const componentType = property.componentType;
-    if (componentType === undefined) {
+    if (!defined(componentType)) {
       return false;
     }
     if (!MetadataComponentTypes.allComponentTypes.includes(componentType)) {

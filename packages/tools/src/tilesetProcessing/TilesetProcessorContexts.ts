@@ -28,7 +28,7 @@ export class TilesetProcessorContexts {
    *
    * @param tilesetSourceName - The tileset source name
    * @param tilesetTargetName - The tileset target name
-   * @param overwrite Whether the target should be overwritten if
+   * @param overwrite - Whether the target should be overwritten if
    * it already exists
    * @returns A promise that resolves when this processor has been
    * initialized
@@ -110,7 +110,7 @@ export class TilesetProcessorContexts {
    * Close the source and the target that are contained in the given
    * context.
    *
-   * @param context The context
+   * @param context - The context
    * @throws TilesetError If closing caused an error
    */
   static async close(context: TilesetProcessorContext) {

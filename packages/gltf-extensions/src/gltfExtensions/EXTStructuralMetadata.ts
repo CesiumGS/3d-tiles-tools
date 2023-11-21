@@ -48,6 +48,8 @@ function ifNot<T>(value: T, defaultValue: T): T | undefined {
 
 /**
  * The type of a metadata class property
+ *
+ * @internal
  */
 export type ClassPropertyType =
   | "SCALAR"
@@ -63,6 +65,8 @@ export type ClassPropertyType =
 
 /**
  * The component type of a metadata class property
+ *
+ * @internal
  */
 export type ClassPropertyComponentType =
   | "INT8"
@@ -78,6 +82,8 @@ export type ClassPropertyComponentType =
 
 /**
  * The value type of a metadata enum
+ *
+ * @internal
  */
 export type EnumValueType =
   | "INT8"
@@ -91,6 +97,8 @@ export type EnumValueType =
 
 /**
  * The type of the string- or array offsets for a property table property
+ *
+ * @internal
  */
 export type PropertyTablePropertyOffsetType =
   | "UINT8"
@@ -226,6 +234,12 @@ interface MeshPrimitiveStructuralMetadataDef {
 
 //============================================================================
 
+/**
+ * [`EXT_structural_metadata`](https://github.com/CesiumGS/glTF/tree/proposal-EXT_structural_metadata/extensions/2.0/Vendor/EXT_structural_metadata/)
+ * defines a means of storing structured metadata within a glTF 2.0 asset.
+ *
+ * @internal
+ */
 export class EXTStructuralMetadata extends Extension {
   // Implementation note:
   //
@@ -811,7 +825,7 @@ export class EXTStructuralMetadata extends Extension {
    * that corresponds to the buffer view.
    *
    * @param context - The reader context
-   * @param bufferViewIndex The buffer view index
+   * @param bufferViewIndex - The buffer view index
    * @returns The buffer view data
    */
   private static obtainBufferViewData(

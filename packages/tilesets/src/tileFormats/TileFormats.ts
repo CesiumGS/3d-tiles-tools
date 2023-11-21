@@ -130,7 +130,7 @@ export class TileFormats {
    *
    * @param buffer - The buffer
    * @param tileDataLayout - The tile data layout
-   * @return The `TileData`
+   * @returns The `TileData`
    * @internal
    */
   static extractTileData(buffer: Buffer, tileDataLayout: TileDataLayout) {
@@ -213,12 +213,24 @@ export class TileFormats {
    * given tile data is a composite (CMPT) tile data, and recursively
    * collect the buffer from its inner tiles.
    *
+   * The resulting buffers will not include any padding bytes that
+   * may have been inserted to satisfy alignment requirements.
+   *
    * @param tileDataBuffer - The tile data buffer
+   * @param externalGlbResolver - The function that will be used for
+   * resolving external GLB files from I3DMs
    * @returns The array of GLB buffers
    */
-  static extractGlbBuffers(tileDataBuffer: Buffer): Buffer[] {
+  static async extractGlbBuffers(
+    tileDataBuffer: Buffer,
+    externalGlbResolver: (glbUri: string) => Promise<Buffer | undefined>
+  ): Promise<Buffer[]> {
     const glbBuffers: Buffer[] = [];
-    TileFormats.extractGlbBuffersInternal(tileDataBuffer, glbBuffers);
+    await TileFormats.extractGlbBuffersInternal(
+      tileDataBuffer,
+      externalGlbResolver,
+      glbBuffers
+    );
     return glbBuffers;
   }
 
@@ -226,18 +238,25 @@ export class TileFormats {
    * Implementation for `extractGlbBuffers`, called recursively.
    *
    * @param tileDataBuffer - The tile data buffer
-   * @param glbBuffers The array of GLB buffers
+   * @param externalGlbResolver - The function that will be used for
+   * resolving external GLB files from I3DMs
+   * @param glbBuffers - The array of GLB buffers
    */
-  private static extractGlbBuffersInternal(
+  private static async extractGlbBuffersInternal(
     tileDataBuffer: Buffer,
+    externalGlbResolver: (glbUri: string) => Promise<Buffer | undefined>,
     glbBuffers: Buffer[]
-  ): void {
+  ): Promise<void> {
     const isComposite = TileFormats.isComposite(tileDataBuffer);
     if (isComposite) {
       const compositeTileData =
         TileFormats.readCompositeTileData(tileDataBuffer);
       for (const innerTileDataBuffer of compositeTileData.innerTileBuffers) {
-        TileFormats.extractGlbBuffersInternal(innerTileDataBuffer, glbBuffers);
+        await TileFormats.extractGlbBuffersInternal(
+          innerTileDataBuffer,
+          externalGlbResolver,
+          glbBuffers
+        );
       }
     } else {
       const tileData = TileFormats.readTileData(tileDataBuffer);
@@ -245,7 +264,71 @@ export class TileFormats {
         tileData.header.magic === "b3dm" ||
         tileData.header.magic === "i3dm"
       ) {
-        glbBuffers.push(tileData.payload);
+        const glbPayload = await TileFormats.obtainGlbPayload(
+          tileData,
+          externalGlbResolver
+        );
+        if (glbPayload) {
+          glbBuffers.push(glbPayload);
+        }
+      }
+    }
+  }
+
+  /**
+   * Split the given (CMPT) tile data and return one buffer for each
+   * of its inner tiles.
+   *
+   * If the given tile data is not CMPT data, it is returned directly.
+   * If `recursive===true`, then any inner tile data that is encountered
+   * and that also is CMPT data will be split and its elements added
+   * to the list of results.
+   *
+   * @param tileDataBuffer - The tile data
+   * @param recursive - Whether the tile data should be split recursively
+   * @returns The inner tile data buffers
+   */
+  static async splitCmpt(
+    tileDataBuffer: Buffer,
+    recursive: boolean
+  ): Promise<Buffer[]> {
+    const resultBuffers: Buffer[] = [];
+    await TileFormats.splitCmptInternal(
+      tileDataBuffer,
+      recursive,
+      resultBuffers
+    );
+    return resultBuffers;
+  }
+
+  /**
+   * Internal implementation for `splitCmpt`, called recursively
+   *
+   * @param tileDataBuffer - The tile data
+   * @param recursive - Whether the tile data should be split recursively
+   * @returns resultBuffers - The inner tile data buffers
+   */
+  private static async splitCmptInternal(
+    tileDataBuffer: Buffer,
+    recursive: boolean,
+    resultBuffers: Buffer[]
+  ) {
+    const isComposite = TileFormats.isComposite(tileDataBuffer);
+    if (!isComposite) {
+      resultBuffers.push(tileDataBuffer);
+    } else {
+      const compositeTileData =
+        TileFormats.readCompositeTileData(tileDataBuffer);
+      if (!recursive) {
+        resultBuffers.push(...compositeTileData.innerTileBuffers);
+      } else {
+        for (const innerTileBuffer of compositeTileData.innerTileBuffers) {
+          await TileFormats.splitCmptInternal(
+            innerTileBuffer,
+            recursive,
+            resultBuffers
+          );
+        }
       }
     }
   }
@@ -519,5 +602,99 @@ export class TileFormats {
     header.writeUInt32LE(tilesLength, 12);
 
     return Buffer.concat(buffers);
+  }
+
+  /**
+   * Returns the GLB data that is stored as tile payload
+   * of the given tile.
+   *
+   * This will exclude any padding bytes that may beve been
+   * inserted to satisfy the alignment requirements.
+   *
+   * This is applicable to B3DM tile data, and to I3DM
+   * tile data that uses `header.gltfFormat===1` (where
+   * the GLB data is stored directly as the payload).
+   *
+   * For I3DM data that uses a `header.gltfFormat` that may
+   * not be `1`, the `obtainGlbPayload` method may be used.
+   *
+   * @param tileData - The tile data
+   * @returns The GLB buffer from the tile data
+   */
+  static extractGlbPayload(tileData: TileData): Buffer {
+    return TileFormats.stripGlbPaddingBytes(tileData.payload);
+  }
+
+  /**
+   * Returns the GLB data that is stored as tile payload
+   * of the given tile.
+   *
+   * This will exclude any padding bytes that may beve been
+   * inserted to satisfy the alignment requirements.
+   *
+   * This is applicable to B3DM and I3DM tile data. If the data
+   * is an I3DM tile data that uses `header.gltfFormat===0`
+   * (meaning that the payload is only a URI to an external
+   * GLB file), then this data will be resolved using the
+   * given resolver function.
+   *
+   * @param tileData - The tile data
+   * @param externalGlbResolver - A function to resolve external
+   * GLB files for I3DMs that use `header.gltfFormat===0`
+   * @returns The GLB buffer from the tile data, or
+   * `undefined` if the data was external data that could not
+   * be resolved with the given function.
+   */
+  static async obtainGlbPayload(
+    tileData: TileData,
+    externalGlbResolver: (glbUri: string) => Promise<Buffer | undefined>
+  ): Promise<Buffer | undefined> {
+    if (tileData.header.magic !== "i3dm") {
+      return TileFormats.stripGlbPaddingBytes(tileData.payload);
+    }
+
+    // Obtain the GLB buffer for the I3DM tile data.
+    // With `gltfFormat===1`, it is stored directly as the payload.
+    // Otherwise, the payload is a URI that has to be resolved.
+    if (tileData.header.gltfFormat === 1) {
+      return TileFormats.stripGlbPaddingBytes(tileData.payload);
+    }
+    const glbUri = tileData.payload.toString().replace(/\0/g, "");
+    return externalGlbResolver(glbUri);
+  }
+
+  /**
+   * Remove any padding bytes at the end of a GLB buffer.
+   *
+   * The GLB data that was extracted as the `payload` of a `TileData`
+   * may include padding bytes at the end, to satisfy the alignment
+   * requirements of the 3D Tiles tile formats.
+   *
+   * If the given input is GLB data, then this method will strip
+   * any padding bytes, by restricting the buffer to the length
+   * that was obtained from the GLB header.
+   *
+   * If the given data is not GLB data, then the buffer is
+   * returned, unmodified.
+   *
+   * @param input - The buffer, including possible padding
+   * @returns The resulting buffer
+   */
+  private static stripGlbPaddingBytes(input: Buffer): Buffer {
+    // Handle the cases that indicate that the data is
+    // not GLB data
+    if (input.length < 12) {
+      return input;
+    }
+    const magic = input.readInt32LE(0);
+    if (magic !== 0x46546c67) {
+      return input;
+    }
+    const length = input.readInt32LE(8);
+    if (length >= input.length) {
+      return input;
+    }
+    const inputWithoutPadding = input.subarray(0, length);
+    return inputWithoutPadding;
   }
 }

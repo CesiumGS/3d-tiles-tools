@@ -1,13 +1,12 @@
 import path from "path";
 
-import { Loggers } from "@3d-tiles-tools/base";
-
 import { TilesetSources } from "@3d-tiles-tools/tilesets";
 import { TilesetTargets } from "@3d-tiles-tools/tilesets";
 import { TilesetError } from "@3d-tiles-tools/tilesets";
 import { Tilesets } from "@3d-tiles-tools/tilesets";
 import { ZipToPackage } from "@3d-tiles-tools/tilesets";
 
+import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("tilesetProcessing");
 
 /**
@@ -35,7 +34,7 @@ export class TilesetConverter {
    * contains a file that matches the required file for the output.
    *
    * @param input - The full input name
-   * @param inputTilesetJsonFileName The name of the tileset JSON file
+   * @param inputTilesetJsonFileName - The name of the tileset JSON file
    * in the input. When this is not given, then the name will either be
    * the file name of the input (if the input was a JSON file), or default
    * to 'tileset.json' (if the input was a directory or a tileset package)

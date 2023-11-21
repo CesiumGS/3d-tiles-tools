@@ -1,8 +1,6 @@
 import { BatchTable } from "@3d-tiles-tools/structure";
 import { PntsFeatureTable } from "@3d-tiles-tools/structure";
 
-import { Loggers } from "@3d-tiles-tools/base";
-
 import { TileFormats } from "@3d-tiles-tools/tilesets";
 import { TileTableData } from "@3d-tiles-tools/tilesets";
 import { BatchTables } from "@3d-tiles-tools/tilesets";
@@ -25,6 +23,7 @@ import { Ids } from "./Ids";
 import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils";
 import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils";
 
+import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("migration");
 
 /**
@@ -168,7 +167,7 @@ export class TileFormatsMigrationPnts {
    * attributes in the `EXT_structural_metadata` extension.
    *
    * @param pntsPointCloud - The point cloud that contains the PNTS data
-   * @param batchTable The batch table
+   * @param batchTable - The batch table
    * @returns The mapping
    */
   private static computeExternalProperties(

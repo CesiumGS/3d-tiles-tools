@@ -1,5 +1,6 @@
 import path from "path";
 
+import { defined } from "../base/defined";
 import { Buffers } from "../base/Buffers";
 
 import { ResourceResolver } from "../io/ResourceResolver";
@@ -104,7 +105,7 @@ export class LazyContentData implements ContentData {
 
   /** {@inheritDoc ContentData.exists} */
   async exists(): Promise<boolean> {
-    if (this._exists !== undefined) {
+    if (defined(this._exists)) {
       return this._exists;
     }
     const partialData = await this._resourceResolver.resolveDataPartial(
@@ -117,7 +118,7 @@ export class LazyContentData implements ContentData {
 
   /** {@inheritDoc ContentData.getMagic} */
   async getMagic(): Promise<Buffer> {
-    if (this._magic !== undefined) {
+    if (defined(this._magic)) {
       return this._magic;
     }
     const magicHeaderLength = 4;

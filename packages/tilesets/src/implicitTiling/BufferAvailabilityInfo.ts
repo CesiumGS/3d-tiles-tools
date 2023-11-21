@@ -3,6 +3,8 @@ import { AvailabilityInfo } from "./AvailabilityInfo";
 /**
  * Implementation of an `AvailabilityInfo` that is backed by
  * a Buffer.
+ *
+ * @internal
  */
 export class BufferAvailabilityInfo implements AvailabilityInfo {
   private readonly _buffer: Buffer;

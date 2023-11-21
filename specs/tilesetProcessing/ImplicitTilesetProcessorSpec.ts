@@ -16,7 +16,6 @@ import { TilesetSources } from "../../src/tilesetData/TilesetSources";
 const implicitInput = "./specs/data/tilesetProcessing/implicitProcessing";
 const implicitOutput =
   "./specs/data/output/tilesetProcessing/implicitProcessing";
-const quiet = true;
 const overwrite = true;
 
 /**
@@ -30,7 +29,7 @@ describe("BasicTilesetProcessor on implicit input", function () {
   });
 
   it("forEachExplicitTile covers all explicit tiles", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(implicitInput, implicitOutput, overwrite);
 
     // There is only one explicit tile in the 'implicitProcessing' data
@@ -46,7 +45,7 @@ describe("BasicTilesetProcessor on implicit input", function () {
   });
 
   it("forEachTile covers all tiles", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(implicitInput, implicitOutput, overwrite);
 
     const actualContentUris: string[][] = [];
@@ -67,7 +66,7 @@ describe("BasicTilesetProcessor on implicit input", function () {
   });
 
   it("processTileContentEntries processes the tile content entries", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(implicitInput, implicitOutput, overwrite);
     const specEntryProcessor = new SpecEntryProcessor();
     await tilesetProcessor.processTileContentEntries(
@@ -88,7 +87,7 @@ describe("BasicTilesetProcessor on implicit input", function () {
   });
 
   it("processTileContentEntries updates the content URIs", async function () {
-    const tilesetProcessor = new BasicTilesetProcessor(quiet);
+    const tilesetProcessor = new BasicTilesetProcessor();
     await tilesetProcessor.begin(implicitInput, implicitOutput, overwrite);
     const specEntryProcessor = new SpecEntryProcessor();
     await tilesetProcessor.processTileContentEntries(

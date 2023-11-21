@@ -3,6 +3,11 @@ import path from "path";
 /**
  * Methods related to tilesets.
  *
+ * Most of the methods in this class are either utility methods, or
+ * wrappers around the classes that implement parts of the command
+ * line functionality (and that may become `TilesetStage`s in a
+ * pipeline at some point).
+ *
  * @internal
  */
 export class Tilesets {

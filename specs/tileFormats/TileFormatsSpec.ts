@@ -1,8 +1,24 @@
 import fs from "fs";
+import path from "path";
 import { Buffers } from "../../src/base/Buffers";
 
 import { TileFormats } from "../../src/tileFormats/TileFormats";
 import { SpecHelpers } from "../SpecHelpers";
+
+function createResolver(
+  input: string
+): (uri: string) => Promise<Buffer | undefined> {
+  const baseDir = path.dirname(input);
+  const resolver = async (uri: string): Promise<Buffer | undefined> => {
+    const externalGlbUri = path.resolve(baseDir, uri);
+    try {
+      return fs.readFileSync(externalGlbUri);
+    } catch (error) {
+      console.error(`Could not resolve ${uri} against ${baseDir}`);
+    }
+  };
+  return resolver;
+}
 
 describe("TileFormats", function () {
   it("reads B3DM (deprecated 1) from a buffer", function () {
@@ -115,28 +131,95 @@ describe("TileFormats", function () {
     expect(tileData.innerTileBuffers.length).toBe(2);
   });
 
-  it("extracts a single GLB buffers from B3DM", function () {
+  it("extracts a single GLB buffers from B3DM", async function () {
     const p = "./specs/data/contentTypes/content.b3dm";
     const tileDataBuffer = fs.readFileSync(p);
-
-    const glbBuffers = TileFormats.extractGlbBuffers(tileDataBuffer);
+    const externalGlbResolver = createResolver(p);
+    const glbBuffers = await TileFormats.extractGlbBuffers(
+      tileDataBuffer,
+      externalGlbResolver
+    );
     expect(glbBuffers.length).toBe(1);
   });
 
-  it("extracts multiple GLB buffers from CMPT", function () {
+  it("extracts multiple GLB buffers from CMPT", async function () {
     const p = "./specs/data/contentTypes/content.cmpt";
     const tileDataBuffer = fs.readFileSync(p);
-
-    const glbBuffers = TileFormats.extractGlbBuffers(tileDataBuffer);
+    const externalGlbResolver = createResolver(p);
+    const glbBuffers = await TileFormats.extractGlbBuffers(
+      tileDataBuffer,
+      externalGlbResolver
+    );
     expect(glbBuffers.length).toBe(2);
   });
 
-  it("extracts no GLB buffers from PNTS", function () {
+  it("extracts a single GLB buffer from an I3DM that refers to an external GLB", async function () {
+    const p = "./specs/data/tileFormats/instancedGltfExternal.i3dm";
+    const tileDataBuffer = fs.readFileSync(p);
+    const externalGlbResolver = createResolver(p);
+    const glbBuffers = await TileFormats.extractGlbBuffers(
+      tileDataBuffer,
+      externalGlbResolver
+    );
+    expect(glbBuffers.length).toBe(1);
+  });
+
+  it("extracts no GLB buffers from PNTS", async function () {
     const p = "./specs/data/contentTypes/content.pnts";
     const tileDataBuffer = fs.readFileSync(p);
-
-    const glbBuffers = TileFormats.extractGlbBuffers(tileDataBuffer);
+    const externalGlbResolver = createResolver(p);
+    const glbBuffers = await TileFormats.extractGlbBuffers(
+      tileDataBuffer,
+      externalGlbResolver
+    );
     expect(glbBuffers.length).toBe(0);
+  });
+
+  it("properly omits padding bytes in extractGlbPayload for b3dmToGlb", async function () {
+    const p = "./specs/data/tileFormats/box.glb";
+
+    const inputGlbBuffer = fs.readFileSync(p);
+    const inputB3dmTileData =
+      TileFormats.createDefaultB3dmTileDataFromGlb(inputGlbBuffer);
+    const b3dmBuffer = TileFormats.createTileDataBuffer(inputB3dmTileData);
+
+    const outputB3dmTileData = TileFormats.readTileData(b3dmBuffer);
+    const outputGlbBuffer = TileFormats.extractGlbPayload(outputB3dmTileData);
+
+    // The input GLB is NOT 8-byte-aligned
+    expect(inputGlbBuffer.length % 8).not.toEqual(0);
+
+    // The payload from the generated B3DM tile data is
+    // aligned to 8 bytes
+    expect(outputB3dmTileData.payload.length % 8).toEqual(0);
+
+    // The GLB that is extracted from the B3DM tile data
+    // has the same length as the original input
+    expect(outputGlbBuffer.length).toEqual(inputGlbBuffer.length);
+  });
+
+  it("splits a composite with splitCmpt", async function () {
+    const p = "./specs/data/composite.cmpt";
+    const recursive = false;
+    const inputBuffer = fs.readFileSync(p);
+    const outputBuffers = await TileFormats.splitCmpt(inputBuffer, recursive);
+    expect(outputBuffers.length).toEqual(2);
+  });
+
+  it("splits a composite-of-composite into a single file with non-recursive splitCmpt", async function () {
+    const p = "./specs/data/compositeOfComposite.cmpt";
+    const recursive = false;
+    const inputBuffer = fs.readFileSync(p);
+    const outputBuffers = await TileFormats.splitCmpt(inputBuffer, recursive);
+    expect(outputBuffers.length).toEqual(1);
+  });
+
+  it("splits a composite-of-composite into a all 'leaf' tiles with recursive splitCmpt", async function () {
+    const p = "./specs/data/compositeOfComposite.cmpt";
+    const recursive = true;
+    const inputBuffer = fs.readFileSync(p);
+    const outputBuffers = await TileFormats.splitCmpt(inputBuffer, recursive);
+    expect(outputBuffers.length).toEqual(2);
   });
 
   it("throws an error when trying to read tile data from a buffer that does not contain B3DM, I3DM, or PNTS", function () {

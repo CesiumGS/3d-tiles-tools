@@ -1,11 +1,13 @@
+import { defined } from "@3d-tiles-tools/base";
+
+import { Availability } from "@3d-tiles-tools/structure";
+import { TileImplicitTiling } from "@3d-tiles-tools/structure";
+
 import { AvailabilityInfo } from "./AvailabilityInfo";
 import { BufferAvailabilityInfo } from "./BufferAvailabilityInfo";
 import { ConstantAvailabilityInfo } from "./ConstantAvailabilityInfo";
 import { ImplicitTilings } from "./ImplicitTilings";
 import { ImplicitTilingError } from "./ImplicitTilingError";
-
-import { Availability } from "@3d-tiles-tools/structure";
-import { TileImplicitTiling } from "@3d-tiles-tools/structure";
 
 /**
  * Methods for creating `AvailabilityInfo` instances
@@ -73,13 +75,13 @@ export class AvailabilityInfos {
     length: number
   ): AvailabilityInfo {
     const constant = availability.constant;
-    if (constant !== undefined) {
+    if (defined(constant)) {
       const available = constant === 1;
       return new ConstantAvailabilityInfo(available, length);
     }
     // The bitstream MUST be defined when constant is undefined
     const bitstream = availability.bitstream;
-    if (bitstream === undefined) {
+    if (!defined(bitstream)) {
       throw new ImplicitTilingError(
         "The availability neither defines a constant nor a bitstream"
       );

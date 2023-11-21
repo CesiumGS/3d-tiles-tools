@@ -1,6 +1,6 @@
-import { GltfUtilities } from "./GltfUtilities";
-
 import { TileFormats } from "@3d-tiles-tools/tilesets";
+
+import { GltfUtilities } from "./GltfUtilities";
 
 /**
  * Internal class containing functions to upgrade tile content data.

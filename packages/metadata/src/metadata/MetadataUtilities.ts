@@ -1,5 +1,8 @@
+import { defined } from "@3d-tiles-tools/base";
+
 import { Schema } from "@3d-tiles-tools/structure";
 import { ClassProperty } from "@3d-tiles-tools/structure";
+import { MetadataEnum } from "@3d-tiles-tools/structure";
 
 import { BinaryEnumInfo } from "./binary/BinaryEnumInfo";
 
@@ -21,6 +24,7 @@ export class MetadataUtilities {
     const binaryEnumInfo: BinaryEnumInfo = {
       enumValueTypes: MetadataUtilities.computeEnumValueTypes(schema),
       enumValueNameValues: MetadataUtilities.computeEnumValueNameValues(schema),
+      enumValueValueNames: MetadataUtilities.computeEnumValueValueNames(schema),
     };
     return binaryEnumInfo;
   }
@@ -49,6 +53,39 @@ export class MetadataUtilities {
   }
 
   /**
+   * Computes the value type of the enum that is represented with
+   * the given class property.
+   *
+   * This assumes that the given schema and class property are
+   * structurally valid: If the class property is not an ENUM
+   * property, or the schema does not define enums, then
+   * `undefined` is returned.
+   *
+   * Otherwise, the `valueType` of the respective enum is returned
+   * (defaulting to `UINT16` if it did not define one).
+   *
+   * @param schema - The metadata `Schema`
+   * @param classProperty - The `ClassProperty`
+   * @returns The enum value type, or `undefined`.
+   */
+  static computeEnumValueType(
+    schema: Schema,
+    classProperty: ClassProperty
+  ): string | undefined {
+    const enumType = classProperty.enumType;
+    if (enumType === undefined) {
+      return undefined;
+    }
+    const enums = schema.enums;
+    if (enums === undefined) {
+      return undefined;
+    }
+    const metadataEnum = enums[enumType];
+    const valueType = metadataEnum.valueType ?? "UINT16";
+    return valueType;
+  }
+
+  /**
    * Computes a mapping from enum type names to the dictionaries
    * that map the enum values names to the enum value values.
    *
@@ -69,19 +106,88 @@ export class MetadataUtilities {
     if (enums) {
       for (const enumName of Object.keys(enums)) {
         const metadataEnum = enums[enumName];
-        const nameValues: {
-          [key: string]: number;
-        } = {};
-        for (let i = 0; i < metadataEnum.values.length; i++) {
-          const enumValue = metadataEnum.values[i];
-          const value = enumValue.value;
-          const name = enumValue.name;
-          nameValues[name] = value;
-        }
+        const nameValues =
+          MetadataUtilities.computeMetadataEnumValueNameValues(metadataEnum);
         enumValueNameValues[enumName] = nameValues;
       }
     }
     return enumValueNameValues;
+  }
+  /**
+   * Computes a mapping from enum values names to the enum value values
+   * for the given metadata enum.
+   *
+   * @param metadataEnum - The metadata enum
+   * @returns The mapping from enum value names to enum value values
+   */
+  static computeMetadataEnumValueNameValues(metadataEnum: MetadataEnum): {
+    [key: string]: number;
+  } {
+    const nameValues: {
+      [key: string]: number;
+    } = {};
+    for (let i = 0; i < metadataEnum.values.length; i++) {
+      const enumValue = metadataEnum.values[i];
+      const value = enumValue.value;
+      const name = enumValue.name;
+      nameValues[name] = value;
+    }
+    return nameValues;
+  }
+
+  /**
+   * Computes a mapping from enum type names to the dictionaries
+   * that map the enum value values to the enum value names.
+   *
+   * @param schema - The metadata `Schema`
+   * @returns The mapping from enum type names to dictionaries
+   */
+  private static computeEnumValueValueNames(schema: Schema): {
+    [key: string]: {
+      [key: number]: string;
+    };
+  } {
+    const enumValueValueNames: {
+      [key: string]: {
+        [key: number]: string;
+      };
+    } = {};
+    const enums = schema.enums;
+    if (enums) {
+      for (const enumName of Object.keys(enums)) {
+        const metadataEnum = enums[enumName];
+        const valueNames =
+          MetadataUtilities.computeMetadataEnumValueValueNames(metadataEnum);
+        enumValueValueNames[enumName] = valueNames;
+      }
+    }
+    return enumValueValueNames;
+  }
+
+  /**
+   * Computes a mapping from enum value values to enum value names
+   * for the given metadata enum.
+   *
+   * The name and comment look strange, but this is indeed the mapping from
+   * `metadataEnum.values[i].value` to `metadataEnum.values[i].name` for
+   * the given metadata enum.
+   *
+   * @param metadataEnum - The metadata enum
+   * @returns The mapping from enum value values to enum value names.
+   */
+  static computeMetadataEnumValueValueNames(metadataEnum: MetadataEnum): {
+    [key: number]: string;
+  } {
+    const valueNames: {
+      [key: number]: string;
+    } = {};
+    for (let i = 0; i < metadataEnum.values.length; i++) {
+      const enumValue = metadataEnum.values[i];
+      const value = enumValue.value;
+      const name = enumValue.name;
+      valueNames[value] = name;
+    }
+    return valueNames;
   }
 
   /**
@@ -106,7 +212,7 @@ export class MetadataUtilities {
       return [];
     }
     const enumType = classProperty.enumType;
-    if (enumType === undefined) {
+    if (!defined(enumType)) {
       return [];
     }
     const enums = schema.enums;
@@ -114,7 +220,7 @@ export class MetadataUtilities {
       return [];
     }
     const theEnum = enums[enumType];
-    if (theEnum === undefined) {
+    if (!defined(theEnum)) {
       return [];
     }
     const enumValues = theEnum.values;

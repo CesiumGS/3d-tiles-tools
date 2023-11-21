@@ -1,3 +1,5 @@
+import { defined } from "../base/defined";
+
 import { ResourceResolver } from "../io/ResourceResolver";
 
 import { BinaryBufferData } from "./BinaryBufferData";
@@ -40,7 +42,7 @@ export class BinaryBufferDataResolver {
     const buffers = binaryBufferStructure.buffers;
     if (buffers) {
       for (const buffer of buffers) {
-        if (buffer.uri === undefined) {
+        if (!defined(buffer.uri)) {
           if (!binaryBuffer) {
             throw new BinaryDataError(
               "Expected a binary buffer, but got undefined"

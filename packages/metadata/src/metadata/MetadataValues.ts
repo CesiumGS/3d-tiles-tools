@@ -1,3 +1,5 @@
+import { defined } from "@3d-tiles-tools/base";
+
 import { ClassProperty } from "@3d-tiles-tools/structure";
 
 import { MetadataComponentTypes } from "./MetadataComponentTypes";
@@ -46,12 +48,12 @@ export class MetadataValues {
   ): any {
     const noData = classProperty.noData;
     const defaultValue = classProperty.default;
-    if (noData !== undefined) {
+    if (defined(noData)) {
       if (ArrayValues.deepEquals(value, noData)) {
         return ArrayValues.deepClone(defaultValue);
       }
     }
-    if (value === undefined) {
+    if (!defined(value)) {
       return ArrayValues.deepClone(defaultValue);
     }
     value = ArrayValues.deepClone(value);
@@ -60,15 +62,15 @@ export class MetadataValues {
       const componentType = classProperty.componentType;
       value = MetadataValues.normalize(value, componentType);
     }
-    const offset =
-      offsetOverride !== undefined ? offsetOverride : classProperty.offset;
-    const scale =
-      scaleOverride !== undefined ? scaleOverride : classProperty.scale;
+    const offset = defined(offsetOverride)
+      ? offsetOverride
+      : classProperty.offset;
+    const scale = defined(scaleOverride) ? scaleOverride : classProperty.scale;
 
-    if (scale !== undefined) {
+    if (defined(scale)) {
       value = ArrayValues.deepMultiply(value, scale);
     }
-    if (offset !== undefined) {
+    if (defined(offset)) {
       value = ArrayValues.deepAdd(value, offset);
     }
     return value;
@@ -91,5 +93,49 @@ export class MetadataValues {
       value[i] = MetadataValues.normalize(value[i], componentType);
     }
     return value;
+  }
+
+  /**
+   * Processes the given "raw" value that was obtained for a metadata
+   * ENUM property in a numeric form (e.g. from a binary property
+   * table), and returns the processed value according to the type
+   * definition that is given by the given class property.
+   *
+   * If the type defines a `noData` value, and the given value
+   * is the `noData` value, then the `default` value of the type
+   * is returned.
+   *
+   * Otherwise, this will translate the numeric representation
+   * of the enum value into the string representation.
+   *
+   * @param classProperty - The `ClassProperty`
+   * @param valueValueNames - The mapping from enum value values
+   * to enum value names for the enum type of the given class
+   * property.
+   * @param value - The value
+   * @returns The processed value
+   */
+  static processNumericEnumValue(
+    classProperty: ClassProperty,
+    valueValueNames: { [key: number]: string },
+    value: number | number[]
+  ): any {
+    let stringValue;
+    if (Array.isArray(value)) {
+      stringValue = value.map((e: number) => valueValueNames[e]);
+    } else {
+      stringValue = valueValueNames[value];
+    }
+    const noData = classProperty.noData;
+    const defaultValue = classProperty.default;
+    if (defined(noData)) {
+      if (ArrayValues.deepEquals(stringValue, noData)) {
+        return ArrayValues.deepClone(defaultValue);
+      }
+    }
+    if (!defined(stringValue)) {
+      return ArrayValues.deepClone(defaultValue);
+    }
+    return stringValue;
   }
 }
