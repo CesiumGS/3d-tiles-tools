@@ -16,7 +16,9 @@
 
   "scripts": {
     "about:build": "echo 'Run the TypeScript compiler to generate the build output.'",
-    "build": "npx tsc"
+    "about:test": "echo 'Execute the unit tests'",
+    "build": "npx tsc --build",
+    "test": "ts-node ../../node_modules/jasmine/bin/jasmine --config=specs/jasmine.json"
   }
 }
 

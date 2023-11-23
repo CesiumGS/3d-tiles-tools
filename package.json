@@ -63,7 +63,7 @@
     "about:package": "echo 'Prepare a package that can then be published on NPM'",
     "start": "npx ts-node src/main.ts",
     "eslint": "eslint \"./**/*.ts\" --cache",
-    "build": "tsc --build --verbose",
+    "build": "tsc --build",
     "test": "ts-node node_modules/jasmine/bin/jasmine --config=specs/jasmine.json",
     "coverage": "nyc npm run test",
     "prettier-check": "prettier --check \"**/*\"",

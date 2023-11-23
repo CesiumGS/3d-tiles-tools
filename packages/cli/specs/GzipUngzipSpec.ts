@@ -1,6 +1,6 @@
 import path from "path";
 
-import { SpecHelpers } from "./SpecHelpers";
+import { SpecHelpers } from "../../../specs/SpecHelpers";
 import { ToolsMain } from "../src/ToolsMain";
 
 const simpleTileset = "./specs/data/gzipUngzip/simpleTileset";

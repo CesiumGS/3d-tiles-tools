@@ -1,0 +1,6 @@
+{
+  "spec_dir": "build/specs",
+  "spec_files": ["**/*Spec.?s"],
+  "helpers": [],
+  "random": false
+}

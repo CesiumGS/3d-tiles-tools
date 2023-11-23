@@ -3,17 +3,19 @@
 import { LazyContentData } from "../../src/contentTypes/LazyContentData";
 import { ResourceResolver } from "../../src/io/ResourceResolver";
 
-import { TilesetSourceResourceResolver } from "../../src/io/TilesetSourceResourceResolver";
-import { TilesetInMemory } from "../../src/tilesetData/TilesetInMemory";
-
 function createTestResourceResolver(): ResourceResolver {
-  const tilesetSource = new TilesetInMemory();
-  tilesetSource.open("");
-  const resourceResolver = new TilesetSourceResourceResolver(
-    ".",
-    tilesetSource
-  );
-  return resourceResolver;
+  return {
+    async resolveData(uri: string): Promise<Buffer | null> {
+      return null;
+    },
+    async resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>
+    {
+      return null;
+    }, 
+    derive(uri: string): ResourceResolver {
+      return this;
+    }
+  }
 }
 
 describe("LazyContentData", function () {

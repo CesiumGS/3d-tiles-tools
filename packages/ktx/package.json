@@ -15,7 +15,7 @@
 
   "scripts": {
     "about:build": "echo 'Run the TypeScript compiler to generate the build output.'",
-    "build": "npx tsc && npm run build-copy",
+    "build": "npx tsc --build && npm run build-copy",
     "build-copy": "npx copyfiles --flat ./src/ktx/external/basis_encoder.wasm build/ktx/external"
   }
 }
