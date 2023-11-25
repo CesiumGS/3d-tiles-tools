@@ -1,8 +1,10 @@
 import fs from "fs";
-import { Paths } from "../../src/base/Paths";
+
+import { Paths } from "@3d-tiles-tools/base";
 
 import { TilesetJsonCreator } from "../../src/tilesetProcessing/TilesetJsonCreator";
-import { SpecHelpers } from "../SpecHelpers";
+
+import { SpecHelpers } from "../../../../specs/SpecHelpers";
 
 const sourceDir = "./specs/data/createTilesetJson/input/";
 const targetDir = "./specs/data/createTilesetJson/output/";

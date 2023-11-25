@@ -1,10 +1,10 @@
 import fs from "fs";
 
-import { Paths } from "../../src/base/Paths";
+import { Paths } from "@3d-tiles-tools/base";
 
-import { Tilesets } from "../../src/tilesets/Tilesets";
+import { TilesetOperations } from "../../src/tilesetProcessing/TilesetOperations";
 
-import { SpecHelpers } from "../SpecHelpers";
+import { SpecHelpers } from "../../../../specs/SpecHelpers";
 
 const basicInput = "./specs/data/combineTilesets/nestedExternal";
 const basicOutput = "./specs/data/output/combineTilesets/nestedExternal";
@@ -16,7 +16,7 @@ describe("TilesetCombiner", function () {
   });
 
   it("combines external tilesets into a single tileset", async function () {
-    await Tilesets.combine(basicInput, basicOutput, overwrite);
+    await TilesetOperations.combine(basicInput, basicOutput, overwrite);
 
     // Ensure that the output directory contains the expected files:
     // All files of the input, except for the external tileset JSON files

@@ -1,19 +1,17 @@
 import fs from "fs";
 
-import { SpecHelpers } from "../SpecHelpers";
-import { SpecEntryProcessor } from "./SpecEntryProcessor";
+import { Paths } from "@3d-tiles-tools/base";
 
-import { Paths } from "../../src/base/Paths";
+import { Tile } from "@3d-tiles-tools/structure";
+
+import { Tiles } from "@3d-tiles-tools/tilesets";
+import { TraversedTile } from "@3d-tiles-tools/tilesets";
+import { TilesetEntry } from "@3d-tiles-tools/tilesets";
 
 import { BasicTilesetProcessor } from "../../src/tilesetProcessing/BasicTilesetProcessor";
 
-import { Tiles } from "../../src/tilesets/Tiles";
-
-import { Tile } from "../../src/structure/Tile";
-
-import { TraversedTile } from "../../src/traversal/TraversedTile";
-
-import { TilesetEntry } from "../../src/tilesetData/TilesetEntry";
+import { SpecEntryProcessor } from "./SpecEntryProcessor";
+import { SpecHelpers } from "../../../../specs/SpecHelpers";
 
 const basicInput = "./specs/data/tilesetProcessing/basicProcessing";
 const basicOutput = "./specs/data/output/tilesetProcessing/basicProcessing";

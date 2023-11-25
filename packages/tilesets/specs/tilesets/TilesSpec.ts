@@ -1,4 +1,5 @@
-import { Tile } from "../../src/structure/Tile";
+import { Tile } from "@3d-tiles-tools/structure";
+
 import { Tiles } from "../../src/tilesets/Tiles";
 
 //============================================================================

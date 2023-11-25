@@ -1,6 +1,6 @@
 import { TilesetConverter } from "../../src/tilesetProcessing/TilesetConverter";
 
-import { SpecHelpers } from "../SpecHelpers";
+import { SpecHelpers } from "../../../../specs/SpecHelpers";
 
 const inputBaseDir = "./specs/data/convert/";
 const outputBaseDir = "./specs/data/output/convert/";

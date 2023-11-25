@@ -5,7 +5,7 @@ import { TilesetInMemory } from "../../src/tilesetData/TilesetInMemory";
 import { TilesetTarget3tz } from "../../src/packages/TilesetTarget3tz";
 import { TilesetTarget3dtiles } from "../../src/packages/TilesetTarget3dtiles";
 
-import { SpecHelpers } from "../SpecHelpers";
+import { SpecHelpers } from "../../../../specs/SpecHelpers";
 
 // The basic contract that is established by the `TilesetTarget`
 // interface is checked for these implementations:

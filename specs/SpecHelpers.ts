@@ -1,26 +1,105 @@
 import fs from "fs";
 
-import { Iterables } from "../src/base/Iterables";
-import { Buffers } from "../src/base/Buffers";
-import { Paths } from "../src/base/Paths";
-import { DeveloperError } from "../src/base/DeveloperError";
+import { defaultValue } from "@3d-tiles-tools/base";
+import { Iterables } from "@3d-tiles-tools/base";
+import { Buffers } from "@3d-tiles-tools/base";
+import { Paths } from "@3d-tiles-tools/base";
+import { DeveloperError } from "@3d-tiles-tools/base";
 
-import { Tile } from "../src/structure/Tile";
-import { Tileset } from "../src/structure/Tileset";
+import { Tile } from "@3d-tiles-tools/structure";
+import { Tileset } from "@3d-tiles-tools/structure";
 
-import { Tiles } from "../src/tilesets/Tiles";
-
-import { TilesetSourceResourceResolver } from "../src/io/TilesetSourceResourceResolver";
-
-import { TilesetTraverser } from "../src/traversal/TilesetTraverser";
-
-import { TilesetSource } from "../src/tilesetData/TilesetSource";
-import { TilesetSources } from "../src/tilesetData/TilesetSources";
+import { Tiles } from "@3d-tiles-tools/tilesets";
+import { TilesetTraverser } from "@3d-tiles-tools/tilesets";
+import { TilesetSource } from "@3d-tiles-tools/tilesets";
+import { TilesetSources } from "@3d-tiles-tools/tilesets";
+import { TilesetSourceResourceResolver } from "@3d-tiles-tools/tilesets";
 
 /**
  * Utility methods for the specs
  */
 export class SpecHelpers {
+  /**
+   * Reads a JSON file, parses it, and returns the result.
+   * If the file cannot be read or parsed, then an error
+   * message will be printed and `undefined` is returned.
+   *
+   * @param filePath - The path to the file
+   * @returns A promise that resolves with the result or `undefined`
+   */
+  static async readJsonUnchecked(filePath: string): Promise<any> {
+    try {
+      const data = fs.readFileSync(filePath);
+      if (!data) {
+        console.error("Could not read " + filePath);
+        return undefined;
+      }
+      const jsonString = data.toString();
+      const result = JSON.parse(jsonString);
+      return result;
+    } catch (error) {
+      console.error("Could not parse JSON", error);
+      return undefined;
+    }
+  }
+
+  /**
+   * Returns whether two numbers are equal, up to a certain epsilon
+   *
+   * @param left - The first value
+   * @param right - The second value
+   * @param relativeEpsilon - The maximum inclusive delta for the relative tolerance test.
+   * @param absoluteEpsilon - The maximum inclusive delta for the absolute tolerance test.
+   * @returns Whether the values are equal within the epsilon
+   */
+  static equalsEpsilon(
+    left: number,
+    right: number,
+    relativeEpsilon: number,
+    absoluteEpsilon?: number
+  ) {
+    relativeEpsilon = defaultValue(relativeEpsilon, 0.0);
+    absoluteEpsilon = defaultValue(absoluteEpsilon, relativeEpsilon);
+    const absDiff = Math.abs(left - right);
+    return (
+      absDiff <= absoluteEpsilon ||
+      absDiff <= relativeEpsilon * Math.max(Math.abs(left), Math.abs(right))
+    );
+  }
+
+  /**
+   * A function for checking values for equality, taking into account the
+   * possibility that the values are (potentially multi- dimensional)
+   * arrays, and recursively comparing the elements in this case.
+   * If the eventual elements are numbers, they are compared for
+   * equality up to the given relative epsilon.
+   *
+   * This is ONLY used in the specs, to compare metadata values.
+   *
+   * @param a - The first element
+   * @param b - The second element
+   * @param epsilon - A relative epsilon
+   * @returns Whether the objects are equal
+   */
+  static genericEquals(a: any, b: any, epsilon: number): boolean {
+    if (Array.isArray(a) && Array.isArray(b)) {
+      if (a.length !== b.length) {
+        return false;
+      }
+
+      for (let i = 0; i < a.length; ++i) {
+        if (!SpecHelpers.genericEquals(a[i], b[i], epsilon)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    if (typeof a === "number") {
+      return SpecHelpers.equalsEpsilon(a, Number(b), epsilon);
+    }
+    return a === b;
+  }
+
   /**
    * Returns the given byte length, padded if necessary to
    * be a multiple of 8

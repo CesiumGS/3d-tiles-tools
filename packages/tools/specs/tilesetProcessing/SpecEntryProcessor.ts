@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import path from "path";
 
-import { TilesetEntry } from "../../src/tilesetData/TilesetEntry";
-import { Paths } from "../../src/base/Paths";
+import { Paths } from "@3d-tiles-tools/base";
+
+import { TilesetEntry } from "@3d-tiles-tools/tilesets";
 
 /**
  * Utility class for processing tileset entries for the specs.

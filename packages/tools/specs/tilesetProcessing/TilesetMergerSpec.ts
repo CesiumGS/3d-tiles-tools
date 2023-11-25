@@ -1,10 +1,10 @@
 import fs from "fs";
 
-import { Paths } from "../../src/base/Paths";
+import { Paths } from "@3d-tiles-tools/base";
 
-import { Tilesets } from "../../src/tilesets/Tilesets";
+import { TilesetOperations } from "../../src/tilesetProcessing/TilesetOperations";
 
-import { SpecHelpers } from "../SpecHelpers";
+import { SpecHelpers } from "../../../../specs/SpecHelpers";
 
 const basicInputs = [
   "./specs/data/mergeTilesets/basicMerge/TilesetA",
@@ -19,7 +19,7 @@ describe("TilesetMerger", function () {
   });
 
   it("merges tilesets into a single tileset", async function () {
-    await Tilesets.merge(basicInputs, basicOutput, overwrite);
+    await TilesetOperations.merge(basicInputs, basicOutput, overwrite);
 
     // Ensure that the output directory contains the expected files:
     // All files of the input, disambiguated for the same base name

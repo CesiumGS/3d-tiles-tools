@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
-import { Buffers } from "../../src/base/Buffers";
+import { Buffers } from "@3d-tiles-tools/base";
 
 import { TileFormats } from "../../src/tileFormats/TileFormats";
-import { SpecHelpers } from "../SpecHelpers";
+import { SpecHelpers } from "../../../../specs/SpecHelpers";
 
 function createResolver(
   input: string

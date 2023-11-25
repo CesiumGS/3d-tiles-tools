@@ -2,7 +2,7 @@
 
 import { TilesetUpgrader } from "../../src/tilesetProcessing/TilesetUpgrader";
 
-import { Tileset } from "../../src/structure/Tileset";
+import { Tileset } from "@3d-tiles-tools/structure";
 
 const gltfUpgradeOptions = undefined;
 

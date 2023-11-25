@@ -8,14 +8,16 @@ function createTestResourceResolver(): ResourceResolver {
     async resolveData(uri: string): Promise<Buffer | null> {
       return null;
     },
-    async resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>
-    {
+    async resolveDataPartial(
+      uri: string,
+      maxBytes: number
+    ): Promise<Buffer | null> {
       return null;
-    }, 
+    },
     derive(uri: string): ResourceResolver {
       return this;
-    }
-  }
+    },
+  };
 }
 
 describe("LazyContentData", function () {

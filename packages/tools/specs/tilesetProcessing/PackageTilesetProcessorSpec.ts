@@ -1,6 +1,6 @@
-import { SpecHelpers } from "../SpecHelpers";
-
 import { BasicTilesetProcessor } from "../../src/tilesetProcessing/BasicTilesetProcessor";
+
+import { SpecHelpers } from "../../../../specs/SpecHelpers";
 
 const inputRoot = "./specs/data/tilesetProcessing/";
 

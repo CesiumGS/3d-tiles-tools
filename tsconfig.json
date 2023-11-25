@@ -19,8 +19,8 @@
       "*": ["./src/*.d.ts"]
     }
   },
-  "include": ["src"],
-  "exclude": ["node_modules"],
+  "include": ["specs"],
+  "exclude": ["node_modules", "specs/data"],
   "references": [
     {
       "path": "./packages/structure/tsconfig.json"
@@ -29,10 +29,10 @@
       "path": "./packages/gltf-extensions/tsconfig.json"
     },
     {
-      "path": "./packages/ktx/tsconfig.json"
+      "path": "./packages/base/tsconfig.json"
     },
     {
-      "path": "./packages/base/tsconfig.json"
+      "path": "./packages/ktx/tsconfig.json"
     },
     {
       "path": "./packages/metadata/tsconfig.json"

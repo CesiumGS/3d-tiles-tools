@@ -1,17 +1,15 @@
 import path from "path";
 
-import { SpecHelpers } from "../SpecHelpers";
-import { SpecEntryProcessor } from "./SpecEntryProcessor";
+import { Tile } from "@3d-tiles-tools/structure";
+
+import { Tiles } from "@3d-tiles-tools/tilesets";
+import { TraversedTile } from "@3d-tiles-tools/tilesets";
+import { TilesetSources } from "@3d-tiles-tools/tilesets";
 
 import { BasicTilesetProcessor } from "../../src/tilesetProcessing/BasicTilesetProcessor";
 
-import { Tiles } from "../../src/tilesets/Tiles";
-
-import { Tile } from "../../src/structure/Tile";
-
-import { TraversedTile } from "../../src/traversal/TraversedTile";
-
-import { TilesetSources } from "../../src/tilesetData/TilesetSources";
+import { SpecEntryProcessor } from "./SpecEntryProcessor";
+import { SpecHelpers } from "../../../../specs/SpecHelpers";
 
 const implicitInput = "./specs/data/tilesetProcessing/implicitProcessing";
 const implicitOutput =

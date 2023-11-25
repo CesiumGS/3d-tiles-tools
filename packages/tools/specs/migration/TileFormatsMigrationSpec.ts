@@ -1,11 +1,12 @@
 import fs from "fs";
 
+import { TilesetOperations } from "../../src/tilesetProcessing/TilesetOperations";
+
+import { Paths } from "@3d-tiles-tools/base";
+
 import { GltfUtilities } from "../../src/contentProcessing/GltfUtilities";
 
-import { Tilesets } from "../../src/tilesets/Tilesets";
-
-import { SpecHelpers } from "../SpecHelpers";
-import { Paths } from "../../src/base/Paths";
+import { SpecHelpers } from "../../../../specs/SpecHelpers";
 
 const sourceDir = "./specs/data/migration/input/";
 const targetDir = "./specs/data/migration/output/";
@@ -39,7 +40,7 @@ async function computeJsonStrings(
   const overwrite = true;
   const targetVersion = "1.1";
   const gltfUpgradeOptions = undefined;
-  await Tilesets.upgrade(
+  await TilesetOperations.upgrade(
     sourceName,
     targetName,
     overwrite,
