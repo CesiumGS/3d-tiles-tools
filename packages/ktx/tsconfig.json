@@ -5,6 +5,9 @@
     "composite": true,
     "outDir": "./build",
     "rootDir": "./src",
+    "paths": {
+      "@3d-tiles-tools/base": ["../packages/base/build/src/index.d.ts"],
+    }
   },
   "include": [
     "src/**/*"
