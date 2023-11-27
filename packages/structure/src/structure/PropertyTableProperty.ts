@@ -1,4 +1,4 @@
-import { RootProperty } from "./RootProperty";
+import { RootProperty } from "./RootProperty.js";
 
 /**
  * An array of binary property values. This represents one column of a

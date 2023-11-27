@@ -1,8 +1,8 @@
 import { Document } from "@gltf-transform/core";
 
-import { TileFormatsMigrationPnts } from "./TileFormatsMigrationPnts";
-import { TileFormatsMigrationB3dm } from "./TileFormatsMigrationB3dm";
-import { TileFormatsMigrationI3dm } from "./TileFormatsMigrationI3dm";
+import { TileFormatsMigrationPnts } from "./TileFormatsMigrationPnts.js";
+import { TileFormatsMigrationB3dm } from "./TileFormatsMigrationB3dm.js";
+import { TileFormatsMigrationI3dm } from "./TileFormatsMigrationI3dm.js";
 
 /**
  * Methods for converting "legacy" tile formats into glTF assets

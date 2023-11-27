@@ -1,4 +1,4 @@
-import { RootProperty } from "./RootProperty";
+import { RootProperty } from "./RootProperty.js";
 
 /**
  * An object describing the location of subtree files.

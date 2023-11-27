@@ -1,9 +1,9 @@
 import { defined } from "@3d-tiles-tools/base";
 
-import { MetadataEntityModel } from "./MetadataEntityModel";
-import { MetadataValues } from "./MetadataValues";
-import { MetadataError } from "./MetadataError";
-import { PropertyTableModel } from "./PropertyTableModel";
+import { MetadataEntityModel } from "./MetadataEntityModel.js";
+import { MetadataValues } from "./MetadataValues.js";
+import { MetadataError } from "./MetadataError.js";
+import { PropertyTableModel } from "./PropertyTableModel.js";
 
 /**
  * Implementation of a `MetadataEntityModel` that is backed by an

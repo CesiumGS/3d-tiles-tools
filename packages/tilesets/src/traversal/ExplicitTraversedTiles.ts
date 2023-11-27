@@ -3,13 +3,13 @@ import { ResourceResolver } from "@3d-tiles-tools/base";
 import { TileImplicitTiling } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
 
-import { TraversedTile } from "./TraversedTile";
-import { ExplicitTraversedTile } from "./ExplicitTraversedTile";
-import { ImplicitTraversedTile } from "./ImplicitTraversedTile";
-import { SubtreeModels } from "./SubtreeModels";
+import { TraversedTile } from "./TraversedTile.js";
+import { ExplicitTraversedTile } from "./ExplicitTraversedTile.js";
+import { ImplicitTraversedTile } from "./ImplicitTraversedTile.js";
+import { SubtreeModels } from "./SubtreeModels.js";
 
-import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError";
-import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
+import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError.js";
+import { ImplicitTilings } from "../implicitTiling/ImplicitTilings.js";
 
 /**
  * Internal methods used in the `ExplicitTraversedTile` class.

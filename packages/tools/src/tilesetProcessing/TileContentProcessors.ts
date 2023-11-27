@@ -1,4 +1,4 @@
-import { TileContentProcessor } from "./TileContentProcessor";
+import { TileContentProcessor } from "./TileContentProcessor.js";
 
 /**
  * Methods related to `TileContentProcessor` instances

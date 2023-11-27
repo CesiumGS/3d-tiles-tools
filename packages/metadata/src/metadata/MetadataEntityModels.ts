@@ -1,13 +1,11 @@
-import { defined } from "@3d-tiles-tools/base";
-
 import { Schema } from "@3d-tiles-tools/structure";
 import { MetadataEntity } from "@3d-tiles-tools/structure";
 import { MetadataClass } from "@3d-tiles-tools/structure";
 import { MetadataEnum } from "@3d-tiles-tools/structure";
 
-import { DefaultMetadataEntityModel } from "./DefaultMetadataEntityModel";
-import { MetadataEntityModel } from "./MetadataEntityModel";
-import { MetadataError } from "./MetadataError";
+import { DefaultMetadataEntityModel } from "./DefaultMetadataEntityModel.js";
+import { MetadataEntityModel } from "./MetadataEntityModel.js";
+import { MetadataError } from "./MetadataError.js";
 
 /**
  * Methods related to `MetadataEntityModel` instances.
@@ -101,7 +99,7 @@ export class MetadataEntityModels {
     if (classProperties) {
       for (const classPropertyId of Object.keys(classProperties)) {
         const property = classProperties[classPropertyId];
-        if (defined(property.semantic)) {
+        if (property.semantic !== undefined) {
           semanticToPropertyId[property.semantic] = classPropertyId;
         }
       }

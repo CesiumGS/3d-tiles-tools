@@ -3,7 +3,7 @@ import path from "path";
 
 import { PathLike } from "fs";
 
-import { DeveloperError } from "./DeveloperError";
+import { DeveloperError } from "./DeveloperError.js";
 
 /**
  * Utility methods for iterable objects.

@@ -2,11 +2,11 @@ import sharp from "sharp";
 import fs from "fs";
 import path from "path";
 
-import { BasisEncoder } from "./BasisEncoder";
-import { KtxOptions } from "./KtxOptions";
-import { KtxEtc1sOptions } from "./KtxEtc1sOptions";
-import { KtxUastcOptions } from "./KtxUastcOptions";
-import { KtxError } from "./KtxError";
+import { BasisEncoder } from "./BasisEncoder.js";
+import { KtxOptions } from "./KtxOptions.js";
+import { KtxEtc1sOptions } from "./KtxEtc1sOptions.js";
+import { KtxUastcOptions } from "./KtxUastcOptions.js";
+import { KtxError } from "./KtxError.js";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("KTX");

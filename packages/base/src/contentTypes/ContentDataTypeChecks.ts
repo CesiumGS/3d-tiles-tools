@@ -1,5 +1,5 @@
-import { ContentData } from "./ContentData";
-import { ContentDataTypeRegistry } from "./ContentDataTypeRegistry";
+import { ContentData } from "./ContentData.js";
+import { ContentDataTypeRegistry } from "./ContentDataTypeRegistry.js";
 
 /**
  * Methods to create predicates that check whether a given

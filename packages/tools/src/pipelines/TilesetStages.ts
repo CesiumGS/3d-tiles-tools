@@ -2,9 +2,9 @@ import { defined } from "@3d-tiles-tools/base";
 import { DeveloperError } from "@3d-tiles-tools/base";
 import { ContentDataTypes } from "@3d-tiles-tools/base";
 
-import { ContentStage } from "./ContentStage";
-import { TilesetStage } from "./TilesetStage";
-import { ContentStages } from "./ContentStages";
+import { ContentStage } from "./ContentStage.js";
+import { TilesetStage } from "./TilesetStage.js";
+import { ContentStages } from "./ContentStages.js";
 
 /**
  * Methods to create `TilesetStage` objects.

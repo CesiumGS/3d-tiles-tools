@@ -3,8 +3,8 @@ import { MetadataClass } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
 import { BatchTable } from "@3d-tiles-tools/structure";
 
-import { BatchTableClassProperties } from "./BatchTableClassProperties";
-import { Ids } from "./Ids";
+import { BatchTableClassProperties } from "./BatchTableClassProperties.js";
+import { Ids } from "./Ids.js";
 
 /**
  * Methods to create metadata 'Schema' objects from batch tables

@@ -4,9 +4,9 @@ import { Extension } from "@gltf-transform/core";
 
 import { ReaderContext } from "@gltf-transform/core";
 import { WriterContext } from "@gltf-transform/core";
-import { FeatureId } from "./InstanceFeatures";
-import { InstanceFeatures } from "./InstanceFeatures";
-import { StructuralMetadata } from "./StructuralMetadata";
+import { FeatureId } from "./InstanceFeatures.js";
+import { InstanceFeatures } from "./InstanceFeatures.js";
+import { StructuralMetadata } from "./StructuralMetadata.js";
 
 const NAME = "EXT_instance_features";
 

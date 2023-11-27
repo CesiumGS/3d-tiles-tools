@@ -7,20 +7,20 @@ import { ReaderContext } from "@gltf-transform/core";
 import { WriterContext } from "@gltf-transform/core";
 import { GLB_BUFFER } from "@gltf-transform/core";
 
-import { Class } from "./StructuralMetadata";
-import { ClassProperty } from "./StructuralMetadata";
-import { ElementStructuralMetadata } from "./StructuralMetadata";
-import { Enum } from "./StructuralMetadata";
-import { EnumValue } from "./StructuralMetadata";
-import { MeshPrimitiveStructuralMetadata } from "./StructuralMetadata";
-import { PropertyAttribute } from "./StructuralMetadata";
-import { PropertyAttributeProperty } from "./StructuralMetadata";
-import { PropertyTable } from "./StructuralMetadata";
-import { PropertyTableProperty } from "./StructuralMetadata";
-import { PropertyTexture } from "./StructuralMetadata";
-import { PropertyTextureProperty } from "./StructuralMetadata";
-import { Schema } from "./StructuralMetadata";
-import { StructuralMetadata } from "./StructuralMetadata";
+import { Class } from "./StructuralMetadata.js";
+import { ClassProperty } from "./StructuralMetadata.js";
+import { ElementStructuralMetadata } from "./StructuralMetadata.js";
+import { Enum } from "./StructuralMetadata.js";
+import { EnumValue } from "./StructuralMetadata.js";
+import { MeshPrimitiveStructuralMetadata } from "./StructuralMetadata.js";
+import { PropertyAttribute } from "./StructuralMetadata.js";
+import { PropertyAttributeProperty } from "./StructuralMetadata.js";
+import { PropertyTable } from "./StructuralMetadata.js";
+import { PropertyTableProperty } from "./StructuralMetadata.js";
+import { PropertyTexture } from "./StructuralMetadata.js";
+import { PropertyTextureProperty } from "./StructuralMetadata.js";
+import { Schema } from "./StructuralMetadata.js";
+import { StructuralMetadata } from "./StructuralMetadata.js";
 
 const NAME = "EXT_structural_metadata";
 

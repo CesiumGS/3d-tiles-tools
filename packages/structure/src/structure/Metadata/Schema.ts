@@ -1,6 +1,6 @@
-import { RootProperty } from "../RootProperty";
-import { MetadataClass } from "./MetadataClass";
-import { MetadataEnum } from "./MetadataEnum";
+import { RootProperty } from "../RootProperty.js";
+import { MetadataClass } from "./MetadataClass.js";
+import { MetadataEnum } from "./MetadataEnum.js";
 
 /**
  * An object defining classes and enums.

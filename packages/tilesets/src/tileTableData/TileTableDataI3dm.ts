@@ -2,9 +2,9 @@ import { Iterables } from "@3d-tiles-tools/base";
 
 import { I3dmFeatureTable } from "@3d-tiles-tools/structure";
 
-import { TileTableData } from "./TileTableData";
-import { VecMath } from "./VecMath";
-import { AttributeCompression } from "./AttributeCompression";
+import { TileTableData } from "./TileTableData.js";
+import { VecMath } from "./VecMath.js";
+import { AttributeCompression } from "./AttributeCompression.js";
 
 /**
  * Methods to access the data that is stored in the feature table

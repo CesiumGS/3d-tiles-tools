@@ -1,7 +1,7 @@
 import gltfpack from "gltfpack";
 
-import { ContentError } from "./ContentError";
-import { GltfPackOptions } from "./GltfPackOptions";
+import { ContentError } from "./ContentError.js";
+import { GltfPackOptions } from "./GltfPackOptions.js";
 
 /**
  * Utility class for using gltfpack in the 3D Tiles tools

@@ -86,7 +86,7 @@ export class Loggers {
       timestamp: pino.stdTimeFunctions.isoTime,
     };
 
-    const logger = pino(loggerOptions, transport);
+    const logger = (pino as any)(loggerOptions, transport);
     Loggers.allLoggers[""] = logger;
     return logger;
   }

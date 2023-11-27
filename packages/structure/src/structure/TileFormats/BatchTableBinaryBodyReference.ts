@@ -1,4 +1,4 @@
-import { RootProperty } from "../RootProperty";
+import { RootProperty } from "../RootProperty.js";
 
 /**
  * An object defining the reference to a section of the binary body of

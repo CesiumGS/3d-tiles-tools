@@ -5,8 +5,8 @@ import { Tile } from "@3d-tiles-tools/structure";
 import { Tileset } from "@3d-tiles-tools/structure";
 import { BoundingVolume } from "@3d-tiles-tools/structure";
 
-import { BoundingVolumes } from "./BoundingVolumes";
-import { ContentBoundingVolumes } from "./ContentBoundingVolumes";
+import { BoundingVolumes } from "./BoundingVolumes.js";
+import { ContentBoundingVolumes } from "./ContentBoundingVolumes.js";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("tilesetProcessing");

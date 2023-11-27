@@ -1,4 +1,4 @@
-import { RootProperty } from "../RootProperty";
+import { RootProperty } from "../RootProperty.js";
 
 /**
  * A 3D Tiles style.

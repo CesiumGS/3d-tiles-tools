@@ -1,4 +1,4 @@
-import { MetadataError } from "./MetadataError";
+import { MetadataError } from "./MetadataError.js";
 
 /**
  * Internal utilities related to the `componentType` of the

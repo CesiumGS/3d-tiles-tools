@@ -1,5 +1,5 @@
-import { KtxEtc1sOptions } from "./KtxEtc1sOptions";
-import { KtxUastcOptions } from "./KtxUastcOptions";
+import { KtxEtc1sOptions } from "./KtxEtc1sOptions.js";
+import { KtxUastcOptions } from "./KtxUastcOptions.js";
 
 /**
  * A set of options for configuring KTX compression in the `KtxUtility`

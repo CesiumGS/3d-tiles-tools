@@ -4,10 +4,10 @@ import { Extension } from "@gltf-transform/core";
 import { ReaderContext } from "@gltf-transform/core";
 import { WriterContext } from "@gltf-transform/core";
 
-import { FeatureId } from "./MeshFeatures";
-import { FeatureIdTexture } from "./MeshFeatures";
-import { MeshFeatures } from "./MeshFeatures";
-import { StructuralMetadata } from "./StructuralMetadata";
+import { FeatureId } from "./MeshFeatures.js";
+import { FeatureIdTexture } from "./MeshFeatures.js";
+import { MeshFeatures } from "./MeshFeatures.js";
+import { StructuralMetadata } from "./StructuralMetadata.js";
 
 const NAME = "EXT_mesh_features";
 

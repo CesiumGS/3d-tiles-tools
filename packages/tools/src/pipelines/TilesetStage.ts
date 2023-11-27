@@ -1,5 +1,5 @@
-import { ContentStage } from "./ContentStage";
-import { Stage } from "./Stage";
+import { ContentStage } from "./ContentStage.js";
+import { Stage } from "./Stage.js";
 
 /**
  * Interface for a stage within a `Pipeline` of

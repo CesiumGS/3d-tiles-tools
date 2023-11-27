@@ -2,11 +2,11 @@ import { Iterables } from "@3d-tiles-tools/base";
 
 import { PntsFeatureTable } from "@3d-tiles-tools/structure";
 
-import { TileTableData } from "./TileTableData";
-import { AttributeCompression } from "./AttributeCompression";
-import { Colors } from "./Colors";
+import { TileTableData } from "./TileTableData.js";
+import { AttributeCompression } from "./AttributeCompression.js";
+import { Colors } from "./Colors.js";
 
-import { TileFormatError } from "../tileFormats/TileFormatError";
+import { TileFormatError } from "../tileFormats/TileFormatError.js";
 
 /**
  * Methods to access the data that is stored in the feature table

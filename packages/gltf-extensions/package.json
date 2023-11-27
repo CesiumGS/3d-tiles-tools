@@ -2,6 +2,7 @@
   "name": "@3d-tiles-tools/gltf-extensions",
   "version": "0.3.0",
   "description": "3D Tiles tools implementations of glTF extensions",
+  "type": "module",
   "source": "./src/index.ts",
   "types": "./build/index.d.ts",
   "dependencies": {
@@ -13,7 +14,7 @@
 
   "scripts": {
     "about:build": "echo 'Run the TypeScript compiler to generate the build output.'",
-    "build": "npx tsc --build"
+    "build": "npx tsc --build --verbose --force"
   }
 }
 

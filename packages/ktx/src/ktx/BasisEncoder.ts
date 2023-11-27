@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const BASIS = require("./external/basis_encoder.js");
 
-import { KtxError } from "./KtxError";
+import { KtxError } from "./KtxError.js";
 
 /**
  * A thin wrapper around the basis encoder. This class and its documentation are created from

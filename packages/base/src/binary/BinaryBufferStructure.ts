@@ -1,4 +1,4 @@
-import { BufferObject } from "@3d-tiles-tools/structure";
+import { BufferObject } from "@3d-tiles-tools/structure"; 
 import { BufferView } from "@3d-tiles-tools/structure";
 
 /**

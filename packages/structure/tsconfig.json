@@ -3,7 +3,7 @@
   "compilerOptions": {
     "declaration": true,
     "composite": true,
-    "outDir": "./build",
+    "outDir": "build",
     "rootDir": "./src",
   },
   "include": [

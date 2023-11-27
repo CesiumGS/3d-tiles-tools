@@ -1,12 +1,14 @@
 {
   "extends": "../../tsconfig.json",  
   "compilerOptions": {
+    "module": "NodeNext",
     "declaration": true,
     "composite": true,
     "outDir": "./build",
     "rootDir": "./src",
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "../../src/cesium.d.ts",
   ]
 }

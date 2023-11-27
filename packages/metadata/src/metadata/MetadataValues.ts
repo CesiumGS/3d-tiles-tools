@@ -2,8 +2,8 @@ import { defined } from "@3d-tiles-tools/base";
 
 import { ClassProperty } from "@3d-tiles-tools/structure";
 
-import { MetadataComponentTypes } from "./MetadataComponentTypes";
-import { ArrayValues } from "./ArrayValues";
+import { MetadataComponentTypes } from "./MetadataComponentTypes.js";
+import { ArrayValues } from "./ArrayValues.js";
 
 /**
  * Internal methods related to metadata values.

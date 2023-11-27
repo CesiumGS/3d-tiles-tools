@@ -3,11 +3,11 @@ import { defined } from "@3d-tiles-tools/base";
 import { Availability } from "@3d-tiles-tools/structure";
 import { TileImplicitTiling } from "@3d-tiles-tools/structure";
 
-import { AvailabilityInfo } from "./AvailabilityInfo";
-import { BufferAvailabilityInfo } from "./BufferAvailabilityInfo";
-import { ConstantAvailabilityInfo } from "./ConstantAvailabilityInfo";
-import { ImplicitTilings } from "./ImplicitTilings";
-import { ImplicitTilingError } from "./ImplicitTilingError";
+import { AvailabilityInfo } from "./AvailabilityInfo.js";
+import { BufferAvailabilityInfo } from "./BufferAvailabilityInfo.js";
+import { ConstantAvailabilityInfo } from "./ConstantAvailabilityInfo.js";
+import { ImplicitTilings } from "./ImplicitTilings.js";
+import { ImplicitTilingError } from "./ImplicitTilingError.js";
 
 /**
  * Methods for creating `AvailabilityInfo` instances

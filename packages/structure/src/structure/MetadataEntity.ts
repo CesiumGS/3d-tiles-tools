@@ -1,4 +1,4 @@
-import { RootProperty } from "./RootProperty";
+import { RootProperty } from "./RootProperty.js";
 
 /**
  * An object containing a reference to a class from a metadata schema and

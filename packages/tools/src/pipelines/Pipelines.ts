@@ -1,8 +1,8 @@
 import { DeveloperError } from "@3d-tiles-tools/base";
 
-import { Pipeline } from "./Pipeline";
-import { TilesetStage } from "./TilesetStage";
-import { TilesetStages } from "./TilesetStages";
+import { Pipeline } from "./Pipeline.js";
+import { TilesetStage } from "./TilesetStage.js";
+import { TilesetStages } from "./TilesetStages.js";
 
 /**
  * Methods to create `Pipeline` objects from JSON input.

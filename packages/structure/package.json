@@ -2,6 +2,7 @@
   "name": "@3d-tiles-tools/structure",
   "version": "0.3.0",
   "description": "3D Tiles tools type definitions for the basic JSON structures",
+  "type": "module",
   "source": "./src/index.ts",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
@@ -11,7 +12,7 @@
 
   "scripts": {
     "about:build": "echo 'Run the TypeScript compiler to generate the build output.'",
-    "build": "npx tsc --build"
+    "build": "npx tsc --build --verbose --force"
   }
 }
 

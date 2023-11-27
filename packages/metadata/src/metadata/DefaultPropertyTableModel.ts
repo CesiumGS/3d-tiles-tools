@@ -1,11 +1,11 @@
 import { PropertyTableProperty } from "@3d-tiles-tools/structure";
 import { ClassProperty } from "@3d-tiles-tools/structure";
 
-import { MetadataEntityModel } from "./MetadataEntityModel";
-import { MetadataError } from "./MetadataError";
-import { PropertyModel } from "./PropertyModel";
-import { PropertyTableModel } from "./PropertyTableModel";
-import { TableMetadataEntityModel } from "./TableMetadataEntityModel";
+import { MetadataEntityModel } from "./MetadataEntityModel.js";
+import { MetadataError } from "./MetadataError.js";
+import { PropertyModel } from "./PropertyModel.js";
+import { PropertyTableModel } from "./PropertyTableModel.js";
+import { TableMetadataEntityModel } from "./TableMetadataEntityModel.js";
 
 /**
  * Implementation of a `PropertyTableModel` that is backed by

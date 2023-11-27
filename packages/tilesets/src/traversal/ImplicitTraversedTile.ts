@@ -2,21 +2,21 @@ import { defined } from "@3d-tiles-tools/base";
 import { ResourceResolver } from "@3d-tiles-tools/base";
 import { TreeCoordinates } from "@3d-tiles-tools/base";
 
-import { TraversedTile } from "./TraversedTile";
-import { SubtreeModel } from "./SubtreeModel";
-import { SubtreeModels } from "./SubtreeModels";
-
 import { Tile } from "@3d-tiles-tools/structure";
 import { Content } from "@3d-tiles-tools/structure";
 import { TileImplicitTiling } from "@3d-tiles-tools/structure";
 
-import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError";
-import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
+import { TraversedTile } from "./TraversedTile.js";
+import { SubtreeModel } from "./SubtreeModel.js";
+import { SubtreeModels } from "./SubtreeModels.js";
 
-import { BoundingVolumeDerivation } from "./cesium/BoundingVolumeDerivation";
-import { MetadataSemanticOverrides } from "./MetadataSemanticOverrides";
+import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError.js";
+import { ImplicitTilings } from "../implicitTiling/ImplicitTilings.js";
 
-import { Tiles } from "../tilesets/Tiles";
+import { BoundingVolumeDerivation } from "./cesium/BoundingVolumeDerivation.js";
+import { MetadataSemanticOverrides } from "./MetadataSemanticOverrides.js";
+
+import { Tiles } from "../tilesets/Tiles.js";
 
 /**
  * An implementation of a `TraversedTile` that represents a tile

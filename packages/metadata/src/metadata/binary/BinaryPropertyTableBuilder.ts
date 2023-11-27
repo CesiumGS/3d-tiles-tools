@@ -7,12 +7,12 @@ import { Schema } from "@3d-tiles-tools/structure";
 import { PropertyTable } from "@3d-tiles-tools/structure";
 import { PropertyTableProperty } from "@3d-tiles-tools/structure";
 
-import { MetadataError } from "../MetadataError";
+import { MetadataError } from "../MetadataError.js";
 
-import { MetadataUtilities } from "../MetadataUtilities";
-import { BinaryMetadata } from "./BinaryMetadata";
-import { BinaryPropertyTable } from "./BinaryPropertyTable";
-import { BinaryPropertyTables } from "./BinaryPropertyTables";
+import { MetadataUtilities } from "../MetadataUtilities.js";
+import { BinaryMetadata } from "./BinaryMetadata.js";
+import { BinaryPropertyTable } from "./BinaryPropertyTable.js";
+import { BinaryPropertyTables } from "./BinaryPropertyTables.js";
 
 /**
  * A class for building `BinaryPropertyTable` objects

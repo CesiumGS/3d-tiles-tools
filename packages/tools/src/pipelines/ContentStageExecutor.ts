@@ -6,15 +6,15 @@ import { ContentDataTypes } from "@3d-tiles-tools/base";
 
 import { TilesetEntry } from "@3d-tiles-tools/tilesets";
 
-import { ContentStage } from "./ContentStage";
-import { ContentStages } from "./ContentStages";
-import { PipelineError } from "./PipelineError";
+import { ContentStage } from "./ContentStage.js";
+import { ContentStages } from "./ContentStages.js";
+import { PipelineError } from "./PipelineError.js";
 
-import { BasicTilesetProcessor } from "../tilesetProcessing/BasicTilesetProcessor";
+import { BasicTilesetProcessor } from "../tilesetProcessing/BasicTilesetProcessor.js";
 
-import { GltfUtilities } from "../contentProcessing/GltfUtilities";
-import { ContentOps } from "../contentProcessing/ContentOps";
-import { TileFormatsMigration } from "../migration/TileFormatsMigration";
+import { GltfUtilities } from "../contentProcessing/GltfUtilities.js";
+import { ContentOps } from "../contentProcessing/ContentOps.js";
+import { TileFormatsMigration } from "../migration/TileFormatsMigration.js";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("pipeline");

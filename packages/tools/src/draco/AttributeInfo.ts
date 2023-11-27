@@ -1,4 +1,4 @@
-import { QuantizationInfo } from "./QuantizationInfo";
+import { QuantizationInfo } from "./QuantizationInfo.js";
 
 /**
  * Information about the structure of an attriubte, after it

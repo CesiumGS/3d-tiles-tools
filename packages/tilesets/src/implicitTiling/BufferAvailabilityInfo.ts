@@ -1,4 +1,4 @@
-import { AvailabilityInfo } from "./AvailabilityInfo";
+import { AvailabilityInfo } from "./AvailabilityInfo.js";
 
 /**
  * Implementation of an `AvailabilityInfo` that is backed by

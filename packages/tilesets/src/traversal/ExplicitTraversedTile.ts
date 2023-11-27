@@ -6,13 +6,13 @@ import { TileImplicitTiling } from "@3d-tiles-tools/structure";
 import { MetadataEntity } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
 
-import { TraversedTile } from "./TraversedTile";
-import { ExplicitTraversedTiles } from "./ExplicitTraversedTiles";
-import { MetadataSemanticOverrides } from "./MetadataSemanticOverrides";
+import { TraversedTile } from "./TraversedTile.js";
+import { ExplicitTraversedTiles } from "./ExplicitTraversedTiles.js";
+import { MetadataSemanticOverrides } from "./MetadataSemanticOverrides.js";
 
-import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
+import { ImplicitTilings } from "../implicitTiling/ImplicitTilings.js";
 
-import { Tiles } from "../tilesets/Tiles";
+import { Tiles } from "../tilesets/Tiles.js";
 
 /**
  * An implementation of a `TraversedTile` that reflects a tile

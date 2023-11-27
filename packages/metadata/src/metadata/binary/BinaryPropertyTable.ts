@@ -1,6 +1,6 @@
 import { PropertyTable } from "@3d-tiles-tools/structure";
 
-import { BinaryMetadata } from "./BinaryMetadata";
+import { BinaryMetadata } from "./BinaryMetadata.js";
 
 /**
  * A basic structure summarizing the (raw) elements of a binary

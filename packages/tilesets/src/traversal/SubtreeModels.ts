@@ -9,14 +9,14 @@ import { Subtree } from "@3d-tiles-tools/structure";
 import { TileImplicitTiling } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
 
-import { BinarySubtreeData } from "../implicitTiling/BinarySubtreeData";
-import { BinarySubtreeDataResolver } from "../implicitTiling/BinarySubtreeDataResolver";
-import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError";
-import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
-import { SubtreeInfos } from "../implicitTiling/SubtreeInfos";
+import { BinarySubtreeData } from "../implicitTiling/BinarySubtreeData.js";
+import { BinarySubtreeDataResolver } from "../implicitTiling/BinarySubtreeDataResolver.js";
+import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError.js";
+import { ImplicitTilings } from "../implicitTiling/ImplicitTilings.js";
+import { SubtreeInfos } from "../implicitTiling/SubtreeInfos.js";
 
-import { SubtreeModel } from "./SubtreeModel";
-import { SubtreeMetadataModels } from "./SubtreeMetadataModels";
+import { SubtreeModel } from "./SubtreeModel.js";
+import { SubtreeMetadataModels } from "./SubtreeMetadataModels.js";
 
 /**
  * Methods to resolve subtree information.

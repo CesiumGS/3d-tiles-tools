@@ -1,5 +1,5 @@
-import { FeatureTable } from "./FeatureTable";
-import { BinaryBodyOffset } from "./BinaryBodyOffset";
+import { FeatureTable } from "./FeatureTable.js";
+import { BinaryBodyOffset } from "./BinaryBodyOffset.js";
 
 /**
  * A set of Batched 3D Model semantics that contain additional

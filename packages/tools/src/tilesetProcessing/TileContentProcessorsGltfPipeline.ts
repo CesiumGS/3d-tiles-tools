@@ -2,7 +2,7 @@ import GltfPipeline from "gltf-pipeline";
 
 import { ContentDataTypes } from "@3d-tiles-tools/base";
 
-import { TileContentProcessor } from "./TileContentProcessor";
+import { TileContentProcessor } from "./TileContentProcessor.js";
 
 /**
  * Methods to create `TileContentProcessor` instances that

@@ -1,4 +1,4 @@
-import { RootProperty } from "../RootProperty";
+import { RootProperty } from "../RootProperty.js";
 
 /**
  * A single property of a metadata class.

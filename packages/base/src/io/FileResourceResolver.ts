@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
 
-import { Uris } from "../base/Uris";
+import { Uris } from "../base/Uris.js";
 
-import { ResourceResolver } from "./ResourceResolver";
+import { ResourceResolver } from "./ResourceResolver.js";
 
 /**
  * Implementation of a `ResourceResolver` based on a file system.

@@ -1,4 +1,4 @@
-import { OctreeCoordinates } from "./OctreeCoordinates";
+import { OctreeCoordinates } from "./OctreeCoordinates.js";
 
 /**
  * Methods related to octrees

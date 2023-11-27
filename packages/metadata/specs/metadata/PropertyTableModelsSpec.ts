@@ -1,9 +1,9 @@
-import { genericEquals } from "./genericEquals";
+import { ClassProperty } from "@3d-tiles-tools/structure";
 
-import { BinaryPropertyTables } from "../../src/metadata/binary/BinaryPropertyTables";
-import { BinaryPropertyTableModel } from "../../src/metadata/binary/BinaryPropertyTableModel";
+import { BinaryPropertyTables } from "../../src/metadata/binary/BinaryPropertyTables.js";
+import { BinaryPropertyTableModel } from "../../src/metadata/binary/BinaryPropertyTableModel.js";
 
-import { ClassProperty } from "../../src/structure/Metadata/ClassProperty";
+import { SpecHelpers } from "./SpecHelpers.js";
 
 /**
  * Test for the `PropertyTableModels` class.
@@ -48,7 +48,7 @@ describe("metadata/PropertyTableModelsSpec", function () {
       const entity = propertyTableModel.getMetadataEntityModel(i);
       const expected = values[i];
       const actual = entity.getPropertyValue("testProperty");
-      expect(genericEquals(actual, expected, epsilon)).toBeTrue();
+      expect(SpecHelpers.genericEquals(actual, expected, epsilon)).toBeTrue();
     }
   });
 
@@ -85,7 +85,7 @@ describe("metadata/PropertyTableModelsSpec", function () {
       const entity = propertyTableModel.getMetadataEntityModel(i);
       const expected = values[i];
       const actual = entity.getPropertyValue("testProperty");
-      expect(genericEquals(actual, expected, epsilon)).toBeTrue();
+      expect(SpecHelpers.genericEquals(actual, expected, epsilon)).toBeTrue();
     }
   });
 
@@ -123,7 +123,7 @@ describe("metadata/PropertyTableModelsSpec", function () {
       const entity = propertyTableModel.getMetadataEntityModel(i);
       const expected = values[i];
       const actual = entity.getPropertyValue("testProperty");
-      expect(genericEquals(actual, expected, epsilon)).toBeTrue();
+      expect(SpecHelpers.genericEquals(actual, expected, epsilon)).toBeTrue();
     }
   });
 
@@ -155,7 +155,7 @@ describe("metadata/PropertyTableModelsSpec", function () {
       const entity = propertyTableModel.getMetadataEntityModel(i);
       const expected = values[i];
       const actual = entity.getPropertyValue("testProperty");
-      expect(genericEquals(actual, expected, epsilon)).toBeTrue();
+      expect(SpecHelpers.genericEquals(actual, expected, epsilon)).toBeTrue();
     }
   });
 
@@ -191,7 +191,7 @@ describe("metadata/PropertyTableModelsSpec", function () {
       const entity = propertyTableModel.getMetadataEntityModel(i);
       const expected = values[i];
       const actual = entity.getPropertyValue("testProperty");
-      expect(genericEquals(actual, expected, epsilon)).toBeTrue();
+      expect(SpecHelpers.genericEquals(actual, expected, epsilon)).toBeTrue();
     }
   });
 
@@ -227,7 +227,7 @@ describe("metadata/PropertyTableModelsSpec", function () {
       const entity = propertyTableModel.getMetadataEntityModel(i);
       const expected = values[i];
       const actual = entity.getPropertyValue("testProperty");
-      expect(genericEquals(actual, expected, epsilon)).toBeTrue();
+      expect(SpecHelpers.genericEquals(actual, expected, epsilon)).toBeTrue();
     }
   });
 
@@ -259,7 +259,7 @@ describe("metadata/PropertyTableModelsSpec", function () {
       const entity = propertyTableModel.getMetadataEntityModel(i);
       const expected = values[i];
       const actual = entity.getPropertyValue("testProperty");
-      expect(genericEquals(actual, expected, epsilon)).toBeTrue();
+      expect(SpecHelpers.genericEquals(actual, expected, epsilon)).toBeTrue();
     }
   });
 
@@ -295,7 +295,7 @@ describe("metadata/PropertyTableModelsSpec", function () {
       const entity = propertyTableModel.getMetadataEntityModel(i);
       const expected = values[i];
       const actual = entity.getPropertyValue("testProperty");
-      expect(genericEquals(actual, expected, epsilon)).toBeTrue();
+      expect(SpecHelpers.genericEquals(actual, expected, epsilon)).toBeTrue();
     }
   });
 
@@ -332,7 +332,7 @@ describe("metadata/PropertyTableModelsSpec", function () {
       const entity = propertyTableModel.getMetadataEntityModel(i);
       const expected = values[i];
       const actual = entity.getPropertyValue("testProperty");
-      expect(genericEquals(actual, expected, epsilon)).toBeTrue();
+      expect(SpecHelpers.genericEquals(actual, expected, epsilon)).toBeTrue();
     }
   });
 
@@ -368,7 +368,7 @@ describe("metadata/PropertyTableModelsSpec", function () {
       const entity = propertyTableModel.getMetadataEntityModel(i);
       const expected = values[i];
       const actual = entity.getPropertyValue("testProperty");
-      expect(genericEquals(actual, expected, epsilon)).toBeTrue();
+      expect(SpecHelpers.genericEquals(actual, expected, epsilon)).toBeTrue();
     }
   });
 
@@ -412,7 +412,7 @@ describe("metadata/PropertyTableModelsSpec", function () {
       const entity = propertyTableModel.getMetadataEntityModel(i);
       const expected = values[i];
       const actual = entity.getPropertyValue("testProperty");
-      expect(genericEquals(actual, expected, epsilon)).toBeTrue();
+      expect(SpecHelpers.genericEquals(actual, expected, epsilon)).toBeTrue();
     }
   });
 
@@ -456,7 +456,7 @@ describe("metadata/PropertyTableModelsSpec", function () {
       const entity = propertyTableModel.getMetadataEntityModel(i);
       const expected = values[i];
       const actual = entity.getPropertyValue("testProperty");
-      expect(genericEquals(actual, expected, epsilon)).toBeTrue();
+      expect(SpecHelpers.genericEquals(actual, expected, epsilon)).toBeTrue();
     }
   });
 
@@ -492,7 +492,7 @@ describe("metadata/PropertyTableModelsSpec", function () {
       const entity = propertyTableModel.getMetadataEntityModel(i);
       const expected = values[i];
       const actual = entity.getPropertyValue("testProperty");
-      expect(genericEquals(actual, expected, epsilon)).toBeTrue();
+      expect(SpecHelpers.genericEquals(actual, expected, epsilon)).toBeTrue();
     }
   });
 
@@ -535,7 +535,7 @@ describe("metadata/PropertyTableModelsSpec", function () {
       const entity = propertyTableModel.getMetadataEntityModel(i);
       const expected = valuesExpected[i];
       const actual = entity.getPropertyValue("testProperty");
-      expect(genericEquals(actual, expected, epsilon)).toBeTrue();
+      expect(SpecHelpers.genericEquals(actual, expected, epsilon)).toBeTrue();
     }
   });
 });

@@ -3,9 +3,10 @@ import { Node } from "@gltf-transform/core";
 
 import { InstancedMesh } from "@gltf-transform/extensions";
 
-import { StringBuilder } from "./StringBuilder";
 import { InstanceFeatures } from "@3d-tiles-tools/gltf-extensions";
 import { InstanceFeaturesFeatureId as FeatureId } from "@3d-tiles-tools/gltf-extensions";
+
+import { StringBuilder } from "./StringBuilder.js";
 
 /**
  * Utilities related to the glTF `EXT_instance_features` extension.

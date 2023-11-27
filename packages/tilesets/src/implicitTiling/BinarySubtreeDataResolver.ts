@@ -6,8 +6,8 @@ import { BinaryDataError } from "@3d-tiles-tools/base";
 
 import { Subtree } from "@3d-tiles-tools/structure";
 
-import { BinarySubtreeData } from "./BinarySubtreeData";
-import { ImplicitTilingError } from "./ImplicitTilingError";
+import { BinarySubtreeData } from "./BinarySubtreeData.js";
+import { ImplicitTilingError } from "./ImplicitTilingError.js";
 
 /**
  * A class for resolving the binary data that is associated with

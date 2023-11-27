@@ -2,8 +2,8 @@ import { defined } from "@3d-tiles-tools/base";
 
 import { ClassProperty } from "@3d-tiles-tools/structure";
 
-import { MetadataTypes } from "./MetadataTypes";
-import { MetadataComponentTypes } from "./MetadataComponentTypes";
+import { MetadataTypes } from "./MetadataTypes.js";
+import { MetadataComponentTypes } from "./MetadataComponentTypes.js";
 
 /**
  * Utility methods related to `ClassProperty` objects

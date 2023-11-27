@@ -1,5 +1,5 @@
-import { RootProperty } from "./RootProperty";
-import { StatisticsClassProperty } from "./StatisticsClassProperty";
+import { RootProperty } from "./RootProperty.js";
+import { StatisticsClassProperty } from "./StatisticsClassProperty.js";
 
 /**
  * Statistics about entities that conform to a class that was defined in

@@ -10,12 +10,12 @@ import { Paths } from "@3d-tiles-tools/base";
 import { Tileset } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
 
-import { TilesetSourceResourceResolver } from "../tilesetData/TilesetSourceResourceResolver";
+import { TilesetSourceResourceResolver } from "../tilesetData/TilesetSourceResourceResolver.js";
 
-import { TraversedTile } from "./TraversedTile";
-import { ExplicitTraversedTile } from "./ExplicitTraversedTile";
+import { TraversedTile } from "./TraversedTile.js";
+import { ExplicitTraversedTile } from "./ExplicitTraversedTile.js";
 
-import { TilesetSource3tz } from "../packages/TilesetSource3tz";
+import { TilesetSource3tz } from "../packages/TilesetSource3tz.js";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("traversal");

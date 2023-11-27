@@ -1,7 +1,6 @@
-import { ArrayBuffers } from "./ArrayBuffers";
-
-import { MetadataComponentTypes } from "../MetadataComponentTypes";
-import { MetadataError } from "../MetadataError";
+import { ArrayBuffers } from "./ArrayBuffers.js";
+import { MetadataComponentTypes } from "../MetadataComponentTypes.js";
+import { MetadataError } from "../MetadataError.js";
 
 /**
  * Methods for extracting `number`- or `bigint` values or arrays thereof

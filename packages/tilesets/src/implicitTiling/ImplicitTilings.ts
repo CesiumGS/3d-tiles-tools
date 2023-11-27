@@ -6,8 +6,8 @@ import { OctreeCoordinates } from "@3d-tiles-tools/base";
 
 import { TileImplicitTiling } from "@3d-tiles-tools/structure";
 
-import { TemplateUris } from "./TemplateUris";
-import { ImplicitTilingError } from "./ImplicitTilingError";
+import { TemplateUris } from "./TemplateUris.js";
+import { ImplicitTilingError } from "./ImplicitTilingError.js";
 
 /**
  * Utility methods related to `TileImplicitTiling` instances.

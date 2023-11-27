@@ -1,4 +1,4 @@
-import { AttributeInfo } from "./AttributeInfo";
+import { AttributeInfo } from "./AttributeInfo.js";
 
 /**
  * The result from the draco decoder, mapping attribute names

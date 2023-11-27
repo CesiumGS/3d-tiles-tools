@@ -7,9 +7,9 @@ import { Schema } from "@3d-tiles-tools/structure";
 import { MetadataEntityModel } from "@3d-tiles-tools/metadata";
 import { MetadataEntityModels } from "@3d-tiles-tools/metadata";
 
-import { SubtreeMetadataModel } from "./SubtreeMetadataModel";
+import { SubtreeMetadataModel } from "./SubtreeMetadataModel.js";
 
-import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError";
+import { ImplicitTilingError } from "../implicitTiling/ImplicitTilingError.js";
 
 /**
  * Methods for overriding properties in `Tile` and `Content` objects,

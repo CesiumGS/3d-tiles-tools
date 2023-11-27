@@ -1,6 +1,6 @@
 import { TileFormats } from "@3d-tiles-tools/tilesets";
 
-import { GltfUtilities } from "./GltfUtilities";
+import { GltfUtilities } from "./GltfUtilities.js";
 
 /**
  * Low-level operations on tile content.

@@ -13,7 +13,7 @@ import { TilesetSources } from "@3d-tiles-tools/tilesets";
 import { TilesetTargets } from "@3d-tiles-tools/tilesets";
 import { Tilesets } from "@3d-tiles-tools/tilesets";
 
-import { BoundingVolumes } from "./BoundingVolumes";
+import { BoundingVolumes } from "./BoundingVolumes.js";
 
 /**
  * A class for merging multiple tilesets, to create a tileset that refers

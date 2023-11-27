@@ -9,6 +9,7 @@
   "include": [
     "src/**/*",
     "../../src/gltf-pipeline.d.ts",
-    "../../src/gltfpack.d.ts"
+    "../../src/gltfpack.d.ts",
+    "../../src/cesium.d.ts",
   ]
 }

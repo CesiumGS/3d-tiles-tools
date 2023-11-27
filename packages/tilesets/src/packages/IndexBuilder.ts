@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-import { IndexBuilderEntry } from "./IndexBuilderEntry";
+import { IndexBuilderEntry } from "./IndexBuilderEntry.js";
 
 /**
  * A class that can build an index for a 3TZ file that will be stored

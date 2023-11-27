@@ -15,9 +15,9 @@ import { Iterables } from "@3d-tiles-tools/base";
 
 import { TileFormatError } from "@3d-tiles-tools/tilesets";
 
-import { AccessorCreation } from "../migration/AccessorCreation";
+import { AccessorCreation } from "../migration/AccessorCreation.js";
 
-import { ReadablePointCloud } from "./ReadablePointCloud";
+import { ReadablePointCloud } from "./ReadablePointCloud.js";
 
 /**
  * An internal interface representing a point cloud with

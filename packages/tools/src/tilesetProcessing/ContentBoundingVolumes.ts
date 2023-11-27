@@ -1,8 +1,5 @@
 import { Node, PropertyType, Scene } from "@gltf-transform/core";
 
-import { GltfTransform } from "../contentProcessing/GltfTransform";
-import { PntsPointClouds } from "../pointClouds/PntsPointClouds";
-
 import { ContentDataTypeRegistry } from "@3d-tiles-tools/base";
 import { ContentDataTypes } from "@3d-tiles-tools/base";
 
@@ -16,7 +13,10 @@ import { TileFormatError } from "@3d-tiles-tools/tilesets";
 import { TileTableData } from "@3d-tiles-tools/tilesets";
 import { TileTableDataI3dm } from "@3d-tiles-tools/tilesets";
 
-import { BoundingVolumes } from "./BoundingVolumes";
+import { GltfTransform } from "../contentProcessing/GltfTransform.js";
+import { PntsPointClouds } from "../pointClouds/PntsPointClouds.js";
+
+import { BoundingVolumes } from "./BoundingVolumes.js";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("tilesetProcessing");

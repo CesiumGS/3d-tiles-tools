@@ -1,12 +1,12 @@
 import path from "path";
 
-import { TilesetTarget3tz } from "../packages/TilesetTarget3tz";
-import { TilesetTarget3dtiles } from "../packages/TilesetTarget3dtiles";
+import { TilesetTarget3tz } from "../packages/TilesetTarget3tz.js";
+import { TilesetTarget3dtiles } from "../packages/TilesetTarget3dtiles.js";
 
-import { TilesetTarget } from "./TilesetTarget";
-import { TilesetError } from "./TilesetError";
-import { TilesetTargetFs } from "./TilesetTargetFs";
-import { TilesetEntry } from "./TilesetEntry";
+import { TilesetTarget } from "./TilesetTarget.js";
+import { TilesetError } from "./TilesetError.js";
+import { TilesetTargetFs } from "./TilesetTargetFs.js";
+import { TilesetEntry } from "./TilesetEntry.js";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("tilesetData");

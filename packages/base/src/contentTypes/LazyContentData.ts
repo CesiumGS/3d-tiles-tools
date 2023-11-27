@@ -1,11 +1,11 @@
 import path from "path";
 
-import { defined } from "../base/defined";
-import { Buffers } from "../base/Buffers";
+import { defined } from "../base/defined.js";
+import { Buffers } from "../base/Buffers.js";
 
-import { ResourceResolver } from "../io/ResourceResolver";
+import { ResourceResolver } from "../io/ResourceResolver.js";
 
-import { ContentData } from "./ContentData";
+import { ContentData } from "./ContentData.js";
 
 /**
  * Lazy implementation of the `ContentData` interface.

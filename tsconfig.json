@@ -1,23 +1,33 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2021",
+    "module": "NodeNext",
+    "target": "ES2021",
     "outDir": "./build",
+    "baseUrl": "./packages",
     "strict": true,
+    "moduleResolution": "NodeNext",
+    "lib": ["es2021"],
+
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
     "resolveJsonModule": true,
     "strictNullChecks": true,
     "noImplicitOverride": true,
     "declaration": true,
     "declarationMap": true,
-    "allowJs": true,
-    "lib": ["es2021"],
+
+    /*
     "paths": {
-      "*": ["./src/*.d.ts"]
+      "@3d-tiles-tools/structure/*": ["./packages/structure/*"],
+      "@3d-tiles-tools/base/*": ["./packages/base/*"],
+      "@3d-tiles-tools/gltf-extensions/*": ["./packages/gltf-extensions/*"],
+      "@3d-tiles-tools/metadata/*": ["./packages/metadata/*"],
+      "@3d-tiles-tools/tilesets/*": ["./packages/tilesets/*"],
+      "@3d-tiles-tools/tools/*": ["./packages/tools/*"],
+      "@3d-tiles-tools/cli/*": ["./packages/cli/*"],
     }
+    */
   },
   "include": ["specs"],
   "exclude": ["node_modules", "specs/data"],

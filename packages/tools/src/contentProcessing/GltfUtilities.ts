@@ -5,7 +5,7 @@ import { Buffers } from "@3d-tiles-tools/base";
 import { TileFormatError } from "@3d-tiles-tools/tilesets";
 import { Extensions } from "@3d-tiles-tools/tilesets";
 
-import { GltfPipelineLegacy } from "./GltfPipelineLegacy";
+import { GltfPipelineLegacy } from "./GltfPipelineLegacy.js";
 
 /**
  * Internal utility methods related to glTF/GLB data.

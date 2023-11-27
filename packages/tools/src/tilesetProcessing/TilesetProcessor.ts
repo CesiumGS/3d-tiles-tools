@@ -4,9 +4,9 @@ import { ContentDataTypeRegistry } from "@3d-tiles-tools/base";
 import { TilesetError } from "@3d-tiles-tools/tilesets";
 import { TilesetEntry } from "@3d-tiles-tools/tilesets";
 
-import { TilesetEntryProcessor } from "./TilesetEntryProcessor";
-import { TilesetProcessorContext } from "./TilesetProcessorContext";
-import { TilesetProcessorContexts } from "./TilesetProcessorContexts";
+import { TilesetEntryProcessor } from "./TilesetEntryProcessor.js";
+import { TilesetProcessorContext } from "./TilesetProcessorContext.js";
+import { TilesetProcessorContexts } from "./TilesetProcessorContexts.js";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("tilesetProcessing");

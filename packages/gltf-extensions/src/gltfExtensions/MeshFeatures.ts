@@ -3,7 +3,8 @@ import { Texture } from "@gltf-transform/core";
 import { TextureInfo } from "@gltf-transform/core";
 import { IProperty } from "@gltf-transform/core";
 import { PropertyType } from "@gltf-transform/core";
-import { PropertyTable } from "./StructuralMetadata";
+
+import { PropertyTable } from "./StructuralMetadata.js";
 
 const NAME = "EXT_mesh_features";
 

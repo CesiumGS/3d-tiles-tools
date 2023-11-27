@@ -1,5 +1,5 @@
-import { RootProperty } from "./RootProperty";
-import { PropertyTableProperty } from "./PropertyTableProperty";
+import { RootProperty } from "./RootProperty.js";
+import { PropertyTableProperty } from "./PropertyTableProperty.js";
 
 /**
  * Properties conforming to a class organized as property values stored

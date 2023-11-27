@@ -1,5 +1,5 @@
-import { RootProperty } from "../RootProperty";
-import { ClassProperty } from "./ClassProperty";
+import { RootProperty } from "../RootProperty.js";
+import { ClassProperty } from "./ClassProperty.js";
 
 /**
  * A class containing a set of properties.

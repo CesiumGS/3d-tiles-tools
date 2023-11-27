@@ -1,8 +1,8 @@
-import { RootProperty } from "./RootProperty";
-import { BoundingVolume } from "./BoundingVolume";
-import { Content } from "./Content";
-import { MetadataEntity } from "./MetadataEntity";
-import { TileImplicitTiling } from "./TileImplicitTiling";
+import { RootProperty } from "./RootProperty.js";
+import { BoundingVolume } from "./BoundingVolume.js";
+import { Content } from "./Content.js";
+import { MetadataEntity } from "./MetadataEntity.js";
+import { TileImplicitTiling } from "./TileImplicitTiling.js";
 
 /**
  * A tile in a 3D Tiles tileset.

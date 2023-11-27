@@ -1,7 +1,7 @@
 import { TilesetEntry } from "@3d-tiles-tools/tilesets";
 
-import { BasicTilesetProcessor } from "./BasicTilesetProcessor";
-import { TileContentProcessor } from "./TileContentProcessor";
+import { BasicTilesetProcessor } from "./BasicTilesetProcessor.js";
+import { TileContentProcessor } from "./TileContentProcessor.js";
 
 /**
  * Methods for processing the tile content of tilesets.

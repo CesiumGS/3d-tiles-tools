@@ -1,4 +1,4 @@
-import { MetadataEntity } from "./MetadataEntity";
+import { MetadataEntity } from "./MetadataEntity.js";
 
 /**
  * An object containing metadata about a group.

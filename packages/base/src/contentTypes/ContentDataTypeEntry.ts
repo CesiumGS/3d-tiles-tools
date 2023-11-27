@@ -1,4 +1,4 @@
-import { ContentData } from "./ContentData";
+import { ContentData } from "./ContentData.js";
 
 /**
  * An entry of the registered content data types,

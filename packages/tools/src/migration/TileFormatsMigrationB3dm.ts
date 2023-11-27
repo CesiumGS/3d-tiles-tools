@@ -5,15 +5,15 @@ import { TileFormats } from "@3d-tiles-tools/tilesets";
 
 import { TileTableData } from "@3d-tiles-tools/tilesets";
 
-import { GltfTransform } from "../contentProcessing/GltfTransform";
-import { GltfUtilities } from "../contentProcessing/GltfUtilities";
+import { GltfTransform } from "../contentProcessing/GltfTransform.js";
+import { GltfUtilities } from "../contentProcessing/GltfUtilities.js";
 
-import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
-import { TileTableDataToMeshFeatures } from "./TileTableDataToMeshFeatures";
-import { TileFormatsMigration } from "./TileFormatsMigration";
+import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata.js";
+import { TileTableDataToMeshFeatures } from "./TileTableDataToMeshFeatures.js";
+import { TileFormatsMigration } from "./TileFormatsMigration.js";
 
-import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils";
-import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils";
+import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils.js";
+import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils.js";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("migration");

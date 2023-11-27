@@ -7,7 +7,7 @@ import { OrientedBoundingBox } from "cesium";
 
 import { BoundingVolume } from "@3d-tiles-tools/structure";
 
-import { OrientedBoundingBoxes } from "./OrientedBoundingBoxes";
+import { OrientedBoundingBoxes } from "./OrientedBoundingBoxes.js";
 
 /**
  * Utility methods for bounding volume computations.

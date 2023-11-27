@@ -1,7 +1,7 @@
-import { MetadataEntityModel } from "../../src/metadata/MetadataEntityModel";
-import { MetadataEntityModels } from "../../src/metadata/MetadataEntityModels";
+import { MetadataEntityModel } from "../../src/metadata/MetadataEntityModel.js";
+import { MetadataEntityModels } from "../../src/metadata/MetadataEntityModels.js";
 
-import { SpecHelpers } from "../../../../specs/SpecHelpers";
+import { SpecHelpers } from "./SpecHelpers.js";
 
 describe("metadata/MetadataEntityModelBasic", function () {
   const epsilon = 0.000001;

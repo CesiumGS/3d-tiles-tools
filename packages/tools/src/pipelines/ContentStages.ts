@@ -1,7 +1,7 @@
 import { defined } from "@3d-tiles-tools/base";
 import { DeveloperError } from "@3d-tiles-tools/base";
 
-import { ContentStage } from "./ContentStage";
+import { ContentStage } from "./ContentStage.js";
 
 /**
  * Methods to create `ContentStage` objects

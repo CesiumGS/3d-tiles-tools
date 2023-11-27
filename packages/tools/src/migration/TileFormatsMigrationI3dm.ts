@@ -1,6 +1,7 @@
 import { Accessor } from "@gltf-transform/core";
 import { Logger } from "@gltf-transform/core";
 import { Node } from "@gltf-transform/core";
+
 import { clearNodeTransform } from "@gltf-transform/functions";
 import { clearNodeParent } from "@gltf-transform/functions";
 import { prune } from "@gltf-transform/functions";
@@ -16,18 +17,18 @@ import { TileFormats } from "@3d-tiles-tools/tilesets";
 import { TileFormatError } from "@3d-tiles-tools/tilesets";
 import { TileTableDataI3dm } from "@3d-tiles-tools/tilesets";
 import { TileTableData } from "@3d-tiles-tools/tilesets";
+import { VecMath } from "@3d-tiles-tools/tilesets";
 
 import { EXTInstanceFeatures } from "@3d-tiles-tools/gltf-extensions";
 
-import { GltfTransform } from "../contentProcessing/GltfTransform";
-import { GltfUtilities } from "../contentProcessing/GltfUtilities";
-import { VecMath } from "@3d-tiles-tools/tilesets";
+import { GltfTransform } from "../contentProcessing/GltfTransform.js";
+import { GltfUtilities } from "../contentProcessing/GltfUtilities.js";
 
-import { TileFormatsMigration } from "./TileFormatsMigration";
-import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
+import { TileFormatsMigration } from "./TileFormatsMigration.js";
+import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata.js";
 
-import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils";
-import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils";
+import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils.js";
+import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils.js";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("migration");

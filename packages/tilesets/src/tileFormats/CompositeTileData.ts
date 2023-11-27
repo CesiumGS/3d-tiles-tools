@@ -1,4 +1,4 @@
-import { Header } from "./Header";
+import { Header } from "./Header.js";
 
 /**
  * A representation of composite (CMPT) tile data.

@@ -1,6 +1,6 @@
-import { ContentDataTypes } from "../../src/contentTypes/ContentDataTypes";
-import { BufferedContentData } from "../../src/contentTypes/BufferedContentData";
-import { ContentDataTypeRegistry } from "../../src/contentTypes/ContentDataTypeRegistry";
+import { ContentDataTypes } from "../../src/contentTypes/ContentDataTypes.js";
+import { BufferedContentData } from "../../src/contentTypes/BufferedContentData.js";
+import { ContentDataTypeRegistry } from "../../src/contentTypes/ContentDataTypeRegistry.js";
 
 describe("ContentDataTypeRegistry.findContentDataType", function () {
   it("detects GLB", async function () {

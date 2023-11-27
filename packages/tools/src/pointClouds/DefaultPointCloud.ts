@@ -2,7 +2,7 @@ import { Iterables } from "@3d-tiles-tools/base";
 
 import { TileFormatError } from "@3d-tiles-tools/tilesets";
 
-import { ReadablePointCloud } from "./ReadablePointCloud";
+import { ReadablePointCloud } from "./ReadablePointCloud.js";
 
 /**
  * Implementation of a `ReadablePointCloud` where the

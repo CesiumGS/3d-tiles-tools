@@ -1,4 +1,4 @@
-import { NumberTypeDescriptions } from "./NumberTypeDescriptions";
+import { NumberTypeDescriptions } from "./NumberTypeDescriptions.js";
 
 /**
  * Methods for detecting the type of values that are obtained
