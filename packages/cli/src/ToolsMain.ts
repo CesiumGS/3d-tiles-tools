@@ -7,7 +7,6 @@ import { Buffers } from "@3d-tiles-tools/base";
 import { Iterables } from "@3d-tiles-tools/base";
 import { ContentDataTypes } from "@3d-tiles-tools/base";
 
-import { Tilesets } from "@3d-tiles-tools/tilesets";
 import { TileFormats } from "@3d-tiles-tools/tilesets";
 import { TileDataLayouts } from "@3d-tiles-tools/tilesets";
 import { TileFormatError } from "@3d-tiles-tools/tilesets";

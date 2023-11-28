@@ -2,8 +2,9 @@ import fs from "fs";
 import path from "path";
 import { Buffers } from "@3d-tiles-tools/base";
 
-import { TileFormats } from "../../src/tileFormats/TileFormats";
-import { SpecHelpers } from "../../../../specs/SpecHelpers";
+import { TileFormats } from "../../src/tileFormats/TileFormats.js";
+
+import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
 function createResolver(
   input: string

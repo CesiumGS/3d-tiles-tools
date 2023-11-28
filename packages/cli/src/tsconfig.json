@@ -1,0 +1,17 @@
+{
+  "extends": "../../../tsconfig.json",  
+  "compilerOptions": {
+    "declaration": true,
+    "composite": true,
+    "rootDir": ".",
+    "outDir": "../build/src",
+    "paths": {
+      "@3d-tiles-tools/base": ["../packages/base/build/src/index.d.ts"],
+      "@3d-tiles-tools/tilesets": ["../packages/tilesets/build/src/index.d.ts"],
+      "@3d-tiles-tools/tools": ["../packages/tools/build/src/index.d.ts"],
+    }
+  },
+  "include": [
+    "./**/*"
+  ]
+}

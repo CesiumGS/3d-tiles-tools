@@ -2,9 +2,9 @@ import fs from "fs";
 
 import { Paths } from "@3d-tiles-tools/base";
 
-import { TilesetOperations } from "../../src/tilesetProcessing/TilesetOperations";
+import { TilesetOperations } from "../../src/tilesetProcessing/TilesetOperations.js";
 
-import { SpecHelpers } from "../../../../specs/SpecHelpers";
+import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
 const basicInput = "./specs/data/combineTilesets/nestedExternal";
 const basicOutput = "./specs/data/output/combineTilesets/nestedExternal";

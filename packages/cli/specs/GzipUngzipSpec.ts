@@ -1,7 +1,8 @@
 import path from "path";
 
-import { SpecHelpers } from "../../../specs/SpecHelpers";
-import { ToolsMain } from "../src/ToolsMain";
+import { ToolsMain } from "../src/ToolsMain.js";
+
+import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
 const simpleTileset = "./specs/data/gzipUngzip/simpleTileset";
 const simpleTilesetGzip = "./specs/data/gzipUngzip/simpleTileset-gzip";

@@ -1,9 +1,9 @@
-import { ImplicitTilings } from "../../src/implicitTiling/ImplicitTilings";
+import { ImplicitTilings } from "../../src/implicitTiling/ImplicitTilings.js";
 
 import { OctreeCoordinates } from "@3d-tiles-tools/base";
 import { QuadtreeCoordinates } from "@3d-tiles-tools/base";
 
-import { SpecHelpers } from "../../../../specs/SpecHelpers";
+import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
 function createQuadtreeImplicitTiling(subtreeLevels: number) {
   const implicitTiling = {

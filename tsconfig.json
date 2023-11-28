@@ -55,6 +55,9 @@
     },
     {
       "path": "./packages/cli/tsconfig.json"
+    },
+    {
+      "path": "./packages/spec-helpers/tsconfig.json"
     }
   ]
 }

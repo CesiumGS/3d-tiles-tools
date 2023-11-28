@@ -8,10 +8,11 @@ import { Tiles } from "@3d-tiles-tools/tilesets";
 import { TraversedTile } from "@3d-tiles-tools/tilesets";
 import { TilesetEntry } from "@3d-tiles-tools/tilesets";
 
-import { BasicTilesetProcessor } from "../../src/tilesetProcessing/BasicTilesetProcessor";
+import { BasicTilesetProcessor } from "../../src/tilesetProcessing/BasicTilesetProcessor.js";
 
-import { SpecEntryProcessor } from "./SpecEntryProcessor";
-import { SpecHelpers } from "../../../../specs/SpecHelpers";
+import { SpecEntryProcessor } from "./SpecEntryProcessor.js";
+
+import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
 const basicInput = "./specs/data/tilesetProcessing/basicProcessing";
 const basicOutput = "./specs/data/output/tilesetProcessing/basicProcessing";

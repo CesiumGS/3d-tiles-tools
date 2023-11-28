@@ -1,7 +1,7 @@
 import { MetadataEntityModel } from "../../src/metadata/MetadataEntityModel.js";
 import { MetadataEntityModels } from "../../src/metadata/MetadataEntityModels.js";
 
-import { SpecHelpers } from "./SpecHelpers.js";
+import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
 describe("metadata/MetadataEntityModelBasic", function () {
   const epsilon = 0.000001;

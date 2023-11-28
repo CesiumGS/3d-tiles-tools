@@ -1,0 +1,22 @@
+{
+  "extends": "../../../tsconfig.json",  
+  "compilerOptions": {
+    "declaration": true,
+    "composite": true,
+    "rootDir": ".",
+    "outDir": "../build/src",
+    "paths": {
+      "@3d-tiles-tools/structure": ["../packages/structure/build/src/index.d.ts"],
+      "@3d-tiles-tools/ktx": ["../packages/ktx/build/src/index.d.ts"],
+      "@3d-tiles-tools/gltf-extensions": ["../packages/gltf-extensions/build/src/index.d.ts"],
+      "@3d-tiles-tools/base": ["../packages/base/build/src/index.d.ts"],
+      "@3d-tiles-tools/metadata": ["../packages/metadata/build/src/index.d.ts"],
+      "@3d-tiles-tools/tilesets": ["../packages/tilesets/build/src/index.d.ts"],
+    }
+  },
+  "include": [
+    "./**/*",
+    "../../../src/gltf-pipeline.d.ts",
+    "../../../src/gltfpack.d.ts"
+  ]
+}

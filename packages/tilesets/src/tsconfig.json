@@ -7,9 +7,14 @@
     "outDir": "../build/src",
     "paths": {
       "@3d-tiles-tools/structure": ["../packages/structure/build/src/index.d.ts"],
+      "@3d-tiles-tools/base": ["../packages/base/build/src/index.d.ts"],
+      "@3d-tiles-tools/metadata": ["../packages/metadata/build/src/index.d.ts"],
     }
   },
   "include": [
-    "./**/*"
+    "./**/*",
+    "../../../src/gltf-pipeline.d.ts",
+    "../../../src/gltfpack.d.ts",
+    "../../../src/cesium.d.ts",
   ]
 }

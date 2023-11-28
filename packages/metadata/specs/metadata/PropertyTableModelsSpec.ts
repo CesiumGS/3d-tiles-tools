@@ -3,7 +3,7 @@ import { ClassProperty } from "@3d-tiles-tools/structure";
 import { BinaryPropertyTables } from "../../src/metadata/binary/BinaryPropertyTables.js";
 import { BinaryPropertyTableModel } from "../../src/metadata/binary/BinaryPropertyTableModel.js";
 
-import { SpecHelpers } from "./SpecHelpers.js";
+import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
 /**
  * Test for the `PropertyTableModels` class.

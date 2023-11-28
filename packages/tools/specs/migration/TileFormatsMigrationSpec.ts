@@ -1,12 +1,11 @@
 import fs from "fs";
 
-import { TilesetOperations } from "../../src/tilesetProcessing/TilesetOperations";
-
 import { Paths } from "@3d-tiles-tools/base";
 
-import { GltfUtilities } from "../../src/contentProcessing/GltfUtilities";
+import { TilesetOperations } from "../../src/tilesetProcessing/TilesetOperations.js";
+import { GltfUtilities } from "../../src/contentProcessing/GltfUtilities.js";
 
-import { SpecHelpers } from "../../../../specs/SpecHelpers";
+import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
 const sourceDir = "./specs/data/migration/input/";
 const targetDir = "./specs/data/migration/output/";

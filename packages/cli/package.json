@@ -25,7 +25,7 @@
     "about:test": "echo 'Execute the unit tests'",
     "start": "npx ts-node src/main.ts",
     "build": "npx tsc --build --verbose --force",
-    "test": "ts-node ../../node_modules/jasmine/bin/jasmine --config=specs/jasmine.json"
+    "test": "ts-node --esm ../../node_modules/jasmine/bin/jasmine.js --config=specs/jasmine.json"
   }
 }
 

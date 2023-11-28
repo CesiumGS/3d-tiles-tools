@@ -1,6 +1,6 @@
 import fs from "fs";
 
-import { GltfTransform } from "../../src/contentProcessing/GltfTransform";
+import { GltfTransform } from "../../src/contentProcessing/GltfTransform.js";
 
 describe("GltfTransform::getIO", function () {
   it("can read a GLB without compression", async function () {

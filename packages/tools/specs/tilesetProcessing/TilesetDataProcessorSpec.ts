@@ -1,8 +1,8 @@
-import { TilesetDataProcessor } from "../../src/tilesetProcessing/TilesetDataProcessor";
+import { TilesetDataProcessor } from "../../src/tilesetProcessing/TilesetDataProcessor.js";
 
-import { SpecEntryProcessor } from "./SpecEntryProcessor";
+import { SpecEntryProcessor } from "./SpecEntryProcessor.js";
 
-import { SpecHelpers } from "../../../../specs/SpecHelpers";
+import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
 const outputRoot = "./specs/data/output/tilesetProcessing/";
 

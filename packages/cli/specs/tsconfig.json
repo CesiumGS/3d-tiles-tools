@@ -1,0 +1,16 @@
+{
+  "extends": "../../../tsconfig.json",  
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "../build/specs",
+    "paths": {
+      "@3d-tiles-tools/spec-helpers": ["../packages/spec-helpers/build/src/index.d.ts"],
+    }
+  },
+  "include": [
+    "./**/*"
+  ],
+  "references": [
+    { "path": "../src/tsconfig.json" }
+  ]  
+}
