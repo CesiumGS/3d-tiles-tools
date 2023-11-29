@@ -4,7 +4,7 @@
     "declaration": true,
     "composite": true,
     "rootDir": ".",
-    "outDir": "../build/src",
+    "outDir": "../build/src"
   },
   "include": [
     "./**/*"

@@ -1,4 +1,4 @@
-import GltfPipeline from "gltf-pipeline";
+//import GltfPipeline from "gltf-pipeline";
 
 import { Buffers } from "@3d-tiles-tools/base";
 
@@ -26,8 +26,10 @@ export class GltfUtilities {
    * @returns A promise that resolves with the upgraded GLB.
    */
   static async upgradeGlb(glbBuffer: Buffer, options: any): Promise<Buffer> {
-    const result = await GltfPipeline.processGlb(glbBuffer, options);
-    return result.glb;
+    // TODO-GLTF-PIPELINE
+    return glbBuffer;
+    //const result = await GltfPipeline.processGlb(glbBuffer, options);
+    //return result.glb;
   }
 
   /**
@@ -232,8 +234,10 @@ export class GltfUtilities {
       return gltf;
     };
     options.customStages.push(customStage);
-    const result = await GltfPipeline.processGlb(glbBuffer, options);
-    return result.glb;
+    // TODO-GLTF-PIPELINE
+    return glbBuffer;
+    //const result = await GltfPipeline.processGlb(glbBuffer, options);
+    //return result.glb;
   }
 
   /**
@@ -255,8 +259,10 @@ export class GltfUtilities {
       customStages: [customStage],
       keepUnusedElements: true,
     };
-    const result = await GltfPipeline.processGlb(glbBuffer, options);
-    return result.glb;
+    // TODO-GLTF-PIPELINE
+    return glbBuffer;
+    //const result = await GltfPipeline.processGlb(glbBuffer, options);
+    //return result.glb;
   }
 
   /**

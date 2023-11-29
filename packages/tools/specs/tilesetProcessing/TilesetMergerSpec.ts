@@ -6,16 +6,21 @@ import { TilesetOperations } from "../../src/tilesetProcessing/TilesetOperations
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
+const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+
 const basicInputs = [
-  "./specs/data/mergeTilesets/basicMerge/TilesetA",
-  "./specs/data/mergeTilesets/basicMerge/sub/TilesetA",
+  SPECS_DATA_BASE_DIRECTORY + "mergeTilesets/basicMerge/TilesetA",
+  SPECS_DATA_BASE_DIRECTORY + "mergeTilesets/basicMerge/sub/TilesetA",
 ];
-const basicOutput = "./specs/data/output/mergeTilesets/basicMerge";
+const basicOutput =
+  SPECS_DATA_BASE_DIRECTORY + "output/mergeTilesets/basicMerge";
 const overwrite = true;
 
 describe("TilesetMerger", function () {
   afterEach(function () {
-    SpecHelpers.forceDeleteDirectory("./specs/data/output/mergeTilesets");
+    SpecHelpers.forceDeleteDirectory(
+      SPECS_DATA_BASE_DIRECTORY + "output/mergeTilesets"
+    );
   });
 
   it("merges tilesets into a single tileset", async function () {

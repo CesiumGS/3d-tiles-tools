@@ -3,6 +3,9 @@
   "version": "0.3.0",
   "description": "3D Tiles tools spec helper classes",
   "type": "module",
+  "source": "./src/index.ts",
+  "exports": "./build/src/index.js",
+  "types": "./build/src/index.d.ts",
   "dependencies": {
     "@3d-tiles-tools/base": "0.3.0",
     "@3d-tiles-tools/structure": "0.3.0",

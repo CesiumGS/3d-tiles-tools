@@ -5,9 +5,8 @@
     "composite": true,
     "rootDir": ".",
     "outDir": "../build/src",
-    "paths": {
-      "@3d-tiles-tools/base": ["../packages/base/build/src/index.d.ts"],
-    }
+    "allowJs": true,
+    "checkJs": false,
   },
   "include": [
     "./**/*"

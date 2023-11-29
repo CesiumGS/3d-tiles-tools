@@ -4,13 +4,16 @@
   "description": "3D Tiles tools basic utility classes",
   "type": "module",
   "source": "./src/index.ts",
-  "types": "./build/index.d.ts",
+  "exports": "./build/src/index.js",
+  "types": "./build/src/index.d.ts",
+
   "dependencies": {
     "@3d-tiles-tools/structure": "0.3.0",
     "pino": "^8.15.0",
     "pino-pretty": "^10.2.0"
   },
   "devDependencies": {
+    "@3d-tiles-tools/spec-helpers": "0.3.0",
     "typescript": "^4.8.3"
   },
 

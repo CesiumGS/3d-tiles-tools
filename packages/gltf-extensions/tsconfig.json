@@ -7,8 +7,4 @@
   "references": [
     { "path": "./src/tsconfig.json" },
   ],
-  "include": [
-    "src/**/*",
-    "../../src/cesium.d.ts",
-  ]
 }

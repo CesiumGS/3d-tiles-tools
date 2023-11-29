@@ -2,7 +2,6 @@
   "compilerOptions": {
     "module": "NodeNext",
     "target": "ES2021",
-    "outDir": "./build",
     "baseUrl": "./packages",
     "strict": true,
     "moduleResolution": "NodeNext",
@@ -10,24 +9,21 @@
 
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "strictNullChecks": true,
     "noImplicitOverride": true,
     "declaration": true,
     "declarationMap": true,
 
-    /*
     "paths": {
-      "@3d-tiles-tools/structure/*": ["./packages/structure/*"],
-      "@3d-tiles-tools/base/*": ["./packages/base/*"],
-      "@3d-tiles-tools/gltf-extensions/*": ["./packages/gltf-extensions/*"],
-      "@3d-tiles-tools/metadata/*": ["./packages/metadata/*"],
-      "@3d-tiles-tools/tilesets/*": ["./packages/tilesets/*"],
-      "@3d-tiles-tools/tools/*": ["./packages/tools/*"],
-      "@3d-tiles-tools/cli/*": ["./packages/cli/*"],
+      "@3d-tiles-tools/structure": ["./packages/structure/"],
+      "@3d-tiles-tools/base": ["./packages/base/"],
+      "@3d-tiles-tools/gltf-extensions": ["./packages/gltf-extensions/"],
+      "@3d-tiles-tools/metadata": ["./packages/metadata/"],
+      "@3d-tiles-tools/tilesets": ["./packages/tilesets/"],
+      "@3d-tiles-tools/tools": ["./packages/tools/"],
+      "@3d-tiles-tools/cli": ["./packages/cli/"],
     }
-    */
   },
   "include": ["specs"],
   "exclude": ["node_modules", "specs/data"],

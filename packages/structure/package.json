@@ -4,8 +4,8 @@
   "description": "3D Tiles tools type definitions for the basic JSON structures",
   "type": "module",
   "source": "./src/index.ts",
-  "main": "./build/index.js",
-  "types": "./build/index.d.ts",
+  "exports": "./build/src/index.js",
+  "types": "./build/src/index.d.ts",
   "devDependencies": {
     "typescript": "^4.8.3"
   },

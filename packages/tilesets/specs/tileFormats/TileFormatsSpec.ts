@@ -6,6 +6,8 @@ import { TileFormats } from "../../src/tileFormats/TileFormats.js";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
+const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+
 function createResolver(
   input: string
 ): (uri: string) => Promise<Buffer | undefined> {
@@ -23,7 +25,8 @@ function createResolver(
 
 describe("TileFormats", function () {
   it("reads B3DM (deprecated 1) from a buffer", function () {
-    const p = "./specs/data/BatchedDeprecated1/batchedDeprecated1.b3dm";
+    const p =
+      SPECS_DATA_BASE_DIRECTORY + "BatchedDeprecated1/batchedDeprecated1.b3dm";
     const tileDataBuffer = fs.readFileSync(p);
 
     const tileData = TileFormats.readTileData(tileDataBuffer);
@@ -42,7 +45,8 @@ describe("TileFormats", function () {
   });
 
   it("reads B3DM (deprecated 2) from a buffer", function () {
-    const p = "./specs/data/BatchedDeprecated2/batchedDeprecated2.b3dm";
+    const p =
+      SPECS_DATA_BASE_DIRECTORY + "BatchedDeprecated2/batchedDeprecated2.b3dm";
     const tileDataBuffer = fs.readFileSync(p);
 
     const tileData = TileFormats.readTileData(tileDataBuffer);
@@ -61,7 +65,7 @@ describe("TileFormats", function () {
   });
 
   it("reads B3DM from a buffer", function () {
-    const p = "./specs/data/contentTypes/content.b3dm";
+    const p = SPECS_DATA_BASE_DIRECTORY + "contentTypes/content.b3dm";
     const tileDataBuffer = fs.readFileSync(p);
 
     const tileData = TileFormats.readTileData(tileDataBuffer);
@@ -82,7 +86,7 @@ describe("TileFormats", function () {
   });
 
   it("reads I3DM from a buffer", function () {
-    const p = "./specs/data/contentTypes/content.i3dm";
+    const p = SPECS_DATA_BASE_DIRECTORY + "contentTypes/content.i3dm";
     const tileDataBuffer = fs.readFileSync(p);
 
     const tileData = TileFormats.readTileData(tileDataBuffer);
@@ -100,7 +104,7 @@ describe("TileFormats", function () {
   });
 
   it("reads PNTS from a buffer", function () {
-    const p = "./specs/data/contentTypes/content.pnts";
+    const p = SPECS_DATA_BASE_DIRECTORY + "contentTypes/content.pnts";
     const tileDataBuffer = fs.readFileSync(p);
 
     const tileData = TileFormats.readTileData(tileDataBuffer);
@@ -121,7 +125,7 @@ describe("TileFormats", function () {
   });
 
   it("reads CMPT from a buffer", function () {
-    const p = "./specs/data/contentTypes/content.cmpt";
+    const p = SPECS_DATA_BASE_DIRECTORY + "contentTypes/content.cmpt";
     const tileDataBuffer = fs.readFileSync(p);
 
     const tileData = TileFormats.readCompositeTileData(tileDataBuffer);
@@ -133,7 +137,7 @@ describe("TileFormats", function () {
   });
 
   it("extracts a single GLB buffers from B3DM", async function () {
-    const p = "./specs/data/contentTypes/content.b3dm";
+    const p = SPECS_DATA_BASE_DIRECTORY + "contentTypes/content.b3dm";
     const tileDataBuffer = fs.readFileSync(p);
     const externalGlbResolver = createResolver(p);
     const glbBuffers = await TileFormats.extractGlbBuffers(
@@ -144,7 +148,7 @@ describe("TileFormats", function () {
   });
 
   it("extracts multiple GLB buffers from CMPT", async function () {
-    const p = "./specs/data/contentTypes/content.cmpt";
+    const p = SPECS_DATA_BASE_DIRECTORY + "contentTypes/content.cmpt";
     const tileDataBuffer = fs.readFileSync(p);
     const externalGlbResolver = createResolver(p);
     const glbBuffers = await TileFormats.extractGlbBuffers(
@@ -155,7 +159,8 @@ describe("TileFormats", function () {
   });
 
   it("extracts a single GLB buffer from an I3DM that refers to an external GLB", async function () {
-    const p = "./specs/data/tileFormats/instancedGltfExternal.i3dm";
+    const p =
+      SPECS_DATA_BASE_DIRECTORY + "tileFormats/instancedGltfExternal.i3dm";
     const tileDataBuffer = fs.readFileSync(p);
     const externalGlbResolver = createResolver(p);
     const glbBuffers = await TileFormats.extractGlbBuffers(
@@ -166,7 +171,7 @@ describe("TileFormats", function () {
   });
 
   it("extracts no GLB buffers from PNTS", async function () {
-    const p = "./specs/data/contentTypes/content.pnts";
+    const p = SPECS_DATA_BASE_DIRECTORY + "contentTypes/content.pnts";
     const tileDataBuffer = fs.readFileSync(p);
     const externalGlbResolver = createResolver(p);
     const glbBuffers = await TileFormats.extractGlbBuffers(
@@ -177,7 +182,7 @@ describe("TileFormats", function () {
   });
 
   it("properly omits padding bytes in extractGlbPayload for b3dmToGlb", async function () {
-    const p = "./specs/data/tileFormats/box.glb";
+    const p = SPECS_DATA_BASE_DIRECTORY + "tileFormats/box.glb";
 
     const inputGlbBuffer = fs.readFileSync(p);
     const inputB3dmTileData =
@@ -200,7 +205,7 @@ describe("TileFormats", function () {
   });
 
   it("splits a composite with splitCmpt", async function () {
-    const p = "./specs/data/composite.cmpt";
+    const p = SPECS_DATA_BASE_DIRECTORY + "composite.cmpt";
     const recursive = false;
     const inputBuffer = fs.readFileSync(p);
     const outputBuffers = await TileFormats.splitCmpt(inputBuffer, recursive);
@@ -208,7 +213,7 @@ describe("TileFormats", function () {
   });
 
   it("splits a composite-of-composite into a single file with non-recursive splitCmpt", async function () {
-    const p = "./specs/data/compositeOfComposite.cmpt";
+    const p = SPECS_DATA_BASE_DIRECTORY + "compositeOfComposite.cmpt";
     const recursive = false;
     const inputBuffer = fs.readFileSync(p);
     const outputBuffers = await TileFormats.splitCmpt(inputBuffer, recursive);
@@ -216,7 +221,7 @@ describe("TileFormats", function () {
   });
 
   it("splits a composite-of-composite into a all 'leaf' tiles with recursive splitCmpt", async function () {
-    const p = "./specs/data/compositeOfComposite.cmpt";
+    const p = SPECS_DATA_BASE_DIRECTORY + "compositeOfComposite.cmpt";
     const recursive = true;
     const inputBuffer = fs.readFileSync(p);
     const outputBuffers = await TileFormats.splitCmpt(inputBuffer, recursive);
@@ -224,7 +229,7 @@ describe("TileFormats", function () {
   });
 
   it("throws an error when trying to read tile data from a buffer that does not contain B3DM, I3DM, or PNTS", function () {
-    const p = "./specs/data/contentTypes/content.cmpt";
+    const p = SPECS_DATA_BASE_DIRECTORY + "contentTypes/content.cmpt";
     const tileDataBuffer = fs.readFileSync(p);
     expect(function () {
       TileFormats.readTileData(tileDataBuffer);
@@ -232,7 +237,7 @@ describe("TileFormats", function () {
   });
 
   it("throws an error when trying to read composite tile data from a buffer that does not contain CMPT", function () {
-    const p = "./specs/data/contentTypes/content.b3dm";
+    const p = SPECS_DATA_BASE_DIRECTORY + "contentTypes/content.b3dm";
     const tileDataBuffer = fs.readFileSync(p);
     expect(function () {
       TileFormats.readCompositeTileData(tileDataBuffer);
@@ -390,7 +395,8 @@ describe("TileFormats", function () {
 
   it("extracts a b3dm from buffer", function () {
     // Ported from legacy tests
-    const b3dmPath = "./specs/data/batchedWithBatchTableBinary.b3dm";
+    const b3dmPath =
+      SPECS_DATA_BASE_DIRECTORY + "batchedWithBatchTableBinary.b3dm";
     const b3dmBuffer = fs.readFileSync(b3dmPath);
     const b3dm = TileFormats.readTileData(b3dmBuffer);
     expect(b3dm.header.magic).toBe("b3dm");
@@ -406,7 +412,7 @@ describe("TileFormats", function () {
 
   it("extracts a b3dm and i3dm from composite buffer", function () {
     // Ported from legacy tests
-    const compositePath = "./specs/data/composite.cmpt";
+    const compositePath = SPECS_DATA_BASE_DIRECTORY + "composite.cmpt";
     const compositeBuffer = fs.readFileSync(compositePath);
     const compositeTileData =
       TileFormats.readCompositeTileData(compositeBuffer);
@@ -421,7 +427,8 @@ describe("TileFormats", function () {
 
   it("extracts a b3dm and i3dm from composite-of-composite buffer", function () {
     // Ported from legacy tests
-    const compositeOfCompositePath = "./specs/data/compositeOfComposite.cmpt";
+    const compositeOfCompositePath =
+      SPECS_DATA_BASE_DIRECTORY + "compositeOfComposite.cmpt";
     const compositeOfCompositeBuffer = fs.readFileSync(
       compositeOfCompositePath
     );
@@ -442,7 +449,8 @@ describe("TileFormats", function () {
 
   it("extracts a i3dm from buffer", function () {
     // Ported from legacy tests
-    const i3dmPath = "./specs/data/instancedWithBatchTableBinary.i3dm";
+    const i3dmPath =
+      SPECS_DATA_BASE_DIRECTORY + "instancedWithBatchTableBinary.i3dm";
     const i3dmBuffer = fs.readFileSync(i3dmPath);
     const i3dm = TileFormats.readTileData(i3dmBuffer);
     expect(i3dm.header.magic).toBe("i3dm");
@@ -458,7 +466,8 @@ describe("TileFormats", function () {
 
   it("generates a basic b3dm header for a glb", function () {
     // Ported from legacy tests
-    const glbPath = "./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb";
+    const glbPath =
+      SPECS_DATA_BASE_DIRECTORY + "CesiumTexturedBox/CesiumTexturedBox.glb";
     const glbBuffer = fs.readFileSync(glbPath);
     const headerByteLength = 28;
     const b3dmTileData =
@@ -488,7 +497,8 @@ describe("TileFormats", function () {
     const featureTableBinaryBuffer = Buffer.alloc(16); // Contents don't matter
     const batchTableBinaryBuffer = Buffer.alloc(32); // Contents don't matter
 
-    const glbPath = "./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb";
+    const glbPath =
+      SPECS_DATA_BASE_DIRECTORY + "CesiumTexturedBox/CesiumTexturedBox.glb";
     const glbBuffer = fs.readFileSync(glbPath);
     const tileData = TileFormats.createB3dmTileDataFromGlb(
       glbBuffer,
@@ -511,7 +521,8 @@ describe("TileFormats", function () {
 
   it("generates a basic i3dm header for a glb", function () {
     // Ported from legacy tests (as far as reasonably possible..)
-    const glbPath = "./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb";
+    const glbPath =
+      SPECS_DATA_BASE_DIRECTORY + "CesiumTexturedBox/CesiumTexturedBox.glb";
     const glbBuffer = fs.readFileSync(glbPath);
     const headerByteLength = 32;
     const tileData = TileFormats.createDefaultI3dmTileDataFromGlb(glbBuffer);
@@ -528,7 +539,8 @@ describe("TileFormats", function () {
 
   it("generates an i3dm with feature table and batch table", function () {
     // Ported from legacy tests (as far as reasonably possible..)
-    const glbPath = "./specs/data/CesiumTexturedBox/CesiumTexturedBox.glb";
+    const glbPath =
+      SPECS_DATA_BASE_DIRECTORY + "CesiumTexturedBox/CesiumTexturedBox.glb";
     const glbBuffer = fs.readFileSync(glbPath);
 
     const featureTableJson = {

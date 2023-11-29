@@ -4,8 +4,8 @@
   "description": "3D Tiles tools command line interface",
   "type": "module",
   "source": "./src/main.ts",
-  "main": "./build/index.js",
-  "types": "./build/index.d.ts",
+  "main": "./build/src/index.js",
+  "types": "./build/src/index.d.ts",
   "bin": {
     "3d-tiles-tools": "./build/main"
   },
@@ -16,6 +16,7 @@
     "yargs": "^17.5.1"
   },
   "devDependencies": {
+    "@3d-tiles-tools/spec-helpers": "0.3.0",
     "@types/yargs": "^17.0.22"
   },
 

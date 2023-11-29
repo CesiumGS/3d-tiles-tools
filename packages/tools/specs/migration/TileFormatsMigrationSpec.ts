@@ -7,10 +7,11 @@ import { GltfUtilities } from "../../src/contentProcessing/GltfUtilities.js";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
-const sourceDir = "./specs/data/migration/input/";
-const targetDir = "./specs/data/migration/output/";
-const targetGltfDir = "./specs/data/migration/output_gltf/";
-const goldenGltfDir = "./specs/data/migration/golden_gltf/";
+const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+const sourceDir = SPECS_DATA_BASE_DIRECTORY + "migration/input/";
+const targetDir = SPECS_DATA_BASE_DIRECTORY + "migration/output/";
+const targetGltfDir = SPECS_DATA_BASE_DIRECTORY + "migration/output_gltf/";
+const goldenGltfDir = SPECS_DATA_BASE_DIRECTORY + "migration/golden_gltf/";
 
 /**
  * Computes the JSON strings to compare for the specified migration

@@ -2,8 +2,12 @@ import { TilesetDataProcessor } from "../../src/tilesetProcessing/TilesetDataPro
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
-const basicInput = "./specs/data/tilesetProcessing/basicProcessing";
-const basicOutput = "./specs/data/output/tilesetProcessing/basicProcessing";
+const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+
+const basicInput =
+  SPECS_DATA_BASE_DIRECTORY + "tilesetProcessing/basicProcessing";
+const basicOutput =
+  SPECS_DATA_BASE_DIRECTORY + "output/tilesetProcessing/basicProcessing";
 
 const overwrite = true;
 
@@ -14,7 +18,9 @@ const overwrite = true;
  */
 describe("TilesetProcessor", function () {
   afterEach(function () {
-    SpecHelpers.forceDeleteDirectory("./specs/data/output/tilesetProcessing");
+    SpecHelpers.forceDeleteDirectory(
+      SPECS_DATA_BASE_DIRECTORY + "output/tilesetProcessing"
+    );
   });
 
   it("throws when trying to call 'begin' with invalid path", async function () {

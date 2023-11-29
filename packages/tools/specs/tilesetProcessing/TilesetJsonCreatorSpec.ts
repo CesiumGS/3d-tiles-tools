@@ -6,9 +6,11 @@ import { TilesetJsonCreator } from "../../src/tilesetProcessing/TilesetJsonCreat
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
-const sourceDir = "./specs/data/createTilesetJson/input/";
-const targetDir = "./specs/data/createTilesetJson/output/";
-const goldenDir = "./specs/data/createTilesetJson/golden/";
+const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+
+const sourceDir = SPECS_DATA_BASE_DIRECTORY + "createTilesetJson/input/";
+const targetDir = SPECS_DATA_BASE_DIRECTORY + "createTilesetJson/output/";
+const goldenDir = SPECS_DATA_BASE_DIRECTORY + "createTilesetJson/golden/";
 
 describe("TilesetJsonCreator", function () {
   afterEach(function () {

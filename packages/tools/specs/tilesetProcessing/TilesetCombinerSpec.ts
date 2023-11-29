@@ -6,13 +6,18 @@ import { TilesetOperations } from "../../src/tilesetProcessing/TilesetOperations
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
-const basicInput = "./specs/data/combineTilesets/nestedExternal";
-const basicOutput = "./specs/data/output/combineTilesets/nestedExternal";
+const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+
+const basicInput = SPECS_DATA_BASE_DIRECTORY + "combineTilesets/nestedExternal";
+const basicOutput =
+  SPECS_DATA_BASE_DIRECTORY + "output/combineTilesets/nestedExternal";
 const overwrite = true;
 
 describe("TilesetCombiner", function () {
   afterEach(function () {
-    SpecHelpers.forceDeleteDirectory("./specs/data/output/combineTilesets");
+    SpecHelpers.forceDeleteDirectory(
+      SPECS_DATA_BASE_DIRECTORY + "output/combineTilesets"
+    );
   });
 
   it("combines external tilesets into a single tileset", async function () {

@@ -3,11 +3,6 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "../build/specs",
-    "paths": {
-      "@3d-tiles-tools/base": ["../packages/base/build/src/index.d.ts"],
-      "@3d-tiles-tools/structure": ["../packages/structure/build/src/index.d.ts"],
-      "@3d-tiles-tools/spec-helpers": ["../packages/spec-helpers/build/src/index.d.ts"],
-    }
   },
   "include": [
     "./**/*"

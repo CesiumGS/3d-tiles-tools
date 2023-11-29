@@ -14,12 +14,17 @@ import { SpecEntryProcessor } from "./SpecEntryProcessor.js";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
-const basicInput = "./specs/data/tilesetProcessing/basicProcessing";
-const basicOutput = "./specs/data/output/tilesetProcessing/basicProcessing";
+const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
 
-const externalInput = "./specs/data/tilesetProcessing/externalProcessing";
+const basicInput =
+  SPECS_DATA_BASE_DIRECTORY + "tilesetProcessing/basicProcessing";
+const basicOutput =
+  SPECS_DATA_BASE_DIRECTORY + "output/tilesetProcessing/basicProcessing";
+
+const externalInput =
+  SPECS_DATA_BASE_DIRECTORY + "tilesetProcessing/externalProcessing";
 const externalOutput =
-  "./specs/data/output/tilesetProcessing/externalProcessing";
+  SPECS_DATA_BASE_DIRECTORY + "output/tilesetProcessing/externalProcessing";
 
 const overwrite = true;
 
@@ -30,7 +35,9 @@ const overwrite = true;
  */
 describe("BasicTilesetProcessor on explicit input", function () {
   afterEach(function () {
-    SpecHelpers.forceDeleteDirectory("./specs/data/output/tilesetProcessing");
+    SpecHelpers.forceDeleteDirectory(
+      SPECS_DATA_BASE_DIRECTORY + "output/tilesetProcessing"
+    );
   });
 
   it("forEachExplicitTile covers all explicit tiles", async function () {

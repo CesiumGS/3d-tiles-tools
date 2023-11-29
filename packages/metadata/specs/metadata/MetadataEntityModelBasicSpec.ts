@@ -9,7 +9,7 @@ describe("metadata/MetadataEntityModelBasic", function () {
 
   beforeEach(async function () {
     const tileset = await SpecHelpers.readJsonUnchecked(
-      "specs/data/TilesetWithFullMetadata/tileset.json"
+      "../../specs/data/TilesetWithFullMetadata/tileset.json"
     );
     metadataEntityModel = MetadataEntityModels.create(
       tileset.schema,

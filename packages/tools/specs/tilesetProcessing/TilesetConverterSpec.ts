@@ -2,13 +2,17 @@ import { TilesetConverter } from "../../src/tilesetProcessing/TilesetConverter.j
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
-const inputBaseDir = "./specs/data/convert/";
-const outputBaseDir = "./specs/data/output/convert/";
+const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+
+const inputBaseDir = SPECS_DATA_BASE_DIRECTORY + "convert/";
+const outputBaseDir = SPECS_DATA_BASE_DIRECTORY + "output/convert/";
 const overwrite = true;
 
 describe("TilesetConverter", function () {
   afterEach(function () {
-    SpecHelpers.forceDeleteDirectory("./specs/data/output/convert");
+    SpecHelpers.forceDeleteDirectory(
+      SPECS_DATA_BASE_DIRECTORY + "output/convert"
+    );
   });
 
   it("converts basic directory to 3TZ", async function () {
