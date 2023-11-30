@@ -29,31 +29,49 @@
   "exclude": ["node_modules", "specs/data"],
   "references": [
     {
-      "path": "./packages/structure/tsconfig.json"
+      "path": "./packages/structure/src/tsconfig.json"
     },
     {
-      "path": "./packages/gltf-extensions/tsconfig.json"
+      "path": "./packages/gltf-extensions/src/tsconfig.json"
     },
     {
-      "path": "./packages/base/tsconfig.json"
+      "path": "./packages/base/src/tsconfig.json"
     },
     {
-      "path": "./packages/ktx/tsconfig.json"
+      "path": "./packages/ktx/src/tsconfig.json"
     },
     {
-      "path": "./packages/metadata/tsconfig.json"
+      "path": "./packages/metadata/src/tsconfig.json"
     },
     {
-      "path": "./packages/tilesets/tsconfig.json"
+      "path": "./packages/tilesets/src/tsconfig.json"
     },
     {
-      "path": "./packages/tools/tsconfig.json"
+      "path": "./packages/tools/src/tsconfig.json"
     },
     {
-      "path": "./packages/cli/tsconfig.json"
+      "path": "./packages/cli/src/tsconfig.json"
+    },
+
+    {
+      "path": "./packages/spec-helpers/src/tsconfig.json"
+    },
+
+    {
+      "path": "./packages/base/specs/tsconfig.json"
     },
     {
-      "path": "./packages/spec-helpers/tsconfig.json"
-    }
+      "path": "./packages/metadata/specs/tsconfig.json"
+    },
+    {
+      "path": "./packages/tilesets/specs/tsconfig.json"
+    },
+    {
+      "path": "./packages/tools/specs/tsconfig.json"
+    },
+    {
+      "path": "./packages/cli/specs/tsconfig.json"
+    },
+
   ]
 }
