@@ -34,7 +34,7 @@ export class BasisEncoder {
     if (BasisEncoder.BasisEncoderImpl) {
       return;
     }
-    // Ignore the warning "(node:8724) [DEP0005] DeprecationWarning: 
+    // Ignore the warning "(node:8724) [DEP0005] DeprecationWarning:
     // Buffer() is deprecated due to security and usability issues."
     const originalEmitWarning = process.emitWarning;
     process.emitWarning = function (...args: any) {
