@@ -5,8 +5,7 @@
     "composite": true,
     "rootDir": ".",
     "outDir": "../build/src",
-    "allowJs": true,
-    "checkJs": false,
+    "allowJs": true
   },
   "include": [
     "./**/*"

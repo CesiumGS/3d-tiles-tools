@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const BASIS = require("./external/basis_encoder.js");
+import { BASIS } from "./external/basis_encoder.cjs";
 
 import { KtxError } from "./KtxError.js";
 
@@ -35,6 +34,16 @@ export class BasisEncoder {
     if (BasisEncoder.BasisEncoderImpl) {
       return;
     }
+    // Ignore the warning "(node:8724) [DEP0005] DeprecationWarning: 
+    // Buffer() is deprecated due to security and usability issues."
+    const originalEmitWarning = process.emitWarning;
+    process.emitWarning = function (...args: any) {
+      if (args[2] !== "DEP0005") {
+        return originalEmitWarning.apply(process, args);
+      } else {
+        // Ignore
+      }
+    };
     const module = await BASIS();
     module.initializeBasis();
     BasisEncoder.BasisEncoderImpl = module.BasisEncoder;

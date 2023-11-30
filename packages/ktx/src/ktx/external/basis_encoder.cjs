@@ -13,9 +13,23 @@ var Module=typeof BASIS!="undefined"?BASIS:{};var readyPromiseResolve,readyPromi
 
 );
 })();
+
+
+// This was the original (auto-generated) export handling for the `.js` file.
+/*
 if (typeof exports === 'object' && typeof module === 'object')
   module.exports = BASIS;
 else if (typeof define === 'function' && define['amd'])
   define([], function() { return BASIS; });
 else if (typeof exports === 'object')
   exports["BASIS"] = BASIS;
+*/
+
+// Making a ton of assumptions (and nobody knows WHICH assumptions are 
+// actually made here, but they include `type:module` being present
+// in the package.json, and some interoperability flags being set
+// in some tsconfig.json files), this seems to be the form that
+// makes that it works here:
+module.exports = {
+  "BASIS": BASIS
+};
