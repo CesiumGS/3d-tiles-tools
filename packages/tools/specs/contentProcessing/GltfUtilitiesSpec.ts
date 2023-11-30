@@ -1,4 +1,6 @@
-//import GltfPipeline from "gltf-pipeline";
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../../@types/gltf-pipeline/index.d.ts" />
+import GltfPipeline from "gltf-pipeline";
 
 import { GltfUtilities } from "../../src/contentProcessing/GltfUtilities.js";
 
@@ -48,8 +50,6 @@ const inputGltfWithCesiumRtc: any = {
   ],
 };
 
-/*
-// TODO-GLTF-PIPELINE
 describe("GltfUtilities", function () {
   it("replaceCesiumRtcExtension replaces the CESIUM_RTC extension", async function () {
     const inputGltf = inputGltfWithCesiumRtc;
@@ -103,4 +103,3 @@ describe("GltfUtilities", function () {
     expect(outputGltf.extensionsRequired).toBeUndefined();
   });
 });
-*/

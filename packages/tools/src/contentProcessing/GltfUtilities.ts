@@ -1,4 +1,6 @@
-//import GltfPipeline from "gltf-pipeline";
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../../@types/gltf-pipeline/index.d.ts" />
+import GltfPipeline from "gltf-pipeline";
 
 import { Buffers } from "@3d-tiles-tools/base";
 
@@ -26,10 +28,8 @@ export class GltfUtilities {
    * @returns A promise that resolves with the upgraded GLB.
    */
   static async upgradeGlb(glbBuffer: Buffer, options: any): Promise<Buffer> {
-    // TODO-GLTF-PIPELINE
-    return glbBuffer;
-    //const result = await GltfPipeline.processGlb(glbBuffer, options);
-    //return result.glb;
+    const result = await GltfPipeline.processGlb(glbBuffer, options);
+    return result.glb;
   }
 
   /**
@@ -234,10 +234,8 @@ export class GltfUtilities {
       return gltf;
     };
     options.customStages.push(customStage);
-    // TODO-GLTF-PIPELINE
-    return glbBuffer;
-    //const result = await GltfPipeline.processGlb(glbBuffer, options);
-    //return result.glb;
+    const result = await GltfPipeline.processGlb(glbBuffer, options);
+    return result.glb;
   }
 
   /**
@@ -259,10 +257,8 @@ export class GltfUtilities {
       customStages: [customStage],
       keepUnusedElements: true,
     };
-    // TODO-GLTF-PIPELINE
-    return glbBuffer;
-    //const result = await GltfPipeline.processGlb(glbBuffer, options);
-    //return result.glb;
+    const result = await GltfPipeline.processGlb(glbBuffer, options);
+    return result.glb;
   }
 
   /**

@@ -7,9 +7,6 @@
     "outDir": "../build/src",
   },
   "include": [
-    "./**/*",
-    "gltf-pipeline.ts",
-    "gltfpack.d.ts",
-    "cesium.d.ts",
+    "./**/*"
   ]
 }
