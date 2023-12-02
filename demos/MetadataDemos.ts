@@ -123,7 +123,7 @@ async function testTilesetWithFullMetadata() {
   // Note: This is making some assumptions about
   // the input, and only intended for the basic
   // demo of the `MetadataEntityModels` class
-  const tileset: Tileset = await readJsonUnchecked(
+  const tileset: Tileset = readJsonUnchecked(
     "./specs/data/TilesetWithFullMetadata/tileset.json"
   );
   const metadataSchema = tileset.schema;

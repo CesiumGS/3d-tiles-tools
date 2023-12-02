@@ -1,13 +1,15 @@
 import { TilesetSource3dtiles } from "../../src/packages/TilesetSource3dtiles.js";
 
-const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
+
+const SPECS_DATA_BASE_DIRECTORY = SpecHelpers.getSpecsDataBaseDirectory();
 
 describe("TilesetSource3dtiles", function () {
   it("throws for invalidColumnName0", function () {
     const tilesetSource = new TilesetSource3dtiles();
     expect(function () {
       tilesetSource.open(
-        SPECS_DATA_BASE_DIRECTORY + "packages/invalidColumnName0.3dtiles"
+        SPECS_DATA_BASE_DIRECTORY + "/packages/invalidColumnName0.3dtiles"
       );
     }).toThrowError();
   });
@@ -16,7 +18,7 @@ describe("TilesetSource3dtiles", function () {
     const tilesetSource = new TilesetSource3dtiles();
     expect(function () {
       tilesetSource.open(
-        SPECS_DATA_BASE_DIRECTORY + "packages/invalidColumnName1.3dtiles"
+        SPECS_DATA_BASE_DIRECTORY + "/packages/invalidColumnName1.3dtiles"
       );
     }).toThrowError();
   });
@@ -24,7 +26,7 @@ describe("TilesetSource3dtiles", function () {
     const tilesetSource = new TilesetSource3dtiles();
     expect(function () {
       tilesetSource.open(
-        SPECS_DATA_BASE_DIRECTORY + "packages/invalidColumnType0.3dtiles"
+        SPECS_DATA_BASE_DIRECTORY + "/packages/invalidColumnType0.3dtiles"
       );
     }).toThrowError();
   });
@@ -32,7 +34,7 @@ describe("TilesetSource3dtiles", function () {
     const tilesetSource = new TilesetSource3dtiles();
     expect(function () {
       tilesetSource.open(
-        SPECS_DATA_BASE_DIRECTORY + "packages/invalidColumnType1.3dtiles"
+        SPECS_DATA_BASE_DIRECTORY + "/packages/invalidColumnType1.3dtiles"
       );
     }).toThrowError();
   });
@@ -40,7 +42,7 @@ describe("TilesetSource3dtiles", function () {
     const tilesetSource = new TilesetSource3dtiles();
     expect(function () {
       tilesetSource.open(
-        SPECS_DATA_BASE_DIRECTORY + "packages/invalidTableName.3dtiles"
+        SPECS_DATA_BASE_DIRECTORY + "/packages/invalidTableName.3dtiles"
       );
     }).toThrowError();
   });
@@ -48,7 +50,7 @@ describe("TilesetSource3dtiles", function () {
     const tilesetSource = new TilesetSource3dtiles();
     expect(function () {
       tilesetSource.open(
-        SPECS_DATA_BASE_DIRECTORY + "packages/missingColumn.3dtiles"
+        SPECS_DATA_BASE_DIRECTORY + "/packages/missingColumn.3dtiles"
       );
     }).toThrowError();
   });
@@ -56,13 +58,13 @@ describe("TilesetSource3dtiles", function () {
     const tilesetSource = new TilesetSource3dtiles();
     expect(function () {
       tilesetSource.open(
-        SPECS_DATA_BASE_DIRECTORY + "packages/superflousColumn.3dtiles"
+        SPECS_DATA_BASE_DIRECTORY + "/packages/superflousColumn.3dtiles"
       );
     }).toThrowError();
   });
   it("finally works with a valid package", function () {
     const tilesetSource = new TilesetSource3dtiles();
-    tilesetSource.open(SPECS_DATA_BASE_DIRECTORY + "packages/valid.3dtiles");
+    tilesetSource.open(SPECS_DATA_BASE_DIRECTORY + "/packages/valid.3dtiles");
     tilesetSource.close();
   });
 });

@@ -7,7 +7,7 @@ import { TilesetTarget3dtiles } from "../../src/packages/TilesetTarget3dtiles.js
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
-const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+const SPECS_DATA_BASE_DIRECTORY = SpecHelpers.getSpecsDataBaseDirectory();
 
 // The basic contract that is established by the `TilesetTarget`
 // interface is checked for these implementations:
@@ -15,17 +15,17 @@ const testCases = [
   {
     description: "TilesetTargetFs",
     creationFunction: () => new TilesetTargetFs(),
-    targetName: SPECS_DATA_BASE_DIRECTORY + "output/target/Tileset/",
+    targetName: SPECS_DATA_BASE_DIRECTORY + "/output/target/Tileset/",
   },
   {
     description: "TilesetTarget3tz",
     creationFunction: () => new TilesetTarget3tz(),
-    targetName: SPECS_DATA_BASE_DIRECTORY + "output/target/tileset.3tz",
+    targetName: SPECS_DATA_BASE_DIRECTORY + "/output/target/tileset.3tz",
   },
   {
     description: "TilesetTarget3dtiles",
     creationFunction: () => new TilesetTarget3dtiles(),
-    targetName: SPECS_DATA_BASE_DIRECTORY + "output/target/tileset.3dtiles",
+    targetName: SPECS_DATA_BASE_DIRECTORY + "/output/target/tileset.3dtiles",
   },
   {
     description: "TilesetInMemory",
@@ -46,7 +46,7 @@ for (const testCase of testCases) {
 
     afterEach(function () {
       SpecHelpers.forceDeleteDirectory(
-        SPECS_DATA_BASE_DIRECTORY + "output/target"
+        SPECS_DATA_BASE_DIRECTORY + "/output/target"
       );
     });
 

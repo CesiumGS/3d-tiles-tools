@@ -5,7 +5,9 @@ import { TilesetInMemory } from "../../src/tilesetData/TilesetInMemory.js";
 import { TilesetSource3tz } from "../../src/packages/TilesetSource3tz.js";
 import { TilesetSource3dtiles } from "../../src/packages/TilesetSource3dtiles.js";
 
-const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
+
+const SPECS_DATA_BASE_DIRECTORY = SpecHelpers.getSpecsDataBaseDirectory();
 
 async function createTilesetInMemory() {
   const tileset = new TilesetInMemory();
@@ -21,22 +23,22 @@ const testCases = [
   {
     description: "TilesetSourceFs",
     creationFunction: () => new TilesetSourceFs(),
-    sourceName: SPECS_DATA_BASE_DIRECTORY + "Tileset/",
+    sourceName: SPECS_DATA_BASE_DIRECTORY + "/Tileset/",
   },
   {
     description: "TilesetSource3tz",
     creationFunction: () => new TilesetSource3tz(),
-    sourceName: SPECS_DATA_BASE_DIRECTORY + "tileset.3tz",
+    sourceName: SPECS_DATA_BASE_DIRECTORY + "/tileset.3tz",
   },
   {
     description: "TilesetSource3dtiles",
     creationFunction: () => new TilesetSource3dtiles(),
-    sourceName: SPECS_DATA_BASE_DIRECTORY + "tileset.3dtiles",
+    sourceName: SPECS_DATA_BASE_DIRECTORY + "/tileset.3dtiles",
   },
   {
     description: "TilesetInMemory",
     creationFunction: createTilesetInMemory,
-    sourceName: SPECS_DATA_BASE_DIRECTORY + "tileset.3dtiles",
+    sourceName: SPECS_DATA_BASE_DIRECTORY + "/tileset.3dtiles",
   },
 ];
 

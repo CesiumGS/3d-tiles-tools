@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 
 /**
  * Only for internal use and basic tests:
@@ -8,20 +9,25 @@ import fs from "fs";
  * message will be printed and `undefined` is returned.
  *
  * @param filePath - The path to the file
- * @returns A promise that resolves with the result or `undefined`
+ * @returns A the result or `undefined`
  */
-export async function readJsonUnchecked(filePath: string): Promise<any> {
+export function readJsonUnchecked(filePath: string): object | undefined {
   try {
     const data = fs.readFileSync(filePath);
-    if (!data) {
-      console.error("Could not read " + filePath);
+    try {
+      const jsonString = data.toString();
+      const result = JSON.parse(jsonString);
+      return result;
+    } catch (error) {
+      console.error("Could parse JSON", error);
       return undefined;
     }
-    const jsonString = data.toString();
-    const result = JSON.parse(jsonString);
-    return result;
   } catch (error) {
-    console.error("Could not parse JSON", error);
+    const resolved = path.resolve(filePath);
+    console.error(
+      `Could read JSON from ${filePath} resolved to ${resolved}`,
+      error
+    );
     return undefined;
   }
 }

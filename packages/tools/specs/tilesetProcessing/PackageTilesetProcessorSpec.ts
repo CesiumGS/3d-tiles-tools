@@ -2,9 +2,9 @@ import { BasicTilesetProcessor } from "../../src/tilesetProcessing/BasicTilesetP
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
-const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+const SPECS_DATA_BASE_DIRECTORY = SpecHelpers.getSpecsDataBaseDirectory();
 
-const inputRoot = SPECS_DATA_BASE_DIRECTORY + "tilesetProcessing/";
+const inputRoot = SPECS_DATA_BASE_DIRECTORY + "/tilesetProcessing/";
 
 const basicInput = inputRoot + "basicProcessing";
 const basicInput3tz = inputRoot + "basicProcessing.3tz";
@@ -14,7 +14,7 @@ const implicitInput = inputRoot + "implicitProcessing";
 const implicitInput3tz = inputRoot + "implicitProcessing.3tz";
 const implicitInput3dtiles = inputRoot + "implicitProcessing.3dtiles";
 
-const outputRoot = SPECS_DATA_BASE_DIRECTORY + "output/tilesetProcessing/";
+const outputRoot = SPECS_DATA_BASE_DIRECTORY + "/output/tilesetProcessing/";
 
 const basicOutput = outputRoot + "basicProcessing";
 const basicOutput3tz = outputRoot + "basicProcessing.3tz";

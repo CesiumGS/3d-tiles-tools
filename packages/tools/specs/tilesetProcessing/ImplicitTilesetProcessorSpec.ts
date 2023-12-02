@@ -12,12 +12,12 @@ import { SpecEntryProcessor } from "./SpecEntryProcessor.js";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
-const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+const SPECS_DATA_BASE_DIRECTORY = SpecHelpers.getSpecsDataBaseDirectory();
 
 const implicitInput =
-  SPECS_DATA_BASE_DIRECTORY + "tilesetProcessing/implicitProcessing";
+  SPECS_DATA_BASE_DIRECTORY + "/tilesetProcessing/implicitProcessing";
 const implicitOutput =
-  SPECS_DATA_BASE_DIRECTORY + "output/tilesetProcessing/implicitProcessing";
+  SPECS_DATA_BASE_DIRECTORY + "/output/tilesetProcessing/implicitProcessing";
 const overwrite = true;
 
 /**
@@ -28,7 +28,7 @@ const overwrite = true;
 describe("BasicTilesetProcessor on implicit input", function () {
   afterEach(function () {
     SpecHelpers.forceDeleteDirectory(
-      SPECS_DATA_BASE_DIRECTORY + "output/tilesetProcessing"
+      SPECS_DATA_BASE_DIRECTORY + "/output/tilesetProcessing"
     );
   });
 

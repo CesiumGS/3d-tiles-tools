@@ -4,16 +4,16 @@ import { SpecEntryProcessor } from "./SpecEntryProcessor.js";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
-const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+const SPECS_DATA_BASE_DIRECTORY = SpecHelpers.getSpecsDataBaseDirectory();
 
-const outputRoot = SPECS_DATA_BASE_DIRECTORY + "output/tilesetProcessing/";
+const outputRoot = SPECS_DATA_BASE_DIRECTORY + "/output/tilesetProcessing/";
 
 const basicInput =
-  SPECS_DATA_BASE_DIRECTORY + "tilesetProcessing/basicProcessing";
+  SPECS_DATA_BASE_DIRECTORY + "/tilesetProcessing/basicProcessing";
 const basicOutput = outputRoot + "basicProcessing";
 
 const implicitInput =
-  SPECS_DATA_BASE_DIRECTORY + "tilesetProcessing/implicitProcessing";
+  SPECS_DATA_BASE_DIRECTORY + "/tilesetProcessing/implicitProcessing";
 const implicitOutput = outputRoot + "implicitProcessing";
 
 const overwrite = true;

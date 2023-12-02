@@ -6,17 +6,18 @@ import { TilesetOperations } from "../../src/tilesetProcessing/TilesetOperations
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
-const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+const SPECS_DATA_BASE_DIRECTORY = SpecHelpers.getSpecsDataBaseDirectory();
 
-const basicInput = SPECS_DATA_BASE_DIRECTORY + "combineTilesets/nestedExternal";
+const basicInput =
+  SPECS_DATA_BASE_DIRECTORY + "/combineTilesets/nestedExternal";
 const basicOutput =
-  SPECS_DATA_BASE_DIRECTORY + "output/combineTilesets/nestedExternal";
+  SPECS_DATA_BASE_DIRECTORY + "/output/combineTilesets/nestedExternal";
 const overwrite = true;
 
 describe("TilesetCombiner", function () {
   afterEach(function () {
     SpecHelpers.forceDeleteDirectory(
-      SPECS_DATA_BASE_DIRECTORY + "output/combineTilesets"
+      SPECS_DATA_BASE_DIRECTORY + "/output/combineTilesets"
     );
   });
 

@@ -1,21 +1,19 @@
-import { MetadataEntityModel } from "../../src/metadata/MetadataEntityModel.js";
 import { MetadataEntityModels } from "../../src/metadata/MetadataEntityModels.js";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
+const SPECS_DATA_BASE_DIRECTORY = SpecHelpers.getSpecsDataBaseDirectory();
+
 describe("metadata/MetadataEntityModelBasic", function () {
   const epsilon = 0.000001;
-  let metadataEntityModel: MetadataEntityModel;
 
-  beforeEach(async function () {
-    const tileset = await SpecHelpers.readJsonUnchecked(
-      "../../specs/data/TilesetWithFullMetadata/tileset.json"
-    );
-    metadataEntityModel = MetadataEntityModels.create(
-      tileset.schema,
-      tileset.metadata
-    );
-  });
+  const tileset = SpecHelpers.readJsonUnchecked(
+    SPECS_DATA_BASE_DIRECTORY + "/TilesetWithFullMetadata/tileset.json"
+  );
+  const metadataEntityModel = MetadataEntityModels.create(
+    tileset.schema,
+    tileset.metadata
+  );
 
   it("obtains the right value for example_STRING", function () {
     const propertyName = "example_STRING";

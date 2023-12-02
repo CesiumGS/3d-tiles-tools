@@ -2,12 +2,12 @@ import { TilesetDataProcessor } from "../../src/tilesetProcessing/TilesetDataPro
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 
-const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+const SPECS_DATA_BASE_DIRECTORY = SpecHelpers.getSpecsDataBaseDirectory();
 
 const basicInput =
-  SPECS_DATA_BASE_DIRECTORY + "tilesetProcessing/basicProcessing";
+  SPECS_DATA_BASE_DIRECTORY + "/tilesetProcessing/basicProcessing";
 const basicOutput =
-  SPECS_DATA_BASE_DIRECTORY + "output/tilesetProcessing/basicProcessing";
+  SPECS_DATA_BASE_DIRECTORY + "/output/tilesetProcessing/basicProcessing";
 
 const overwrite = true;
 
@@ -19,7 +19,7 @@ const overwrite = true;
 describe("TilesetProcessor", function () {
   afterEach(function () {
     SpecHelpers.forceDeleteDirectory(
-      SPECS_DATA_BASE_DIRECTORY + "output/tilesetProcessing"
+      SPECS_DATA_BASE_DIRECTORY + "/output/tilesetProcessing"
     );
   });
 

@@ -20,25 +20,46 @@ import { TilesetSourceResourceResolver } from "@3d-tiles-tools/tilesets";
  */
 export class SpecHelpers {
   /**
+   * Returns the directory that was defined as the
+   * `SPECS_DATA_BASE_DIRECTORY` environment variable
+   * in the jasmine helpers (or `./specs/data` by
+   * default)
+   *
+   * @returns The specs data base directory
+   */
+  static getSpecsDataBaseDirectory() {
+    const directory = process.env.SPECS_DATA_BASE_DIRECTORY;
+    if (directory === undefined) {
+      return "./specs/data";
+    }
+    return directory;
+  }
+
+  /**
    * Reads a JSON file, parses it, and returns the result.
    * If the file cannot be read or parsed, then an error
    * message will be printed and `undefined` is returned.
    *
    * @param filePath - The path to the file
-   * @returns A promise that resolves with the result or `undefined`
+   * @returns The result or `undefined`
    */
-  static async readJsonUnchecked(filePath: string): Promise<any> {
+  static readJsonUnchecked(filePath: string): any {
     try {
       const data = fs.readFileSync(filePath);
-      if (!data) {
-        console.error("Could not read " + filePath);
+      try {
+        const jsonString = data.toString();
+        const result = JSON.parse(jsonString);
+        return result;
+      } catch (error) {
+        console.error("Could parse JSON", error);
         return undefined;
       }
-      const jsonString = data.toString();
-      const result = JSON.parse(jsonString);
-      return result;
     } catch (error) {
-      console.error("Could not parse JSON", error);
+      const resolved = Paths.resolve(filePath);
+      console.error(
+        `Could read JSON from ${filePath} resolved to ${resolved}`,
+        error
+      );
       return undefined;
     }
   }
