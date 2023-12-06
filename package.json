@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "3d-tiles-tools",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "license": "Apache-2.0",
   "description": "3D Tiles tools",
   "author": {
@@ -36,6 +36,7 @@
     "eslint-config-cesium": "^9.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-node": "^11.1.0",
+    "glob": "^10.3.10",
     "jasmine": "^4.3.0",
     "mkdirp": "^1.0.4",
     "nyc": "^15.1.0",
@@ -76,7 +77,7 @@
     "docs": "npm run build && npm run docs-generate",
     "package-clean": "del-cli ./packages/*/build/** && del-cli ./packages/*/tsconfig.tsbuildinfo",
     "package-prepare": "npm run eslint && npm run prettier-check && npm run build && npm run test && npm run docs-generate && npm run generate-third-party",
-    "package-copy": "npx copyfiles --flat bin/main build",
-    "package": "npm run package-clean && npm run package-prepare && npm run package-copy && npm pack"
+    "package-copy": "npx copyfiles --flat bin/main packages/cli/build",
+    "package": "npm run package-clean && npm run package-prepare && npm run package-copy && npm pack --workspaces"
   }
 }

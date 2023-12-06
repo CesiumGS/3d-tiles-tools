@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const glob = require("glob");
 
 function defaultValue(a, b) {
   if (a !== undefined && a !== null) {
@@ -9,6 +10,15 @@ function defaultValue(a, b) {
   }
   return b;
 }
+
+/**
+ * Returns the license data from the specified package, as it is
+ * found in the `node_modules/<packageName>/package.json`.
+ *
+ * @param {string} packageName
+ * @param {object} override
+ * @returns The license data
+ */
 function getLicenseDataFromPackage(packageName, override) {
   override = defaultValue(override, {});
   const packagePath = path.join("node_modules", packageName, "package.json");
@@ -23,13 +33,12 @@ function getLicenseDataFromPackage(packageName, override) {
   let licenseField = override.license;
 
   if (!licenseField) {
-    licenseField = [packageJson.license];
+    if (packageJson.license !== undefined) {
+      licenseField = [packageJson.license];
+    } else if (packageJson.licenses !== undefined) {
+      licenseField = packageJson.licenses;
+    }
   }
-
-  if (!licenseField && packageJson.licenses) {
-    licenseField = packageJson.licenses;
-  }
-
   if (!licenseField) {
     console.log(`No license found for ${packageName}`);
     licenseField = ["NONE"];
@@ -50,32 +59,69 @@ function getLicenseDataFromPackage(packageName, override) {
   };
 }
 
-function readThirdPartyExtraJson() {
-  const path = "ThirdParty.extra.json";
-  if (fs.existsSync(path)) {
-    const contents = fs.readFileSync(path);
+function readThirdPartyExtraJson(baseDirectory) {
+  const extraPath = path.resolve(baseDirectory, "ThirdParty.extra.json");
+  if (fs.existsSync(extraPath)) {
+    const contents = fs.readFileSync(extraPath);
     return JSON.parse(contents);
   }
   return [];
 }
 
-async function generateThirdParty() {
-  const packageJson = JSON.parse(fs.readFileSync("package.json"));
-  const thirdPartyExtraJson = readThirdPartyExtraJson();
-
-  const thirdPartyJson = [];
-
+/**
+ * Collect all dependencies that are declared in the `package.json`
+ * file that is found in the given directory, and add the entries
+ * to the given licenseDatas array.
+ *
+ * @param {string} baseDirectory
+ * @param {object[]} licenseDatas
+ */
+async function collectThirdParty(baseDirectory, licenseDatas) {
+  const packageJsonPath = path.resolve(baseDirectory, "package.json");
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath));
+  const thirdPartyExtraJson = readThirdPartyExtraJson(baseDirectory);
   const dependencies = packageJson.dependencies;
   for (const packageName in dependencies) {
     if (dependencies.hasOwnProperty(packageName)) {
-      const override = thirdPartyExtraJson.find(
+      const existingEntry = licenseDatas.find(
         (entry) => entry.name === packageName
       );
-      thirdPartyJson.push(getLicenseDataFromPackage(packageName, override));
+      if (existingEntry === undefined) {
+        const override = thirdPartyExtraJson.find(
+          (entry) => entry.name === packageName
+        );
+        licenseDatas.push(getLicenseDataFromPackage(packageName, override));
+      }
+    }
+  }
+}
+
+async function generateThirdParty() {
+  // The pattern for dependency names that will be
+  // excluded because they are actually internal ones
+  const exclusionRegex = "@3d-tiles-tools/.*";
+
+  console.log("Generating ThirdParty.json...");
+
+  const rootDirectory = ".";
+  const rootPackageJsonPath = path.resolve(rootDirectory, "package.json");
+  const rootPackageJson = JSON.parse(fs.readFileSync(rootPackageJsonPath));
+
+  const licenseDatas = [];
+  collectThirdParty(rootDirectory, licenseDatas);
+
+  const workspaces = rootPackageJson.workspaces;
+  if (workspaces !== undefined && Array.isArray(workspaces)) {
+    for (const workspacePattern of workspaces) {
+      const workspaceDirectories = glob.sync(workspacePattern);
+      for (const workspaceDirectory of workspaceDirectories) {
+        console.log("  Collecting dependencies from " + workspaceDirectory);
+        collectThirdParty(workspaceDirectory, licenseDatas);
+      }
     }
   }
 
-  thirdPartyJson.sort(function (a, b) {
+  licenseDatas.sort(function (a, b) {
     const nameA = a.name.toLowerCase();
     const nameB = b.name.toLowerCase();
     if (nameA < nameB) {
@@ -87,7 +133,13 @@ async function generateThirdParty() {
     return 0;
   });
 
+  const thirdPartyJson = licenseDatas.filter((entry) => {
+    const match = entry.name.match(exclusionRegex);
+    return match === null;
+  });
+
   fs.writeFileSync("ThirdParty.json", JSON.stringify(thirdPartyJson, null, 2));
+  console.log("Generating ThirdParty.json DONE");
 }
 
 generateThirdParty();

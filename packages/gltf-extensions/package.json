@@ -1,6 +1,7 @@
 {
   "name": "@3d-tiles-tools/gltf-extensions",
-  "version": "0.3.0",
+  "version": "0.4.0",
+  "license": "Apache-2.0",
   "description": "3D Tiles tools implementations of glTF extensions",
   "type": "module",
   "source": "./src/index.ts",

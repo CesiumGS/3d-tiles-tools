@@ -1,6 +1,7 @@
 {
   "name": "@3d-tiles-tools/cli",
-  "version": "0.3.0",
+  "version": "0.4.0",
+  "license": "Apache-2.0",
   "description": "3D Tiles tools command line interface",
   "type": "module",
   "source": "./src/main.ts",
@@ -10,13 +11,13 @@
     "3d-tiles-tools": "./build/main"
   },
   "dependencies": {
-    "@3d-tiles-tools/base": "0.3.0",
-    "@3d-tiles-tools/tilesets": "0.3.0",
-    "@3d-tiles-tools/tools": "0.3.0",
+    "@3d-tiles-tools/base": "0.4.0",
+    "@3d-tiles-tools/tilesets": "0.4.0",
+    "@3d-tiles-tools/tools": "0.4.0",
     "yargs": "^17.5.1"
   },
   "devDependencies": {
-    "@3d-tiles-tools/spec-helpers": "0.3.0",
+    "@3d-tiles-tools/spec-helpers": "0.4.0",
     "@types/yargs": "^17.0.22"
   },
 

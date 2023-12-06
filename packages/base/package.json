@@ -1,6 +1,7 @@
 {
   "name": "@3d-tiles-tools/base",
-  "version": "0.3.0",
+  "version": "0.4.0",
+  "license": "Apache-2.0",
   "description": "3D Tiles tools basic utility classes",
   "type": "module",
   "source": "./src/index.ts",
@@ -8,12 +9,12 @@
   "types": "./build/src/index.d.ts",
 
   "dependencies": {
-    "@3d-tiles-tools/structure": "0.3.0",
+    "@3d-tiles-tools/structure": "0.4.0",
     "pino": "^8.15.0",
     "pino-pretty": "^10.2.0"
   },
   "devDependencies": {
-    "@3d-tiles-tools/spec-helpers": "0.3.0",
+    "@3d-tiles-tools/spec-helpers": "0.4.0",
     "typescript": "^4.8.3"
   },
 

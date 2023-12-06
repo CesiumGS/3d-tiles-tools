@@ -1,6 +1,7 @@
 {
   "name": "@3d-tiles-tools/structure",
-  "version": "0.3.0",
+  "version": "0.4.0",
+  "license": "Apache-2.0",
   "description": "3D Tiles tools type definitions for the basic JSON structures",
   "type": "module",
   "source": "./src/index.ts",

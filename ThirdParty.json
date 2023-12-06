@@ -4,7 +4,7 @@
     "license": [
       "MIT"
     ],
-    "version": "3.3.1",
+    "version": "3.9.0",
     "url": "https://www.npmjs.com/package/@gltf-transform/core"
   },
   {
@@ -12,7 +12,7 @@
     "license": [
       "MIT"
     ],
-    "version": "3.3.1",
+    "version": "3.9.0",
     "url": "https://www.npmjs.com/package/@gltf-transform/extensions"
   },
   {
@@ -20,7 +20,7 @@
     "license": [
       "MIT"
     ],
-    "version": "3.3.1",
+    "version": "3.9.0",
     "url": "https://www.npmjs.com/package/@gltf-transform/functions"
   },
   {
@@ -28,7 +28,7 @@
     "license": [
       "MIT"
     ],
-    "version": "5.3.1",
+    "version": "5.3.2",
     "url": "https://www.npmjs.com/package/archiver"
   },
   {
@@ -36,7 +36,7 @@
     "license": [
       "MIT"
     ],
-    "version": "8.3.0",
+    "version": "8.7.0",
     "url": "https://www.npmjs.com/package/better-sqlite3"
   },
   {
@@ -44,7 +44,7 @@
     "license": [
       "Apache-2.0"
     ],
-    "version": "1.103.0",
+    "version": "1.112.0",
     "url": "https://www.npmjs.com/package/cesium"
   },
   {
@@ -54,14 +54,6 @@
     ],
     "version": "1.5.6",
     "url": "https://www.npmjs.com/package/draco3d"
-  },
-  {
-    "name": "draco3dgltf",
-    "license": [
-      "Apache-2.0"
-    ],
-    "version": "1.5.6",
-    "url": "https://www.npmjs.com/package/draco3dgltf"
   },
   {
     "name": "gltf-pipeline",
@@ -80,14 +72,6 @@
     "url": "https://www.npmjs.com/package/gltfpack"
   },
   {
-    "name": "minimist",
-    "license": [
-      "MIT"
-    ],
-    "version": "1.2.8",
-    "url": "https://www.npmjs.com/package/minimist"
-  },
-  {
     "name": "node-stream-zip",
     "license": [
       "MIT"
@@ -96,19 +80,27 @@
     "url": "https://www.npmjs.com/package/node-stream-zip"
   },
   {
-    "name": "seedrandom",
+    "name": "pino",
     "license": [
       "MIT"
     ],
-    "version": "3.0.5",
-    "url": "https://www.npmjs.com/package/seedrandom"
+    "version": "8.16.2",
+    "url": "https://www.npmjs.com/package/pino"
+  },
+  {
+    "name": "pino-pretty",
+    "license": [
+      "MIT"
+    ],
+    "version": "10.2.3",
+    "url": "https://www.npmjs.com/package/pino-pretty"
   },
   {
     "name": "sharp",
     "license": [
       "Apache-2.0"
     ],
-    "version": "0.32.1",
+    "version": "0.32.6",
     "url": "https://www.npmjs.com/package/sharp"
   },
   {
@@ -116,7 +108,7 @@
     "license": [
       "MIT"
     ],
-    "version": "17.6.2",
+    "version": "15.4.1",
     "url": "https://www.npmjs.com/package/yargs"
   }
 ]

@@ -1,22 +1,23 @@
 {
   "name": "@3d-tiles-tools/tilesets",
-  "version": "0.3.0",
+  "version": "0.4.0",
+  "license": "Apache-2.0",
   "description": "3D Tiles tools tileset representation",
   "type": "module",
   "source": "./src/index.ts",
   "exports": "./build/src/index.js",
   "types": "./build/src/index.d.ts",
   "dependencies": {
-    "@3d-tiles-tools/structure": "0.3.0",
-    "@3d-tiles-tools/base": "0.3.0",
-    "@3d-tiles-tools/metadata": "0.3.0",
+    "@3d-tiles-tools/structure": "0.4.0",
+    "@3d-tiles-tools/base": "0.4.0",
+    "@3d-tiles-tools/metadata": "0.4.0",
     "archiver": "^5.3.1",
     "better-sqlite3": "^8.0.1",
     "cesium": "^1.103.0",
     "node-stream-zip": "^1.15.0"
   },
   "devDependencies": {
-    "@3d-tiles-tools/spec-helpers": "0.3.0",
+    "@3d-tiles-tools/spec-helpers": "0.4.0",
     "@types/archiver": "^5.3.1",
     "@types/better-sqlite3": "^7.6.2",
     "typescript": "^4.8.3"
