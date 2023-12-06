@@ -4,6 +4,7 @@ package-lock.json
 /.nyc_output
 /coverage
 /node_modules
+/packages/cli/node_modules
 /build
 /dist
 /data
