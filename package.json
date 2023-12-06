@@ -76,8 +76,7 @@
     "docs-generate": "npm run docs-prepare-directory && npm run docs-extract-api && npm run docs-generate-markdown",
     "docs": "npm run build && npm run docs-generate",
     "package-clean": "del-cli ./packages/*/build/** && del-cli ./packages/*/tsconfig.tsbuildinfo",
-    "package-prepare": "npm run eslint && npm run prettier-check && npm run build && npm run test && npm run docs-generate && npm run generate-third-party",
-    "package-copy": "npx copyfiles --flat bin/main packages/cli/build",
-    "package": "npm run package-clean && npm run package-prepare && npm run package-copy && npm pack --workspaces"
+    "package-prepare": "npm run eslint && npm run prettier-check && npm run build && npm run test && npm run generate-third-party",
+    "package": "npm run package-clean && npm run package-prepare && npm pack --workspaces"
   }
 }
