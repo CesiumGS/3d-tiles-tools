@@ -16,7 +16,9 @@
 
   "scripts": {
     "about:build": "echo 'Run the TypeScript compiler to generate the build output.'",
-    "build": "npx tsc --build --verbose --force"
+    "about:docs-extract-api": "echo 'Extract the API definition file from the current build output.'",
+    "build": "npx tsc --build --verbose --force",
+    "docs-extract-api": "api-extractor run --config api-extractor.jsonc --local --verbose"
   }
 }
 

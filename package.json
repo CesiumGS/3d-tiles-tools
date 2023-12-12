@@ -71,7 +71,7 @@
     "prettier": "prettier --write \"**/*\"",
     "generate-third-party": "node generateThirdParty.js",
     "docs-prepare-directory": "mkdirp etc",
-    "docs-extract-api": "api-extractor run --config api-extractor.jsonc --local --verbose",
+    "docs-extract-api": "npm run docs-extract-api --workspaces",
     "docs-generate-markdown": "api-documenter markdown -i build/api-extractor -o build/docs",
     "docs-generate": "npm run docs-prepare-directory && npm run docs-extract-api && npm run docs-generate-markdown",
     "docs": "npm run build && npm run docs-generate",

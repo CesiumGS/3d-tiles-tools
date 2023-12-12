@@ -18,7 +18,8 @@
 
   "scripts": {
     "about:build": "echo 'Run the TypeScript compiler to generate the build output.'",
-    "build": "npx tsc --build"
+    "build": "npx tsc --build",
+    "docs-extract-api": ""
   }
 }
 

@@ -15,7 +15,7 @@
    *
    * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
    */
-  "mainEntryPointFilePath": "build/index.d.ts",
+  "mainEntryPointFilePath": "packages/<unscopedPackageName>/build/src/index.d.ts",
 
   /**
    * Configures how the API report file (*.api.md) will be generated.
@@ -39,7 +39,22 @@
      * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
      * DEFAULT VALUE: "<projectFolder>/temp/"
      */
-    "reportTempFolder": "<projectFolder>/build/api-extractor"
+    "reportTempFolder": "<projectFolder>/../../build/api-extractor",
+
+    /**
+     * Specifies the folder where the API report file is written.  The file name portion is determined by
+     * the "reportFileName" setting.
+     *
+     * The API report file is normally tracked by Git.  Changes to it can be used to trigger a branch policy,
+     * e.g. for an API review.
+     *
+     * The path is resolved relative to the folder of the config file that contains the setting; to change this,
+     * prepend a folder token such as "<projectFolder>".
+     *
+     * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
+     * DEFAULT VALUE: "<projectFolder>/etc/"
+     */
+     "reportFolder": "<projectFolder>/../../etc/"
   },
 
   /**
@@ -60,7 +75,7 @@
      * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
      * DEFAULT VALUE: "<projectFolder>/temp/<unscopedPackageName>.api.json"
      */
-     "apiJsonFilePath": "<projectFolder>/build/api-extractor/<unscopedPackageName>.api.json"
+     "apiJsonFilePath": "<projectFolder>/../../build/api-extractor/<unscopedPackageName>.api.json"
   },
 
   /**
@@ -70,7 +85,35 @@
     /**
      * (REQUIRED) Whether to generate the .d.ts rollup file.
      */
-    "enabled": true
+    "enabled": true,
+
+    /**
+     * Specifies the output path for a .d.ts rollup file to be generated without any trimming.
+     * This file will include all declarations that are exported by the main entry point.
+     *
+     * If the path is an empty string, then this file will not be written.
+     *
+     * The path is resolved relative to the folder of the config file that contains the setting; to change this,
+     * prepend a folder token such as "<projectFolder>".
+     *
+     * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
+     * DEFAULT VALUE: "<projectFolder>/dist/<unscopedPackageName>.d.ts"
+     */
+     "untrimmedFilePath": "",
+
+    /**
+     * Specifies the output path for a .d.ts rollup file to be generated with trimming for a "public" release.
+     * This file will include only declarations that are marked as "@public".
+     *
+     * If the path is an empty string, then this file will not be written.
+     *
+     * The path is resolved relative to the folder of the config file that contains the setting; to change this,
+     * prepend a folder token such as "<projectFolder>".
+     *
+     * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
+     * DEFAULT VALUE: ""
+     */
+     "publicTrimmedFilePath": "<projectFolder>/../../dist/<unscopedPackageName>.d.ts"    
   },
 
   "messages": {
