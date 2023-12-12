@@ -7,6 +7,12 @@ import { TilesetCombiner } from "./TilesetCombiner.js";
 import { TilesetMerger } from "./TilesetMerger.js";
 import { TilesetUpgrader } from "./TilesetUpgrader.js";
 
+/**
+ * Convenience methods for executing the `combine`, `merge`, and
+ * `upgrade` functions on tilesets.
+ * 
+ * @internal
+ */
 export class TilesetOperations {
   /**
    * Performs the `combine` command line operation.

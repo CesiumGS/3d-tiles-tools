@@ -35,9 +35,9 @@ export class TilesetStages {
   /**
    * Creates a tileset stage that performs the "gzip" operation
    *
-   * @param - The array of `ContentDataType` strings that the operation
-   * should be applied to (or `undefined` if it should be applied to
-   * all data types)
+   * @param includedContentTypes - The array of `ContentDataType` strings 
+   * that the operation should be applied to (or `undefined` if it should 
+   * be applied to all data types)
    * @returns The tileset stage
    */
   public static createGzip(

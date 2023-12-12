@@ -129,7 +129,7 @@ export class TilesetStageExecutor {
    * @param currentInput - The current input name
    * @param currentOutput - The current output name
    * @param overwrite - Whether outputs should be overwritten
-   * @param condition The condition that was created from
+   * @param condition - The condition that was created from
    * the included- and excluded types that have been defined
    * in the `ContentStage`.
    * @returns A promise that resolves when the process is finished
