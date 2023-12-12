@@ -99,7 +99,7 @@ So in order to resolve the test data in both cases:
 
 The coverage originally had been checked with `nyc`, but apparently, "modern modules" are not supported by `nyc` (see https://github.com/istanbuljs/nyc/issues/1287 ). The coverage is now computed with `c8` from https://github.com/bcoe/c8 , which seems to be a "drop-in-replacement" of `nyc` that works with "modern modules". 
 
-### Even Mode Internal Notes:
+### Even More Internal Notes:
 
 - Despite being purely written in TypeScript, `import` statements that use relative paths in TypeScript files have to refer to the other TypeScript files with the file extension `.js`. These files do not exist. They have the file extension `.ts`. But it has to be this way.
 - There are places where the `/// <reference path=" ... " />` syntax is used, in order to point TypeScript to the right type information (see [TypeScript: Triple-Slash Directives](https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html)). This appears to be necessary for `gltf-pipeline` and `gltfpack` dependencies, which do not have associated type information. This is strongly discouraged, and should instead be solved by specifying proper `typeRoots` in the `compilerOptions` of the respective `tsconfig.json`. Maybe there is a way to tweak this so that it actually _works_ ...
@@ -110,11 +110,19 @@ The coverage originally had been checked with `nyc`, but apparently, "modern mod
 
 The API definition is tracked with https://api-extractor.com
 
-After running `npm install`, the API documentation can be created with `npm run docs`. The API documentation will be written into the `build/docs` directory. The surface API information will be written into `etc/3d-tiles-tools.api.md`. This file captures the public API, and changes in the public API will cause a warning to be printed
+After running `npm install`, the API documentation can be created with `npm run docs`.
 
-> Warning: You have changed the public API signature for this project. Updating etc/3d-tiles-tools.api.md
+Generating the documentation consists of two steps (which are subcommands of the `docs` command), namely
+- extracting the API definitions from the build output
+- generating the markdown from the API definitions.
 
-This API definition file is tracked with Git, so changes in this file should be reviewed carefully.
+The first step is performed by running `api-extractor` for each package individually. This happens from the top-level package JSON file, using the `--workspaces` parameter. The surface API information will be written into `./etc/<package>.md`. These files capture the public API, and changes in the public API will cause a warning to be printed
+
+> Warning: You have changed the public API signature for this project.
+
+The API definition files are tracked with Git, so changes in these files should be reviewed carefully.
+
+After extracting the API definition files, `api-documenter` is used to generate the actual API documentation markdown files, which will be written into the `./build/docs` directory.
 
 
 ## Release Process
