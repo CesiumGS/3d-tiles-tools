@@ -10,7 +10,7 @@ import { TilesetUpgrader } from "./TilesetUpgrader.js";
 /**
  * Convenience methods for executing the `combine`, `merge`, and
  * `upgrade` functions on tilesets.
- * 
+ *
  * @internal
  */
 export class TilesetOperations {
