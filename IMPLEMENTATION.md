@@ -2,36 +2,108 @@
 
 Parts of the current implementation may still change. This page is only a short description of the overall structure.
 
-## Demos
+## Internal notes
 
-The `./demos/` folder contains demos that show how to use various parts of the API. This is intended as an internal preview for developers. The functionality is not yet exposed as a public API.
+The original 3D Tiles Tools have been converted into a monorepo with different packages.
 
-Each of these demos can be started with
+The packages are 
 
-`npx ts-node ./demos/`_`<DemoName>`_`.ts`
+- [`base`](./packages/base/) - Basic utility classes shared by nearly all other packages
+- [`structure`](./packages/structure/) - Typescript types for the elements of a 3D Tiles tileset JSON
+- [`ktx`](./packages/structure/) - A convenience wrapper around the BinomialLLC basis (KTX) encoder WASM module
+- [`gltf-extensions`](./packages/gltf-extensions/) - Implementations of the Cesium glTF extensions based on glTF-Transform
+- [`metadata`](./packages/metadata/) - Basic classes for the implementation of the 3D Metadata Specification
+- [`tilesets`](./packages/tilesets/) - Classes for handling 3D Tiles tileset data (including tile content and tileset packages)
+- [`tools`](./packages/tools/) - The main classes implementing the 3D Tiles Tools functionalities
+- [`cli`](./packages/cli/) - The main command line application for the 3D Tiles tools
+- [`spec-helpers`](./packages/spec-helpers/) - Internal utility classes for running the specs (unit tests)
 
-### General tool functions
+### Structure of `package.json`
 
-- `BinaryMetadataDemos`: Examples that show how to create and access `BinaryPropertyTableModel` instances with different types of properties.
-- `ContentDataTypeChecksDemo`: Shows how to use `ContentDataTypeChecks` to check whether content data has a certain type
-- `ContentDataTypeRegistryDemo`: Shows how to query the type of content data from the `ContentDataTypeRegistry`
-- `MetadataDemos`: Examples that show how to work with `MetadataEntityModel` instances for accessing JSON-based metadata entities.
-- `PackageConversion`: A command-line tool for converting from files/3TZ/3DTILES/ZIP to files/3TZ/3DTILES
-- `PackagesDemo`: Show how to read/create/write 3D Tiles packages
-- `PackageServer`: A **very** basic server that serves data from an arbitrary 3D Tiles package
-  - To be used with the `PackageSandcastle`
-- `Pipeline...`: **Preliminary** drafts for the `pipelines` functionalities
-- `SpatialDemos`: Very basic examples showing how to use the quadree- and octree classes in `spatial`
-- `SubtreeInfoDemos`: A demo that shows how to use the `SubtreeInfo` class to access (binary) subtree data
-- `TileFormatsDemoBasic`: Basic usage demos for the `TileFormats` class
-- `TileFormatsDemoConversions`: Demos showing how to use the `TileFormats` class for conversions (like extracting GLB from B3DM etc.)
-- `TilesetProcessingDemos`: Demos for the `combine/merge/upgrade` functions
-- `TilesetProcessorExamples`: Very basic demo of the `BasicTilesetProcessor` functions
-- `TilesetUpgraderDemos`: More fine-grained demos for the upgrade functionality
-- `TraversalDemo`: A basic example showing how to traverse a tileset
-- `TraversalStatsDemo`: A basic example showing how to traverse a tileset and collect statistical information in the process.
+From the perspective of the top-level `package.json`, each package is a _workspace_. This means that each package has its own `package.json` that declares its dependencies and basic build- and test commands. The top-level `package.json` only declares
+```
+  "workspaces": [
+    "packages/*"
+  ],
+```
+which allows certain operations (like packaging) to be run in a "bulk" fashion on all the packages at once.
 
-The `./demos/benchmarks` folder contains very basic benchmarks for creating/reading different 3D Tiles package formats.
+It is important to run `npm install` at the root directory after cloning the repo (preferably even before opening VSCode). When workspaces are present, then this will establish one symbolic link for each package in the `node_modules` repository, making sure that "the packages know each other". 
+
+### Structure of `tsconfig.json`
+
+The 3D Tiles Tools are supposed to be a "modern (pure) TypeScript" project, and this involves the following points:
+
+<sup>(Based on my understanding (at the time of writing this) of what constitutes a 'modern' project (at the time of writing this))</sup>
+
+- The `package.json` of each package declares `"type": "module"` (See [Node.js, 'Enabling' (ESM)](https://nodejs.org/api/esm.html#enabling))
+- The `compilerOptions` of the `tsconfig.json` declares
+  - `"module": "NodeNext"`
+  - `"moduleResolution": "NodeNext"`
+
+The root-level `tsconfig.json` defines the common settings. Each package contains further `tsconfig.json` files that _inherit_ from the root-level one (See [TSConfig `extends`](https://www.typescriptlang.org/tsconfig#extends)).
+
+The structure of the project and its packages is reflected in the `tsconfig.json` files via _Project References_ (See [TypeScript: 'Project References](https://www.typescriptlang.org/docs/handbook/project-references.html)). Each `tsconfig.json` in the packages has to declare
+```
+  "compilerOptions": {
+    "declaration": true,
+    "composite": true,
+  },
+```
+so that the respective `tsconfig.json` may be used via a Project Reference.
+
+Each package contains three `tsconfig.json` files: 
+- `<package>/tsconfig.json`: The main config file for the package
+  - This may add package-specific settings in the `compilerOptions`
+  - Beyond that, it only refers to the other ones:
+- `<package>/src/tsconfig.json`: The configuration for the actual source code of the package
+- `<package>/specs/tsconfig.json`: The configuration for the specs (unit tests) of the package
+  - This refers to the `src` configuration file as a "dependency"
+
+The reason for separating the `tsconfig.json` file for the `src` and the `specs` is to have different build output directories for them, to make sure that `src` cannot not import anything from `specs`, and the final, distributed package can contain only the build output of `src`. (NOTE: Right now, it contains both. This is not critical, but the `specs` build output might be omitted from the packages in the future).
+
+The root-level `tsconfig` file refers to the `tsconfig.json` file of the `src`- and `specs` folders:
+```
+  "references": [
+    { "path": "./packages/base/src/tsconfig.json" },
+    { "path": "./packages/base/specs/tsconfig.json" },
+    ...
+  ]
+```
+
+They are listed there in the order in which they are built:
+
+- Build all `src` part for each package
+- Build the `spec-helpers` (which depends on some of the `src` outputs)
+- Build the `specs` part for each package (which often depends on the `spec-helpers`)
+
+### Tests
+
+Running the tests with Jasmine eventually looks simple: Jasmine has to be started with
+
+`ts-node --esm node_modules/jasmine/bin/jasmine.js ...`
+
+where that `--esm` is somehow important to properly resolve the modules...
+
+One caveat is:
+
+- The test data is stored in `./specs/data` (because parts of it is shared by multiple packages)
+- It should be possible to run _all_ tests from the _root_ directory
+- It should be possible to run the tests of a _single_ package from the directory of that package
+
+So in order to resolve the test data in both cases:
+- The `jasmine.json` config files in the packages refer to a `helper` that sets `process.env.SPECS_DATA_BASE_DIRECTORY = "../../specs/data";` (whereas the default in the top-level case is just `"./specs/data"`)
+- This environment variable is picked up by the `/spec-helpers/SpecHelpers` class and returned as the "base" directory for resolving data
+
+### Coverage
+
+The coverage originally had been checked with `nyc`, but apparently, "modern modules" are not supported by `nyc` (see https://github.com/istanbuljs/nyc/issues/1287 ). The coverage is now computed with `c8` from https://github.com/bcoe/c8 , which seems to be a "drop-in-replacement" of `nyc` that works with "modern modules". 
+
+### Even Mode Internal Notes:
+
+- Despite being purely written in TypeScript, `import` statements that use relative paths in TypeScript files have to refer to the other TypeScript files with the file extension `.js`. These files do not exist. They have the file extension `.ts`. But it has to be this way.
+- There are places where the `/// <reference path=" ... " />` syntax is used, in order to point TypeScript to the right type information (see [TypeScript: Triple-Slash Directives](https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html)). This appears to be necessary for `gltf-pipeline` and `gltfpack` dependencies, which do not have associated type information. This is strongly discouraged, and should instead be solved by specifying proper `typeRoots` in the `compilerOptions` of the respective `tsconfig.json`. Maybe there is a way to tweak this so that it actually _works_ ...
+- There seem to be a few differences btween _compiling_ code (with `tsc`) and _executing_ code (with `npx ts-node`) when it comes to ~"module and type resolution". Sometimes types are not found here and there. There are rumours in hundreds of issues related to that. Sometimes the [`ts-node` `--files` argument](https://typestrong.org/ts-node/docs/options/#files) (which is completely unrelated to the `files` in `tsconfig.json`, although it also refers to this property) seemed to help. Sometimes the `tsconfig-paths` package from https://www.npmjs.com/package/tsconfig-paths seemed to help. Maybe some of these approaches will have to be investigated when a specific problem comes up.
 
 
 ## API Definition
