@@ -70,3 +70,9 @@ export * from "./tilesetProcessing/TilesetUpgrader.js";
 
 export * from "./tilesetProcessing/upgrade/TilesetObjectUpgrader.js";
 export * from "./tilesetProcessing/upgrade/TilesetUpgradeOptions.js";
+
+export * from "./gltfExtensionsUtils/InstanceFeaturesUtils.js";
+export * from "./gltfExtensionsUtils/MeshFeaturesUtils.js";
+export * from "./gltfExtensionsUtils/StringBuilder.js";
+export * from "./gltfExtensionsUtils/StructuralMetadataPropertyTables.js";
+export * from "./gltfExtensionsUtils/StructuralMetadataUtils.js";
