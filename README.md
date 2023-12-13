@@ -187,6 +187,22 @@ Extracts the glb models from a cmpt tile. If multiple models are found a number 
 npx 3d-tiles-tools cmptToGlb -i ./specs/data/composite.cmpt -o ./output/extracted.glb
 ```
 
+#### splitCmpt
+
+Split a cmpt tile into its inner tiles. The output file name for each inner tile will be determined by appending a number to the given output file name, and an extension that depends on the type of the inner tile data.
+
+```
+npx 3d-tiles-tools cmptToGlb -i ./specs/data/compositeOfComposite.cmpt -o ./output/inner --recursive
+```
+
+For an input file `compositeOfComposite.cmpt` that contains a composite tile that contains one B3DM and one I3DM content, this will generate the files `inner_0.b3dm` and `inner_1.i3dm` in the output directory.
+
+Additional command line options:
+
+| Flag | Description | Required |
+| ---- | ----------- | -------- |
+|`--recursive`|Whether the split operation should be applied to inner tiles that are composite| No, default: `false` |
+
 
 #### convertB3dmToGlb
 
@@ -347,5 +363,4 @@ npx ts-node src/main.ts gzip -i ./specs/data/TilesetOfTilesets/ -o ./output/Tile
 ```
 
 See the [implementation notes](IMPLEMENTATION.md) for details about the project structure.
-
 
