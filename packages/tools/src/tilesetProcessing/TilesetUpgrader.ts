@@ -241,7 +241,6 @@ export class TilesetUpgrader {
     } catch (error) {
       const sourceKey = sourceEntry.key;
       logger.error(`Failed to upgrade ${sourceKey}: ${error}`);
-      logger.error(error);
       const targetKey = this.processContentUri(sourceKey);
       const targetEntry = {
         key: targetKey,

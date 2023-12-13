@@ -588,7 +588,7 @@ export class ToolsMain {
         Paths.relativize(inputName, fileName)
       );
     }
-    logger.info("Creating tileset.json with content URIs: ", contentUris);
+    logger.info(`Creating tileset.json with content URIs: ${contentUris}`);
     const tileset = await TilesetJsonCreator.createTilesetFromContents(
       baseDir,
       contentUris
