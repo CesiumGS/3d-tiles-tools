@@ -81,9 +81,13 @@ They are listed there in the order in which they are built:
 
 Running the tests with Jasmine eventually looks simple: Jasmine has to be started with
 
-`ts-node --esm node_modules/jasmine/bin/jasmine.js ...`
+`node --loader ts-node/esm node_modules/jasmine/bin/jasmine.js ...`
 
-where that `--esm` is somehow important to properly resolve the modules...
+> Note: This will emit `ExperimentalWarning` messages, and should actually have been
+>
+> `ts-node --esm node_modules/jasmine/bin/jasmine.js ...`
+>
+> but this breaks with certain Node.js versions - see https://github.com/TypeStrong/ts-node/issues/2094 .
 
 One caveat is:
 
