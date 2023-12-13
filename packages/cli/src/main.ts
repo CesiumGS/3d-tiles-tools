@@ -67,7 +67,7 @@ const outputStringDefinition: any = {
  */
 function parseToolArgs(a: string[]) {
   const args = yargs(a)
-    .usage("Usage: npx 3d-tiles-tools <command> [options]")
+    .usage("Usage: 3d-tiles-tools <command> [options]")
     .scriptName("") // Only print the commands (not the script name)
     .help("h")
     .alias("h", "help")
