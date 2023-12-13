@@ -359,7 +359,7 @@ When the tools are not installed as a package from NPM, but supposed to be used 
 
 After this, `ts-node` can be used to directly execute the tools, using the same command line options as described above - for example:
 ```
-npx ts-node src/main.ts gzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-gzipped/
+npx ts-node --esm .\packages\cli\src\main.ts gzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-gzipped/
 ```
 
 See the [implementation notes](IMPLEMENTATION.md) for details about the project structure.
