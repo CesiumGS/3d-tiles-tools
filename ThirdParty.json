@@ -84,7 +84,7 @@
     "license": [
       "MIT"
     ],
-    "version": "8.16.2",
+    "version": "8.17.0",
     "url": "https://www.npmjs.com/package/pino"
   },
   {
@@ -108,7 +108,7 @@
     "license": [
       "MIT"
     ],
-    "version": "15.4.1",
+    "version": "17.7.2",
     "url": "https://www.npmjs.com/package/yargs"
   }
 ]
