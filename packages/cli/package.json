@@ -8,7 +8,7 @@
   "main": "./build/src/index.js",
   "types": "./build/src/index.d.ts",
   "bin": {
-    "3d-tiles-tools": "./build/main"
+    "3d-tiles-tools": "./build/cli.mjs"
   },
   "dependencies": {
     "@3d-tiles-tools/base": "0.4.0",

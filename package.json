@@ -77,6 +77,7 @@
     "docs": "npm run build && npm run docs-generate",
     "package-clean": "del-cli ./packages/*/build/** && del-cli ./packages/*/tsconfig.tsbuildinfo",
     "package-prepare": "npm run eslint && npm run prettier-check && npm run build && npm run test && npm run generate-third-party",
-    "package": "npm run package-clean && npm run package-prepare && npm pack --workspaces"
+    "package-copy": "npx copyfiles --flat ./packages/cli/bin/cli.mjs ./packages/cli/build",
+    "package": "npm run package-clean && npm run package-prepare && npm run package-copy && npm pack --workspaces"
   }
 }
