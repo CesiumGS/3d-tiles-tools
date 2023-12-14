@@ -8,9 +8,10 @@ import { NodeIO } from "@gltf-transform/core";
 import { savePixels } from "ndarray-pixels";
 import NdArray from "ndarray";
 
-import { EXTMeshFeatures } from "../src/gltfExtensions/EXTMeshFeatures";
-import { MeshFeaturesUtils } from "../src/gltfExtensions/MeshFeaturesUtils";
-import { FeatureId } from "../src/gltfExtensions/MeshFeatures";
+import { EXTMeshFeatures } from "@3d-tiles-tools/gltf-extensions";
+import { MeshFeaturesFeatureId as FeatureId } from "@3d-tiles-tools/gltf-extensions";
+
+import { MeshFeaturesUtils } from "@3d-tiles-tools/tools";
 
 /**
  * Create a primitive that represents a unit square
