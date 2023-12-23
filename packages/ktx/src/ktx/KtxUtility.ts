@@ -8,15 +8,27 @@ import { KtxEtc1sOptions } from "./KtxEtc1sOptions.js";
 import { KtxUastcOptions } from "./KtxUastcOptions.js";
 import { KtxError } from "./KtxError.js";
 
-import { Loggers } from "@3d-tiles-tools/base";
-const logger = Loggers.get("KTX");
-
 /**
  * Utility class for converting images into KTX2 format.
  *
  * @internal
  */
 export class KtxUtility {
+  /**
+   * An optional callback that will receive log messages
+   */
+  private static logCallback: ((value: any) => void) | undefined;
+
+  /**
+   * Set the optional callback that will receive log messages containing
+   * information about the encoded image and encoding options.
+   *
+   * @param logCallback - The log callback
+   */
+  static setLogCallback(logCallback: ((value: any) => void) | undefined) {
+    KtxUtility.logCallback = logCallback;
+  }
+
   /**
    * Apply KTX compression to the specified input file, and write
    * the result to the specified output file.
@@ -133,9 +145,10 @@ export class KtxUtility {
     // reasonable, with a factor of `* 2` to be safe...
     const basisData = new Uint8Array(imageWidth * imageHeight * 4 * 2);
 
-    logger.debug(`Encoding ${imageWidth}x${imageHeight} pixels to KTX`);
-    if (logger.isLevelEnabled("trace")) {
-      logger.trace(`Encoding options: ${JSON.stringify(options)}`);
+    const logCallback = KtxUtility.logCallback;
+    if (logCallback !== undefined) {
+      logCallback(`Encoding ${imageWidth}x${imageHeight} pixels to KTX`);
+      logCallback(`Encoding options: ${JSON.stringify(options)}`);
     }
 
     const resultSize = basisEncoder.encode(basisData);
@@ -146,7 +159,9 @@ export class KtxUtility {
 
     const result = Buffer.from(basisData.subarray(0, resultSize));
 
-    logger.debug(`Encoding ${imageWidth}x${imageHeight} pixels to KTX DONE`);
+    if (logCallback !== undefined) {
+      logCallback(`Encoding ${imageWidth}x${imageHeight} pixels to KTX DONE`);
+    }
 
     return result;
   }
