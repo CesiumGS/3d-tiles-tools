@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-const SPECS_DATA_BASE_DIRECTORY = "../../specs/data/";
+const SPECS_DATA_BASE_DIRECTORY = "./specs/data";
 
 import { KtxUtility } from "@3d-tiles-tools/ktx";
 import { KtxOptions } from "@3d-tiles-tools/ktx";
@@ -9,7 +9,7 @@ import { KtxOptions } from "@3d-tiles-tools/ktx";
 async function convertImageFileEtc1s() {
   const inputFileName = SPECS_DATA_BASE_DIRECTORY + "/images/CesiumLogo.png";
   const outputFileName =
-    SPECS_DATA_BASE_DIRECTORY + "/output/CesiumLogoFileEtc1s.ktx2";
+    SPECS_DATA_BASE_DIRECTORY + "/output/CesiumLogoEtc1s.ktx2";
 
   const etc1sOptions: KtxOptions = {
     uastc: false,
@@ -31,7 +31,7 @@ async function convertImageFileEtc1s() {
 async function convertImageFileUastc() {
   const inputFileName = SPECS_DATA_BASE_DIRECTORY + "/images/CesiumLogo.png";
   const outputFileName =
-    SPECS_DATA_BASE_DIRECTORY + "/output/CesiumLogoFileUastc.ktx2";
+    SPECS_DATA_BASE_DIRECTORY + "/output/CesiumLogoUastc.ktx2";
 
   const uastcOptions: KtxOptions = {
     uastc: true,
