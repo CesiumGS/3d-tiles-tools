@@ -25,10 +25,9 @@
     "about:start": "echo 'Start the tools, as a TypeScript command line application'",
     "about:build": "echo 'Run the TypeScript compiler to generate the build output.'",
     "about:test": "echo 'Execute the unit tests'",
-    "start": "npx ts-node --esm src/main.ts",
+    "start": "npx node --loader ts-node/esm src/main.ts",
     "build": "npx tsc --build --verbose --force",
-    "test": "ts-node --esm ../../node_modules/jasmine/bin/jasmine.js --config=specs/jasmine.json",
-    "docs-extract-api": ""
+    "test": "node --loader ts-node/esm ../../node_modules/jasmine/bin/jasmine.js --config=specs/jasmine.json"
   }
 }
 
