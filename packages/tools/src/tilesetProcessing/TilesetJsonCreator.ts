@@ -46,7 +46,7 @@ export class TilesetJsonCreator {
     baseDir: string,
     contentUris: string[]
   ) {
-    const leafTiles = [];
+    const leafTiles: Tile[] = [];
     for (let i = 0; i < contentUris.length; i++) {
       const contentUri = contentUris[i];
       const leafTile = await TilesetJsonCreator.createLeafTileFromContent(
@@ -129,7 +129,7 @@ export class TilesetJsonCreator {
    */
   private static createTilesetFromLeafTiles(leafTiles: Tile[]): Tileset {
     const tilesetGeometricError = DEFAULT_TILESET_GEOMETRIC_ERROR;
-    let root = undefined;
+    let root: Tile | undefined = undefined;
     if (leafTiles.length === 1) {
       root = leafTiles[0];
     } else {

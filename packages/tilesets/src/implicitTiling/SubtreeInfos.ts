@@ -7,6 +7,7 @@ import { SubtreeInfo } from "./SubtreeInfo.js";
 import { AvailabilityInfos } from "./AvailabilityInfos.js";
 import { BinarySubtreeData } from "./BinarySubtreeData.js";
 import { BinarySubtreeDataResolver } from "./BinarySubtreeDataResolver.js";
+import { AvailabilityInfo } from "./AvailabilityInfo.js";
 
 /**
  * Methods to create `SubtreeInfo` instances.
@@ -103,7 +104,7 @@ export class SubtreeInfos {
 
     // Create the `AvailabilityInfo` objects, one for
     // each content availability
-    const contentAvailabilityInfos = [];
+    const contentAvailabilityInfos: AvailabilityInfo[] = [];
     const contentAvailabilities = subtree.contentAvailability;
     if (contentAvailabilities) {
       for (const contentAvailability of contentAvailabilities) {

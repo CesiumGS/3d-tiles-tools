@@ -49,7 +49,7 @@ export class PipelineExecutor {
    */
   static async executePipeline(pipeline: Pipeline, overwrite: boolean) {
     let currentInput = pipeline.input;
-    let currentOutput = undefined;
+    let currentOutput: string | undefined = undefined;
     let currentOverwrite = true;
 
     const tilesetStages = pipeline.tilesetStages;

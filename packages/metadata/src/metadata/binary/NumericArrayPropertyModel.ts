@@ -59,7 +59,8 @@ export class NumericArrayPropertyModel implements PropertyModel {
     for (let i = 0; i < arrayLength; i++) {
       const n = arrayOffset + i;
 
-      let element = undefined;
+      let element: number | bigint | (number | bigint)[] | undefined =
+        undefined;
       if (type === "SCALAR" || type === "ENUM") {
         element = NumericBuffers.getNumericFromBuffer(
           valuesBuffer,

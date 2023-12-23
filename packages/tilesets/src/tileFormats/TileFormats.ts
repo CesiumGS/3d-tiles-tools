@@ -63,7 +63,7 @@ export class TileFormats {
 
     // Read each inner tile into a buffer
     const tilesLength = buffer.readUint32LE(12);
-    const innerTileBuffers = [];
+    const innerTileBuffers: Buffer[] = [];
     let byteOffset = 16;
     for (let i = 0; i < tilesLength; ++i) {
       if (buffer.length < byteOffset + 4) {
@@ -138,7 +138,7 @@ export class TileFormats {
     const version = buffer.readUInt32LE(4);
 
     // The `gltfFormat` is only stored for I3DM
-    let gltfFormat = undefined;
+    let gltfFormat: number | undefined = undefined;
     if (magic === "i3dm") {
       gltfFormat = buffer.readUInt32LE(28);
     }
@@ -480,7 +480,7 @@ export class TileFormats {
    * @returns The `CompositeTileData`
    */
   static createCompositeTileData(tileDatas: TileData[]): CompositeTileData {
-    const innerBuffers = [];
+    const innerBuffers: Buffer[] = [];
     for (const tileData of tileDatas) {
       const innerBuffer = TileFormats.createTileDataBuffer(tileData);
       innerBuffers.push(innerBuffer);
@@ -570,7 +570,7 @@ export class TileFormats {
   static createCompositeTileDataBuffer(
     compositeTileData: CompositeTileData
   ): Buffer {
-    const buffers = [];
+    const buffers: Buffer[] = [];
 
     // Create one buffer for the header
     const headerByteLength = 16;

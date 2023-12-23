@@ -212,7 +212,7 @@ export class TileTableData {
 
     // Fetch the `RTC_CENTER` from the feature table, to be used
     // as on part of the "global position"
-    let rtcCenter = undefined;
+    let rtcCenter: number[] | undefined = undefined;
     if (featureTable.RTC_CENTER) {
       rtcCenter = TileTableData.obtainRtcCenter(
         featureTable.RTC_CENTER,

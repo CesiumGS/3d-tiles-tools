@@ -70,7 +70,7 @@ export class Tiles {
    */
   static getContentUris(tile: Tile): string[] {
     const contents = Tiles.getContents(tile);
-    const contentUris = [];
+    const contentUris: string[] = [];
     for (const content of contents) {
       const uri = Contents.getUri(content);
       if (uri) {

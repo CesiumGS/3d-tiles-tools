@@ -144,7 +144,7 @@ export class TilesetMerger {
     }
 
     // Parse the Tileset objects from all sources
-    const tilesets = [];
+    const tilesets: Tileset[] = [];
     const length = this.tilesetSources.length;
     for (let i = 0; i < length; ++i) {
       const tilesetSource = this.tilesetSources[i];

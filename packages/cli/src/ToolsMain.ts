@@ -424,7 +424,7 @@ export class ToolsMain {
     output: string,
     tilesOnly: boolean
   ) {
-    let includedContentTypes = undefined;
+    let includedContentTypes: string[] | undefined = undefined;
     const excludedContentTypes = undefined;
     if (tilesOnly === true) {
       includedContentTypes = [
@@ -576,7 +576,7 @@ export class ToolsMain {
 
     ToolsMain.ensureCanWrite(output, force);
     let baseDir = inputName;
-    let contentUris = [];
+    let contentUris: string[] = [];
     if (!Paths.isDirectory(inputName)) {
       baseDir = path.dirname(inputName);
       const contentUri = path.basename(inputName);

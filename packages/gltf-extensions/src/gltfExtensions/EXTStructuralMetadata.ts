@@ -1001,7 +1001,7 @@ export class EXTStructuralMetadata extends Extension {
 
     const propertyTables = structuralMetadata.listPropertyTables();
     if (propertyTables.length > 0) {
-      const propertyTableDefs = [];
+      const propertyTableDefs: PropertyTableDef[] = [];
       for (const propertyTable of propertyTables) {
         const propertyTableDef = this.createPropertyTableDef(
           context,
@@ -1014,7 +1014,7 @@ export class EXTStructuralMetadata extends Extension {
 
     const propertyTextures = structuralMetadata.listPropertyTextures();
     if (propertyTextures.length > 0) {
-      const propertyTextureDefs = [];
+      const propertyTextureDefs: PropertyTextureDef[] = [];
       for (const propertyTexture of propertyTextures) {
         const propertyTextureDef = this.createPropertyTextureDef(
           context,
@@ -1027,7 +1027,7 @@ export class EXTStructuralMetadata extends Extension {
 
     const propertyAttributes = structuralMetadata.listPropertyAttributes();
     if (propertyAttributes.length > 0) {
-      const propertyAttributeDefs = [];
+      const propertyAttributeDefs: PropertyAttributeDef[] = [];
       for (const propertyAttribute of propertyAttributes) {
         const propertyAttributeDef =
           this.createPropertyAttributeDef(propertyAttribute);

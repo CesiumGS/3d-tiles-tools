@@ -85,7 +85,7 @@ export abstract class TilesetProcessor {
   async end() {
     const context = this.getContext();
 
-    let pendingError = undefined;
+    let pendingError: any = undefined;
     try {
       // Perform a no-op on all entries that have not yet
       // been marked as processed

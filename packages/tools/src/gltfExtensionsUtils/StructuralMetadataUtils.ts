@@ -163,7 +163,7 @@ export class StructuralMetadataUtils {
     }
     const stringOffsetType = propertyTableProperty.getStringOffsetType();
 
-    let enumValueType = undefined;
+    let enumValueType: string | undefined = undefined;
     const enumType = classProperty.getEnumType();
     if (enumType !== undefined) {
       const enumObject = schema.getEnum(enumType);

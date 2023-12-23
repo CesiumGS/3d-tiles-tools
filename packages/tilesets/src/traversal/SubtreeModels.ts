@@ -17,6 +17,7 @@ import { SubtreeInfos } from "../implicitTiling/SubtreeInfos.js";
 
 import { SubtreeModel } from "./SubtreeModel.js";
 import { SubtreeMetadataModels } from "./SubtreeMetadataModels.js";
+import { SubtreeMetadataModel } from "./SubtreeMetadataModel.js";
 
 /**
  * Methods to resolve subtree information.
@@ -147,7 +148,7 @@ export class SubtreeModels {
     schema: Schema | undefined
   ): SubtreeModel {
     const subtreeInfo = SubtreeInfos.create(binarySubtreeData, implicitTiling);
-    let subtreeMetadataModel = undefined;
+    let subtreeMetadataModel: SubtreeMetadataModel | undefined = undefined;
     if (schema) {
       subtreeMetadataModel = SubtreeMetadataModels.create(
         binarySubtreeData,

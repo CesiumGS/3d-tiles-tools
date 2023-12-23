@@ -169,9 +169,9 @@ export class TileFormatsMigrationI3dm {
     // from the I3DM matrices, by decomposing them into their
     // TRS (translation, rotation, scale) components and putting
     // these into flat arrays.
-    const translationsForAccessor = [];
-    const rotationsForAccessor = [];
-    const scalesForAccessor = [];
+    const translationsForAccessor: number[] = [];
+    const rotationsForAccessor: number[] = [];
+    const scalesForAccessor: number[] = [];
     for (const i3dmMatrix of i3dmMatrices) {
       // Convert the matrix into the right coordinate system
       const gltfMatrix = VecMath.multiplyAll4([
@@ -225,13 +225,16 @@ export class TileFormatsMigrationI3dm {
     // by the propertyTable being defined), then create artificial
     // batch IDs, consisting of consecutive numbers.
     let featureIdComponentType = "UINT16";
-    let batchIds = undefined;
+    let batchIds: number[] | undefined = undefined;
     const batchId = featureTable.BATCH_ID;
     if (batchId) {
-      batchIds = TileTableDataI3dm.createBatchIds(
+      const iterable = TileTableDataI3dm.createBatchIds(
         featureTable,
         featureTableBinary
       );
+      if (iterable) {
+        batchIds = [...iterable];
+      }
       const componentType =
         TileTableData.obtainBatchIdComponentType(featureTable);
       if (componentType !== undefined) {
@@ -248,8 +251,8 @@ export class TileFormatsMigrationI3dm {
     // as consecutive numbers for accessing the property table), then
     // use them to create a feature ID accessor that will be used
     // in the EXT_instance_features extension
-    let extInstanceFeatures = undefined;
-    let instanceFeaturesAccessor = undefined;
+    let extInstanceFeatures: EXTInstanceFeatures | undefined = undefined;
+    let instanceFeaturesAccessor: Accessor | undefined = undefined;
     let featureCount = 0;
     const featureIdAttributeNumber = 0;
     const featureIdAttributeName = `_FEATURE_ID_${featureIdAttributeNumber}`;

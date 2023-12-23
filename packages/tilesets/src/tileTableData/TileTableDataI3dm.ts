@@ -91,7 +91,7 @@ export class TileTableDataI3dm {
     if (scales3D) {
       scalesArray = [...scales3D];
     }
-    const i3dmMatrices = [];
+    const i3dmMatrices: number[][] = [];
     for (let i = 0; i < numInstances; i++) {
       const translation = translationsArray[i];
       const rotationQuaternion = rotationQuaternionsArray

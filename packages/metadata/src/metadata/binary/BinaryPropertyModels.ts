@@ -90,7 +90,7 @@ export class BinaryPropertyModels {
 
     // Obtain the `arrayOffsets` buffer view data
     const arrayOffsetsBufferViewIndex = propertyTableProperty.arrayOffsets;
-    let arrayOffsetsBufferViewData = undefined;
+    let arrayOffsetsBufferViewData: Buffer | undefined = undefined;
     if (arrayOffsetsBufferViewIndex !== undefined) {
       arrayOffsetsBufferViewData = bufferViewsData[arrayOffsetsBufferViewIndex];
     }
@@ -98,7 +98,7 @@ export class BinaryPropertyModels {
 
     // Obtain the `stringOffsets` buffer view data
     const stringOffsetsBufferViewIndex = propertyTableProperty.stringOffsets;
-    let stringOffsetsBufferViewData = undefined;
+    let stringOffsetsBufferViewData: Buffer | undefined = undefined;
     if (stringOffsetsBufferViewIndex !== undefined) {
       stringOffsetsBufferViewData =
         bufferViewsData[stringOffsetsBufferViewIndex];
@@ -107,7 +107,7 @@ export class BinaryPropertyModels {
 
     // Determine the `enumValueType` of the property
     const enumType = classProperty.enumType;
-    let enumValueType = undefined;
+    let enumValueType: string | undefined = undefined;
     if (enumType !== undefined) {
       const binaryEnumInfo = binaryMetadata.binaryEnumInfo;
       const enumValueTypes = binaryEnumInfo.enumValueTypes;

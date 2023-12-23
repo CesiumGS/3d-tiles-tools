@@ -58,7 +58,7 @@ export class SubtreeMetadataModels {
 
     // Obtain the structural information about the schema that
     // is required for creating the property table models
-    const propertyTableModels = [];
+    const propertyTableModels: PropertyTableModel[] = [];
     const binaryEnumInfo = MetadataUtilities.computeBinaryEnumInfo(schema);
     const propertyTables = subtree.propertyTables;
     if (propertyTables) {
@@ -96,7 +96,7 @@ export class SubtreeMetadataModels {
 
     // Obtain the property table model that is pointed to
     // by subtree.tileMetadata
-    let tileMetadataModel = undefined;
+    let tileMetadataModel: PropertyTableModel | undefined = undefined;
     if (defined(subtree.tileMetadata)) {
       tileMetadataModel = propertyTableModels[subtree.tileMetadata];
       if (!tileMetadataModel) {

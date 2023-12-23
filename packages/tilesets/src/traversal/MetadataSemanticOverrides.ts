@@ -50,7 +50,7 @@ export class MetadataSemanticOverrides {
     if (!metadata) {
       return;
     }
-    let metadataEntityModel = undefined;
+    let metadataEntityModel: MetadataEntityModel | undefined = undefined;
     try {
       metadataEntityModel = MetadataEntityModels.create(schema, metadata);
     } catch (error) {
@@ -83,7 +83,7 @@ export class MetadataSemanticOverrides {
       return;
     }
 
-    let metadataEntityModel = undefined;
+    let metadataEntityModel: MetadataEntityModel | undefined = undefined;
     try {
       metadataEntityModel = MetadataEntityModels.create(schema, metadata);
     } catch (error) {

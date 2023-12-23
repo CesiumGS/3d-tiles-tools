@@ -224,7 +224,7 @@ export class ImplicitTraversedTile implements TraversedTile {
    */
   private async createNextSubtreeLevelChildren(): Promise<TraversedTile[]> {
     const subtreeInfo = this._subtreeModel.subtreeInfo;
-    const traversedChildren = [];
+    const traversedChildren: TraversedTile[] = [];
     const localChildCoordinates = this._localCoordinate.children();
     for (const localChildCoordinate of localChildCoordinates) {
       const globalChildCoordinate = ImplicitTilings.globalizeCoordinates(
@@ -288,7 +288,7 @@ export class ImplicitTraversedTile implements TraversedTile {
     const subtreeInfo = this._subtreeModel.subtreeInfo;
     const tileAvailabilityInfo = subtreeInfo.tileAvailabilityInfo;
     const localChildCoordinates = this._localCoordinate.children();
-    const traversedChildren = [];
+    const traversedChildren: TraversedTile[] = [];
     for (const localChildCoordinate of localChildCoordinates) {
       const available = tileAvailabilityInfo.isAvailable(
         localChildCoordinate.toIndex()
@@ -327,7 +327,7 @@ export class ImplicitTraversedTile implements TraversedTile {
 
   /** {@inheritDoc TraversedTile.getRawContents} */
   getRawContents(): Content[] {
-    const contents = [];
+    const contents: Content[] = [];
     const subtreeInfo = this._subtreeModel.subtreeInfo;
     const contentAvailabilityInfos = subtreeInfo.contentAvailabilityInfos;
     const tileIndex = this._localCoordinate.toIndex();

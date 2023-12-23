@@ -81,7 +81,7 @@ export class TileDataLayouts {
     let batchTableJsonLength = buffer.readUInt32LE(20);
     let batchTableBinaryLength = buffer.readUInt32LE(24);
 
-    let batchLength = undefined;
+    let batchLength: number | undefined = undefined;
     if (magic === "b3dm") {
       // Keep this legacy check in for now since a lot of tilesets are still using the old header.
       // Legacy header #1: [batchLength] [batchTableLength]

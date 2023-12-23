@@ -32,7 +32,7 @@ export class BufferedContentData implements ContentData {
    * @returns The ContentData
    */
   static create(uri: string): ContentData {
-    let data = null;
+    let data: Buffer | null = null;
     try {
       data = fs.readFileSync(uri);
     } catch (error) {

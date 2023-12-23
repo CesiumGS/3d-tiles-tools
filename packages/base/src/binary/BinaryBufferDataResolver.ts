@@ -63,7 +63,7 @@ export class BinaryBufferDataResolver {
 
     // Obtain the buffer view data objects: One `Buffer` for
     // each `BufferView`
-    const bufferViewsData = [];
+    const bufferViewsData: Buffer[] = [];
     const bufferViews = binaryBufferStructure.bufferViews;
     if (bufferViews) {
       for (const bufferView of bufferViews) {
