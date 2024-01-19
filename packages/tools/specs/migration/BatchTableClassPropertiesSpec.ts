@@ -1,4 +1,4 @@
-import { BatchTableClassProperties } from "../../src/migration/BatchTableClassProperties.js";
+import { BatchTableClassProperties } from "../../src/migration/BatchTableClassProperties";
 
 describe("BatchTableClassProperties", function () {
   it("obtains the right type for STRING values", async function () {

@@ -1,9 +1,9 @@
 import fs from "fs";
 import crypto from "crypto";
 
-import { TilesetError } from "../tilesetData/TilesetError.js";
+import { TilesetError } from "../tilesetData/TilesetError";
 
-import { IndexEntry } from "./IndexEntry.js";
+import { IndexEntry } from "./IndexEntry";
 
 // NOTE: These functions are carved out and ported to TypeScript from
 // https://github.com/bjornblissing/3d-tiles-tools/blob/2f4844d5bdd704509bff65199898981228594aaa/validator/lib/archive.js

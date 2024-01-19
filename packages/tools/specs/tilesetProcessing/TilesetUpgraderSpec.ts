@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { TilesetUpgrader } from "../../src/tilesetProcessing/TilesetUpgrader.js";
+import { TilesetUpgrader } from "../../src/tilesetProcessing/TilesetUpgrader";
 
 import { Tileset } from "@3d-tiles-tools/structure";
 

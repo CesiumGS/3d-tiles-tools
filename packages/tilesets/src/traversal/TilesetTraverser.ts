@@ -5,10 +5,10 @@ import { Tile } from "@3d-tiles-tools/structure";
 import { Tileset } from "@3d-tiles-tools/structure";
 import { Schema } from "@3d-tiles-tools/structure";
 
-import { TraversedTile } from "./TraversedTile.js";
-import { ExplicitTraversedTile } from "./ExplicitTraversedTile.js";
-import { TraversalCallback } from "./TraversalCallback.js";
-import { TilesetTraversers } from "./TilesetTraversers.js";
+import { TraversedTile } from "./TraversedTile";
+import { ExplicitTraversedTile } from "./ExplicitTraversedTile";
+import { TraversalCallback } from "./TraversalCallback";
+import { TilesetTraversers } from "./TilesetTraversers";
 
 /**
  * A collection of configuration options for the traversal.

@@ -1,4 +1,4 @@
-import { RootProperty } from "./RootProperty.js";
+import { RootProperty } from "./RootProperty";
 
 /**
  * A bounding volume that encloses a tile or its content. At least one

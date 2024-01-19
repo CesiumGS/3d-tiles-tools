@@ -1,6 +1,6 @@
-import { RootProperty } from "./RootProperty.js";
-import { BoundingVolume } from "./BoundingVolume.js";
-import { MetadataEntity } from "./MetadataEntity.js";
+import { RootProperty } from "./RootProperty";
+import { BoundingVolume } from "./BoundingVolume";
+import { MetadataEntity } from "./MetadataEntity";
 
 /**
  * Metadata about the tile's content and a link to the content.

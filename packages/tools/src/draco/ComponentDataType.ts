@@ -1,4 +1,4 @@
-import { DracoError } from "./DracoError.js";
+import { DracoError } from "./DracoError";
 
 /**
  * Ported from CesiumJS 'ComponentDataType', ONLY for the use

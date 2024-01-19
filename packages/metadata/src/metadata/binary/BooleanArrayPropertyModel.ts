@@ -1,6 +1,6 @@
-import { PropertyModel } from "../PropertyModel.js";
-import { BinaryPropertyModels } from "./BinaryPropertyModels.js";
-import { NumericBuffers } from "./NumericBuffers.js";
+import { PropertyModel } from "../PropertyModel";
+import { BinaryPropertyModels } from "./BinaryPropertyModels";
+import { NumericBuffers } from "./NumericBuffers";
 
 /**
  * Implementation of a `PropertyModel` for boolean arrays

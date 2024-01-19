@@ -8,14 +8,14 @@ import { Schema } from "@3d-tiles-tools/structure";
 
 import { TilesetEntry } from "@3d-tiles-tools/tilesets";
 
-import { TilesetUpgradeOptions } from "./upgrade/TilesetUpgradeOptions.js";
-import { TilesetObjectUpgrader } from "./upgrade/TilesetObjectUpgrader.js";
+import { TilesetUpgradeOptions } from "./upgrade/TilesetUpgradeOptions";
+import { TilesetObjectUpgrader } from "./upgrade/TilesetObjectUpgrader";
 
-import { ContentUpgrades } from "../contentProcessing/ContentUpgrades.js";
+import { ContentUpgrades } from "../contentProcessing/ContentUpgrades";
 
-import { BasicTilesetProcessor } from "./BasicTilesetProcessor.js";
+import { BasicTilesetProcessor } from "./BasicTilesetProcessor";
 
-import { TileFormatsMigration } from "../migration/TileFormatsMigration.js";
+import { TileFormatsMigration } from "../migration/TileFormatsMigration";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("upgrade");

@@ -1,6 +1,6 @@
 import { BASIS } from "./external/basis_encoder.cjs";
 
-import { KtxError } from "./KtxError.js";
+import { KtxError } from "./KtxError";
 
 /**
  * A thin wrapper around the basis encoder. This class and its documentation are created from

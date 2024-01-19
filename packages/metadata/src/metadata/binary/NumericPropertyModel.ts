@@ -1,6 +1,6 @@
-import { NumericBuffers } from "./NumericBuffers.js";
-import { PropertyModel } from "../PropertyModel.js";
-import { MetadataTypes } from "../MetadataTypes.js";
+import { NumericBuffers } from "./NumericBuffers";
+import { PropertyModel } from "../PropertyModel";
+import { MetadataTypes } from "../MetadataTypes";
 
 /**
  * Implementation of a `PropertyModel` for numeric types.

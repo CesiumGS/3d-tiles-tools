@@ -1,8 +1,8 @@
 import zlib from "zlib";
 
-import { defined } from "./defined.js";
+import { defined } from "./defined";
 
-import { DataError } from "./DataError.js";
+import { DataError } from "./DataError";
 
 /**
  * Methods related to buffers.

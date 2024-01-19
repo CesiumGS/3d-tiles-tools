@@ -1,4 +1,4 @@
-import { MetadataError } from "./MetadataError.js";
+import { MetadataError } from "./MetadataError";
 
 /**
  * Type definition for numeric values (number or bigint)

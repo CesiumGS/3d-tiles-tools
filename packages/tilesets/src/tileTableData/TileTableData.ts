@@ -10,7 +10,7 @@ import { BinaryBodyOffset } from "@3d-tiles-tools/structure";
 import { I3dmFeatureTable } from "@3d-tiles-tools/structure";
 import { PntsFeatureTable } from "@3d-tiles-tools/structure";
 
-import { TileFormatError } from "../tileFormats/TileFormatError.js";
+import { TileFormatError } from "../tileFormats/TileFormatError";
 
 /**
  * Methods to access the data that is stored in batch- or feature tables

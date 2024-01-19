@@ -14,12 +14,12 @@ import { PropertyModel } from "@3d-tiles-tools/metadata";
 import { BinaryPropertyTableModel } from "@3d-tiles-tools/metadata";
 import { BinaryPropertyTableBuilder } from "@3d-tiles-tools/metadata";
 
-import { StructuralMetadataPropertyTables } from "../gltfExtensionsUtils/StructuralMetadataPropertyTables.js";
+import { StructuralMetadataPropertyTables } from "../gltfExtensionsUtils/StructuralMetadataPropertyTables";
 
-import { BatchTableSchemas } from "./BatchTableSchemas.js";
-import { BatchTablePropertyTableModels } from "./BatchTablePropertyTableModels.js";
-import { AccessorCreation } from "./AccessorCreation.js";
-import { TileFormatsMigration } from "./TileFormatsMigration.js";
+import { BatchTableSchemas } from "./BatchTableSchemas";
+import { BatchTablePropertyTableModels } from "./BatchTablePropertyTableModels";
+import { AccessorCreation } from "./AccessorCreation";
+import { TileFormatsMigration } from "./TileFormatsMigration";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("migration");

@@ -1,6 +1,6 @@
-import { FileResourceResolver } from "./FileResourceResolver.js";
-import { ResourceResolver } from "./ResourceResolver.js";
-import { UnzippingResourceResolver } from "./UnzippingResourceResolver.js";
+import { FileResourceResolver } from "./FileResourceResolver";
+import { ResourceResolver } from "./ResourceResolver";
+import { UnzippingResourceResolver } from "./UnzippingResourceResolver";
 
 /**
  * Methods to create `ResourceResolver` instances.

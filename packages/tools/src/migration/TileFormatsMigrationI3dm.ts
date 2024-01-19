@@ -21,14 +21,14 @@ import { VecMath } from "@3d-tiles-tools/tilesets";
 
 import { EXTInstanceFeatures } from "@3d-tiles-tools/gltf-extensions";
 
-import { GltfTransform } from "../contentProcessing/GltfTransform.js";
-import { GltfUtilities } from "../contentProcessing/GltfUtilities.js";
+import { GltfTransform } from "../contentProcessing/GltfTransform";
+import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 
-import { TileFormatsMigration } from "./TileFormatsMigration.js";
-import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata.js";
+import { TileFormatsMigration } from "./TileFormatsMigration";
+import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
 
-import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils.js";
-import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils.js";
+import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils";
+import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("migration");

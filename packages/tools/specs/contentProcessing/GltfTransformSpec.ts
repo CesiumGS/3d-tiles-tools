@@ -1,6 +1,6 @@
 import fs from "fs";
 
-import { GltfTransform } from "../../src/contentProcessing/GltfTransform.js";
+import { GltfTransform } from "../../src/contentProcessing/GltfTransform";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 

@@ -1,4 +1,4 @@
-import { NumberTypeDescriptions } from "../../src/migration/NumberTypeDescriptions.js";
+import { NumberTypeDescriptions } from "../../src/migration/NumberTypeDescriptions";
 
 describe("NumberTypeDescriptions", function () {
   //==========================================================================

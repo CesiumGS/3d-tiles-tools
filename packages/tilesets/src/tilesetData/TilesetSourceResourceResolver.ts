@@ -2,7 +2,7 @@ import { Paths } from "@3d-tiles-tools/base";
 import { Uris } from "@3d-tiles-tools/base";
 import { ResourceResolver } from "@3d-tiles-tools/base";
 
-import { TilesetSource } from "../tilesetData/TilesetSource.js";
+import { TilesetSource } from "../tilesetData/TilesetSource";
 
 /**
  * Implementation of a `ResourceResolver` based on a `TilesetSource`

@@ -1,10 +1,9 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
+    "module": "CommonJS",
     "target": "ES2021",
     "baseUrl": "./packages",
     "strict": true,
-    "moduleResolution": "NodeNext",
     "lib": ["es2021"],
 
     "esModuleInterop": true,

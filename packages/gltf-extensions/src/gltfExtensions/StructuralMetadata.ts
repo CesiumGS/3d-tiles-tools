@@ -4,10 +4,10 @@ import { TextureInfo } from "@gltf-transform/core";
 import { IProperty } from "@gltf-transform/core";
 import { PropertyType } from "@gltf-transform/core";
 
-import { ClassPropertyType } from "./EXTStructuralMetadata.js";
-import { ClassPropertyComponentType } from "./EXTStructuralMetadata.js";
-import { EnumValueType } from "./EXTStructuralMetadata.js";
-import { PropertyTablePropertyOffsetType } from "./EXTStructuralMetadata.js";
+import { ClassPropertyType } from "./EXTStructuralMetadata";
+import { ClassPropertyComponentType } from "./EXTStructuralMetadata";
+import { EnumValueType } from "./EXTStructuralMetadata";
+import { PropertyTablePropertyOffsetType } from "./EXTStructuralMetadata";
 
 const NAME = "EXT_structural_metadata";
 

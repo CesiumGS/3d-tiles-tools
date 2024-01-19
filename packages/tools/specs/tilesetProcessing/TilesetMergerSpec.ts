@@ -2,7 +2,7 @@ import fs from "fs";
 
 import { Paths } from "@3d-tiles-tools/base";
 
-import { TilesetOperations } from "../../src/tilesetProcessing/TilesetOperations.js";
+import { TilesetOperations } from "../../src/tilesetProcessing/TilesetOperations";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 

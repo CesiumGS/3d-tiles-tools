@@ -11,10 +11,10 @@ import { MetadataClass } from "@3d-tiles-tools/structure";
 import { ClassProperty } from "@3d-tiles-tools/structure";
 import { MetadataEnum } from "@3d-tiles-tools/structure";
 
-import { BinaryPropertyTable } from "./BinaryPropertyTable.js";
-import { BinaryMetadata } from "./BinaryMetadata.js";
-import { MetadataUtilities } from "../MetadataUtilities.js";
-import { MetadataError } from "../MetadataError.js";
+import { BinaryPropertyTable } from "./BinaryPropertyTable";
+import { BinaryMetadata } from "./BinaryMetadata";
+import { MetadataUtilities } from "../MetadataUtilities";
+import { MetadataError } from "../MetadataError";
 
 /**
  * Methods to create `BinaryPropertyTable` instances from individual

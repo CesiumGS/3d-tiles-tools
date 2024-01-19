@@ -1,5 +1,5 @@
-import { TilesetEntryProcessor } from "./TilesetEntryProcessor.js";
-import { TilesetProcessor } from "./TilesetProcessor.js";
+import { TilesetEntryProcessor } from "./TilesetEntryProcessor";
+import { TilesetProcessor } from "./TilesetProcessor";
 
 /**
  * A class that can process tileset data.

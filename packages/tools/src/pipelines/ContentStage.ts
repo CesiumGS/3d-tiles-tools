@@ -1,4 +1,4 @@
-import { Stage } from "./Stage.js";
+import { Stage } from "./Stage";
 
 /**
  * An interface that describes an operation that may be

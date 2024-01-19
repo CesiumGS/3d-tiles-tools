@@ -1,9 +1,9 @@
-import { TilesetSource } from "../../src/tilesetData/TilesetSource.js";
-import { TilesetSourceFs } from "../../src/tilesetData/TilesetSourceFs.js";
-import { TilesetInMemory } from "../../src/tilesetData/TilesetInMemory.js";
+import { TilesetSource } from "../../src/tilesetData/TilesetSource";
+import { TilesetSourceFs } from "../../src/tilesetData/TilesetSourceFs";
+import { TilesetInMemory } from "../../src/tilesetData/TilesetInMemory";
 
-import { TilesetSource3tz } from "../../src/packages/TilesetSource3tz.js";
-import { TilesetSource3dtiles } from "../../src/packages/TilesetSource3dtiles.js";
+import { TilesetSource3tz } from "../../src/packages/TilesetSource3tz";
+import { TilesetSource3dtiles } from "../../src/packages/TilesetSource3dtiles";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 

@@ -1,4 +1,4 @@
-import { RootProperty } from "./RootProperty.js";
+import { RootProperty } from "./RootProperty";
 
 /**
  * A dictionary object of metadata about per-feature properties.

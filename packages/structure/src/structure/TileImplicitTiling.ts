@@ -1,5 +1,5 @@
-import { RootProperty } from "./RootProperty.js";
-import { Subtrees } from "./Subtrees.js";
+import { RootProperty } from "./RootProperty";
+import { Subtrees } from "./Subtrees";
 
 /**
  * This object allows a tile to be implicitly subdivided. Tile and

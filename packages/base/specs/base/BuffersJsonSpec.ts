@@ -1,4 +1,4 @@
-import { Buffers } from "../../src/base/Buffers.js";
+import { Buffers } from "../../src/base/Buffers";
 
 describe("Buffer::isProbablyJson", function () {
   it("detects JSON object", function () {

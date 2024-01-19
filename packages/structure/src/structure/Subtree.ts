@@ -1,9 +1,9 @@
-import { RootProperty } from "./RootProperty.js";
-import { BufferObject } from "./BufferObject.js";
-import { BufferView } from "./BufferView.js";
-import { PropertyTable } from "./PropertyTable.js";
-import { Availability } from "./Availability.js";
-import { MetadataEntity } from "./MetadataEntity.js";
+import { RootProperty } from "./RootProperty";
+import { BufferObject } from "./BufferObject";
+import { BufferView } from "./BufferView";
+import { PropertyTable } from "./PropertyTable";
+import { Availability } from "./Availability";
+import { MetadataEntity } from "./MetadataEntity";
 
 /**
  * An object describing the availability of tiles and content in a

@@ -1,4 +1,4 @@
-import { RootProperty } from "./RootProperty.js";
+import { RootProperty } from "./RootProperty";
 
 /**
  * An object describing the availability of a set of elements.

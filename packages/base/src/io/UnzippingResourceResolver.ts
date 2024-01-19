@@ -1,8 +1,8 @@
 import zlib from "zlib";
 
-import { Buffers } from "../base/Buffers.js";
+import { Buffers } from "../base/Buffers";
 
-import { ResourceResolver } from "./ResourceResolver.js";
+import { ResourceResolver } from "./ResourceResolver";
 
 /**
  * Implementation of a `ResourceResolver` that obtains the resource

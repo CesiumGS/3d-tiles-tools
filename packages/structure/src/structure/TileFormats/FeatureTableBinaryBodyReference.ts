@@ -1,4 +1,4 @@
-import { BinaryBodyOffset } from "./BinaryBodyOffset.js";
+import { BinaryBodyOffset } from "./BinaryBodyOffset";
 
 /**
  * An object defining the reference to a section of the binary body of

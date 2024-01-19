@@ -13,10 +13,10 @@ import { TileFormatError } from "@3d-tiles-tools/tilesets";
 import { TileTableData } from "@3d-tiles-tools/tilesets";
 import { TileTableDataI3dm } from "@3d-tiles-tools/tilesets";
 
-import { GltfTransform } from "../contentProcessing/GltfTransform.js";
-import { PntsPointClouds } from "../pointClouds/PntsPointClouds.js";
+import { GltfTransform } from "../contentProcessing/GltfTransform";
+import { PntsPointClouds } from "../pointClouds/PntsPointClouds";
 
-import { BoundingVolumes } from "./BoundingVolumes.js";
+import { BoundingVolumes } from "./BoundingVolumes";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("tilesetProcessing");

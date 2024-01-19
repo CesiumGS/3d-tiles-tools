@@ -1,4 +1,4 @@
-import { RootProperty } from "../RootProperty.js";
+import { RootProperty } from "../RootProperty";
 
 /**
  * A set of semantics containing per-tile and per-feature values defining

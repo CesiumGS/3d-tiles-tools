@@ -1,5 +1,5 @@
-import { ContentDataTypes } from "../../src/contentTypes/ContentDataTypes.js";
-import { ContentDataTypeChecks } from "../../src/contentTypes/ContentDataTypeChecks.js";
+import { ContentDataTypes } from "../../src/contentTypes/ContentDataTypes";
+import { ContentDataTypeChecks } from "../../src/contentTypes/ContentDataTypeChecks";
 
 describe("ContentDataTypeChecks", function () {
   it("returns true when included is undefined and excluded is undefined", async function () {

@@ -1,6 +1,6 @@
-import { ContentDataTypes } from "../../src/contentTypes/ContentDataTypes.js";
-import { BufferedContentData } from "../../src/contentTypes/BufferedContentData.js";
-import { ContentDataTypeRegistry } from "../../src/contentTypes/ContentDataTypeRegistry.js";
+import { ContentDataTypes } from "../../src/contentTypes/ContentDataTypes";
+import { BufferedContentData } from "../../src/contentTypes/BufferedContentData";
+import { ContentDataTypeRegistry } from "../../src/contentTypes/ContentDataTypeRegistry";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 

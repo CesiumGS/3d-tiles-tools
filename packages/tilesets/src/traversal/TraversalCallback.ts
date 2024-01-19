@@ -1,4 +1,4 @@
-import { TraversedTile } from "./TraversedTile.js";
+import { TraversedTile } from "./TraversedTile";
 
 /**
  * An interface with a function that will be called by

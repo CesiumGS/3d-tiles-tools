@@ -6,8 +6,8 @@ import { TilesetSource } from "@3d-tiles-tools/tilesets";
 import { TilesetSource3tz } from "@3d-tiles-tools/tilesets";
 import { TilesetSource3dtiles } from "@3d-tiles-tools/tilesets";
 
-import { BenchmarkUtils } from "./BenchmarkUtils.js";
-import { Arrays } from "./Arrays.js";
+import { BenchmarkUtils } from "./BenchmarkUtils";
+import { Arrays } from "./Arrays";
 
 /**
  * Reads all entries from the given source, repeatedly and in random

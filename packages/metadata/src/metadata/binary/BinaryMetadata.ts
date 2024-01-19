@@ -3,7 +3,7 @@ import { BinaryBufferStructure } from "@3d-tiles-tools/base";
 
 import { MetadataClass } from "@3d-tiles-tools/structure";
 
-import { BinaryEnumInfo } from "./BinaryEnumInfo.js";
+import { BinaryEnumInfo } from "./BinaryEnumInfo";
 
 /**
  * A basic structure summarizing the (raw) elements of binary metadata.

@@ -4,11 +4,11 @@ import { B3dmFeatureTable } from "@3d-tiles-tools/structure";
 import { BatchTable } from "@3d-tiles-tools/structure";
 import { I3dmFeatureTable } from "@3d-tiles-tools/structure";
 
-import { CompositeTileData } from "./CompositeTileData.js";
-import { TileData } from "./TileData.js";
-import { TileDataLayout } from "./TileDataLayouts.js";
-import { TileDataLayouts } from "./TileDataLayouts.js";
-import { TileFormatError } from "./TileFormatError.js";
+import { CompositeTileData } from "./CompositeTileData";
+import { TileData } from "./TileData";
+import { TileDataLayout } from "./TileDataLayouts";
+import { TileDataLayouts } from "./TileDataLayouts";
+import { TileFormatError } from "./TileFormatError";
 
 /**
  * Methods for handling 3D Tiles tile data.

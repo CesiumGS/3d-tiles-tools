@@ -3,11 +3,11 @@ import zlib from "zlib";
 
 import { defined } from "@3d-tiles-tools/base";
 
-import { TilesetSource } from "../tilesetData/TilesetSource.js";
-import { TilesetError } from "../tilesetData/TilesetError.js";
+import { TilesetSource } from "../tilesetData/TilesetSource";
+import { TilesetError } from "../tilesetData/TilesetError";
 
-import { IndexEntry } from "./IndexEntry.js";
-import { ArchiveFunctions3tz } from "./ArchiveFunctions3tz.js";
+import { IndexEntry } from "./IndexEntry";
+import { ArchiveFunctions3tz } from "./ArchiveFunctions3tz";
 
 /**
  * Implementation of a TilesetSource based on a 3TZ file.

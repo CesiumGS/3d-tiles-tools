@@ -1,6 +1,6 @@
 import { MetadataClass } from "@3d-tiles-tools/structure";
 
-import { MetadataEntityModels } from "../../src/metadata/MetadataEntityModels.js";
+import { MetadataEntityModels } from "../../src/metadata/MetadataEntityModels";
 
 // NOTE: The tests here aim at testing the handling of default- and noData
 // values, as well as the handling of offset/scale and the mechanism of

@@ -6,11 +6,11 @@ import { Mesh } from "draco3d";
 
 import { Buffers } from "@3d-tiles-tools/base";
 
-import { DracoError } from "./DracoError.js";
-import { ComponentDatatype } from "./ComponentDataType.js";
-import { AttributeInfo } from "./AttributeInfo.js";
-import { QuantizationInfo } from "./QuantizationInfo.js";
-import { DracoDecoderResult } from "./DracoDecoderResult.js";
+import { DracoError } from "./DracoError";
+import { ComponentDatatype } from "./ComponentDataType";
+import { AttributeInfo } from "./AttributeInfo";
+import { QuantizationInfo } from "./QuantizationInfo";
+import { DracoDecoderResult } from "./DracoDecoderResult";
 
 /**
  * A thin wrapper around Draco, tailored for decompressing

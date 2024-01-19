@@ -1,11 +1,11 @@
 import fs from "fs";
 import path from "path";
 
-import { Buffers } from "../base/Buffers.js";
+import { Buffers } from "../base/Buffers";
 
-import { ContentData } from "./ContentData.js";
+import { ContentData } from "./ContentData";
 
-import { Loggers } from "../logging/Loggers.js";
+import { Loggers } from "../logging/Loggers";
 const logger = Loggers.get("tilesetProcessing");
 
 /**

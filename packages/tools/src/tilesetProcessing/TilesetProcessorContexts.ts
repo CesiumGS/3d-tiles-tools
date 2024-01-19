@@ -5,8 +5,8 @@ import { TilesetTargets } from "@3d-tiles-tools/tilesets";
 
 import { Tileset } from "@3d-tiles-tools/structure";
 
-import { TilesetProcessing } from "./TilesetProcessing.js";
-import { TilesetProcessorContext } from "./TilesetProcessorContext.js";
+import { TilesetProcessing } from "./TilesetProcessing";
+import { TilesetProcessorContext } from "./TilesetProcessorContext";
 
 /**
  * A class summarizing the data that a `TilesetProcessor` is operating on.

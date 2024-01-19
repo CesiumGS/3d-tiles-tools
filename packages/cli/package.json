@@ -3,7 +3,7 @@
   "version": "0.4.0",
   "license": "Apache-2.0",
   "description": "3D Tiles tools command line interface",
-  "type": "module",
+  "type": "commonjs",
   "source": "./src/main.ts",
   "main": "./build/src/index.js",
   "types": "./build/src/index.d.ts",
@@ -25,9 +25,9 @@
     "about:start": "echo 'Start the tools, as a TypeScript command line application'",
     "about:build": "echo 'Run the TypeScript compiler to generate the build output.'",
     "about:test": "echo 'Execute the unit tests'",
-    "start": "npx node --loader ts-node/esm src/main.ts",
+    "start": "npx ts-node src/main.ts",
     "build": "npx tsc --build --verbose --force",
-    "test": "node --loader ts-node/esm ../../node_modules/jasmine/bin/jasmine.js --config=specs/jasmine.json"
+    "test": "npx ts-node ../../node_modules/jasmine/bin/jasmine.js --config=specs/jasmine.json"
   }
 }
 

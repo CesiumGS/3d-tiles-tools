@@ -1,4 +1,4 @@
-import { ArrayValues } from "../../src/metadata/ArrayValues.js";
+import { ArrayValues } from "../../src/metadata/ArrayValues";
 
 describe("metadata/ArrayValues", function () {
   //==========================================================================

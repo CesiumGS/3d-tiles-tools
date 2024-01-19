@@ -3,9 +3,9 @@ import { MetadataEntity } from "@3d-tiles-tools/structure";
 import { MetadataClass } from "@3d-tiles-tools/structure";
 import { MetadataEnum } from "@3d-tiles-tools/structure";
 
-import { DefaultMetadataEntityModel } from "./DefaultMetadataEntityModel.js";
-import { MetadataEntityModel } from "./MetadataEntityModel.js";
-import { MetadataError } from "./MetadataError.js";
+import { DefaultMetadataEntityModel } from "./DefaultMetadataEntityModel";
+import { MetadataEntityModel } from "./MetadataEntityModel";
+import { MetadataError } from "./MetadataError";
 
 /**
  * Methods related to `MetadataEntityModel` instances.

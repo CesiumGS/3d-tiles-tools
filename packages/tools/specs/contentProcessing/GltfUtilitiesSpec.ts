@@ -2,7 +2,7 @@
 /// <reference path="../../@types/gltf-pipeline/index.d.ts" />
 import GltfPipeline from "gltf-pipeline";
 
-import { GltfUtilities } from "../../src/contentProcessing/GltfUtilities.js";
+import { GltfUtilities } from "../../src/contentProcessing/GltfUtilities";
 
 // A glTF that uses CESIUM_RTC.
 // It defines two scenes

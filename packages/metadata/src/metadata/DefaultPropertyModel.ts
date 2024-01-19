@@ -1,4 +1,4 @@
-import { PropertyModel } from "./PropertyModel.js";
+import { PropertyModel } from "./PropertyModel";
 
 /**
  * Default implementation of a `PropertyModel` that is

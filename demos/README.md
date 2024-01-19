@@ -6,7 +6,7 @@ After installing the dependencies by running
 `npm install`
 in the `./demos` subdirectory, each of these demos can be started (from the root directory of the 3D Tiles Tools!) with
 
-`npx node --loader ts-node/esm ./demos/`_`<PackageName>`_`/`_`<DemoName>`_`.ts`
+`npx ts-node ./demos/`_`<PackageName>`_`/`_`<DemoName>`_`.ts`
 
 ### General tool functions
 

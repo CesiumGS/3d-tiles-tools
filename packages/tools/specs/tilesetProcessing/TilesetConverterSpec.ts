@@ -1,4 +1,4 @@
-import { TilesetConverter } from "../../src/tilesetProcessing/TilesetConverter.js";
+import { TilesetConverter } from "../../src/tilesetProcessing/TilesetConverter";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 

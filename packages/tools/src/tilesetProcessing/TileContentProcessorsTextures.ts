@@ -1,9 +1,9 @@
 import { KtxEtc1sOptions } from "@3d-tiles-tools/ktx";
 import { KtxUastcOptions } from "@3d-tiles-tools/ktx";
 
-import { TileContentProcessor } from "./TileContentProcessor.js";
-import { TileContentProcessorsGltfTransform } from "./TileContentProcessorsGltfTransform.js";
-import { GltfTransformTextures } from "../contentProcessing/GltfTransformTextures.js";
+import { TileContentProcessor } from "./TileContentProcessor";
+import { TileContentProcessorsGltfTransform } from "./TileContentProcessorsGltfTransform";
+import { GltfTransformTextures } from "../contentProcessing/GltfTransformTextures";
 
 /**
  * Methods to create `TileContentProcessor` instances that

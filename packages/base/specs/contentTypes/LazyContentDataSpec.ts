@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { LazyContentData } from "../../src/contentTypes/LazyContentData.js";
-import { ResourceResolver } from "../../src/io/ResourceResolver.js";
+import { LazyContentData } from "../../src/contentTypes/LazyContentData";
+import { ResourceResolver } from "../../src/io/ResourceResolver";
 
 function createTestResourceResolver(): ResourceResolver {
   return {

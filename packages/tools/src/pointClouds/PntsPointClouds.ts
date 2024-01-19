@@ -8,11 +8,11 @@ import { BatchTables } from "@3d-tiles-tools/tilesets";
 import { Colors } from "@3d-tiles-tools/tilesets";
 import { TileTableDataPnts } from "@3d-tiles-tools/tilesets";
 
-import { DefaultPointCloud } from "./DefaultPointCloud.js";
-import { ReadablePointCloud } from "./ReadablePointCloud.js";
+import { DefaultPointCloud } from "./DefaultPointCloud";
+import { ReadablePointCloud } from "./ReadablePointCloud";
 
-import { DracoDecoder } from "../draco/DracoDecoder.js";
-import { DracoDecoderResult } from "../draco/DracoDecoderResult.js";
+import { DracoDecoder } from "../draco/DracoDecoder";
+import { DracoDecoderResult } from "../draco/DracoDecoderResult";
 
 /**
  * Methods to create `ReadablePointCloud` instances from PNTS data

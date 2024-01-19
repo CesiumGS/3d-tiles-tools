@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "license": "Apache-2.0",
   "description": "3D Tiles tools demos",
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
     "@3d-tiles-tools/base": "file:../packages/base",
     "@3d-tiles-tools/gltf-extensions": "file:../packages/gltf-extensions",

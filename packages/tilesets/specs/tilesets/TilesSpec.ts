@@ -1,6 +1,6 @@
 import { Tile } from "@3d-tiles-tools/structure";
 
-import { Tiles } from "../../src/tilesets/Tiles.js";
+import { Tiles } from "../../src/tilesets/Tiles";
 
 //============================================================================
 // Test data definition

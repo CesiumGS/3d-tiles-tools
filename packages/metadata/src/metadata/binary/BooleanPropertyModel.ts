@@ -1,5 +1,5 @@
-import { PropertyModel } from "../PropertyModel.js";
-import { NumericBuffers } from "./NumericBuffers.js";
+import { PropertyModel } from "../PropertyModel";
+import { NumericBuffers } from "./NumericBuffers";
 
 /**
  * Implementation of a `PropertyModel` for booleans

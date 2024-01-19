@@ -1,4 +1,4 @@
-import { ImplicitTilings } from "../../src/implicitTiling/ImplicitTilings.js";
+import { ImplicitTilings } from "../../src/implicitTiling/ImplicitTilings";
 
 import { OctreeCoordinates } from "@3d-tiles-tools/base";
 import { QuadtreeCoordinates } from "@3d-tiles-tools/base";

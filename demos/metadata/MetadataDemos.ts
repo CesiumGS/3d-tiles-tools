@@ -1,4 +1,4 @@
-import { readJsonUnchecked } from "../readJsonUnchecked.js";
+import { readJsonUnchecked } from "../readJsonUnchecked";
 
 import { MetadataClass } from "@3d-tiles-tools/structure";
 import { Tileset } from "@3d-tiles-tools/structure";

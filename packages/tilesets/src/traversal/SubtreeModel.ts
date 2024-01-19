@@ -1,6 +1,6 @@
-import { SubtreeInfo } from "../implicitTiling/SubtreeInfo.js";
+import { SubtreeInfo } from "../implicitTiling/SubtreeInfo";
 
-import { SubtreeMetadataModel } from "./SubtreeMetadataModel.js";
+import { SubtreeMetadataModel } from "./SubtreeMetadataModel";
 
 /**
  * An interface that summarizes the information for a subtree.

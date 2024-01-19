@@ -9,11 +9,11 @@ import { BinaryPropertyTable } from "@3d-tiles-tools/metadata";
 import { BinaryPropertyTableModel } from "@3d-tiles-tools/metadata";
 import { BinaryMetadata } from "@3d-tiles-tools/metadata";
 
-import { BinarySubtreeData } from "../implicitTiling/BinarySubtreeData.js";
-import { SubtreeInfo } from "../implicitTiling/SubtreeInfo.js";
-import { AvailabilityInfo } from "../implicitTiling/AvailabilityInfo.js";
+import { BinarySubtreeData } from "../implicitTiling/BinarySubtreeData";
+import { SubtreeInfo } from "../implicitTiling/SubtreeInfo";
+import { AvailabilityInfo } from "../implicitTiling/AvailabilityInfo";
 
-import { SubtreeMetadataModel } from "./SubtreeMetadataModel.js";
+import { SubtreeMetadataModel } from "./SubtreeMetadataModel";
 
 /**
  * Methods to create `SubtreeMetadataModel` instances.

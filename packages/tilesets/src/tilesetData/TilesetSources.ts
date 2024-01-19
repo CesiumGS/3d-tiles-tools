@@ -2,13 +2,13 @@ import path from "path";
 
 import { Iterables } from "@3d-tiles-tools/base";
 
-import { TilesetSource3tz } from "../packages/TilesetSource3tz.js";
-import { TilesetSource3dtiles } from "../packages/TilesetSource3dtiles.js";
+import { TilesetSource3tz } from "../packages/TilesetSource3tz";
+import { TilesetSource3dtiles } from "../packages/TilesetSource3dtiles";
 
-import { TilesetEntry } from "./TilesetEntry.js";
-import { TilesetError } from "./TilesetError.js";
-import { TilesetSource } from "./TilesetSource.js";
-import { TilesetSourceFs } from "./TilesetSourceFs.js";
+import { TilesetEntry } from "./TilesetEntry";
+import { TilesetError } from "./TilesetError";
+import { TilesetSource } from "./TilesetSource";
+import { TilesetSourceFs } from "./TilesetSourceFs";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("tilesetData");
