@@ -1,5 +1,5 @@
 {
-  "name": "@3d-tiles-tools/cli",
+  "name": "3d-tiles-tools",
   "version": "0.4.0",
   "license": "Apache-2.0",
   "description": "3D Tiles tools command line interface",
@@ -26,7 +26,8 @@
     "about:build": "echo 'Run the TypeScript compiler to generate the build output.'",
     "about:test": "echo 'Execute the unit tests'",
     "start": "npx ts-node src/main.ts",
-    "build": "npx tsc --build --verbose --force",
+    "build": "npx tsc --build --verbose --force && npm run build-post",
+    "build-post": "npx copyfiles --flat ./bin/cli.mjs build/",
     "test": "npx ts-node ../../node_modules/jasmine/bin/jasmine.js --config=specs/jasmine.json"
   }
 }
