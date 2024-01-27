@@ -67,7 +67,7 @@
     "eslint": "eslint \"./**/*.ts\" --cache",
     "build": "tsc --build --verbose --force && npm run build-post",
     "build-post": "npm run build-post --workspaces --if-present",
-    "test": "node --loader ts-node/esm node_modules/jasmine/bin/jasmine.js --config=specs/jasmine.json",
+    "test": "npx ts-node node_modules/jasmine/bin/jasmine.js --config=specs/jasmine.json",
     "coverage": "npx c8 --clean npm run test",
     "prettier-check": "prettier --check \"**/*\"",
     "prettier": "prettier --write \"**/*\"",

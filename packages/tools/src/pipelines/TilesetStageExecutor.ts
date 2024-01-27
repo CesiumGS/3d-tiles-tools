@@ -4,15 +4,15 @@ import { ContentDataTypes } from "@3d-tiles-tools/base";
 
 import { TilesetEntry } from "@3d-tiles-tools/tilesets";
 
-import { TilesetStage } from "./TilesetStage.js";
-import { ContentStageExecutor } from "./ContentStageExecutor.js";
-import { PipelineError } from "./PipelineError.js";
-import { TilesetStages } from "./TilesetStages.js";
+import { TilesetStage } from "./TilesetStage";
+import { ContentStageExecutor } from "./ContentStageExecutor";
+import { PipelineError } from "./PipelineError";
+import { TilesetStages } from "./TilesetStages";
 
-import { BasicTilesetProcessor } from "../tilesetProcessing/BasicTilesetProcessor.js";
-import { TilesetUpgrader } from "../tilesetProcessing/TilesetUpgrader.js";
-import { TilesetCombiner } from "../tilesetProcessing/TilesetCombiner.js";
-import { TilesetDataProcessor } from "../tilesetProcessing/TilesetDataProcessor.js";
+import { BasicTilesetProcessor } from "../tilesetProcessing/BasicTilesetProcessor";
+import { TilesetUpgrader } from "../tilesetProcessing/TilesetUpgrader";
+import { TilesetCombiner } from "../tilesetProcessing/TilesetCombiner";
+import { TilesetDataProcessor } from "../tilesetProcessing/TilesetDataProcessor";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("pipeline");

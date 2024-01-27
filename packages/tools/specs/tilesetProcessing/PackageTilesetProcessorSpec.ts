@@ -1,4 +1,4 @@
-import { BasicTilesetProcessor } from "../../src/tilesetProcessing/BasicTilesetProcessor.js";
+import { BasicTilesetProcessor } from "../../src/tilesetProcessing/BasicTilesetProcessor";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 

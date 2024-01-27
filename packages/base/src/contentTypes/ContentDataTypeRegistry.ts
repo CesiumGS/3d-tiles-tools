@@ -1,9 +1,9 @@
-import { ContentData } from "./ContentData.js";
-import { ContentDataTypes } from "./ContentDataTypes.js";
-import { ContentDataTypeEntry } from "./ContentDataTypeEntry.js";
-import { defined } from "../base/defined.js";
-import { DeveloperError } from "../base/DeveloperError.js";
-import { BufferedContentData } from "./BufferedContentData.js";
+import { ContentData } from "./ContentData";
+import { ContentDataTypes } from "./ContentDataTypes";
+import { ContentDataTypeEntry } from "./ContentDataTypeEntry";
+import { defined } from "../base/defined";
+import { DeveloperError } from "../base/DeveloperError";
+import { BufferedContentData } from "./BufferedContentData";
 
 /**
  * A class for determining the type of data that a URI points to.

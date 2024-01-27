@@ -16,7 +16,7 @@ import { StructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
 
 import { BinaryPropertyModels } from "@3d-tiles-tools/metadata";
 
-import { StringBuilder } from "./StringBuilder.js";
+import { StringBuilder } from "./StringBuilder";
 
 /**
  * Utilities related to the glTF `EXT_structural_metadata` extension.

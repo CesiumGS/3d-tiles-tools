@@ -4,7 +4,7 @@ import { Schema } from "@3d-tiles-tools/structure";
 import { ClassProperty } from "@3d-tiles-tools/structure";
 import { MetadataEnum } from "@3d-tiles-tools/structure";
 
-import { BinaryEnumInfo } from "./binary/BinaryEnumInfo.js";
+import { BinaryEnumInfo } from "./binary/BinaryEnumInfo";
 
 /**
  * Internal utilities related to metadata

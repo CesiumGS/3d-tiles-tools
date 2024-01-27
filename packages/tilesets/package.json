@@ -3,7 +3,7 @@
   "version": "0.4.0",
   "license": "Apache-2.0",
   "description": "3D Tiles tools tileset representation",
-  "type": "module",
+  "type": "commonjs",
   "source": "./src/index.ts",
   "exports": "./build/src/index.js",
   "types": "./build/src/index.d.ts",
@@ -28,7 +28,7 @@
     "about:test": "echo 'Execute the unit tests'",
     "about:docs-extract-api": "echo 'Extract the API definition file from the current build output.'",
     "build": "npx tsc --build --verbose --force",
-    "test": "node --loader ts-node/esm ../../node_modules/jasmine/bin/jasmine.js --config=specs/jasmine.json",
+    "test": "npx ts-node ../../node_modules/jasmine/bin/jasmine.js --config=specs/jasmine.json",
     "docs-extract-api": "api-extractor run --config api-extractor.jsonc --local --verbose"
   }
 }

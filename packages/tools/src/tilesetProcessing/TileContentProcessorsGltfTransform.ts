@@ -2,8 +2,8 @@ import { Transform } from "@gltf-transform/core";
 
 import { ContentDataTypes } from "@3d-tiles-tools/base";
 
-import { TileContentProcessor } from "./TileContentProcessor.js";
-import { GltfTransform } from "../contentProcessing/GltfTransform.js";
+import { TileContentProcessor } from "./TileContentProcessor";
+import { GltfTransform } from "../contentProcessing/GltfTransform";
 
 /**
  * Methods to create `TileContentProcessor` instances that

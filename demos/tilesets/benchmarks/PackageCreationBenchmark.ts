@@ -7,7 +7,7 @@ import { TilesetEntry } from "@3d-tiles-tools/tilesets";
 import { TilesetTarget3dtiles } from "@3d-tiles-tools/tilesets";
 import { TilesetTarget3tz } from "@3d-tiles-tools/tilesets";
 
-import { BenchmarkUtils } from "./BenchmarkUtils.js";
+import { BenchmarkUtils } from "./BenchmarkUtils";
 
 /**
  * Adds the given entries to the given tileset target,

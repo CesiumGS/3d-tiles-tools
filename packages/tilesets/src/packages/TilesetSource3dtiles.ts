@@ -3,11 +3,11 @@ import DatabaseConstructor from "better-sqlite3";
 
 import { Iterables } from "@3d-tiles-tools/base";
 
-import { TilesetSource } from "../tilesetData/TilesetSource.js";
-import { TilesetError } from "../tilesetData/TilesetError.js";
+import { TilesetSource } from "../tilesetData/TilesetSource";
+import { TilesetError } from "../tilesetData/TilesetError";
 
-import { TableStructure } from "./TableStructureValidator.js";
-import { TableStructureValidator } from "./TableStructureValidator.js";
+import { TableStructure } from "./TableStructureValidator";
+import { TableStructureValidator } from "./TableStructureValidator";
 
 /**
  * Implementation of a TilesetSource based on a 3DTILES (SQLITE3 database)

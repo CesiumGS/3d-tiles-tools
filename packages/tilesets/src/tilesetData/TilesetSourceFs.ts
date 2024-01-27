@@ -4,8 +4,8 @@ import path from "path";
 import { Paths } from "@3d-tiles-tools/base";
 import { Iterables } from "@3d-tiles-tools/base";
 
-import { TilesetSource } from "./TilesetSource.js";
-import { TilesetError } from "./TilesetError.js";
+import { TilesetSource } from "./TilesetSource";
+import { TilesetError } from "./TilesetError";
 
 /**
  * Implementation of a TilesetSource based on a directory

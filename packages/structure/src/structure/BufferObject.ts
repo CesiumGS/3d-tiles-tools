@@ -1,4 +1,4 @@
-import { RootProperty } from "./RootProperty.js";
+import { RootProperty } from "./RootProperty";
 
 /**
  * A buffer is a binary blob. It is either the binary chunk of the

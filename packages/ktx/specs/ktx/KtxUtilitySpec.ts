@@ -1,7 +1,7 @@
 import fs from "fs";
 
-import { KtxUtility } from "../../src/ktx/KtxUtility.js";
-import { KtxOptions } from "../../src/ktx/KtxOptions.js";
+import { KtxUtility } from "../../src/ktx/KtxUtility";
+import { KtxOptions } from "../../src/ktx/KtxOptions";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 

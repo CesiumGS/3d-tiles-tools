@@ -1,8 +1,8 @@
 import { BufferObject } from "@3d-tiles-tools/structure";
 import { BufferView } from "@3d-tiles-tools/structure";
 
-import { BinaryBufferStructure } from "./BinaryBufferStructure.js";
-import { BinaryBufferData } from "./BinaryBufferData.js";
+import { BinaryBufferStructure } from "./BinaryBufferStructure";
+import { BinaryBufferData } from "./BinaryBufferData";
 
 /**
  * Methods related to binary buffers.

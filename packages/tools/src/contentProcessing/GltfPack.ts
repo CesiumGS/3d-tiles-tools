@@ -2,8 +2,8 @@
 /// <reference path="../../@types/gltfpack/index.d.ts" />
 import gltfpack from "gltfpack";
 
-import { ContentError } from "./ContentError.js";
-import { GltfPackOptions } from "./GltfPackOptions.js";
+import { ContentError } from "./ContentError";
+import { GltfPackOptions } from "./GltfPackOptions";
 
 /**
  * Utility class for using gltfpack in the 3D Tiles tools

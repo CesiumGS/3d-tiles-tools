@@ -1,8 +1,8 @@
 import { Content } from "@3d-tiles-tools/structure";
 import { Tile } from "@3d-tiles-tools/structure";
 
-import { Contents } from "./Contents.js";
-import { TileTraversalCallback } from "./TileTraversalCallback.js";
+import { Contents } from "./Contents";
+import { TileTraversalCallback } from "./TileTraversalCallback";
 
 /**
  * Utility methods related to tiles, given as `Tile` objects.

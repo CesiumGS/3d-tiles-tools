@@ -6,7 +6,7 @@ import { InstancedMesh } from "@gltf-transform/extensions";
 import { InstanceFeatures } from "@3d-tiles-tools/gltf-extensions";
 import { InstanceFeaturesFeatureId as FeatureId } from "@3d-tiles-tools/gltf-extensions";
 
-import { StringBuilder } from "./StringBuilder.js";
+import { StringBuilder } from "./StringBuilder";
 
 /**
  * Utilities related to the glTF `EXT_instance_features` extension.

@@ -1,6 +1,6 @@
 import path from "path";
 
-import { readJsonUnchecked } from "../readJsonUnchecked.js";
+import { readJsonUnchecked } from "../readJsonUnchecked";
 
 import { ResourceResolvers } from "@3d-tiles-tools/base";
 import { TilesetTraverser } from "@3d-tiles-tools/tilesets";

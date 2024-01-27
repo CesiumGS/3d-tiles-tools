@@ -6,8 +6,8 @@ import { PropertyModel } from "@3d-tiles-tools/metadata";
 import { DefaultPropertyModel } from "@3d-tiles-tools/metadata";
 import { DefaultPropertyTableModel } from "@3d-tiles-tools/metadata";
 
-import { BatchTableClassProperties } from "./BatchTableClassProperties.js";
-import { Ids } from "./Ids.js";
+import { BatchTableClassProperties } from "./BatchTableClassProperties";
+import { Ids } from "./Ids";
 
 /**
  * Methods to create `PropertyTableModel` instances for batch table data

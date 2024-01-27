@@ -1,5 +1,5 @@
-import { RootProperty } from "../RootProperty.js";
-import { EnumValue } from "./EnumValue.js";
+import { RootProperty } from "../RootProperty";
+import { EnumValue } from "./EnumValue";
 
 /**
  * An object defining the values of an enum.

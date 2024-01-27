@@ -1,5 +1,5 @@
-import { RootProperty } from "../RootProperty.js";
-import { BatchTableBinaryBodyReference } from "./BatchTableBinaryBodyReference.js";
+import { RootProperty } from "../RootProperty";
+import { BatchTableBinaryBodyReference } from "./BatchTableBinaryBodyReference";
 
 /**
  * A set of properties defining application-specific metadata for

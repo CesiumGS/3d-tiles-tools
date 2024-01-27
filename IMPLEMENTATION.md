@@ -32,14 +32,10 @@ It is important to run `npm install` at the root directory after cloning the rep
 
 ### Structure of `tsconfig.json`
 
-The 3D Tiles Tools are supposed to be a "modern (pure) TypeScript" project, and this involves the following points:
+The goal of splitting the 3D Tiles Tools into modules originally was to create ESM modules. However, due to limited interoperability of ESM modules and CommonJS projects, it was decided to offer the tools as CommonJS modules instead. 
 
-<sup>(Based on my understanding (at the time of writing this) of what constitutes a 'modern' project (at the time of writing this))</sup>
-
-- The `package.json` of each package declares `"type": "module"` (See [Node.js, 'Enabling' (ESM)](https://nodejs.org/api/esm.html#enabling))
-- The `compilerOptions` of the `tsconfig.json` declares
-  - `"module": "NodeNext"`
-  - `"moduleResolution": "NodeNext"`
+- The `package.json` of each package declares `"type": "commonjs"`
+- The `compilerOptions` of the `tsconfig.json` declares `"module": "CommonJS"`
 
 The root-level `tsconfig.json` defines the common settings. Each package contains further `tsconfig.json` files that _inherit_ from the root-level one (See [TSConfig `extends`](https://www.typescriptlang.org/tsconfig#extends)).
 
@@ -81,13 +77,21 @@ They are listed there in the order in which they are built:
 
 Running the tests with Jasmine eventually looks simple: Jasmine has to be started with
 
-`node --loader ts-node/esm node_modules/jasmine/bin/jasmine.js ...`
+`npx ts-node node_modules/jasmine/bin/jasmine.js ...`
 
-> Note: This will emit `ExperimentalWarning` messages, and should actually have been
+> Anecdotal note: With the initial ESM approach, the call would have been
 >
 > `ts-node --esm node_modules/jasmine/bin/jasmine.js ...`
 >
 > but this breaks with certain Node.js versions - see https://github.com/TypeStrong/ts-node/issues/2094 .
+>
+> To work around this, the call had to be 
+> 
+> `node --loader ts-node/esm node_modules/jasmine/bin/jasmine.js ...`
+>
+> This emitted `ExperimentalWarning` messages, but worked.
+>
+> With CommonJS, all this does not matter.
 
 One caveat is:
 
@@ -101,11 +105,15 @@ So in order to resolve the test data in both cases:
 
 ### Coverage
 
-The coverage originally had been checked with `nyc`, but apparently, "modern modules" are not supported by `nyc` (see https://github.com/istanbuljs/nyc/issues/1287 ). The coverage is now computed with `c8` from https://github.com/bcoe/c8 , which seems to be a "drop-in-replacement" of `nyc` that works with "modern modules". 
+The coverage is now computed with `c8` from https://github.com/bcoe/c8 
+
+> Anecdotal note: 
+> 
+> The coverage originally had been checked with `nyc`, but apparently, ESM modules are not supported by `nyc` (see https://github.com/istanbuljs/nyc/issues/1287 ). 
+> So `c8` was chosen as a solution that also worked with ESM. It is a "drop-in-replacement" of `nyc`, so there is no reason to go back to `nyc` for now (even though the tools are now packaged as CommonJS modules).
 
 ### Even More Internal Notes:
 
-- Despite being purely written in TypeScript, `import` statements that use relative paths in TypeScript files have to refer to the other TypeScript files with the file extension `.js`. These files do not exist. They have the file extension `.ts`. But it has to be this way.
 - There are places where the `/// <reference path=" ... " />` syntax is used, in order to point TypeScript to the right type information (see [TypeScript: Triple-Slash Directives](https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html)). This appears to be necessary for `gltf-pipeline` and `gltfpack` dependencies, which do not have associated type information. This is strongly discouraged, and should instead be solved by specifying proper `typeRoots` in the `compilerOptions` of the respective `tsconfig.json`. Maybe there is a way to tweak this so that it actually _works_ ...
 - There seem to be a few differences btween _compiling_ code (with `tsc`) and _executing_ code (with `npx ts-node`) when it comes to ~"module and type resolution". Sometimes types are not found here and there. There are rumours in hundreds of issues related to that. Sometimes the [`ts-node` `--files` argument](https://typestrong.org/ts-node/docs/options/#files) (which is completely unrelated to the `files` in `tsconfig.json`, although it also refers to this property) seemed to help. Sometimes the `tsconfig-paths` package from https://www.npmjs.com/package/tsconfig-paths seemed to help. Maybe some of these approaches will have to be investigated when a specific problem comes up.
 

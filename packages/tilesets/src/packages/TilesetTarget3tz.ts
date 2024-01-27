@@ -2,10 +2,10 @@ import fs from "fs";
 import path from "path";
 import archiver from "archiver";
 
-import { TilesetTarget } from "../tilesetData/TilesetTarget.js";
-import { TilesetError } from "../tilesetData/TilesetError.js";
+import { TilesetTarget } from "../tilesetData/TilesetTarget";
+import { TilesetError } from "../tilesetData/TilesetError";
 
-import { IndexBuilder } from "./IndexBuilder.js";
+import { IndexBuilder } from "./IndexBuilder";
 
 /**
  * Implementation of a TilesetTarget that creates a 3TZ file.

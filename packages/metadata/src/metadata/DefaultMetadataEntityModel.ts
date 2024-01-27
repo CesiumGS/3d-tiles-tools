@@ -1,8 +1,8 @@
 import { MetadataClass } from "@3d-tiles-tools/structure";
 
-import { MetadataEntityModel } from "./MetadataEntityModel.js";
-import { MetadataValues } from "./MetadataValues.js";
-import { MetadataError } from "./MetadataError.js";
+import { MetadataEntityModel } from "./MetadataEntityModel";
+import { MetadataValues } from "./MetadataValues";
+import { MetadataError } from "./MetadataError";
 
 /**
  * Default implementation of a `MetadataEntityModel` that is backed

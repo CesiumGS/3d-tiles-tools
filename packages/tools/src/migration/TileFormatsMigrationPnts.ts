@@ -10,18 +10,18 @@ import { MeshFeatures } from "@3d-tiles-tools/gltf-extensions";
 import { PropertyModel } from "@3d-tiles-tools/metadata";
 import { DefaultPropertyModel } from "@3d-tiles-tools/metadata";
 
-import { GltfTransform } from "../contentProcessing/GltfTransform.js";
+import { GltfTransform } from "../contentProcessing/GltfTransform";
 
-import { PntsPointClouds } from "../pointClouds/PntsPointClouds.js";
-import { GltfTransformPointClouds } from "../pointClouds/GltfTransformPointClouds.js";
-import { ReadablePointCloud } from "../pointClouds/ReadablePointCloud.js";
+import { PntsPointClouds } from "../pointClouds/PntsPointClouds";
+import { GltfTransformPointClouds } from "../pointClouds/GltfTransformPointClouds";
+import { ReadablePointCloud } from "../pointClouds/ReadablePointCloud";
 
-import { TileFormatsMigration } from "./TileFormatsMigration.js";
-import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata.js";
-import { Ids } from "./Ids.js";
+import { TileFormatsMigration } from "./TileFormatsMigration";
+import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
+import { Ids } from "./Ids";
 
-import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils.js";
-import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils.js";
+import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils";
+import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("migration");

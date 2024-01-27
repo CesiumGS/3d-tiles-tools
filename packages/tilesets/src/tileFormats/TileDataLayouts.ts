@@ -1,6 +1,6 @@
 import { Buffers } from "@3d-tiles-tools/base";
 
-import { TileFormatError } from "./TileFormatError.js";
+import { TileFormatError } from "./TileFormatError";
 
 /**
  * An interface describing the start, length, and end (in bytes)

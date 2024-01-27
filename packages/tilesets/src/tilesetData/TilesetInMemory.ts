@@ -1,6 +1,6 @@
-import { TilesetSource } from "./TilesetSource.js";
-import { TilesetError } from "./TilesetError.js";
-import { TilesetTarget } from "./TilesetTarget.js";
+import { TilesetSource } from "./TilesetSource";
+import { TilesetError } from "./TilesetError";
+import { TilesetTarget } from "./TilesetTarget";
 
 /**
  * Implementation of a TilesetSource and TilesetTarget that

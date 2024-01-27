@@ -1,14 +1,14 @@
-import { PropertyModel } from "../PropertyModel.js";
-import { MetadataError } from "../MetadataError.js";
+import { PropertyModel } from "../PropertyModel";
+import { MetadataError } from "../MetadataError";
 
-import { BinaryPropertyTable } from "./BinaryPropertyTable.js";
-import { StringPropertyModel } from "./StringPropertyModel.js";
-import { BooleanPropertyModel } from "./BooleanPropertyModel.js";
-import { NumericPropertyModel } from "./NumericPropertyModel.js";
-import { NumericArrayPropertyModel } from "./NumericArrayPropertyModel.js";
-import { StringArrayPropertyModel } from "./StringArrayPropertyModel.js";
-import { BooleanArrayPropertyModel } from "./BooleanArrayPropertyModel.js";
-import { NumericBuffers } from "./NumericBuffers.js";
+import { BinaryPropertyTable } from "./BinaryPropertyTable";
+import { StringPropertyModel } from "./StringPropertyModel";
+import { BooleanPropertyModel } from "./BooleanPropertyModel";
+import { NumericPropertyModel } from "./NumericPropertyModel";
+import { NumericArrayPropertyModel } from "./NumericArrayPropertyModel";
+import { StringArrayPropertyModel } from "./StringArrayPropertyModel";
+import { BooleanArrayPropertyModel } from "./BooleanArrayPropertyModel";
+import { NumericBuffers } from "./NumericBuffers";
 
 /**
  * Methods related to `PropertyModel` instances that are created

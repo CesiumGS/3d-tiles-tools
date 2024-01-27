@@ -1,4 +1,4 @@
-import { TilesetStage } from "./TilesetStage.js";
+import { TilesetStage } from "./TilesetStage";
 
 /**
  * An interface that describes a pipeline of operations

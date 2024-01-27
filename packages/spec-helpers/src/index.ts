@@ -1,1 +1,1 @@
-export * from "./SpecHelpers.js";
+export * from "./SpecHelpers";

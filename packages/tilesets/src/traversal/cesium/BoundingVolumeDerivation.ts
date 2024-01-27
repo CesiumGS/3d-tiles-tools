@@ -8,8 +8,8 @@ import { defined } from "@3d-tiles-tools/base";
 import { BoundingVolume } from "@3d-tiles-tools/structure";
 import { BoundingVolumeS2 } from "@3d-tiles-tools/structure";
 
-import { HilbertOrder } from "./HilbertOrder.js";
-import { S2Cell } from "./S2Cell.js";
+import { HilbertOrder } from "./HilbertOrder";
+import { S2Cell } from "./S2Cell";
 
 /**
  * Methods to derive bounding volumes of implicit tiles.

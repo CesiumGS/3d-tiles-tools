@@ -1,10 +1,10 @@
-import { defined } from "../base/defined.js";
+import { defined } from "../base/defined";
 
-import { ResourceResolver } from "../io/ResourceResolver.js";
+import { ResourceResolver } from "../io/ResourceResolver";
 
-import { BinaryBufferData } from "./BinaryBufferData.js";
-import { BinaryBufferStructure } from "./BinaryBufferStructure.js";
-import { BinaryDataError } from "./BinaryDataError.js";
+import { BinaryBufferData } from "./BinaryBufferData";
+import { BinaryBufferStructure } from "./BinaryBufferStructure";
+import { BinaryDataError } from "./BinaryDataError";
 
 /**
  * A class for resolving binary buffer data.

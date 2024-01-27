@@ -83,6 +83,7 @@ export type KtxUastcOptions = Partial<{
 export class KtxUtility {
     static convertImageData(inputImageData: Buffer, options: KtxOptions | undefined): Promise<Buffer>;
     static convertImageFile(inputFileName: string, outputFileName: string, options: KtxOptions | undefined): Promise<void>;
+    static setLogCallback(logCallback: ((value: any) => void) | undefined): void;
 }
 
 // (No @packageDocumentation comment for this package)

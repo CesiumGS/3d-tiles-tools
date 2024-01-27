@@ -1,6 +1,6 @@
-import { MortonOrder } from "./MortonOrder.js";
-import { Quadtrees } from "./Quadtrees.js";
-import { TreeCoordinates } from "./TreeCoordinates.js";
+import { MortonOrder } from "./MortonOrder";
+import { Quadtrees } from "./Quadtrees";
+import { TreeCoordinates } from "./TreeCoordinates";
 
 /**
  * An implementation of `TreeCoordinates` for octrees

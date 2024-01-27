@@ -3,8 +3,8 @@ import { Matrix4 } from "cesium";
 import { Cartesian3 } from "cesium";
 import { OrientedBoundingBox } from "cesium";
 
-import { computeOBB } from "./external/dito.js";
-import { Obb } from "./external/dito.js";
+import { computeOBB } from "./external/dito";
+import { Obb } from "./external/dito";
 
 /**
  * Methods for computing oriented bounding boxes.

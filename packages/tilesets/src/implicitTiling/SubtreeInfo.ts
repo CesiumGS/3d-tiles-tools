@@ -1,4 +1,4 @@
-import { AvailabilityInfo } from "./AvailabilityInfo.js";
+import { AvailabilityInfo } from "./AvailabilityInfo";
 
 /**
  * Summarizes the information about the elements that are

@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
 
-import { TilesetTarget } from "./TilesetTarget.js";
-import { TilesetError } from "./TilesetError.js";
+import { TilesetTarget } from "./TilesetTarget";
+import { TilesetError } from "./TilesetError";
 
 /**
  * Implementation of a TilesetTarget that writes into

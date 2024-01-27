@@ -1,7 +1,7 @@
 import { ClassProperty } from "@3d-tiles-tools/structure";
 
-import { BinaryPropertyTables } from "../../src/metadata/binary/BinaryPropertyTables.js";
-import { BinaryPropertyTableModel } from "../../src/metadata/binary/BinaryPropertyTableModel.js";
+import { BinaryPropertyTables } from "../../src/metadata/binary/BinaryPropertyTables";
+import { BinaryPropertyTableModel } from "../../src/metadata/binary/BinaryPropertyTableModel";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 

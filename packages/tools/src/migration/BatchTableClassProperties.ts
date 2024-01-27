@@ -3,7 +3,7 @@ import { ClassProperty } from "@3d-tiles-tools/structure";
 import { TileFormatError } from "@3d-tiles-tools/tilesets";
 import { TileTableData } from "@3d-tiles-tools/tilesets";
 
-import { TypeDetection } from "./TypeDetection.js";
+import { TypeDetection } from "./TypeDetection";
 
 /**
  * Methods to create `ClassProperty` objects from batch table properties.

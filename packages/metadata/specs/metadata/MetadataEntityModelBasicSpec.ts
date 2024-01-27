@@ -1,4 +1,4 @@
-import { MetadataEntityModels } from "../../src/metadata/MetadataEntityModels.js";
+import { MetadataEntityModels } from "../../src/metadata/MetadataEntityModels";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 

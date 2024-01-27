@@ -1,6 +1,6 @@
-import { FeatureTable } from "./FeatureTable.js";
-import { FeatureTableBinaryBodyReference } from "./FeatureTableBinaryBodyReference.js";
-import { BinaryBodyOffset } from "./BinaryBodyOffset.js";
+import { FeatureTable } from "./FeatureTable";
+import { FeatureTableBinaryBodyReference } from "./FeatureTableBinaryBodyReference";
+import { BinaryBodyOffset } from "./BinaryBodyOffset";
 
 /**
  * A set of Point Cloud semantics that contains values defining the

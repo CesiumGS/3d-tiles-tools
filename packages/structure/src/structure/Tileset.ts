@@ -1,11 +1,11 @@
-import { RootProperty } from "./RootProperty.js";
-import { Asset } from "./Asset.js";
-import { Properties } from "./Properties.js";
-import { Schema } from "./Metadata/Schema.js";
-import { Statistics } from "./Statistics.js";
-import { Group } from "./Group.js";
-import { MetadataEntity } from "./MetadataEntity.js";
-import { Tile } from "./Tile.js";
+import { RootProperty } from "./RootProperty";
+import { Asset } from "./Asset";
+import { Properties } from "./Properties";
+import { Schema } from "./Metadata/Schema";
+import { Statistics } from "./Statistics";
+import { Group } from "./Group";
+import { MetadataEntity } from "./MetadataEntity";
+import { Tile } from "./Tile";
 
 /**
  * A 3D Tiles tileset.

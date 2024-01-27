@@ -4,8 +4,8 @@ import path from "path";
 import { Database } from "better-sqlite3";
 import DatabaseConstructor from "better-sqlite3";
 
-import { TilesetTarget } from "../tilesetData/TilesetTarget.js";
-import { TilesetError } from "../tilesetData/TilesetError.js";
+import { TilesetTarget } from "../tilesetData/TilesetTarget";
+import { TilesetError } from "../tilesetData/TilesetError";
 
 /**
  * Implementation of a TilesetTarget that creates a

@@ -5,8 +5,8 @@
 ```ts
 
 /// <reference types="node" />
-/// <reference types="tools/@types/gltf-pipeline/index.js" />
-/// <reference types="tools/@types/gltfpack/index.js" />
+/// <reference types="tools/@types/gltf-pipeline" />
+/// <reference types="tools/@types/gltfpack" />
 
 import { Accessor } from '@gltf-transform/core';
 import { BatchTable } from '@3d-tiles-tools/structure';

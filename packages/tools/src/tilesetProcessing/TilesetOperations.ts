@@ -3,9 +3,9 @@ import { ContentDataTypes } from "@3d-tiles-tools/base";
 
 import { Tileset } from "@3d-tiles-tools/structure";
 
-import { TilesetCombiner } from "./TilesetCombiner.js";
-import { TilesetMerger } from "./TilesetMerger.js";
-import { TilesetUpgrader } from "./TilesetUpgrader.js";
+import { TilesetCombiner } from "./TilesetCombiner";
+import { TilesetMerger } from "./TilesetMerger";
+import { TilesetUpgrader } from "./TilesetUpgrader";
 
 /**
  * Convenience methods for executing the `combine`, `merge`, and

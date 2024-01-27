@@ -1,5 +1,5 @@
-import { Header } from "./Header.js";
-import { Table } from "./Table.js";
+import { Header } from "./Header";
+import { Table } from "./Table";
 
 /**
  * A representation of tile data.

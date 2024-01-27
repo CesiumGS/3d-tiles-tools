@@ -15,8 +15,8 @@ import { TilesetTraverser } from "@3d-tiles-tools/tilesets";
 import { TraversalCallback } from "@3d-tiles-tools/tilesets";
 import { TilesetEntry } from "@3d-tiles-tools/tilesets";
 
-import { TilesetProcessor } from "./TilesetProcessor.js";
-import { TilesetEntryProcessor } from "./TilesetEntryProcessor.js";
+import { TilesetProcessor } from "./TilesetProcessor";
+import { TilesetEntryProcessor } from "./TilesetEntryProcessor";
 
 import { Loggers } from "@3d-tiles-tools/base";
 const logger = Loggers.get("tilesetProcessing");

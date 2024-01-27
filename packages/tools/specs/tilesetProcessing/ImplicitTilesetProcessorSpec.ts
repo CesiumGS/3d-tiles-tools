@@ -6,9 +6,9 @@ import { Tiles } from "@3d-tiles-tools/tilesets";
 import { TraversedTile } from "@3d-tiles-tools/tilesets";
 import { TilesetSources } from "@3d-tiles-tools/tilesets";
 
-import { BasicTilesetProcessor } from "../../src/tilesetProcessing/BasicTilesetProcessor.js";
+import { BasicTilesetProcessor } from "../../src/tilesetProcessing/BasicTilesetProcessor";
 
-import { SpecEntryProcessor } from "./SpecEntryProcessor.js";
+import { SpecEntryProcessor } from "./SpecEntryProcessor";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 

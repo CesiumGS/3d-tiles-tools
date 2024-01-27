@@ -1,9 +1,9 @@
 import { ContentDataTypes } from "@3d-tiles-tools/base";
 
-import { TileContentProcessor } from "./TileContentProcessor.js";
+import { TileContentProcessor } from "./TileContentProcessor";
 
-import { GltfPack } from "../contentProcessing/GltfPack.js";
-import { GltfPackOptions } from "../contentProcessing/GltfPackOptions.js";
+import { GltfPack } from "../contentProcessing/GltfPack";
+import { GltfPackOptions } from "../contentProcessing/GltfPackOptions";
 
 /**
  * Methods to create `TileContentProcessor` instances that

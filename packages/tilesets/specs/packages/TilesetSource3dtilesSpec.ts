@@ -1,4 +1,4 @@
-import { TilesetSource3dtiles } from "../../src/packages/TilesetSource3dtiles.js";
+import { TilesetSource3dtiles } from "../../src/packages/TilesetSource3dtiles";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 

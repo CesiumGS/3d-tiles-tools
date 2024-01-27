@@ -1,6 +1,6 @@
 import path from "path";
 
-import { ToolsMain } from "../src/ToolsMain.js";
+import { ToolsMain } from "../src/ToolsMain";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 

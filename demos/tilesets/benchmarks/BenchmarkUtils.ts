@@ -1,7 +1,7 @@
 import util from "util";
 import seedrandom from "seedrandom";
 
-import { BenchmarkConfig } from "./BenchmarkConfig.js";
+import { BenchmarkConfig } from "./BenchmarkConfig";
 
 import { TilesetEntry } from "@3d-tiles-tools/tilesets";
 

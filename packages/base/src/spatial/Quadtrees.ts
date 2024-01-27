@@ -1,4 +1,4 @@
-import { QuadtreeCoordinates } from "./QuadtreeCoordinates.js";
+import { QuadtreeCoordinates } from "./QuadtreeCoordinates";
 
 /**
  * Methods related to quadtrees.

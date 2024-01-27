@@ -1,6 +1,6 @@
-import { TilesetDataProcessor } from "../../src/tilesetProcessing/TilesetDataProcessor.js";
+import { TilesetDataProcessor } from "../../src/tilesetProcessing/TilesetDataProcessor";
 
-import { SpecEntryProcessor } from "./SpecEntryProcessor.js";
+import { SpecEntryProcessor } from "./SpecEntryProcessor";
 
 import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
 

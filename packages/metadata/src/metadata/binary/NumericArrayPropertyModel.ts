@@ -1,7 +1,7 @@
-import { PropertyModel } from "../PropertyModel.js";
-import { MetadataTypes } from "../MetadataTypes.js";
-import { NumericBuffers } from "./NumericBuffers.js";
-import { BinaryPropertyModels } from "./BinaryPropertyModels.js";
+import { PropertyModel } from "../PropertyModel";
+import { MetadataTypes } from "../MetadataTypes";
+import { NumericBuffers } from "./NumericBuffers";
+import { BinaryPropertyModels } from "./BinaryPropertyModels";
 
 /**
  * Implementation of a `PropertyModel` for numeric array types.

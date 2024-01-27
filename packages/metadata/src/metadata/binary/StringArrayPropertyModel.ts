@@ -1,6 +1,6 @@
-import { PropertyModel } from "../PropertyModel.js";
-import { BinaryPropertyModels } from "./BinaryPropertyModels.js";
-import { ArrayBuffers } from "./ArrayBuffers.js";
+import { PropertyModel } from "../PropertyModel";
+import { BinaryPropertyModels } from "./BinaryPropertyModels";
+import { ArrayBuffers } from "./ArrayBuffers";
 
 /**
  * Implementation of a `PropertyModel` for string arrays

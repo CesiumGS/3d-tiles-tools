@@ -1,4 +1,4 @@
-import { AvailabilityInfo } from "./AvailabilityInfo.js";
+import { AvailabilityInfo } from "./AvailabilityInfo";
 
 /**
  * Implementation of an `AvailabilityInfo` that has a constant value.
