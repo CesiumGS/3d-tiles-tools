@@ -1,0 +1,33 @@
+{
+  "name": "@3d-tiles-tools/base",
+  "version": "0.4.0",
+  "license": "Apache-2.0",
+  "description": "3D Tiles tools basic utility classes",
+  "type": "commonjs",
+  "source": "./src/index.ts",
+  "exports": "./build/src/index.js",
+  "types": "./build/src/index.d.ts",
+
+  "dependencies": {
+    "@3d-tiles-tools/structure": "0.4.0",
+    "pino": "^8.15.0",
+    "pino-pretty": "^10.2.0"
+  },
+  "devDependencies": {
+    "@3d-tiles-tools/spec-helpers": "0.4.0",
+    "typescript": "^4.8.3"
+  },
+
+  "scripts": {
+    "about:build": "echo 'Run the TypeScript compiler to generate the build output.'",
+    "about:test": "echo 'Execute the unit tests'",
+    "about:docs-extract-api": "echo 'Extract the API definition file from the current build output.'",
+    "build": "npx tsc --build --verbose --force",
+    "test": "npx ts-node ../../node_modules/jasmine/bin/jasmine.js --config=specs/jasmine.json",
+    "docs-extract-api": "api-extractor run --config api-extractor.jsonc --local --verbose"
+  }
+}
+
+
+
+

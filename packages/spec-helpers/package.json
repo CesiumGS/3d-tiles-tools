@@ -1,0 +1,27 @@
+{
+  "name": "@3d-tiles-tools/spec-helpers",
+  "version": "0.4.0",
+  "license": "Apache-2.0",
+  "description": "3D Tiles tools spec helper classes",
+  "type": "commonjs",
+  "source": "./src/index.ts",
+  "exports": "./build/src/index.js",
+  "types": "./build/src/index.d.ts",
+  "dependencies": {
+    "@3d-tiles-tools/base": "0.4.0",
+    "@3d-tiles-tools/structure": "0.4.0",
+    "@3d-tiles-tools/tilesets": "0.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.3"
+  },
+
+  "scripts": {
+    "about:build": "echo 'Run the TypeScript compiler to generate the build output.'",
+    "build": "npx tsc --build"
+  }
+}
+
+
+
+

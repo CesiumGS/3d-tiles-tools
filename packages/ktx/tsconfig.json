@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",  
+  "compilerOptions": {
+    "declaration": true,
+    "composite": true,
+    "noImplicitAny": false
+  },
+  "references": [
+    { "path": "./src/tsconfig.json" },
+    { "path": "./specs/tsconfig.json" },
+  ]
+}

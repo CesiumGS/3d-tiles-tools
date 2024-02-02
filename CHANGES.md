@@ -23,7 +23,6 @@ Change Log
   - The different representations of `ENUM` values (namely, as numbers or as strings) had not been handled correctly (via [#71](https://github.com/CesiumGS/3d-tiles-tools/issues/71))
   - Internal fixes for KTX encoding (via [#40](https://github.com/CesiumGS/3d-tiles-tools/pull/40) - not yet part of a public functionality)
 
-
 ### 0.3.0 - 2023-08-30
 
 - Transparently decompress entries in `3tz` files when they are compressed with `DEFLATE` (via [#55](https://github.com/CesiumGS/3d-tiles-tools/pull/55))
