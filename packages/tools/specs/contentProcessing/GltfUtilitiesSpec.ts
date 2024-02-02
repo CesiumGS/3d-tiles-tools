@@ -2,7 +2,13 @@
 /// <reference path="../../@types/gltf-pipeline/index.d.ts" />
 import GltfPipeline from "gltf-pipeline";
 
+import fs from "fs";
+
 import { GltfUtilities } from "../../src/contentProcessing/GltfUtilities";
+
+import { SpecHelpers } from "@3d-tiles-tools/spec-helpers";
+
+const SPECS_DATA_BASE_DIRECTORY = SpecHelpers.getSpecsDataBaseDirectory();
 
 // A glTF that uses CESIUM_RTC.
 // It defines two scenes
@@ -101,5 +107,43 @@ describe("GltfUtilities", function () {
     expect(outputGltf.extensions).toBeUndefined();
     expect(outputGltf.extensionsUsed).toBeUndefined();
     expect(outputGltf.extensionsRequired).toBeUndefined();
+  });
+
+  it("can extract data from a glTF 1.0 GLB with 5 bytes binary data", function () {
+    const glb = fs.readFileSync(
+      SPECS_DATA_BASE_DIRECTORY + "/gltf/glTF1GlbWith5BytesBin.glb"
+    );
+    const data = GltfUtilities.extractDataFromGlb(glb);
+    expect(data.jsonData.length).not.toBe(0);
+    // glTF 1.0 did not require padding
+    expect(data.binData).toEqual(Buffer.from([0, 1, 2, 3, 4]));
+  });
+
+  it("can extract data from a glTF 1.0 GLB without binary data", function () {
+    const glb = fs.readFileSync(
+      SPECS_DATA_BASE_DIRECTORY + "/gltf/glTF1GlbWithoutBin.glb"
+    );
+    const data = GltfUtilities.extractDataFromGlb(glb);
+    expect(data.jsonData.length).not.toBe(0);
+    expect(data.binData).toEqual(Buffer.from([]));
+  });
+
+  it("can extract data from a glTF 2.0 GLB with 5 bytes binary data", function () {
+    const glb = fs.readFileSync(
+      SPECS_DATA_BASE_DIRECTORY + "/gltf/glTF2GlbWith5BytesBin.glb"
+    );
+    const data = GltfUtilities.extractDataFromGlb(glb);
+    expect(data.jsonData.length).not.toBe(0);
+    // glTF 2.0 does require padding with '0'-bytes
+    expect(data.binData).toEqual(Buffer.from([0, 1, 2, 3, 4, 0, 0, 0]));
+  });
+
+  it("can extract data from a glTF 2.0 GLB without binary data", function () {
+    const glb = fs.readFileSync(
+      SPECS_DATA_BASE_DIRECTORY + "/gltf/glTF2GlbWithoutBin.glb"
+    );
+    const data = GltfUtilities.extractDataFromGlb(glb);
+    expect(data.jsonData.length).not.toBe(0);
+    expect(data.binData).toEqual(Buffer.from([]));
   });
 });

@@ -70,7 +70,7 @@ export class GltfUtilities {
     const magic = Buffers.getMagicString(glbBuffer);
     if (magic !== "glTF") {
       throw new TileFormatError(
-        `Expected magic header to be 'gltf', but found ${magic}`
+        `Expected magic header to be 'glTF', but found ${magic}`
       );
     }
     if (glbBuffer.length < 12) {
@@ -105,11 +105,13 @@ export class GltfUtilities {
     jsonData: Buffer;
     binData: Buffer;
   } {
-    if (glbBuffer.length < 20) {
+    const headerLength = 20;
+    if (glbBuffer.length < headerLength) {
       throw new TileFormatError(
         `Expected at least 20 bytes, but only got ${glbBuffer.length}`
       );
     }
+    const length = glbBuffer.readUInt32LE(8);
     const contentLength = glbBuffer.readUint32LE(12);
     const contentFormat = glbBuffer.readUint32LE(16);
     if (contentFormat !== 0) {
@@ -117,7 +119,7 @@ export class GltfUtilities {
         `Expected content format to be 0, but found ${contentFormat}`
       );
     }
-    const contentStart = 20;
+    const contentStart = headerLength;
     const contentEnd = contentStart + contentLength;
     if (glbBuffer.length < contentEnd) {
       throw new TileFormatError(
@@ -126,8 +128,8 @@ export class GltfUtilities {
     }
     const contentData = glbBuffer.subarray(contentStart, contentEnd);
 
-    const bodyStart = 20 + contentLength;
-    const bodyEnd = glbBuffer.length;
+    const bodyStart = contentEnd;
+    const bodyEnd = length;
     const bodyData = glbBuffer.subarray(bodyStart, bodyEnd);
     return {
       jsonData: contentData,
@@ -148,10 +150,12 @@ export class GltfUtilities {
         `Expected at least 20 bytes, but only got ${glbBuffer.length}`
       );
     }
+    const length = glbBuffer.readUInt32LE(8);
 
     // Extract the JSON chunk data
-    const jsonChunkLength = glbBuffer.readUint32LE(12);
-    const jsonChunkType = glbBuffer.readUint32LE(16);
+    const jsonChunkHeaderStart = 12;
+    const jsonChunkLength = glbBuffer.readUint32LE(jsonChunkHeaderStart);
+    const jsonChunkType = glbBuffer.readUint32LE(jsonChunkHeaderStart + 4);
     const expectedJsonChunkType = 0x4e4f534a; // ASCII string for "JSON"
     if (jsonChunkType !== expectedJsonChunkType) {
       throw new TileFormatError(
@@ -168,24 +172,33 @@ export class GltfUtilities {
     const jsonChunkData = glbBuffer.subarray(jsonChunkStart, jsonChunkEnd);
 
     // Extract the BIN chunk data
+    let binChunkData: Buffer;
     const binChunkHeaderStart = jsonChunkEnd;
-    const binChunkLength = glbBuffer.readUint32LE(binChunkHeaderStart);
-    const binChunkType = glbBuffer.readUint32LE(binChunkHeaderStart + 4);
-    const expectedBinChunkType = 0x004e4942; // ASCII string for "BIN"
-    if (binChunkType !== expectedBinChunkType) {
-      throw new TileFormatError(
-        `Expected chunk type to be ${expectedBinChunkType}, but found ${binChunkType}`
-      );
-    }
-    const binChunkStart = binChunkHeaderStart + 8;
-    const binChunkEnd = binChunkStart + binChunkLength;
-    if (glbBuffer.length < binChunkEnd) {
-      throw new TileFormatError(
-        `Expected at least ${binChunkEnd} bytes, but only got ${glbBuffer.length}`
-      );
-    }
+    const chunkHeaderLength = 12;
 
-    const binChunkData = glbBuffer.subarray(binChunkStart, binChunkEnd);
+    // If there are not enough bytes for the BIN chunk header
+    // after the end of the JSON chunk, then the BIN data
+    // will be an empty buffer
+    if (binChunkHeaderStart + chunkHeaderLength > length) {
+      binChunkData = Buffer.alloc(0);
+    } else {
+      const binChunkLength = glbBuffer.readUint32LE(binChunkHeaderStart);
+      const binChunkType = glbBuffer.readUint32LE(binChunkHeaderStart + 4);
+      const expectedBinChunkType = 0x004e4942; // ASCII string for "BIN"
+      if (binChunkType !== expectedBinChunkType) {
+        throw new TileFormatError(
+          `Expected chunk type to be ${expectedBinChunkType}, but found ${binChunkType}`
+        );
+      }
+      const binChunkStart = binChunkHeaderStart + 8;
+      const binChunkEnd = binChunkStart + binChunkLength;
+      if (glbBuffer.length < binChunkEnd) {
+        throw new TileFormatError(
+          `Expected at least ${binChunkEnd} bytes, but only got ${glbBuffer.length}`
+        );
+      }
+      binChunkData = glbBuffer.subarray(binChunkStart, binChunkEnd);
+    }
 
     return {
       jsonData: jsonChunkData,
