@@ -528,7 +528,10 @@ export class BinaryPropertyTables {
     let offset = 0;
     for (let i = 0; i < length; ++i) {
       offsets[i] = offset;
-      offset += encoder.encode(strings[i]).length;
+      const s = strings[i];
+      if (s !== null && s !== undefined) {
+        offset += encoder.encode(s).length;
+      }
     }
     offsets[length] = offset;
     offsetType = defaultValue(offsetType, "UINT32");
