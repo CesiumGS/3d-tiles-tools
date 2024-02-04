@@ -824,8 +824,8 @@ describe("TileFormatsMigration", function () {
 
   it("converts BatchedWithGlTF1With2DNormals to the expected output", async function () {
     const subDir = "BatchedLegacy/";
-    const name = "BatchedWithGlTF1With2DNormals";
-    const fileNameWithoutExtension = "batchedWithGlTF1With2DNormals";
+    const name = "BatchedWithGltf1With2DNormals";
+    const fileNameWithoutExtension = "batchedWithGltf1With2DNormals";
     const jsonStrings = await computeJsonStrings(
       subDir,
       name,
