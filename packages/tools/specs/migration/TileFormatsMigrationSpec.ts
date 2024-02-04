@@ -822,7 +822,7 @@ describe("TileFormatsMigration", function () {
   //==========================================================================
   // B3DM (Legacy)
 
-  it("converts BatchedWithGlTF1With2DNormals to the expected output", async function () {
+  it("converts BatchedWithGltf1With2DNormals to the expected output", async function () {
     const subDir = "BatchedLegacy/";
     const name = "BatchedWithGltf1With2DNormals";
     const fileNameWithoutExtension = "batchedWithGltf1With2DNormals";

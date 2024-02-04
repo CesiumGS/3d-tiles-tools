@@ -22,7 +22,7 @@
     },
     "geometricError": 512,
     "content": {
-      "uri": "batchedWithGlTF1With2DNormals.b3dm"
+      "uri": "batchedWithGltf1With2DNormals.b3dm"
     },
     "refine": "ADD"
   }
