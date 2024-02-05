@@ -561,6 +561,9 @@ describe("TileFormatsMigration", function () {
     expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
   });
 
+  //==========================================================================
+  // I3DM
+
   it("converts InstancedAnimated to the expected output", async function () {
     const subDir = "Instanced/";
     const name = "InstancedAnimated";
@@ -777,6 +780,9 @@ describe("TileFormatsMigration", function () {
     expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
   });
 
+  //==========================================================================
+  // I3DM (Axes)
+
   it("converts InstancedAxesSimple to the expected output", async function () {
     const subDir = "InstancedAxes/";
     const name = "InstancedAxesSimple";
@@ -805,6 +811,21 @@ describe("TileFormatsMigration", function () {
     const subDir = "InstancedAxes/";
     const name = "InstancedAxesScaled";
     const fileNameWithoutExtension = "instancedAxesScaled";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  //==========================================================================
+  // B3DM (Legacy)
+
+  it("converts BatchedWithGltf1With2DNormals to the expected output", async function () {
+    const subDir = "BatchedLegacy/";
+    const name = "BatchedWithGltf1With2DNormals";
+    const fileNameWithoutExtension = "batchedWithGltf1With2DNormals";
     const jsonStrings = await computeJsonStrings(
       subDir,
       name,

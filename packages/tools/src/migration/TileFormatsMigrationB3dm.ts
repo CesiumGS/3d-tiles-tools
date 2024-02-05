@@ -6,11 +6,11 @@ import { TileFormats } from "@3d-tiles-tools/tilesets";
 import { TileTableData } from "@3d-tiles-tools/tilesets";
 
 import { GltfTransform } from "../contentProcessing/GltfTransform";
-import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 
 import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
 import { TileTableDataToMeshFeatures } from "./TileTableDataToMeshFeatures";
 import { TileFormatsMigration } from "./TileFormatsMigration";
+import { GltfUpgrade } from "./GltfUpgrade";
 
 import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils";
 import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils";
@@ -47,21 +47,8 @@ export class TileFormatsMigrationB3dm {
       logger.trace("Feature table:\n" + JSON.stringify(featureTable, null, 2));
     }
 
-    // If the B3DM contained glTF 1.0 data, try to upgrade it
-    // with the gltf-pipeline first
-    let glbBuffer = tileData.payload;
-    const gltfVersion = GltfUtilities.getGltfVersion(glbBuffer);
-    if (gltfVersion < 2.0) {
-      logger.info("Found glTF 1.0 - upgrading to glTF 2.0 with gltf-pipeline");
-      glbBuffer = await GltfUtilities.upgradeGlb(glbBuffer, undefined);
-      glbBuffer = await GltfUtilities.replaceCesiumRtcExtension(glbBuffer);
-    }
-
-    // Read the GLB data from the payload of the tile
-    const io = await GltfTransform.getIO();
-    const document = await io.readBinary(glbBuffer);
+    const document = await GltfUpgrade.obtainDocument(tileData.payload);
     const root = document.getRoot();
-    root.getAsset().generator = "glTF-Transform";
 
     // If the feature table defines an `RTC_CENTER`, then insert
     // a new root node above each scene node, that carries the
@@ -104,6 +91,8 @@ export class TileFormatsMigrationB3dm {
         }
       }
     }
+
+    const io = await GltfTransform.getIO();
 
     if (
       TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&

@@ -22,10 +22,10 @@ import { VecMath } from "@3d-tiles-tools/tilesets";
 import { EXTInstanceFeatures } from "@3d-tiles-tools/gltf-extensions";
 
 import { GltfTransform } from "../contentProcessing/GltfTransform";
-import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 
 import { TileFormatsMigration } from "./TileFormatsMigration";
 import { TileTableDataToStructuralMetadata } from "./TileTableDataToStructuralMetadata";
+import { GltfUpgrade } from "./GltfUpgrade";
 
 import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUtils";
 import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils";
@@ -75,7 +75,7 @@ export class TileFormatsMigrationI3dm {
     // Obtain the GLB buffer for the tile data. With `gltfFormat===1`, it
     // is stored directly as the payload. Otherwise (with `gltfFormat===0`)
     // the payload is a URI that has to be resolved.
-    let glbBuffer = await TileFormats.obtainGlbPayload(
+    const glbBuffer = await TileFormats.obtainGlbPayload(
       tileData,
       externalGlbResolver
     );
@@ -85,21 +85,10 @@ export class TileFormatsMigrationI3dm {
       );
     }
 
-    // If the I3DM contained glTF 1.0 data, try to upgrade it
-    // with the gltf-pipeline first
-    const gltfVersion = GltfUtilities.getGltfVersion(glbBuffer);
-    if (gltfVersion < 2.0) {
-      console.log("Found glTF 1.0 - upgrading to glTF 2.0 with gltf-pipeline");
-      glbBuffer = await GltfUtilities.upgradeGlb(glbBuffer, undefined);
-      glbBuffer = await GltfUtilities.replaceCesiumRtcExtension(glbBuffer);
-    }
-
-    // Create a glTF-Transform document from the GLB buffer
-    const io = await GltfTransform.getIO();
-    const document = await io.readBinary(glbBuffer);
+    const document = await GltfUpgrade.obtainDocument(glbBuffer);
     const root = document.getRoot();
-    root.getAsset().generator = "glTF-Transform";
 
+    const io = await GltfTransform.getIO();
     if (
       TileFormatsMigration.DEBUG_LOG_FILE_CONTENT &&
       logger.isLevelEnabled("trace")

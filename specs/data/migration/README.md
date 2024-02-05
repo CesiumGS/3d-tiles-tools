@@ -21,11 +21,18 @@ then this sandcastle allows selecing the different test cases and compare the in
 
 ---
 
-Inputs that are not part of the CesiumJS spec files are in the `InstancedAxes`directory.
+Inputs that are not part of the CesiumJS spec files are the following:
+
+The inputs in the `InstancedAxes`directory:
+
 They all consist of I3DMs with a simple GLB with labeled coordinate axes, occupying 
 exactly the unit cube. This coordinate axes GLB asset is CC0 (public domain).
 
 - `InstancedAxesSimple`: Instanced at the corners of a cube (0,0,0)-(2,2,2).
 - `InstancedAxesRotated`: The instance at (x,y,z) is rotated around the axis along (x,y,z), by 22.5 degrees
 - `InstancedAxesRotated`: The instance at (x,y,z) is scaled by 1.5 for each non-zero component of (x,y,z)
-  
+
+The inputs in the `BatchedLegacy` directory:
+
+- `BatchedWithGltf1With2DNormals`: A B3DM that contains a glTF 1.0 asset that uses oct-encoded VEC2/BYTE normals. These had originally been decoded in the shader that was part of the glTF asset itself. Now, they are decoded into 3D normals during the `upgrade`. See https://github.com/CesiumGS/3d-tiles-tools/issues/97
+
