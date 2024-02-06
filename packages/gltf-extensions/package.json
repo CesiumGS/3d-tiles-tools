@@ -8,7 +8,7 @@
   "exports": "./build/src/index.js",
   "types": "./build/src/index.d.ts",
   "dependencies": {
-    "@gltf-transform/core": "^3.2.1"
+    "@gltf-transform/core": "3.9.0"
   },
   "devDependencies": {
     "typescript": "^4.8.3"
