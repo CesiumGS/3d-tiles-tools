@@ -44,7 +44,7 @@
     "license": [
       "Apache-2.0"
     ],
-    "version": "1.112.0",
+    "version": "1.114.0",
     "url": "https://www.npmjs.com/package/cesium"
   },
   {
@@ -52,7 +52,7 @@
     "license": [
       "Apache-2.0"
     ],
-    "version": "1.5.6",
+    "version": "1.5.7",
     "url": "https://www.npmjs.com/package/draco3d"
   },
   {
@@ -84,7 +84,7 @@
     "license": [
       "MIT"
     ],
-    "version": "8.17.0",
+    "version": "8.18.0",
     "url": "https://www.npmjs.com/package/pino"
   },
   {
@@ -92,7 +92,7 @@
     "license": [
       "MIT"
     ],
-    "version": "10.2.3",
+    "version": "10.3.1",
     "url": "https://www.npmjs.com/package/pino-pretty"
   },
   {
