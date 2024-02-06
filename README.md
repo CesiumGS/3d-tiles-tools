@@ -192,7 +192,7 @@ npx 3d-tiles-tools cmptToGlb -i ./specs/data/composite.cmpt -o ./output/extracte
 Split a cmpt tile into its inner tiles. The output file name for each inner tile will be determined by appending a number to the given output file name, and an extension that depends on the type of the inner tile data.
 
 ```
-npx 3d-tiles-tools cmptToGlb -i ./specs/data/compositeOfComposite.cmpt -o ./output/inner --recursive
+npx 3d-tiles-tools splitCmpt -i ./specs/data/compositeOfComposite.cmpt -o ./output/inner --recursive
 ```
 
 For an input file `compositeOfComposite.cmpt` that contains a composite tile that contains one B3DM and one I3DM content, this will generate the files `inner_0.b3dm` and `inner_1.i3dm` in the output directory.
