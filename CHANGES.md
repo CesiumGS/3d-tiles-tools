@@ -1,6 +1,21 @@
 Change Log
 ==========
 
+### 0.4.0 - 2024-02-06
+
+- The 3D Tiles Tools have been split into multiple packages.
+  For users of the command-line interface, this should not make a noticable difference: The installed package declares all other packages as its dependencies, and installs them transparently. 
+  Structurally, the packages are now organized as a 'monorepo', meaning that all packages are maintained in this repository, in a `packages` subfolder. Further details about the structure can be found in the updated [implementation notes](./IMPLEMENTATION.md).
+- Improved the computation of bounding volumes in [#79](https://github.com/CesiumGS/3d-tiles-tools/pull/79)
+  - Some bounding volumes had been computed as bounding spheres or as non-tight-fitting oriented bounding boxes. By integrating the [dito.ts](https://github.com/Esri/dito.ts) library, it is now possible to compute tighter-fitting oriented bounding boxes for tile content ([#58](https://github.com/CesiumGS/3d-tiles-tools/issues/58)) and creating bounding boxes instead of bounding spheres when applying the `merge` command ([#69](https://github.com/CesiumGS/3d-tiles-tools/issues/69))
+- Fixed a bug where `b3dmToGlb` left invalid "padding" bytes at the end of GLB data [#82](https://github.com/CesiumGS/3d-tiles-tools/issues/82)
+- Added a `splitCmpt` function to split a composite (CMPT) file into its elements [#78](https://github.com/CesiumGS/3d-tiles-tools/issues/78)
+- Extended the support for instanced 3D model (I3DM) files that used a URI to refer to an external GLB file [#45](https://github.com/CesiumGS/3d-tiles-tools/issues/45)
+- Fixed a bug where the upgrade of batched 3D models (B3DM) into GLB files with metadata caused errors when the B3DM contained `null` or `undefined` strings in its batch table [#96](https://github.com/CesiumGS/3d-tiles-tools/pull/96)
+- Fixed a bug where GLB files could not be processed (and caused crashes) when they did not contain a `BIN` chunk [#94](https://github.com/CesiumGS/3d-tiles-tools/pull/94)
+- Extended the upgrade of legacy B3DM that contained glTF 1.0 data with oct-encoded (2D) normals. These normals are now decoded into 3D normals as part of the upgrade [#98](https://github.com/CesiumGS/3d-tiles-tools/pull/98)
+
+
 ### 0.3.2 - 2023-11-01
 
 - The `upgrade` command is now removing empty `tile.children` arrays, setting the `children` to be `undefined` instead (via [#73](https://github.com/CesiumGS/3d-tiles-tools/pull/73))
