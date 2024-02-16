@@ -356,6 +356,11 @@ When the tools are not installed as a package from NPM, but supposed to be used 
   ```
   npm install
   ```
+- Build the tools:
+  ```
+  npm run build
+  ```
+
 
 After this, the tools can be executed using the same command line options as described above - for example:
 ```
