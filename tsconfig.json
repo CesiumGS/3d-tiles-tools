@@ -2,9 +2,11 @@
   "compilerOptions": {
     "module": "CommonJS",
     "target": "ES2021",
-    "baseUrl": "./packages",
+    "baseUrl": "./src",
     "strict": true,
     "lib": ["es2021"],
+
+    "outDir": "./build",
 
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -15,67 +17,7 @@
     "declarationMap": true,
     "noImplicitAny": false,
     "sourceMap": true,
-
-    "paths": {
-      "@3d-tiles-tools/structure": ["./packages/structure/"],
-      "@3d-tiles-tools/base": ["./packages/base/"],
-      "@3d-tiles-tools/gltf-extensions": ["./packages/gltf-extensions/"],
-      "@3d-tiles-tools/metadata": ["./packages/metadata/"],
-      "@3d-tiles-tools/tilesets": ["./packages/tilesets/"],
-      "@3d-tiles-tools/tools": ["./packages/tools/"],
-      "@3d-tiles-tools/cli": ["./packages/cli/"],
-    }
   },
   "include": ["specs"],
-  "exclude": ["node_modules", "specs/data"],
-  "references": [
-    {
-      "path": "./packages/structure/src/tsconfig.json"
-    },
-    {
-      "path": "./packages/gltf-extensions/src/tsconfig.json"
-    },
-    {
-      "path": "./packages/base/src/tsconfig.json"
-    },
-    {
-      "path": "./packages/ktx/src/tsconfig.json"
-    },
-    {
-      "path": "./packages/metadata/src/tsconfig.json"
-    },
-    {
-      "path": "./packages/tilesets/src/tsconfig.json"
-    },
-    {
-      "path": "./packages/tools/src/tsconfig.json"
-    },
-    {
-      "path": "./packages/cli/src/tsconfig.json"
-    },
-
-    {
-      "path": "./packages/spec-helpers/src/tsconfig.json"
-    },
-
-    {
-      "path": "./packages/base/specs/tsconfig.json"
-    },
-    {
-      "path": "./packages/ktx/specs/tsconfig.json"
-    },
-    {
-      "path": "./packages/metadata/specs/tsconfig.json"
-    },
-    {
-      "path": "./packages/tilesets/specs/tsconfig.json"
-    },
-    {
-      "path": "./packages/tools/specs/tsconfig.json"
-    },
-    {
-      "path": "./packages/cli/specs/tsconfig.json"
-    },
-
-  ]
+  "exclude": ["node_modules", "specs/data"]
 }

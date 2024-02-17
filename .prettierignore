@@ -2,10 +2,8 @@
 !src/**/
 !demos/**/
 !specs/**/
-!packages/**/
 !**/*.js
 !**/*.ts
-src/**/*.ts
 specs/data/
-packages/**/build/
-packages/ktx/src/ktx/external/basis_encoder.js
+build/
+src/ktx/ktx/external/basis_encoder.js

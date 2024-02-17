@@ -99,7 +99,7 @@ async function collectThirdParty(baseDirectory, licenseDatas) {
 async function generateThirdParty() {
   // The pattern for dependency names that will be
   // excluded because they are actually internal ones
-  const exclusionRegex = "@3d-tiles-tools/.*";
+  const exclusionRegex = "";
 
   console.log("Generating ThirdParty.json...");
 
