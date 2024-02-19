@@ -140,7 +140,7 @@ async function generateThirdParty() {
     thirdPartyJson = licenseDatas.filter((entry) => {
       const match = entry.name.match(exclusionRegex);
       return match === null;
-    })
+    });
   } else {
     thirdPartyJson = licenseDatas;
   }
