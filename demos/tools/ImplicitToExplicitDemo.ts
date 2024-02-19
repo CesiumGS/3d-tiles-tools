@@ -1,13 +1,13 @@
-import { TraversedTile } from "@3d-tiles-tools/tilesets";
-import { TilesetEntry } from "@3d-tiles-tools/tilesets";
+import { TraversedTile } from "3d-tiles-tools";
+import { TilesetEntry } from "3d-tiles-tools";
 
-import { BasicTilesetProcessor } from "@3d-tiles-tools/tools";
+import { BasicTilesetProcessor } from "3d-tiles-tools";
 
-import { Tileset } from "@3d-tiles-tools/structure";
-import { Schema } from "@3d-tiles-tools/structure";
-import { Tile } from "@3d-tiles-tools/structure";
+import { Tileset } from "3d-tiles-tools";
+import { Schema } from "3d-tiles-tools";
+import { Tile } from "3d-tiles-tools";
 
-import { ContentDataTypes } from "@3d-tiles-tools/base";
+import { ContentDataTypes } from "3d-tiles-tools";
 
 const SPECS_DATA_BASE_DIRECTORY = "./specs/data";
 

@@ -1,10 +1,10 @@
-import { BinaryPropertyTableBuilder } from "@3d-tiles-tools/metadata";
-import { PropertyTableModels } from "@3d-tiles-tools/metadata";
-import { BinaryPropertyTableModel } from "@3d-tiles-tools/metadata";
+import { BinaryPropertyTableBuilder } from "3d-tiles-tools";
+import { PropertyTableModels } from "3d-tiles-tools";
+import { BinaryPropertyTableModel } from "3d-tiles-tools";
 
-import { Schema } from "@3d-tiles-tools/structure";
-import { MetadataClass } from "@3d-tiles-tools/structure";
-import { MetadataEnum } from "@3d-tiles-tools/structure";
+import { Schema } from "3d-tiles-tools";
+import { MetadataClass } from "3d-tiles-tools";
+import { MetadataEnum } from "3d-tiles-tools";
 
 const exampleMetadataClass: MetadataClass = {
   name: "Example metadata class",

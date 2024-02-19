@@ -2,10 +2,10 @@ import path from "path";
 
 import { readJsonUnchecked } from "../readJsonUnchecked";
 
-import { ResourceResolvers } from "@3d-tiles-tools/base";
-import { TilesetTraverser } from "@3d-tiles-tools/tilesets";
-import { TraversedTile } from "@3d-tiles-tools/tilesets";
-import { Tileset } from "@3d-tiles-tools/structure";
+import { ResourceResolvers } from "3d-tiles-tools";
+import { TilesetTraverser } from "3d-tiles-tools";
+import { TraversedTile } from "3d-tiles-tools";
+import { Tileset } from "3d-tiles-tools";
 
 const SPECS_DATA_BASE_DIRECTORY = "./specs/data";
 

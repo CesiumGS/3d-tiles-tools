@@ -3,7 +3,7 @@ import seedrandom from "seedrandom";
 
 import { BenchmarkConfig } from "./BenchmarkConfig";
 
-import { TilesetEntry } from "@3d-tiles-tools/tilesets";
+import { TilesetEntry } from "3d-tiles-tools";
 
 /**
  * Methods related to the 3D Tiles Package benchmarks.

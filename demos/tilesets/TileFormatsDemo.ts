@@ -1,9 +1,9 @@
 import fs from "fs";
 
-import { Paths } from "@3d-tiles-tools/base";
+import { Paths } from "3d-tiles-tools";
 
-import { GltfUtilities } from "@3d-tiles-tools/tools";
-import { TileFormats } from "@3d-tiles-tools/tilesets";
+import { GltfUtilities } from "3d-tiles-tools";
+import { TileFormats } from "3d-tiles-tools";
 
 const SPECS_DATA_BASE_DIRECTORY = "./specs/data";
 

@@ -1,10 +1,10 @@
 import path from "path";
 import minimist from "minimist";
 
-import { TilesetTargets } from "@3d-tiles-tools/tilesets";
-import { TilesetSources } from "@3d-tiles-tools/tilesets";
+import { TilesetTargets } from "3d-tiles-tools";
+import { TilesetSources } from "3d-tiles-tools";
 
-import { ZipToPackage } from "@3d-tiles-tools/tilesets";
+import { ZipToPackage } from "3d-tiles-tools";
 
 /**
  * Print the help message showing the command line options

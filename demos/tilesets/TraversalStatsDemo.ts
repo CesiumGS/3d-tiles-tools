@@ -2,15 +2,15 @@ import path from "path";
 
 import { readJsonUnchecked } from "../readJsonUnchecked";
 
-import { TilesetTraverser } from "@3d-tiles-tools/tilesets";
-import { TraversedTile } from "@3d-tiles-tools/tilesets";
+import { TilesetTraverser } from "3d-tiles-tools";
+import { TraversedTile } from "3d-tiles-tools";
 
-import { ResourceResolvers } from "@3d-tiles-tools/base";
-import { BufferedContentData } from "@3d-tiles-tools/base";
-import { ContentDataTypeChecks } from "@3d-tiles-tools/base";
-import { ContentDataTypes } from "@3d-tiles-tools/base";
+import { ResourceResolvers } from "3d-tiles-tools";
+import { BufferedContentData } from "3d-tiles-tools";
+import { ContentDataTypeChecks } from "3d-tiles-tools";
+import { ContentDataTypes } from "3d-tiles-tools";
 
-import { Tileset } from "@3d-tiles-tools/structure";
+import { Tileset } from "3d-tiles-tools";
 
 const SPECS_DATA_BASE_DIRECTORY = "./specs/data";
 

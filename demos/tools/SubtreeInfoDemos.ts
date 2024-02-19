@@ -2,12 +2,12 @@ import path from "path";
 
 import { readJsonUnchecked } from "../readJsonUnchecked";
 
-import { ResourceResolvers } from "@3d-tiles-tools/base";
-import { QuadtreeCoordinates } from "@3d-tiles-tools/base";
+import { ResourceResolvers } from "3d-tiles-tools";
+import { QuadtreeCoordinates } from "3d-tiles-tools";
 
-import { SubtreeInfos } from "@3d-tiles-tools/tilesets";
+import { SubtreeInfos } from "3d-tiles-tools";
 
-import { Subtree, TileImplicitTiling } from "@3d-tiles-tools/structure";
+import { Subtree, TileImplicitTiling } from "3d-tiles-tools";
 
 const SPECS_DATA_BASE_DIRECTORY = "./specs/data";
 

@@ -2,10 +2,10 @@ import path from "path";
 import http from "http";
 import minimist from "minimist";
 
-import { Buffers } from "@3d-tiles-tools/base";
+import { Buffers } from "3d-tiles-tools";
 
-import { TilesetSource } from "@3d-tiles-tools/tilesets";
-import { TilesetSources } from "@3d-tiles-tools/tilesets";
+import { TilesetSource } from "3d-tiles-tools";
+import { TilesetSources } from "3d-tiles-tools";
 
 /**
  * Print the help message showing the command line options

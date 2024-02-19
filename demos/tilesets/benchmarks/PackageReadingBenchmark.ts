@@ -2,9 +2,9 @@ import fs from "fs";
 import util from "util";
 import { performance } from "perf_hooks";
 
-import { TilesetSource } from "@3d-tiles-tools/tilesets";
-import { TilesetSource3tz } from "@3d-tiles-tools/tilesets";
-import { TilesetSource3dtiles } from "@3d-tiles-tools/tilesets";
+import { TilesetSource } from "3d-tiles-tools";
+import { TilesetSource3tz } from "3d-tiles-tools";
+import { TilesetSource3dtiles } from "3d-tiles-tools";
 
 import { BenchmarkUtils } from "./BenchmarkUtils";
 import { Arrays } from "./Arrays";
