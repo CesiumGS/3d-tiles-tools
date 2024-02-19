@@ -1,6 +1,6 @@
 {
   "name": "3d-tiles-tools",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "license": "Apache-2.0",
   "description": "3D Tiles tools",
   "author": {
@@ -97,12 +97,12 @@
     "prettier": "prettier --write \"**/*\"",
     "generate-third-party": "node generateThirdParty.js",
     "docs-prepare-directory": "mkdirp etc",
-    "docs-extract-api": "npm run docs-extract-api",
+    "docs-extract-api": "api-extractor run --config api-extractor.jsonc --local --verbose",
     "docs-generate-markdown": "api-documenter markdown -i build/api-extractor -o build/docs",
     "docs-generate": "npm run docs-prepare-directory && npm run docs-extract-api && npm run docs-generate-markdown",
     "docs": "npm run build && npm run docs-generate",
-    "package-clean": "del-cli ./build/**",
-    "package-prepare": "npm run eslint && npm run prettier-check && npm run build && npm run test && npm run coverage && npm run generate-third-party",
+    "package-clean": "del-cli ./build/** del-cli ./temp/**",
+    "package-prepare": "npm run eslint && npm run prettier-check && npm run build && npm run test && npm run coverage && npm run docs-generate && npm run generate-third-party",
     "package": "npm run package-clean && npm run package-prepare && npm pack"
   }
 }
