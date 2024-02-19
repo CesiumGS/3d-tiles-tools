@@ -13,11 +13,12 @@
 .eslintrc.json
 .gitignore
 .npmignore
-.nycrc
+.c8rc.json
 .prettierignore
 .prettierrc.json
 api-extractor.jsonc
 generateThirdParty.js
 ThirdParty.json
+ThirdParty.extra.json
 tsconfig.json
 *.tgz
