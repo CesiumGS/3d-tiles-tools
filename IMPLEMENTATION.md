@@ -4,74 +4,20 @@ Parts of the current implementation may still change. This page is only a short 
 
 ## Internal notes
 
-The original 3D Tiles Tools have been converted into a monorepo with different packages.
+The source code folder contains the sources in a form that is organized so that each subdirectory can easily become a "workspace"/"package" in a monorepo. This is the result of https://github.com/CesiumGS/3d-tiles-tools/pull/64 , even though the current state does not use workspaces yet.
 
-The packages are 
+The subdirectories are 
 
-- [`base`](./packages/base/) - Basic utility classes shared by nearly all other packages
-- [`structure`](./packages/structure/) - Typescript types for the elements of a 3D Tiles tileset JSON
-- [`ktx`](./packages/structure/) - A convenience wrapper around the BinomialLLC basis (KTX) encoder WASM module
-- [`gltf-extensions`](./packages/gltf-extensions/) - Implementations of the Cesium glTF extensions based on glTF-Transform
-- [`metadata`](./packages/metadata/) - Basic classes for the implementation of the 3D Metadata Specification
-- [`tilesets`](./packages/tilesets/) - Classes for handling 3D Tiles tileset data (including tile content and tileset packages)
-- [`tools`](./packages/tools/) - The main classes implementing the 3D Tiles Tools functionalities
-- [`cli`](./packages/cli/) - The main command line application for the 3D Tiles tools
-- [`spec-helpers`](./packages/spec-helpers/) - Internal utility classes for running the specs (unit tests)
+- `base` - Basic utility classes shared by nearly all other packages
+- `structure` - Typescript types for the elements of a 3D Tiles tileset JSON
+- `ktx` - A convenience wrapper around the BinomialLLC basis (KTX) encoder WASM module
+- `gltf-extensions` - Implementations of the Cesium glTF extensions based on glTF-Transform
+- `metadata` - Basic classes for the implementation of the 3D Metadata Specification
+- `tilesets` - Classes for handling 3D Tiles tileset data (including tile content and tileset packages)
+- `tools` - The main classes implementing the 3D Tiles Tools functionalities
+- `cli` - The main command line application for the 3D Tiles tools
+- `spec-helpers` - Internal utility classes for running the specs (unit tests)
 
-### Structure of `package.json`
-
-From the perspective of the top-level `package.json`, each package is a _workspace_. This means that each package has its own `package.json` that declares its dependencies and basic build- and test commands. The top-level `package.json` only declares
-```
-  "workspaces": [
-    "packages/*"
-  ],
-```
-which allows certain operations (like packaging) to be run in a "bulk" fashion on all the packages at once.
-
-It is important to run `npm install` at the root directory after cloning the repo (preferably even before opening VSCode). When workspaces are present, then this will establish one symbolic link for each package in the `node_modules` repository, making sure that "the packages know each other". 
-
-### Structure of `tsconfig.json`
-
-The goal of splitting the 3D Tiles Tools into modules originally was to create ESM modules. However, due to limited interoperability of ESM modules and CommonJS projects, it was decided to offer the tools as CommonJS modules instead. 
-
-- The `package.json` of each package declares `"type": "commonjs"`
-- The `compilerOptions` of the `tsconfig.json` declares `"module": "CommonJS"`
-
-The root-level `tsconfig.json` defines the common settings. Each package contains further `tsconfig.json` files that _inherit_ from the root-level one (See [TSConfig `extends`](https://www.typescriptlang.org/tsconfig#extends)).
-
-The structure of the project and its packages is reflected in the `tsconfig.json` files via _Project References_ (See [TypeScript: 'Project References](https://www.typescriptlang.org/docs/handbook/project-references.html)). Each `tsconfig.json` in the packages has to declare
-```
-  "compilerOptions": {
-    "declaration": true,
-    "composite": true,
-  },
-```
-so that the respective `tsconfig.json` may be used via a Project Reference.
-
-Each package contains three `tsconfig.json` files: 
-- `<package>/tsconfig.json`: The main config file for the package
-  - This may add package-specific settings in the `compilerOptions`
-  - Beyond that, it only refers to the other ones:
-- `<package>/src/tsconfig.json`: The configuration for the actual source code of the package
-- `<package>/specs/tsconfig.json`: The configuration for the specs (unit tests) of the package
-  - This refers to the `src` configuration file as a "dependency"
-
-The reason for separating the `tsconfig.json` file for the `src` and the `specs` is to have different build output directories for them, to make sure that `src` cannot not import anything from `specs`, and the final, distributed package can contain only the build output of `src`. (NOTE: Right now, it contains both. This is not critical, but the `specs` build output might be omitted from the packages in the future).
-
-The root-level `tsconfig` file refers to the `tsconfig.json` file of the `src`- and `specs` folders:
-```
-  "references": [
-    { "path": "./packages/base/src/tsconfig.json" },
-    { "path": "./packages/base/specs/tsconfig.json" },
-    ...
-  ]
-```
-
-They are listed there in the order in which they are built:
-
-- Build all `src` part for each package
-- Build the `spec-helpers` (which depends on some of the `src` outputs)
-- Build the `specs` part for each package (which often depends on the `spec-helpers`)
 
 ### Tests
 
@@ -79,43 +25,11 @@ Running the tests with Jasmine eventually looks simple: Jasmine has to be starte
 
 `npx ts-node node_modules/jasmine/bin/jasmine.js ...`
 
-> Anecdotal note: With the initial ESM approach, the call would have been
->
-> `ts-node --esm node_modules/jasmine/bin/jasmine.js ...`
->
-> but this breaks with certain Node.js versions - see https://github.com/TypeStrong/ts-node/issues/2094 .
->
-> To work around this, the call had to be 
-> 
-> `node --loader ts-node/esm node_modules/jasmine/bin/jasmine.js ...`
->
-> This emitted `ExperimentalWarning` messages, but worked.
->
-> With CommonJS, all this does not matter.
-
-One caveat is:
-
-- The test data is stored in `./specs/data` (because parts of it is shared by multiple packages)
-- It should be possible to run _all_ tests from the _root_ directory
-- It should be possible to run the tests of a _single_ package from the directory of that package
-
-So in order to resolve the test data in both cases:
-- The `jasmine.json` config files in the packages refer to a `helper` that sets `process.env.SPECS_DATA_BASE_DIRECTORY = "../../specs/data";` (whereas the default in the top-level case is just `"./specs/data"`)
-- This environment variable is picked up by the `/spec-helpers/SpecHelpers` class and returned as the "base" directory for resolving data
+The test data is stored in `./specs/data`.
 
 ### Coverage
 
 The coverage is now computed with `c8` from https://github.com/bcoe/c8 
-
-> Anecdotal note: 
-> 
-> The coverage originally had been checked with `nyc`, but apparently, ESM modules are not supported by `nyc` (see https://github.com/istanbuljs/nyc/issues/1287 ). 
-> So `c8` was chosen as a solution that also worked with ESM. It is a "drop-in-replacement" of `nyc`, so there is no reason to go back to `nyc` for now (even though the tools are now packaged as CommonJS modules).
-
-### Even More Internal Notes:
-
-- There are places where the `/// <reference path=" ... " />` syntax is used, in order to point TypeScript to the right type information (see [TypeScript: Triple-Slash Directives](https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html)). This appears to be necessary for `gltf-pipeline` and `gltfpack` dependencies, which do not have associated type information. This is strongly discouraged, and should instead be solved by specifying proper `typeRoots` in the `compilerOptions` of the respective `tsconfig.json`. Maybe there is a way to tweak this so that it actually _works_ ...
-- There seem to be a few differences btween _compiling_ code (with `tsc`) and _executing_ code (with `npx ts-node`) when it comes to ~"module and type resolution". Sometimes types are not found here and there. There are rumours in hundreds of issues related to that. Sometimes the [`ts-node` `--files` argument](https://typestrong.org/ts-node/docs/options/#files) (which is completely unrelated to the `files` in `tsconfig.json`, although it also refers to this property) seemed to help. Sometimes the `tsconfig-paths` package from https://www.npmjs.com/package/tsconfig-paths seemed to help. Maybe some of these approaches will have to be investigated when a specific problem comes up.
 
 
 ## API Definition

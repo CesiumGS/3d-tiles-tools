@@ -4,7 +4,7 @@
     "license": [
       "MIT"
     ],
-    "version": "3.9.0",
+    "version": "3.10.0",
     "url": "https://www.npmjs.com/package/@gltf-transform/core"
   },
   {
@@ -12,7 +12,7 @@
     "license": [
       "MIT"
     ],
-    "version": "3.9.0",
+    "version": "3.10.0",
     "url": "https://www.npmjs.com/package/@gltf-transform/extensions"
   },
   {
@@ -20,7 +20,7 @@
     "license": [
       "MIT"
     ],
-    "version": "3.9.0",
+    "version": "3.10.0",
     "url": "https://www.npmjs.com/package/@gltf-transform/functions"
   },
   {
@@ -56,6 +56,14 @@
     "url": "https://www.npmjs.com/package/draco3d"
   },
   {
+    "name": "draco3dgltf",
+    "license": [
+      "Apache-2.0"
+    ],
+    "version": "1.5.7",
+    "url": "https://www.npmjs.com/package/draco3dgltf"
+  },
+  {
     "name": "gltf-pipeline",
     "license": [
       "Apache-2.0"
@@ -72,6 +80,22 @@
     "url": "https://www.npmjs.com/package/gltfpack"
   },
   {
+    "name": "meshoptimizer",
+    "license": [
+      "MIT"
+    ],
+    "version": "0.19.0",
+    "url": "https://www.npmjs.com/package/meshoptimizer"
+  },
+  {
+    "name": "minimist",
+    "license": [
+      "MIT"
+    ],
+    "version": "1.2.8",
+    "url": "https://www.npmjs.com/package/minimist"
+  },
+  {
     "name": "node-stream-zip",
     "license": [
       "MIT"
@@ -84,7 +108,7 @@
     "license": [
       "MIT"
     ],
-    "version": "8.18.0",
+    "version": "8.19.0",
     "url": "https://www.npmjs.com/package/pino"
   },
   {
@@ -94,6 +118,14 @@
     ],
     "version": "10.3.1",
     "url": "https://www.npmjs.com/package/pino-pretty"
+  },
+  {
+    "name": "seedrandom",
+    "license": [
+      "MIT"
+    ],
+    "version": "3.0.5",
+    "url": "https://www.npmjs.com/package/seedrandom"
   },
   {
     "name": "sharp",
