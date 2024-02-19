@@ -89,7 +89,7 @@
     "eslint": "eslint \"./**/*.ts\" --cache",
     "build": "tsc --build --verbose --force && npm run build-post",
     "build-post": "npm run build-post-ktx && npm run build-post-cli",
-    "build-post-ktx": "npx copyfiles --flat ./src/ktx/ktx/external/basis_encoder.wasm ./build/src/ktx/external",    
+    "build-post-ktx": "npx copyfiles --flat ./src/ktx/ktx/external/basis_encoder.* ./build/src/ktx/ktx/external",
     "build-post-cli": "npx copyfiles --flat ./bin/cli.mjs ./build/src",
     "test": "npx ts-node node_modules/jasmine/bin/jasmine.js --config=specs/jasmine.json",
     "coverage": "npx c8 --clean npm run test",
@@ -102,7 +102,7 @@
     "docs-generate": "npm run docs-prepare-directory && npm run docs-extract-api && npm run docs-generate-markdown",
     "docs": "npm run build && npm run docs-generate",
     "package-clean": "del-cli ./build/**",
-    "package-prepare": "npm run eslint && npm run prettier-check && npm run build && npm run test && npm run generate-third-party",
+    "package-prepare": "npm run eslint && npm run prettier-check && npm run build && npm run test && npm run coverage && npm run generate-third-party",
     "package": "npm run package-clean && npm run package-prepare && npm pack"
   }
 }

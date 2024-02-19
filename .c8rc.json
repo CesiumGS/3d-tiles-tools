@@ -1,9 +1,9 @@
 {
     "exclude": [
-        "**specs/**/*Spec.ts"
+        "specs/**/*Spec.ts"
     ],
     "include": [
-        "packages/**/src/**/*.ts"
+        "src/**/*.ts"
     ],
     "reporter": [
         "html",

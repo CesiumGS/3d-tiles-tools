@@ -98,12 +98,14 @@ async function collectThirdParty(baseDirectory, licenseDatas) {
 
 async function generateThirdParty() {
   // The pattern for dependency names that will be
-  // excluded because they are actually internal ones
-  const exclusionRegex = "";
+  // excluded because they are actually internal ones.
+  // In the future, this might, for example, be
+  // something like "@3d-tiles-tools/.*".
+  const exclusionRegex = undefined;
 
   console.log("Generating ThirdParty.json...");
 
-  const rootDirectory = ".";
+  const rootDirectory = "./";
   const rootPackageJsonPath = path.resolve(rootDirectory, "package.json");
   const rootPackageJson = JSON.parse(fs.readFileSync(rootPackageJsonPath));
 
@@ -133,10 +135,15 @@ async function generateThirdParty() {
     return 0;
   });
 
-  const thirdPartyJson = licenseDatas.filter((entry) => {
-    const match = entry.name.match(exclusionRegex);
-    return match === null;
-  });
+  let thirdPartyJson;
+  if (exclusionRegex !== undefined) {
+    thirdPartyJson = licenseDatas.filter((entry) => {
+      const match = entry.name.match(exclusionRegex);
+      return match === null;
+    })
+  } else {
+    thirdPartyJson = licenseDatas;
+  }
 
   fs.writeFileSync("ThirdParty.json", JSON.stringify(thirdPartyJson, null, 2));
   console.log("Generating ThirdParty.json DONE");
