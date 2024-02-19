@@ -75,10 +75,10 @@ async function createFeatureIdFromTexture(
   // RGBA pixels.
   const sizeX = 3;
   const sizeY = 3;
-  const pixels = NdArray(new Uint8Array(sizeX * sizeY), [sizeX, sizeY]);
+  const pixels = NdArray(new Uint8Array(sizeX * sizeY), [sizeX, sizeY, 4]);
   for (let x = 0; x < pixels.shape[0]; x++) {
     for (let y = 0; y < pixels.shape[1]; y++) {
-      pixels.set(x, y, x * sizeY + y);
+      pixels.set(x, y, 3, x * sizeY + y);
     }
   }
   const image = await savePixels(pixels, "image/png");
