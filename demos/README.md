@@ -1,10 +1,20 @@
 ## 3D Tiles Tools Demos
 
-This project declares all 3D Tiles tools packages as (local) dependencies. The demos show how to use various parts of the API. This is intended as an internal preview for developers. The functionality is not yet exposed as a public API.
+This project declares the 3D Tiles tools build output as (local) dependency. The demos show how to use various parts of the API. This is intended as an internal preview for developers. The functionality is not yet exposed as a public API.
 
-After installing the dependencies by running
-`npm install`
-in the `./demos` subdirectory, each of these demos can be started (from the root directory of the 3D Tiles Tools!) with
+In the root directory of the 3D Tiles tools:
+
+- Install the 3D Tiles Tools dependencies:
+  `npm install`
+- Create the build output of the 3D Tiles tools:
+  `npm run build`
+
+In the `/demos/` subdirectory:
+
+- Install the 3D Tiles Tools build output as a dependency:
+  `npm install`
+
+Then, each of these demos can be started (from the root directory of the 3D Tiles Tools!) with
 
 `npx ts-node ./demos/`_`<PackageName>`_`/`_`<DemoName>`_`.ts`
 
