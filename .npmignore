@@ -3,6 +3,7 @@
 /coverage
 /demos
 /dist
+/temp
 /etc
 /figures
 /node_modules
