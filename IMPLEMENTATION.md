@@ -42,7 +42,7 @@ Generating the documentation consists of two steps (which are subcommands of the
 - extracting the API definitions from the build output
 - generating the markdown from the API definitions.
 
-The first step is performed by running `api-extractor` for each package individually. This happens from the top-level package JSON file, using the `--workspaces` parameter. The surface API information will be written into `./etc/<package>.md`. These files capture the public API, and changes in the public API will cause a warning to be printed
+The first step is performed by running `api-extractor`. The surface API information will be written into `./etc/3d-tiles-tools.md`. This file captures the public API, and changes in the public API will cause a warning to be printed
 
 > Warning: You have changed the public API signature for this project.
 

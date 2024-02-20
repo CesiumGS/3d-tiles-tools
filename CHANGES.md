@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-### 0.4.1 - 2024-mm-dd
+### 0.4.1 - 2024-02-20
 
 - The packages that have been introduced in version `0.4.0` have been merged back into a single package.
   Details about the structure can be found in the [implementation notes](./IMPLEMENTATION.md).

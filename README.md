@@ -359,7 +359,7 @@ When the tools are not installed as a package from NPM, but supposed to be used 
 
 After this, the tools can be executed using the same command line options as described above - for example:
 ```
-npx ts-node .\packages\cli\src\main.ts gzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-gzipped/
+npx ts-node .\src\cli\main.ts gzip -i ./specs/data/TilesetOfTilesets/ -o ./output/TilesetOfTilesets-gzipped/
 ```
 
 See the [implementation notes](IMPLEMENTATION.md) for details about the project structure.

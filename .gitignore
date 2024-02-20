@@ -9,6 +9,7 @@ package-lock.json
 /build
 /dist
 /data
+/temp
 /output
 /specs/data/output
 /specs/data/migration/output_gltf
