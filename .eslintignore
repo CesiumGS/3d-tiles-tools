@@ -4,5 +4,4 @@ node_modules
 dist
 etc
 generateThirdParty.js
-packages/ktx/src/ktx/external/basis_encoder.cjs
-packages/cli/bin/cli.mjs
+src/ktx/ktx/external/basis_encoder.cjs

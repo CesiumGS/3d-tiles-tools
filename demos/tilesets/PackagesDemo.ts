@@ -1,7 +1,7 @@
 import fs from "fs";
 
-import { TilesetSources } from "@3d-tiles-tools/tilesets";
-import { TilesetTargets } from "@3d-tiles-tools/tilesets";
+import { TilesetSources } from "3d-tiles-tools";
+import { TilesetTargets } from "3d-tiles-tools";
 
 /**
  * Basic example showing how to create a package

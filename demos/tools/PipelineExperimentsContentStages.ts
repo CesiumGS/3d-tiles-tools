@@ -1,8 +1,8 @@
-import { Pipeline } from "@3d-tiles-tools/tools";
-import { TilesetStages } from "@3d-tiles-tools/tools";
-import { ContentStages } from "@3d-tiles-tools/tools";
-import { PipelineExecutor } from "@3d-tiles-tools/tools";
-import { TilesetStage } from "@3d-tiles-tools/tools";
+import { Pipeline } from "3d-tiles-tools";
+import { TilesetStages } from "3d-tiles-tools";
+import { ContentStages } from "3d-tiles-tools";
+import { PipelineExecutor } from "3d-tiles-tools";
+import { TilesetStage } from "3d-tiles-tools";
 
 const SPECS_DATA_BASE_DIRECTORY = "./specs/data";
 

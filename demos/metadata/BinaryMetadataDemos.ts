@@ -1,6 +1,6 @@
-import { ClassProperty } from "@3d-tiles-tools/structure";
-import { BinaryPropertyTables } from "@3d-tiles-tools/metadata";
-import { BinaryPropertyTableModel } from "@3d-tiles-tools/metadata";
+import { ClassProperty } from "3d-tiles-tools";
+import { BinaryPropertyTables } from "3d-tiles-tools";
+import { BinaryPropertyTableModel } from "3d-tiles-tools";
 
 /**
  * A test for the `BinaryPropertyTableModel` class.

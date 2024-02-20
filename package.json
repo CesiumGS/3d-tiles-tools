@@ -1,10 +1,16 @@
 {
   "name": "3d-tiles-tools",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "license": "Apache-2.0",
   "description": "3D Tiles tools",
   "author": {
     "name": "Cesium GS, Inc. and Contributors"
+  },
+  "source": "./src/index.ts",
+  "exports": "./build/src/index.js",
+  "types": "./build/src/index.d.ts",
+  "bin": {
+    "3d-tiles-tools": "./build/src/cli.mjs"
   },
   "keywords": [
     "3D Tiles"
@@ -20,15 +26,33 @@
   "engines": {
     "node": ">=16.0.0"
   },
-  "workspaces": [
-    "packages/*"
-  ],
+  "dependencies": {
+    "@gltf-transform/core": "^3.9.0",
+    "@gltf-transform/extensions": "^3.9.0",
+    "@gltf-transform/functions": "^3.9.0",
+    "archiver": "^5.3.1",
+    "better-sqlite3": "^8.0.1",
+    "cesium": "^1.103.0",
+    "draco3d": "^1.5.6",
+    "draco3dgltf": "^1.5.6",
+    "gltf-pipeline": "^4.1.0",
+    "gltfpack": "^0.19.1",
+    "meshoptimizer": "^0.19.0",
+    "minimist": "^1.2.7",
+    "node-stream-zip": "^1.15.0",
+    "pino": "^8.15.0",
+    "pino-pretty": "^10.2.0",
+    "seedrandom": "^3.0.5",
+    "sharp": "^0.32.1",
+    "yargs": "^17.5.1"
+  },
   "devDependencies": {
     "@microsoft/api-documenter": "^7.19.24",
     "@microsoft/api-extractor": "^7.33.6",
     "@types/jasmine": "^4.0.3",
     "@typescript-eslint/eslint-plugin": "^5.38.0",
     "@typescript-eslint/parser": "^5.38.0",
+    "@types/yargs": "^17.0.22",
     "c8": "^8.0.1",
     "del-cli": "^5.0.0",
     "eslint": "^8.23.1",
@@ -60,25 +84,25 @@
     "about:docs": "echo 'Perform a build and generate the API documentation based on the build output'",
     "about:package-clean": "echo 'Delete the contents of the 'build' output folder'",
     "about:package-prepare": "echo 'Prepare a package: Linting, formatting, build, test, documentation, and third-party information updates'",
-    "about:package-copy": "echo 'Copy the entry point for the application from the bin to the build directory'",
     "about:package": "echo 'Prepare a package that can then be published on NPM'",
     "start": "npx ts-node src/main.ts",
     "eslint": "eslint \"./**/*.ts\" --cache",
     "build": "tsc --build --verbose --force && npm run build-post",
-    "build-post": "npm run build-post --workspaces --if-present",
+    "build-post": "npm run build-post-ktx && npm run build-post-cli",
+    "build-post-ktx": "npx copyfiles --flat ./src/ktx/ktx/external/basis_encoder.* ./build/src/ktx/ktx/external",
+    "build-post-cli": "npx copyfiles --flat ./bin/cli.mjs ./build/src",
     "test": "npx ts-node node_modules/jasmine/bin/jasmine.js --config=specs/jasmine.json",
     "coverage": "npx c8 --clean npm run test",
     "prettier-check": "prettier --check \"**/*\"",
     "prettier": "prettier --write \"**/*\"",
     "generate-third-party": "node generateThirdParty.js",
     "docs-prepare-directory": "mkdirp etc",
-    "docs-extract-api": "npm run docs-extract-api --workspaces --if-present",
+    "docs-extract-api": "api-extractor run --config api-extractor.jsonc --local --verbose",
     "docs-generate-markdown": "api-documenter markdown -i build/api-extractor -o build/docs",
     "docs-generate": "npm run docs-prepare-directory && npm run docs-extract-api && npm run docs-generate-markdown",
     "docs": "npm run build && npm run docs-generate",
-    "package-clean": "del-cli ./packages/*/build/** && del-cli ./packages/*/tsconfig.tsbuildinfo",
-    "package-prepare": "npm run eslint && npm run prettier-check && npm run build && npm run test && npm run generate-third-party",
-    "package-copy": "npx copyfiles --flat ./packages/cli/bin/cli.mjs ./packages/cli/build",
-    "package": "npm run package-clean && npm run package-prepare && npm run package-copy && npm pack --workspaces"
+    "package-clean": "del-cli ./build/** del-cli ./temp/**",
+    "package-prepare": "npm run eslint && npm run prettier-check && npm run build && npm run test && npm run coverage && npm run docs-generate && npm run generate-third-party",
+    "package": "npm run package-clean && npm run package-prepare && npm pack"
   }
 }

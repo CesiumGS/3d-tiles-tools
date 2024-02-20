@@ -1,4 +1,4 @@
-import { Loggers } from "@3d-tiles-tools/base";
+import { Loggers } from "3d-tiles-tools";
 
 // Create a default logger to use in this file.
 const logger = Loggers.get();

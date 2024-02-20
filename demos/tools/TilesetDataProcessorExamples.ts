@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { TilesetEntry } from "@3d-tiles-tools/tilesets";
+import { TilesetEntry } from "3d-tiles-tools";
 
-import { TilesetDataProcessor } from "@3d-tiles-tools/tools";
+import { TilesetDataProcessor } from "3d-tiles-tools";
 
 const SPECS_DATA_BASE_DIRECTORY = "./specs/data";
 

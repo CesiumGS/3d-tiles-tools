@@ -1,9 +1,9 @@
 import { readJsonUnchecked } from "../readJsonUnchecked";
 
-import { MetadataClass } from "@3d-tiles-tools/structure";
-import { Tileset } from "@3d-tiles-tools/structure";
+import { MetadataClass } from "3d-tiles-tools";
+import { Tileset } from "3d-tiles-tools";
 
-import { MetadataEntityModels } from "@3d-tiles-tools/metadata";
+import { MetadataEntityModels } from "3d-tiles-tools";
 
 const SPECS_DATA_BASE_DIRECTORY = "./specs/data";
 

@@ -8,10 +8,10 @@ import { NodeIO } from "@gltf-transform/core";
 import { savePixels } from "ndarray-pixels";
 import NdArray from "ndarray";
 
-import { EXTMeshFeatures } from "@3d-tiles-tools/gltf-extensions";
-import { MeshFeaturesFeatureId as FeatureId } from "@3d-tiles-tools/gltf-extensions";
+import { EXTMeshFeatures } from "3d-tiles-tools";
+import { MeshFeaturesFeatureId as FeatureId } from "3d-tiles-tools";
 
-import { MeshFeaturesUtils } from "@3d-tiles-tools/tools";
+import { MeshFeaturesUtils } from "3d-tiles-tools";
 
 /**
  * Create a primitive that represents a unit square
@@ -75,10 +75,10 @@ async function createFeatureIdFromTexture(
   // RGBA pixels.
   const sizeX = 3;
   const sizeY = 3;
-  const pixels = NdArray(new Uint8Array(sizeX * sizeY), [sizeX, sizeY]);
+  const pixels = NdArray(new Uint8Array(sizeX * sizeY), [sizeX, sizeY, 4]);
   for (let x = 0; x < pixels.shape[0]; x++) {
     for (let y = 0; y < pixels.shape[1]; y++) {
-      pixels.set(x, y, x * sizeY + y);
+      pixels.set(x, y, 3, x * sizeY + y);
     }
   }
   const image = await savePixels(pixels, "image/png");

@@ -4,8 +4,8 @@ import { NodeIO } from "@gltf-transform/core";
 
 import { EXTMeshGPUInstancing } from "@gltf-transform/extensions";
 
-import { EXTInstanceFeatures } from "@3d-tiles-tools/gltf-extensions";
-import { InstanceFeaturesUtils } from "@3d-tiles-tools/tools";
+import { EXTInstanceFeatures } from "3d-tiles-tools";
+import { InstanceFeaturesUtils } from "3d-tiles-tools";
 
 function createMesh(document: Document) {
   const root = document.getRoot();

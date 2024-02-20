@@ -1,7 +1,13 @@
 Change Log
 ==========
 
-### 0.4.0 - 2024-02-06
+### 0.4.1 - 2024-02-20
+
+- The packages that have been introduced in version `0.4.0` have been merged back into a single package.
+  Details about the structure can be found in the [implementation notes](./IMPLEMENTATION.md).
+
+
+### 0.4.0 - 2024-02-06 (not released)
 
 - The 3D Tiles Tools have been split into multiple packages.
   For users of the command-line interface, this should not make a noticable difference: The installed package declares all other packages as its dependencies, and installs them transparently. 

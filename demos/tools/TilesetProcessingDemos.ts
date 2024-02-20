@@ -1,11 +1,11 @@
 import fs from "fs";
 import path from "path";
 
-import { Paths } from "@3d-tiles-tools/base";
+import { Paths } from "3d-tiles-tools";
 
-import { Tileset } from "@3d-tiles-tools/structure";
+import { Tileset } from "3d-tiles-tools";
 
-import { TilesetOperations } from "@3d-tiles-tools/tools";
+import { TilesetOperations } from "3d-tiles-tools";
 
 const SPECS_DATA_BASE_DIRECTORY = "./specs/data";
 

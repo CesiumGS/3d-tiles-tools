@@ -1,6 +1,6 @@
-import { BufferedContentData } from "@3d-tiles-tools/base";
-import { ContentDataTypeChecks } from "@3d-tiles-tools/base";
-import { ContentDataTypes } from "@3d-tiles-tools/base";
+import { BufferedContentData } from "3d-tiles-tools";
+import { ContentDataTypeChecks } from "3d-tiles-tools";
+import { ContentDataTypes } from "3d-tiles-tools";
 
 const SPECS_DATA_BASE_DIRECTORY = "./specs/data";
 

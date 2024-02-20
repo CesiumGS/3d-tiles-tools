@@ -1,7 +1,7 @@
-import { QuadtreeCoordinates } from "@3d-tiles-tools/base";
-import { OctreeCoordinates } from "@3d-tiles-tools/base";
+import { QuadtreeCoordinates } from "3d-tiles-tools";
+import { OctreeCoordinates } from "3d-tiles-tools";
 
-import { TemplateUris } from "@3d-tiles-tools/tilesets";
+import { TemplateUris } from "3d-tiles-tools";
 
 /**
  * A basic demo for the `TemplateUris.substituteQuadtree` method

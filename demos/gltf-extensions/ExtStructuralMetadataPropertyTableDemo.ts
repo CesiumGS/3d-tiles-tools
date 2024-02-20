@@ -1,14 +1,14 @@
 import { Document } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
 
-import { EXTStructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
-import { StructuralMetadata } from "@3d-tiles-tools/gltf-extensions";
+import { EXTStructuralMetadata } from "3d-tiles-tools";
+import { StructuralMetadata } from "3d-tiles-tools";
 
-import { BinaryPropertyTableBuilder } from "@3d-tiles-tools/metadata";
-import { BinaryPropertyTableModel } from "@3d-tiles-tools/metadata";
-import { PropertyTableModels } from "@3d-tiles-tools/metadata";
+import { BinaryPropertyTableBuilder } from "3d-tiles-tools";
+import { BinaryPropertyTableModel } from "3d-tiles-tools";
+import { PropertyTableModels } from "3d-tiles-tools";
 
-import { StructuralMetadataPropertyTables } from "@3d-tiles-tools/tools";
+import { StructuralMetadataPropertyTables } from "3d-tiles-tools";
 
 // An example metadata schema
 const exampleSchema = {

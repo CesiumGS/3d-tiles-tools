@@ -3,12 +3,12 @@ import { prune } from "@gltf-transform/functions";
 import { textureCompress } from "@gltf-transform/functions";
 import sharp from "sharp";
 
-import { TileContentProcessing } from "@3d-tiles-tools/tools";
-import { TileContentProcessors } from "@3d-tiles-tools/tools";
-import { TileContentProcessorsGltfTransform } from "@3d-tiles-tools/tools";
-import { TileContentProcessorsGltfPipeline } from "@3d-tiles-tools/tools";
-import { TileContentProcessorsGltfpack } from "@3d-tiles-tools/tools";
-import { GltfPackOptions } from "@3d-tiles-tools/tools";
+import { TileContentProcessing } from "3d-tiles-tools";
+import { TileContentProcessors } from "3d-tiles-tools";
+import { TileContentProcessorsGltfTransform } from "3d-tiles-tools";
+import { TileContentProcessorsGltfPipeline } from "3d-tiles-tools";
+import { TileContentProcessorsGltfpack } from "3d-tiles-tools";
+import { GltfPackOptions } from "3d-tiles-tools";
 
 // The intention of this demo is to show the effects of compression that
 // may be applied with glTF-Transform,  gltf-pipeline, or gltfpack. To

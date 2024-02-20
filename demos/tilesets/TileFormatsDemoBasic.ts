@@ -1,6 +1,6 @@
 import fs from "fs";
 
-import { TileFormats } from "@3d-tiles-tools/tilesets";
+import { TileFormats } from "3d-tiles-tools";
 
 const SPECS_DATA_BASE_DIRECTORY = "./specs/data";
 

@@ -3,8 +3,8 @@ import path from "path";
 
 const SPECS_DATA_BASE_DIRECTORY = "./specs/data";
 
-import { KtxUtility } from "@3d-tiles-tools/ktx";
-import { KtxOptions } from "@3d-tiles-tools/ktx";
+import { KtxUtility } from "3d-tiles-tools";
+import { KtxOptions } from "3d-tiles-tools";
 
 async function convertImageFileEtc1s() {
   const inputFileName = SPECS_DATA_BASE_DIRECTORY + "/images/CesiumLogo.png";

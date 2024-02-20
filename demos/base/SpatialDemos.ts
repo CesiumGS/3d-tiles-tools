@@ -1,5 +1,5 @@
-import { Quadtrees } from "@3d-tiles-tools/base";
-import { QuadtreeCoordinates } from "@3d-tiles-tools/base";
+import { Quadtrees } from "3d-tiles-tools";
+import { QuadtreeCoordinates } from "3d-tiles-tools";
 
 /**
  * A basic demo of the `QuadtreeCoordinates.children` method

@@ -15,7 +15,7 @@
    *
    * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
    */
-  "mainEntryPointFilePath": "packages/<unscopedPackageName>/build/src/index.d.ts",
+  "mainEntryPointFilePath": "build/src/index.d.ts",
 
   /**
    * Configures how the API report file (*.api.md) will be generated.
@@ -39,7 +39,7 @@
      * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
      * DEFAULT VALUE: "<projectFolder>/temp/"
      */
-    "reportTempFolder": "<projectFolder>/../../build/api-extractor",
+    "reportTempFolder": "<projectFolder>/temp/api-extractor",
 
     /**
      * Specifies the folder where the API report file is written.  The file name portion is determined by
@@ -54,7 +54,7 @@
      * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
      * DEFAULT VALUE: "<projectFolder>/etc/"
      */
-     "reportFolder": "<projectFolder>/../../etc/"
+     "reportFolder": "<projectFolder>/etc/"
   },
 
   /**
@@ -75,7 +75,7 @@
      * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
      * DEFAULT VALUE: "<projectFolder>/temp/<unscopedPackageName>.api.json"
      */
-     "apiJsonFilePath": "<projectFolder>/../../build/api-extractor/<unscopedPackageName>.api.json"
+     "apiJsonFilePath": "<projectFolder>/build/api-extractor/<unscopedPackageName>.api.json"
   },
 
   /**
@@ -113,7 +113,7 @@
      * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
      * DEFAULT VALUE: ""
      */
-     "publicTrimmedFilePath": "<projectFolder>/../../dist/<unscopedPackageName>.d.ts"    
+     "publicTrimmedFilePath": ""
   },
 
   "messages": {
