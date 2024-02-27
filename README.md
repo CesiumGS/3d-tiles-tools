@@ -271,6 +271,26 @@ npx 3d-tiles-tools analyze -i ./specs/data/batchedWithBatchTableBinary.b3dm -o .
 This will accept B3DM, I3DM, PNTS, CMPT, and GLB files (both for glTF 1.0 and for glTF 2.0), and write files into the output directory that contain the feature table, batch table, layout information, the GLB, and the JSON of the GLB. This is primarily intended for debugging and analyzing tile data. Therefore, the exact naming and content of the generated output files are not specified.
 
 
+#### createTilesetJson
+
+Create a tileset JSON file from a given set of tile content files.
+
+Additional command line options:
+
+| Flag | Description | Required |
+| ---- | ----------- | -------- |
+|`--cartographicPositionDegrees`|An array of either two or three values, which are the (longitude, latitude) or (longitude, latitude, height) of the target position. The longitude and latitude are given in degrees, and the height is given in meters.| No |
+
+If the input is a single file, then this will result in a single (root) tile with the input file as its tile content. If the input is a directory, then all content files in this directory will be used as tile content, recursively. The exact set of file types that are considered to be 'tile content' is not specified, but it will include GLB, B3DM, PNTS, I3DM, and CMPT files.
+
+Examples:
+
+```
+npx 3d-tiles-tools createTilesetJson -i ./input/ -o ./output/tileset.json --cartographicPositionDegrees -75.152 39.94 10
+```
+This creates the specified tileset JSON file, which will refer to all tile content files in the given input directory as its tile contents. The root node of the tileset will have a transform that will place it at the given cartographic position.
+
+
 
 ### Pipeline 
 
