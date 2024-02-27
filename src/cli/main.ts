@@ -303,12 +303,23 @@ function parseToolArgs(a: string[]) {
     )
     .command(
       "createTilesetJson",
-      "Creates a 'tileset.json' file that just refers to given GLB tile content files. " +
+      "Creates a tileset JSON file that just refers to given tile content files. " +
         "If the input is a single file, then this will result in a single (root) tile with " +
-        "the input file as its tile content. If the input is a directory, then all files" +
-        "with '.glb' file extension in this directory will be used as tile content, " +
-        "recursively.",
-      { i: inputStringDefinition, o: outputStringDefinition }
+        "the input file as its tile content. If the input is a directory, then all content " +
+        "files in this directory will be used as tile content, recursively. The exact set " +
+        "of file types that are considered to be 'tile content' is not specified, but it " +
+        "will include GLB, B3DM, PNTS, I3DM, and CMPT files.",
+      {
+        i: inputStringDefinition,
+        o: outputStringDefinition,
+        cartographicPositionDegrees: {
+          description:
+            "An array of either two or three values, which are the (longitude, latitude) " +
+            "or (longitude, latitude, height) of the target position. The longitude and " +
+            "latitude are given in degrees, and the height is given in meters.",
+          type: "array",
+        },
+      }
     )
     .demandCommand(1)
     .strict();
@@ -336,6 +347,63 @@ function parseOptionArgs(a: string[]) {
     v.dracoOptions = v.draco;
   }
   return v;
+}
+
+/**
+ * Ensures that the given value is an array of numbers with the given
+ * length constraints.
+ *
+ * If the given value is `undefined`, then no check will be performed
+ * and `undefined` is returned.
+ *
+ * Otherwise, this function will check the given constraints, and
+ * throw a `DeveloperError` if they are not met.
+ *
+ * @param value - The value
+ * @param minLength - The minimum length
+ * @param maxLength - The maximum length
+ * @returns The validated value
+ * @throws DeveloperError If the given value does not meet the given
+ * constraints.
+ */
+function validateOptionalNumberArray(
+  value: any,
+  minLength: number | undefined,
+  maxLength: number | undefined
+): number[] | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (!Array.isArray(value)) {
+    throw new DeveloperError(`Expected an array, but received ${value}`);
+  }
+  if (minLength !== undefined) {
+    if (value.length < minLength) {
+      throw new DeveloperError(
+        `Expected an array of at least length ${minLength}, ` +
+          `but received an array of length ${value.length}: ${value}`
+      );
+    }
+  }
+  if (maxLength !== undefined) {
+    if (value.length > maxLength) {
+      throw new DeveloperError(
+        `Expected an array of at most length ${maxLength}, ` +
+          `but received an array of length ${value.length}: ${value}`
+      );
+    }
+  }
+  for (let i = 0; i < value.length; i++) {
+    const element = value[i];
+    const type = typeof element;
+    if (type !== "number") {
+      throw new DeveloperError(
+        `Expected an array of numbers, but element at index ${i} ` +
+          `has type '${type}': ${element}`
+      );
+    }
+  }
+  return value;
 }
 
 const parsedToolArgs = parseToolArgs(toolArgs);
@@ -385,8 +453,6 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   const inputs: string[] = toolArgs.input;
   const output = toolArgs.output;
   const force = toolArgs.force;
-  const recursive = toolArgs.recursive;
-  const tilesOnly = toolArgs.tilesOnly;
   const parsedOptionArgs = parseOptionArgs(optionArgs);
 
   logger.trace(`Command line call:`);
@@ -394,7 +460,6 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   logger.trace(`  inputs: ${inputs}`);
   logger.trace(`  output: ${output}`);
   logger.trace(`  force: ${force}`);
-  logger.trace(`  recursive: ${recursive}`);
   logger.trace(`  optionArgs: ${optionArgs}`);
   logger.trace(`  parsedOptionArgs: ${JSON.stringify(parsedOptionArgs)}`);
 
@@ -407,6 +472,7 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   } else if (command === "cmptToGlb") {
     await ToolsMain.cmptToGlb(input, output, force);
   } else if (command === "splitCmpt") {
+    const recursive = toolArgs.recursive === true;
     await ToolsMain.splitCmpt(input, output, recursive, force);
   } else if (command === "convertB3dmToGlb") {
     await ToolsMain.convertB3dmToGlb(input, output, force);
@@ -423,6 +489,7 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   } else if (command === "optimizeI3dm") {
     await ToolsMain.optimizeI3dm(input, output, force, parsedOptionArgs);
   } else if (command === "gzip") {
+    const tilesOnly = toolArgs.tilesOnly === true;
     await ToolsMain.gzip(input, output, force, tilesOnly);
   } else if (command === "ungzip") {
     await ToolsMain.ungzip(input, output, force);
@@ -446,11 +513,12 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   } else if (command === "combine") {
     await ToolsMain.combine(input, output, force);
   } else if (command === "upgrade") {
+    const targetVersion = toolArgs.targetVersion ?? "1.0";
     await ToolsMain.upgrade(
       input,
       output,
       force,
-      toolArgs.targetVersion,
+      targetVersion,
       parsedOptionArgs
     );
   } else if (command === "merge") {
@@ -460,7 +528,17 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   } else if (command === "analyze") {
     ToolsMain.analyze(input, output, force);
   } else if (command === "createTilesetJson") {
-    await ToolsMain.createTilesetJson(input, output, force);
+    const cartographicPositionDegrees = validateOptionalNumberArray(
+      toolArgs.cartographicPositionDegrees,
+      2,
+      3
+    );
+    await ToolsMain.createTilesetJson(
+      input,
+      output,
+      cartographicPositionDegrees,
+      force
+    );
   } else {
     throw new DeveloperError(`Invalid command: ${command}`);
   }

@@ -567,6 +567,7 @@ export class ToolsMain {
   static async createTilesetJson(
     inputName: string,
     output: string,
+    cartographicPositionDegrees: number[] | undefined,
     force: boolean
   ) {
     logger.debug(`Executing createTilesetJson`);
@@ -588,11 +589,24 @@ export class ToolsMain {
         Paths.relativize(inputName, fileName)
       );
     }
-    logger.info(`Creating tileset.json with content URIs: ${contentUris}`);
+    logger.info(`Creating tileset JSON with content URIs: ${contentUris}`);
     const tileset = await TilesetJsonCreator.createTilesetFromContents(
       baseDir,
       contentUris
     );
+
+    if (cartographicPositionDegrees !== undefined) {
+      logger.info(
+        `Creating tileset at cartographic position: ` +
+          `${cartographicPositionDegrees} (in degress)`
+      );
+      const transform =
+        TilesetJsonCreator.computeTransformFromCartographicPositionDegrees(
+          cartographicPositionDegrees
+        );
+      tileset.root.transform = transform;
+    }
+
     const tilesetJsonString = JSON.stringify(tileset, null, 2);
     const outputDirectory = path.dirname(output);
     Paths.ensureDirectoryExists(outputDirectory);
