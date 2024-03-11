@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+### 0.4.2 - yyyy-mm-dd
+
+- The `createTilesetJson` command has been extended to receive an optional cartographic position, which serves as the position of generated tileset.
+
+
 ### 0.4.1 - 2024-02-20
 
 - The packages that have been introduced in version `0.4.0` have been merged back into a single package.
