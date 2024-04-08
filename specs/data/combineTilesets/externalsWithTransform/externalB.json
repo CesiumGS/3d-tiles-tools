@@ -1,0 +1,21 @@
+{
+  "asset" : {
+    "version" : "1.1"
+  },
+  "geometricError" : 4.0,
+  "root" : {
+    "boundingVolume" : {
+      "box" : [ 0.5,-0.5,0.5,0.5,0,0,0,-0.5,0,0,0,0.5 ]
+    },
+    "geometricError" : 2.0,
+    "content": {
+      "uri": "unitCubeB.glb"
+    },
+    "transform": [ 
+      1, 0, 0, 0,
+      0, 1, 0, 0,
+      0, 0, 1, 0,
+      0, 0, 5, 1
+    ]
+  }
+}

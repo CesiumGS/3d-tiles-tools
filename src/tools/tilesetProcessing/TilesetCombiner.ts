@@ -142,7 +142,7 @@ export class TilesetCombiner {
     this.externalTilesetFileNames.length = 0;
     await this.combineTilesetsInternal(".", tileset, undefined);
 
-    this.copyResources();
+    this.copyResources(tilesetTargetJsonFileName);
 
     const combinedTilesetJsonString = JSON.stringify(tileset, null, 2);
     const combinedTilesetJsonBuffer = Buffer.from(combinedTilesetJsonString);
@@ -176,6 +176,8 @@ export class TilesetCombiner {
       parentTile.content = root.content;
       parentTile.contents = root.contents;
       parentTile.children = root.children;
+      parentTile.boundingVolume = root.boundingVolume;
+      parentTile.transform = root.transform;
     }
     await Tiles.traverseExplicit(root, async (tilePath: Tile[]) => {
       const tile = tilePath[tilePath.length - 1];
@@ -278,20 +280,26 @@ export class TilesetCombiner {
   /**
    * Copy all elements from the tileset source to the tileset target,
    * except for the ones that have been determined to be external
-   * tilesets.
+   * tilesets, and the one that has the given target name.
    *
    * This is supposed to be called when the `tilesetSource` and
    * `tilesetTarget` are defined, and BEFORE the entry for the
-   * combined tileset JSON is added to the target, because that
-   * entry might overwrite an existing one.
+   * combined tileset JSON (with the given name) is added
+   * to the target.
+   *
+   * @param tilesetTargetJsonFileName The name of the target file
+   * that will contain the combined tileset JSON
    */
-  private copyResources(): void {
+  private copyResources(tilesetTargetJsonFileName: string): void {
     if (!this.tilesetSource || !this.tilesetTarget) {
       throw new DeveloperError("The source and target must be defined");
     }
     const entries = TilesetSources.getEntries(this.tilesetSource);
     for (const entry of entries) {
       const key = entry.key;
+      if (key === tilesetTargetJsonFileName) {
+        continue;
+      }
       if (this.externalTilesetFileNames.includes(key)) {
         continue;
       }
