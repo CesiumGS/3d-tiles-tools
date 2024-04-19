@@ -3,8 +3,13 @@ import draco3d from "draco3d";
 import { MeshoptDecoder } from "meshoptimizer";
 import { MeshoptEncoder } from "meshoptimizer";
 
+import { Document } from "@gltf-transform/core";
+import { Logger } from "@gltf-transform/core";
 import { Transform } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
+
+import { prune } from "@gltf-transform/functions";
+import { unpartition } from "@gltf-transform/functions";
 
 import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
 
@@ -78,5 +83,58 @@ export class GltfTransform {
     await document.transform(...transforms);
     const outputGlb = await io.writeBinary(document);
     return Buffer.from(outputGlb);
+  }
+
+  /**
+   * Combine all scenes in the given document into one.
+   *
+   * This will take the first scene, declare it as the default scene,
+   * attach the nodes from all other scenes to this one, and dispose
+   * the other scenes.
+   *
+   * @param document - The glTF-Transform document
+   */
+  private static async combineScenes(document: Document) {
+    const root = document.getRoot();
+    const scenes = root.listScenes();
+    if (scenes.length > 0) {
+      const combinedScene = scenes[0];
+      root.setDefaultScene(combinedScene);
+      for (let s = 1; s < scenes.length; s++) {
+        const otherScene = scenes[s];
+        const children = otherScene.listChildren();
+        for (const child of children) {
+          combinedScene.addChild(child);
+          otherScene.removeChild(child);
+        }
+        otherScene.dispose();
+      }
+    }
+    document.setLogger(new Logger(Logger.Verbosity.WARN));
+    await document.transform(prune());
+  }
+
+  /**
+   * Creates a single glTF Transform document from the given GLB buffers.
+   *
+   * This will create a document with a single scene that contains all
+   * nodes that have been children of any scene in the given input
+   * GLBs.
+   *
+   * @param inputGlbBuffers - The buffers containing GLB data
+   * @returns The merged document
+   */
+  static async merge(inputGlbBuffers: Buffer[]): Promise<Document> {
+    // Create one document from each buffer and merge them
+    const io = await GltfTransform.getIO();
+    const mergedDocument = new Document();
+    for (const inputGlbBuffer of inputGlbBuffers) {
+      const inputDocument = await io.readBinary(inputGlbBuffer);
+      mergedDocument.merge(inputDocument);
+    }
+    // Combine all scenes into one
+    await GltfTransform.combineScenes(mergedDocument);
+    await mergedDocument.transform(unpartition());
+    return mergedDocument;
   }
 }

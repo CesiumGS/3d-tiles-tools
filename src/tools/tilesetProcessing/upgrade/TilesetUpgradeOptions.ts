@@ -47,4 +47,7 @@ export type TilesetUpgradeOptions = {
   // Whether attempts should be made to convert I3DM files to GLB
   // with metadata
   upgradeI3dmToGlb: boolean;
+
+  // Whether attempts should be made to convert CMPT files to GLB
+  upgradeCmptToGlb: boolean;
 };
