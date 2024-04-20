@@ -128,9 +128,6 @@ export class GltfTransform {
     // Create one document from each buffer and merge them
     const io = await GltfTransform.getIO();
     const mergedDocument = new Document();
-    const root = mergedDocument.getRoot();
-    const asset = root.getAsset();
-    asset.generator = "glTF-Transform";
     for (const inputGlbBuffer of inputGlbBuffers) {
       const inputDocument = await io.readBinary(inputGlbBuffer);
       mergedDocument.merge(inputDocument);
@@ -138,6 +135,9 @@ export class GltfTransform {
     // Combine all scenes into one
     await GltfTransform.combineScenes(mergedDocument);
     await mergedDocument.transform(unpartition());
+    const root = mergedDocument.getRoot();
+    const asset = root.getAsset();
+    asset.generator = "glTF-Transform";
     return mergedDocument;
   }
 }
