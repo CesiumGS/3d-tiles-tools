@@ -833,4 +833,43 @@ describe("TileFormatsMigration", function () {
     );
     expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
   });
+
+  //==========================================================================
+  // CMPT
+
+  fit("converts Composite to the expected output", async function () {
+    const subDir = "Composite/";
+    const name = "Composite";
+    const fileNameWithoutExtension = "composite";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  fit("converts CompositeOfComposite to the expected output", async function () {
+    const subDir = "Composite/";
+    const name = "CompositeOfComposite";
+    const fileNameWithoutExtension = "compositeOfComposite";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  fit("converts CompositeOfInstanced to the expected output", async function () {
+    const subDir = "Composite/";
+    const name = "CompositeOfInstanced";
+    const fileNameWithoutExtension = "compositeOfInstanced";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
 });
