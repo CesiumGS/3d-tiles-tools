@@ -995,7 +995,7 @@ export class EXTStructuralMetadata extends Extension {
       structuralMetadataDef.schema = schemaDef;
     }
     const schemaUri = structuralMetadata.getSchemaUri();
-    if (schemaUri !== undefined) {
+    if (schemaUri !== null) {
       structuralMetadataDef.schemaUri = schemaUri;
     }
 

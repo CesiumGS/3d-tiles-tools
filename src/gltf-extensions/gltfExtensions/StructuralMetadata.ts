@@ -25,7 +25,7 @@ const NAME = "EXT_structural_metadata";
 
 interface IStructuralMetadata extends IProperty {
   schema: Schema;
-  schemaUri: string;
+  schemaUri: string | null;
   propertyTables: PropertyTable[];
   propertyTextures: PropertyTexture[];
   propertyAttributes: PropertyAttribute[];
@@ -179,6 +179,8 @@ export class StructuralMetadata extends ExtensionProperty<IStructuralMetadata> {
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
+      schema: null,
+      schemaUri: null,
       propertyTables: [],
       propertyTextures: [],
       propertyAttributes: [],
@@ -192,11 +194,11 @@ export class StructuralMetadata extends ExtensionProperty<IStructuralMetadata> {
     return this.setRef("schema", schema);
   }
 
-  getSchemaUri(): string {
+  getSchemaUri(): string | null {
     return this.get("schemaUri");
   }
-  setSchemaUri(name: string) {
-    return this.set("schemaUri", name);
+  setSchemaUri(schemaUri: string | null) {
+    return this.set("schemaUri", schemaUri);
   }
 
   listPropertyTables(): PropertyTable[] {
