@@ -1,3 +1,5 @@
+import crypto from "crypto";
+
 import { Document } from "@gltf-transform/core";
 import { Property } from "@gltf-transform/core";
 import { IProperty } from "@gltf-transform/core";
@@ -171,6 +173,8 @@ export class StructuralMetadataMerger {
     }
 
     log("Merging schemas...");
+    const oldClassKeys = targetSchema.listClassKeys();
+    const oldEnumKeys = targetSchema.listEnumKeys();
 
     const sourceClassNamesInTarget = StructuralMetadataMerger.mergeSchemas(
       targetDocument,
@@ -178,6 +182,15 @@ export class StructuralMetadataMerger {
       sourceDocument,
       sourceSchema
     );
+
+    const newClassKeys = targetSchema.listClassKeys();
+    const newEnumKeys = targetSchema.listEnumKeys();
+    if (oldClassKeys != newClassKeys || oldEnumKeys != newEnumKeys) {
+      const newId = "SCHEMA-ID-" + crypto.randomUUID();
+      log("Target schema was modified - assigning ID "+newId);
+      targetSchema.setId(newId)
+    }
+
 
     log("Merging property tables...");
     StructuralMetadataMerger.mergePropertyTables(
