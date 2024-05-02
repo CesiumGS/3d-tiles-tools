@@ -238,7 +238,7 @@ export class StructuralMetadataUtils {
         StructuralMetadataUtils.createClassString(sb, classObject);
         sb.decreaseIndent();
       }
-      sb.increaseIndent();
+      sb.decreaseIndent();
     }
   }
 
