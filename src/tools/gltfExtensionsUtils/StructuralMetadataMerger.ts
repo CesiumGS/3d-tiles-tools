@@ -187,10 +187,9 @@ export class StructuralMetadataMerger {
     const newEnumKeys = targetSchema.listEnumKeys();
     if (oldClassKeys != newClassKeys || oldEnumKeys != newEnumKeys) {
       const newId = "SCHEMA-ID-" + crypto.randomUUID();
-      log("Target schema was modified - assigning ID "+newId);
-      targetSchema.setId(newId)
+      log("Target schema was modified - assigning ID " + newId);
+      targetSchema.setId(newId);
     }
-
 
     log("Merging property tables...");
     StructuralMetadataMerger.mergePropertyTables(
