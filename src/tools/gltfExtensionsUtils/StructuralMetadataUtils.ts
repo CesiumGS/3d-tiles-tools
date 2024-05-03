@@ -165,7 +165,7 @@ export class StructuralMetadataUtils {
 
     let enumValueType: string | undefined = undefined;
     const enumType = classProperty.getEnumType();
-    if (enumType !== undefined) {
+    if (enumType !== null) {
       const enumObject = schema.getEnum(enumType);
       if (!enumObject) {
         sb.addLine(`decoded values: (no enum '${enumType}' in schema)`);
@@ -176,9 +176,9 @@ export class StructuralMetadataUtils {
     const propertyModel = BinaryPropertyModels.createPropertyModelInternal(
       propertyName,
       type,
-      componentType,
+      componentType ?? undefined,
       isArray,
-      count,
+      count ?? undefined,
       valuesBufferViewData,
       arrayOffsetsBufferViewData,
       arrayOffsetType,
