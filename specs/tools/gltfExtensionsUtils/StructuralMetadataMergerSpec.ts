@@ -4,6 +4,7 @@ import { EXTStructuralMetadata } from "../../../src/gltf-extensions";
 import { StructuralMetadata } from "../../../src/gltf-extensions";
 import { StructuralMetadataSchema as Schema } from "../../../src/gltf-extensions";
 import { StructuralMetadataClass as Class } from "../../../src/gltf-extensions";
+import { StructuralMetadataPropertyTable as PropertyTable } from "../../../src/gltf-extensions";
 
 import { BinaryPropertyTableBuilder } from "../../../src/metadata/";
 
@@ -113,6 +114,27 @@ function getNumPropertyTables(document: Document): number {
   }
   const propertyTables = structuralMetadata.listPropertyTables();
   return propertyTables.length;
+}
+
+/**
+ * Returns the property table with the given index from the
+ * `EXT_structural_metadata`, throwing up if this does not
+ * exist.
+ *
+ * @param document - The glTF-Transform document
+ * @param index The index of the property table
+ * @returns The property table
+ */
+function getPropertyTable(document: Document, index: number): PropertyTable {
+  const root = document.getRoot();
+  const structuralMetadata = root.getExtension<StructuralMetadata>(
+    "EXT_structural_metadata"
+  );
+  if (structuralMetadata === null) {
+    throw new Error("Document does not contain metadata");
+  }
+  const propertyTables = structuralMetadata.listPropertyTables();
+  return propertyTables[index];
 }
 
 /**
@@ -517,14 +539,13 @@ fdescribe("StructuralMetadataMerger", function () {
   //==========================================================================
   // Basic property table merging
 
-  // TODO:
-  it("works", async function () {
-    // One schema (with one class) for each document.
-    // The schemas (i.e. their classes) are structurally equal.
-    // One property table for each document.
-    // The result should be
-    // - one schema with one class
-    // - two property tables
+  it("merges the set of property tables for one resulting class", async function () {
+    // The classes have the same name/key
+    // The classes are structurally equal
+    // The property tables refer to the respective class (which turns out to be equal)
+    // The result should be:
+    // One class
+    // Two property tables
 
     const schemaA = {
       id: "EXAMPLE_SCHEMA_ID",
@@ -590,7 +611,7 @@ fdescribe("StructuralMetadataMerger", function () {
     // After merging in the first document:
     // There should be one class
     // There should be one property table
-    expect(getMetadataClassNames(document).length).toBe(1);
+    expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
     expect(getNumPropertyTables(document)).toBe(1);
 
     StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
@@ -602,7 +623,102 @@ fdescribe("StructuralMetadataMerger", function () {
     // After merging in the second document:
     // There should still be one class
     // There should be two property tables
-    expect(getMetadataClassNames(document).length).toBe(1);
+    expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
     expect(getNumPropertyTables(document)).toBe(2);
+  });
+
+  it("merges the set of property tables and updates their class for disambiguated classes", async function () {
+    // The classes have the same name/key
+    // The classes are structurally equal
+    // The property tables refer to the respective class (which turns out to be equal)
+    // The result should be:
+    // One class
+    // Two property tables
+
+    const schemaA = {
+      id: "EXAMPLE_SCHEMA_ID",
+      classes: {
+        exampleClass: {
+          name: "Example Class",
+          properties: {
+            example_STRING: {
+              name: "Example STRING property",
+              type: "STRING",
+            },
+          },
+        },
+      },
+    };
+
+    const schemaB = {
+      id: "EXAMPLE_SCHEMA_ID",
+      classes: {
+        exampleClass: {
+          name: "Example Class but with a difference", // Structural difference!
+          properties: {
+            example_STRING: {
+              name: "Example STRING property",
+              type: "STRING",
+            },
+          },
+        },
+      },
+    };
+
+    const propertyTableA = {
+      class: "exampleClass",
+      properties: {
+        example_STRING: ["This", "is", "an", "example"],
+      },
+    };
+
+    const propertyTableB = {
+      class: "exampleClass",
+      properties: {
+        example_STRING: ["Yet", "another", "example", "table"],
+      },
+    };
+
+    const documentA = new Document();
+    documentA.createBuffer();
+    assignMetadataSchema(documentA, schemaA);
+    addPropertyTable(documentA, schemaA, propertyTableA);
+
+    const documentB = new Document();
+    documentB.createBuffer();
+    assignMetadataSchema(documentB, schemaB);
+    addPropertyTable(documentB, schemaB, propertyTableB);
+
+    const document = new Document();
+    StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+      document,
+      documentA,
+      specSchemaUriResolver
+    );
+
+    // After merging in the first document:
+    // There should be one class
+    // There should be one property table
+    expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
+    expect(getNumPropertyTables(document)).toBe(1);
+
+    StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+      document,
+      documentB,
+      specSchemaUriResolver
+    );
+
+    // After merging in the second document:
+    // There should be two classes
+    // There should be two property tables
+    expect(getMetadataClassNames(document).sort()).toEqual(
+      ["exampleClass", "exampleClass_0"].sort()
+    );
+    expect(getNumPropertyTables(document)).toBe(2);
+
+    // Expect the second property table to refer to the
+    // renamed class
+    const propertyTable1 = getPropertyTable(document, 1);
+    expect(propertyTable1.getClass()).toBe("exampleClass_0");
   });
 });
