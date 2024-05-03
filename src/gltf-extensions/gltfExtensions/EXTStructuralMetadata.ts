@@ -28,16 +28,16 @@ const NAME = "EXT_structural_metadata";
  * Returns the given value if it is **NOT** equal to the given
  * default value.
  *
- * Returns `undefined` if the given value **IS** equal to the
+ * Returns `null` if the given value **IS** equal to the
  * given default value.
  *
  * @param value - The value
  * @param defaultValue - The default value
  * @returns The result
  */
-function ifNot<T>(value: T, defaultValue: T): T | undefined {
+function ifNot<T>(value: T, defaultValue: T): T | null {
   if (value === defaultValue) {
-    return undefined;
+    return null;
   }
   return value;
 }
@@ -1069,9 +1069,9 @@ export class EXTStructuralMetadata extends Extension {
 
     const schemaDef: SchemaDef = {
       id: schema.getId(),
-      name: schema.getObjectName(),
-      description: schema.getDescription(),
-      version: schema.getVersion(),
+      name: schema.getObjectName() ?? undefined,
+      description: schema.getDescription() ?? undefined,
+      version: schema.getVersion() ?? undefined,
       classes: classes,
       enums: enums,
     };
@@ -1095,8 +1095,8 @@ export class EXTStructuralMetadata extends Extension {
     }
 
     const classDef: ClassDef = {
-      name: classObject.getObjectName(),
-      description: classObject.getDescription(),
+      name: classObject.getObjectName() ?? undefined,
+      description: classObject.getDescription() ?? undefined,
       properties: properties,
     };
     return classDef;
@@ -1106,19 +1106,19 @@ export class EXTStructuralMetadata extends Extension {
     classProperty: ClassProperty
   ): ClassPropertyDef {
     const classPropertyDef: ClassPropertyDef = {
-      name: classProperty.getObjectName(),
-      description: classProperty.getDescription(),
+      name: classProperty.getObjectName() ?? undefined,
+      description: classProperty.getDescription() ?? undefined,
       type: classProperty.getType(),
-      componentType: classProperty.getComponentType(),
-      enumType: classProperty.getEnumType(),
-      array: ifNot(classProperty.getArray(), false),
-      count: classProperty.getCount(),
-      normalized: ifNot(classProperty.getNormalized(), false),
+      componentType: classProperty.getComponentType() ?? undefined,
+      enumType: classProperty.getEnumType() ?? undefined,
+      array: ifNot(classProperty.getArray(), false) ?? undefined,
+      count: classProperty.getCount() ?? undefined,
+      normalized: ifNot(classProperty.getNormalized(), false) ?? undefined,
       offset: classProperty.getOffset(),
       scale: classProperty.getScale(),
       max: classProperty.getMax(),
       min: classProperty.getMin(),
-      required: ifNot(classProperty.getRequired(), false),
+      required: ifNot(classProperty.getRequired(), false) ?? undefined,
       noData: classProperty.getNoData(),
       default: classProperty.getDefault(),
     };
@@ -1137,7 +1137,7 @@ export class EXTStructuralMetadata extends Extension {
     const enumDef: EnumDef = {
       name: enumObject.getObjectName(),
       description: enumObject.getDescription(),
-      valueType: ifNot(enumObject.getValueType(), "UINT16"),
+      valueType: ifNot(enumObject.getValueType(), "UINT16") ?? undefined,
       values: valueDefs,
     };
     return enumDef;
@@ -1225,11 +1225,11 @@ export class EXTStructuralMetadata extends Extension {
       arrayOffsetType: ifNot(
         propertyTableProperty.getArrayOffsetType(),
         "UINT32"
-      ),
+      ) ?? undefined,
       stringOffsetType: ifNot(
         propertyTableProperty.getStringOffsetType(),
         "UINT32"
-      ),
+      ) ?? undefined,
       offset: propertyTableProperty.getOffset(),
       scale: propertyTableProperty.getScale(),
       max: propertyTableProperty.getMax(),

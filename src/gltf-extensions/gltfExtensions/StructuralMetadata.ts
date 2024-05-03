@@ -32,15 +32,15 @@ interface IStructuralMetadata extends IProperty {
 }
 interface ISchema extends IProperty {
   id: string;
-  objectName: string;
-  description: string;
-  version: string;
+  objectName: string | null;
+  description: string | null;
+  version: string | null;
   classes: { [key: string]: Class };
   enums: { [key: string]: Enum };
 }
 interface IClass extends IProperty {
-  objectName: string;
-  description: string;
+  objectName: string | null;
+  description: string | null;
   properties: { [key: string]: ClassProperty };
 }
 
@@ -58,19 +58,19 @@ type AnyValue =
 */
 
 interface IClassProperty extends IProperty {
-  objectName: string;
-  description: string;
+  objectName: string | null;
+  description: string | null;
   type: ClassPropertyType;
-  componentType: ClassPropertyComponentType;
-  enumType: string;
-  array: boolean;
-  count: number;
-  normalized: boolean;
+  componentType: ClassPropertyComponentType | null;
+  enumType: string | null;
+  array: boolean | null;
+  count: number | null;
+  normalized: boolean | null;
   offset: any;
   scale: any;
   max: any;
   min: any;
-  required: boolean;
+  required: boolean | null;
   noData: any;
   default: any;
 }
@@ -251,6 +251,9 @@ export class Schema extends ExtensionProperty<ISchema> {
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
+      objectName: null,
+      description: null,
+      version: null,
       classes: {},
       enums: {},
     });
@@ -263,24 +266,24 @@ export class Schema extends ExtensionProperty<ISchema> {
     return this.set("id", name);
   }
 
-  getObjectName(): string {
+  getObjectName(): string | null {
     return this.get("objectName");
   }
-  setObjectName(name: string) {
+  setObjectName(name: string | null) {
     return this.set("objectName", name);
   }
 
-  getDescription(): string {
+  getDescription(): string | null {
     return this.get("description");
   }
-  setDescription(description: string) {
+  setDescription(description: string | null) {
     return this.set("description", description);
   }
 
-  getVersion(): string {
+  getVersion(): string | null {
     return this.get("version");
   }
-  setVersion(version: string) {
+  setVersion(version: string | null) {
     return this.set("version", version);
   }
 
@@ -330,21 +333,23 @@ export class Class extends ExtensionProperty<IClass> {
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
+      objectName: null,
+      description: null,
       properties: {},
     });
   }
 
-  getObjectName(): string {
+  getObjectName(): string | null {
     return this.get("objectName");
   }
-  setObjectName(name: string) {
+  setObjectName(name: string | null) {
     return this.set("objectName", name);
   }
 
-  getDescription(): string {
+  getDescription(): string | null {
     return this.get("description");
   }
-  setDescription(description: string) {
+  setDescription(description: string | null) {
     return this.set("description", description);
   }
 
@@ -381,23 +386,34 @@ export class ClassProperty extends ExtensionProperty<IClassProperty> {
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
-      array: false,
-      normalized: false,
-      required: false,
+      objectName: null,
+      description: null,
+      componentType: null,
+      enumType: null,
+      array: null,
+      count: null,
+      normalized: null,
+      offset: null,
+      scale: null,
+      max: null,
+      min: null,
+      required: null,
+      noData: null,
+      default: null
     });
   }
 
-  getObjectName(): string {
+  getObjectName(): string | null {
     return this.get("objectName");
   }
-  setObjectName(name: string) {
+  setObjectName(name: string | null) {
     return this.set("objectName", name);
   }
 
-  getDescription(): string {
+  getDescription(): string | null {
     return this.get("description");
   }
-  setDescription(description: string) {
+  setDescription(description: string | null) {
     return this.set("description", description);
   }
 
@@ -408,38 +424,38 @@ export class ClassProperty extends ExtensionProperty<IClassProperty> {
     return this.set("type", type);
   }
 
-  getComponentType(): ClassPropertyComponentType {
+  getComponentType(): ClassPropertyComponentType | null {
     return this.get("componentType");
   }
-  setComponentType(componentType: ClassPropertyComponentType) {
+  setComponentType(componentType: ClassPropertyComponentType | null) {
     return this.set("componentType", componentType);
   }
 
-  getEnumType(): string {
+  getEnumType(): string | null {
     return this.get("enumType");
   }
-  setEnumType(enumType: string) {
+  setEnumType(enumType: string | null) {
     return this.set("enumType", enumType);
   }
 
-  getArray(): boolean {
+  getArray(): boolean | null{
     return this.get("array");
   }
-  setArray(array: boolean) {
+  setArray(array: boolean | null) {
     return this.set("array", array);
   }
 
-  getCount(): number {
+  getCount(): number | null {
     return this.get("count");
   }
-  setCount(count: number) {
+  setCount(count: number | null) {
     return this.set("count", count);
   }
 
-  getNormalized(): boolean {
+  getNormalized(): boolean | null {
     return this.get("normalized");
   }
-  setNormalized(normalized: boolean) {
+  setNormalized(normalized: boolean | null) {
     return this.set("normalized", normalized);
   }
 
@@ -471,10 +487,10 @@ export class ClassProperty extends ExtensionProperty<IClassProperty> {
     return this.set("min", min);
   }
 
-  getRequired(): boolean {
+  getRequired(): boolean | null {
     return this.get("required");
   }
-  setRequired(required: boolean) {
+  setRequired(required: boolean | null) {
     return this.set("required", required);
   }
 
