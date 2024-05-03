@@ -159,9 +159,9 @@ export class EXTInstanceFeatures extends Extension {
     }
     const featureIdDef: FeatureIdDef = {
       featureCount: featureId.getFeatureCount(),
-      nullFeatureId: featureId.getNullFeatureId(),
-      label: featureId.getLabel(),
-      attribute: featureId.getAttribute(),
+      nullFeatureId: featureId.getNullFeatureId() ?? undefined,
+      label: featureId.getLabel() ?? undefined,
+      attribute: featureId.getAttribute() ?? undefined,
       propertyTable: propertyTableDef,
     };
     return featureIdDef;
