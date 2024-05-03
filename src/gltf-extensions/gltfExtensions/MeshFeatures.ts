@@ -152,7 +152,7 @@ export class FeatureId extends ExtensionProperty<IFeatureId> {
       label: null,
       attribute: null,
       texture: null,
-      propertyTable: null
+      propertyTable: null,
     });
   }
 
@@ -177,7 +177,7 @@ export class FeatureId extends ExtensionProperty<IFeatureId> {
     return this.set("label", label);
   }
 
-  getAttribute(): FeatureIdAttribute | null{
+  getAttribute(): FeatureIdAttribute | null {
     return this.get("attribute");
   }
   setAttribute(attribute: FeatureIdAttribute | null) {

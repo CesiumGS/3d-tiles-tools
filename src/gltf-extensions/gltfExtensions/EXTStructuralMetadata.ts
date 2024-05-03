@@ -1222,14 +1222,12 @@ export class EXTStructuralMetadata extends Extension {
       values: values,
       arrayOffsets: arrayOffsets,
       stringOffsets: stringOffsets,
-      arrayOffsetType: ifNot(
-        propertyTableProperty.getArrayOffsetType(),
-        "UINT32"
-      ) ?? undefined,
-      stringOffsetType: ifNot(
-        propertyTableProperty.getStringOffsetType(),
-        "UINT32"
-      ) ?? undefined,
+      arrayOffsetType:
+        ifNot(propertyTableProperty.getArrayOffsetType(), "UINT32") ??
+        undefined,
+      stringOffsetType:
+        ifNot(propertyTableProperty.getStringOffsetType(), "UINT32") ??
+        undefined,
       offset: propertyTableProperty.getOffset(),
       scale: propertyTableProperty.getScale(),
       max: propertyTableProperty.getMax(),

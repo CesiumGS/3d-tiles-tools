@@ -84,7 +84,7 @@ export class FeatureId extends ExtensionProperty<IFeatureId> {
       nullFeatureId: null,
       label: null,
       attribute: null,
-      propertyTable: null
+      propertyTable: null,
     });
   }
 

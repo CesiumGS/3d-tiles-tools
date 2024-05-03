@@ -399,7 +399,7 @@ export class ClassProperty extends ExtensionProperty<IClassProperty> {
       min: null,
       required: null,
       noData: null,
-      default: null
+      default: null,
     });
   }
 
@@ -542,7 +542,7 @@ export class Enum extends ExtensionProperty<IEnum> {
     return this.set("objectName", name);
   }
 
-  getDescription(): string  | null{
+  getDescription(): string | null {
     return this.get("description");
   }
   setDescription(description: string | null) {
@@ -586,7 +586,7 @@ export class EnumValue extends ExtensionProperty<IEnumValue> {
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
-      description: null
+      description: null,
     });
   }
 
@@ -597,7 +597,7 @@ export class EnumValue extends ExtensionProperty<IEnumValue> {
     return this.set("objectName", name);
   }
 
-  getDescription(): string | null{
+  getDescription(): string | null {
     return this.get("description");
   }
   setDescription(description: string | null) {
@@ -697,7 +697,7 @@ export class PropertyTableProperty extends ExtensionProperty<IPropertyTablePrope
       offset: null,
       scale: null,
       max: null,
-      min: null
+      min: null,
     });
   }
 
@@ -845,7 +845,7 @@ export class PropertyTextureProperty extends ExtensionProperty<IPropertyTextureP
       offset: null,
       scale: null,
       max: null,
-      min: null
+      min: null,
     });
   }
 
@@ -920,7 +920,7 @@ export class PropertyAttribute extends ExtensionProperty<IPropertyAttribute> {
     });
   }
 
-  getObjectName(): string | null{
+  getObjectName(): string | null {
     return this.get("objectName");
   }
   setObjectName(name: string | null) {
@@ -967,10 +967,10 @@ export class PropertyAttributeProperty extends ExtensionProperty<IPropertyAttrib
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
-      offset: null, 
+      offset: null,
       scale: null,
       max: null,
-      min: null
+      min: null,
     });
   }
 
@@ -1038,7 +1038,7 @@ export class ElementStructuralMetadata extends ExtensionProperty<IElementStructu
     return this.setRef("propertyTable", propertyTable);
   }
 
-  getIndex(): number | null{
+  getIndex(): number | null {
     return this.get("index");
   }
   setIndex(index: number | null) {
