@@ -171,7 +171,7 @@ export class StructuralMetadataUtils {
         sb.addLine(`decoded values: (no enum '${enumType}' in schema)`);
         return;
       }
-      enumValueType = enumObject.getValueType() ?? "UINT16";
+      enumValueType = enumObject.getValueType();
     }
     const propertyModel = BinaryPropertyModels.createPropertyModelInternal(
       propertyName,
