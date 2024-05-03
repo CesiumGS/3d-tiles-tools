@@ -11,6 +11,24 @@ import { StructuralMetadata } from "./StructuralMetadata";
 
 const NAME = "EXT_mesh_features";
 
+/**
+ * Returns the given value if it is **NOT** equal to the given
+ * default value.
+ *
+ * Returns `null` if the given value **IS** equal to the
+ * given default value.
+ *
+ * @param value - The value
+ * @param defaultValue - The default value
+ * @returns The result
+ */
+function ifNot<T>(value: T, defaultValue: T): T | null {
+  if (value == defaultValue) {
+    return null;
+  }
+  return value;
+}
+
 //============================================================================
 // Interfaces for the JSON structure
 //
@@ -285,7 +303,7 @@ export class EXTMeshFeatures extends Extension {
           textureInfo
         );
         textureDef = {
-          channels: featureIdTexture.getChannels(),
+          channels: ifNot(featureIdTexture.getChannels(), [0]) ?? undefined,
           index: basicTextureDef.index,
           texCoord: basicTextureDef.texCoord,
         };

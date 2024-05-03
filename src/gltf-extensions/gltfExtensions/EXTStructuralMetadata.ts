@@ -36,7 +36,7 @@ const NAME = "EXT_structural_metadata";
  * @returns The result
  */
 function ifNot<T>(value: T, defaultValue: T): T | null {
-  if (value === defaultValue) {
+  if (value == defaultValue) {
     return null;
   }
   return value;
@@ -1290,7 +1290,7 @@ export class EXTStructuralMetadata extends Extension {
     }
     const basicTextureDef = context.createTextureInfoDef(texture, textureInfo);
     const propertyTexturePropertyDef: PropertyTexturePropertyDef = {
-      channels: propertyTextureProperty.getChannels() ?? undefined,
+      channels: ifNot(propertyTextureProperty.getChannels(), [0]) ?? undefined,
       index: basicTextureDef.index,
       texCoord: basicTextureDef.texCoord,
       offset: propertyTextureProperty.getOffset(),

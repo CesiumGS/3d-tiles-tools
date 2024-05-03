@@ -63,14 +63,14 @@ interface IClassProperty extends IProperty {
   type: ClassPropertyType;
   componentType: ClassPropertyComponentType | null;
   enumType: string | null;
-  array: boolean | null;
+  array: boolean;
   count: number | null;
-  normalized: boolean | null;
+  normalized: boolean;
   offset: any;
   scale: any;
   max: any;
   min: any;
-  required: boolean | null;
+  required: boolean;
   noData: any;
   default: any;
 }
@@ -78,7 +78,7 @@ interface IClassProperty extends IProperty {
 interface IEnum extends IProperty {
   objectName: string | null;
   description: string | null;
-  valueType: EnumValueType | null;
+  valueType: EnumValueType;
   values: EnumValue[];
 }
 
@@ -99,8 +99,8 @@ interface IPropertyTableProperty extends IProperty {
   values: Uint8Array;
   arrayOffsets: Uint8Array;
   stringOffsets: Uint8Array;
-  arrayOffsetType: PropertyTablePropertyOffsetType | null;
-  stringOffsetType: PropertyTablePropertyOffsetType | null;
+  arrayOffsetType: PropertyTablePropertyOffsetType;
+  stringOffsetType: PropertyTablePropertyOffsetType;
   offset: any;
   scale: any;
   max: any;
@@ -114,7 +114,7 @@ interface IPropertyTexture extends IProperty {
 }
 
 interface IPropertyTextureProperty extends IProperty {
-  channels: number[] | null;
+  channels: number[];
   offset: any;
   scale: any;
   max: any;
@@ -438,10 +438,10 @@ export class ClassProperty extends ExtensionProperty<IClassProperty> {
     return this.set("enumType", enumType);
   }
 
-  getArray(): boolean | null{
+  getArray(): boolean {
     return this.get("array");
   }
-  setArray(array: boolean | null) {
+  setArray(array: boolean) {
     return this.set("array", array);
   }
 
@@ -452,10 +452,10 @@ export class ClassProperty extends ExtensionProperty<IClassProperty> {
     return this.set("count", count);
   }
 
-  getNormalized(): boolean | null {
+  getNormalized(): boolean {
     return this.get("normalized");
   }
-  setNormalized(normalized: boolean | null) {
+  setNormalized(normalized: boolean) {
     return this.set("normalized", normalized);
   }
 
@@ -487,10 +487,10 @@ export class ClassProperty extends ExtensionProperty<IClassProperty> {
     return this.set("min", min);
   }
 
-  getRequired(): boolean | null {
+  getRequired(): boolean {
     return this.get("required");
   }
-  setRequired(required: boolean | null) {
+  setRequired(required: boolean) {
     return this.set("required", required);
   }
 
@@ -530,7 +530,7 @@ export class Enum extends ExtensionProperty<IEnum> {
     return Object.assign(super.getDefaults(), {
       objectName: null,
       description: null,
-      valueType: null,
+      valueType: "UINT16",
       values: [],
     });
   }
@@ -549,10 +549,10 @@ export class Enum extends ExtensionProperty<IEnum> {
     return this.set("description", description);
   }
 
-  getValueType(): EnumValueType | null{
+  getValueType(): EnumValueType {
     return this.get("valueType");
   }
-  setValueType(valueType: EnumValueType | null) {
+  setValueType(valueType: EnumValueType) {
     return this.set("valueType", valueType);
   }
 
@@ -722,17 +722,17 @@ export class PropertyTableProperty extends ExtensionProperty<IPropertyTablePrope
     return this.set("stringOffsets", stringOffsets);
   }
 
-  getArrayOffsetType(): PropertyTablePropertyOffsetType | null {
+  getArrayOffsetType(): PropertyTablePropertyOffsetType {
     return this.get("arrayOffsetType");
   }
-  setArrayOffsetType(arrayOffsetType: PropertyTablePropertyOffsetType | null) {
+  setArrayOffsetType(arrayOffsetType: PropertyTablePropertyOffsetType) {
     return this.set("arrayOffsetType", arrayOffsetType);
   }
 
-  getStringOffsetType(): PropertyTablePropertyOffsetType | null {
+  getStringOffsetType(): PropertyTablePropertyOffsetType {
     return this.get("stringOffsetType");
   }
-  setStringOffsetType(stringOffsetType: PropertyTablePropertyOffsetType | null) {
+  setStringOffsetType(stringOffsetType: PropertyTablePropertyOffsetType) {
     return this.set("stringOffsetType", stringOffsetType);
   }
 
@@ -839,7 +839,7 @@ export class PropertyTextureProperty extends ExtensionProperty<IPropertyTextureP
     defaultTextureInfo.setMinFilter(TextureInfo.MagFilter.NEAREST);
     defaultTextureInfo.setMagFilter(TextureInfo.MagFilter.NEAREST);
     return Object.assign(super.getDefaults(), {
-      channels: null,
+      channels: [0],
       texture: null,
       textureInfo: defaultTextureInfo,
       offset: null,
@@ -849,10 +849,10 @@ export class PropertyTextureProperty extends ExtensionProperty<IPropertyTextureP
     });
   }
 
-  getChannels(): number[] | null{
+  getChannels(): number[] {
     return this.get("channels");
   }
-  setChannels(channels: number[] | null) {
+  setChannels(channels: number[]) {
     return this.set("channels", channels);
   }
 
