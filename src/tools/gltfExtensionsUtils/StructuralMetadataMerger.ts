@@ -627,7 +627,7 @@ export class StructuralMetadataMerger {
       const sourceProperty = sourceClass.getProperty(sourcePropertyKey);
       if (sourceProperty) {
         const sourceEnumType = sourceProperty.getEnumType();
-        if (sourceEnumType !== undefined) {
+        if (sourceEnumType !== null) {
           const targetEnumType = sourceEnumNamesInTarget[sourceEnumType];
           if (targetEnumType !== sourceEnumType) {
             return true;
@@ -655,7 +655,7 @@ export class StructuralMetadataMerger {
       const targetProperty = targetClass.getProperty(targetPropertyKey);
       if (targetProperty) {
         const sourceEnumType = targetProperty.getEnumType();
-        if (sourceEnumType !== undefined) {
+        if (sourceEnumType !== null) {
           const targetEnumType = sourceEnumNamesInTarget[sourceEnumType];
           targetProperty.setEnumType(targetEnumType);
         }
