@@ -311,9 +311,9 @@ export class EXTMeshFeatures extends Extension {
 
     const featureIdDef: FeatureIdDef = {
       featureCount: featureId.getFeatureCount(),
-      nullFeatureId: featureId.getNullFeatureId(),
-      label: featureId.getLabel(),
-      attribute: featureId.getAttribute(),
+      nullFeatureId: featureId.getNullFeatureId() ?? undefined,
+      label: featureId.getLabel() ?? undefined,
+      attribute: featureId.getAttribute() ?? undefined,
       texture: textureDef,
       propertyTable: propertyTableDef,
     };
