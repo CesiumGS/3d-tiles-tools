@@ -973,7 +973,7 @@ export class EXTStructuralMetadata extends Extension {
       if (propertyTableIndex >= 0) {
         const elementStructuralMetadataDef: ElementStructuralMetadataDef = {
           propertyTable: propertyTableIndex,
-          index: elementStructuralMetadata.getIndex(),
+          index: elementStructuralMetadata.getIndex() ?? undefined,
         };
         nodeDef.extensions = nodeDef.extensions || {};
         nodeDef.extensions[NAME] = elementStructuralMetadataDef;
@@ -1135,8 +1135,8 @@ export class EXTStructuralMetadata extends Extension {
     }
 
     const enumDef: EnumDef = {
-      name: enumObject.getObjectName(),
-      description: enumObject.getDescription(),
+      name: enumObject.getObjectName() ?? undefined,
+      description: enumObject.getDescription() ?? undefined,
       valueType: ifNot(enumObject.getValueType(), "UINT16") ?? undefined,
       values: valueDefs,
     };
@@ -1146,7 +1146,7 @@ export class EXTStructuralMetadata extends Extension {
   private createEnumValueDef(enumValue: EnumValue): EnumValueDef {
     const enumValueDef: EnumValueDef = {
       name: enumValue.getObjectName(),
-      description: enumValue.getDescription(),
+      description: enumValue.getDescription() ?? undefined,
       value: enumValue.getValue(),
     };
     return enumValueDef;
@@ -1175,7 +1175,7 @@ export class EXTStructuralMetadata extends Extension {
     }
 
     const propertyTableDef: PropertyTableDef = {
-      name: propertyTable.getObjectName(),
+      name: propertyTable.getObjectName() ?? undefined,
       class: propertyTable.getClass(),
       count: propertyTable.getCount(),
       properties: propertyDefs,
@@ -1264,7 +1264,7 @@ export class EXTStructuralMetadata extends Extension {
     }
 
     const propertyTextureDef: PropertyTextureDef = {
-      name: propertyTexture.getObjectName(),
+      name: propertyTexture.getObjectName() ?? undefined,
       class: propertyTexture.getClass(),
       properties: propertyDefs,
     };
@@ -1290,7 +1290,7 @@ export class EXTStructuralMetadata extends Extension {
     }
     const basicTextureDef = context.createTextureInfoDef(texture, textureInfo);
     const propertyTexturePropertyDef: PropertyTexturePropertyDef = {
-      channels: propertyTextureProperty.getChannels(),
+      channels: propertyTextureProperty.getChannels() ?? undefined,
       index: basicTextureDef.index,
       texCoord: basicTextureDef.texCoord,
       offset: propertyTextureProperty.getOffset(),
@@ -1322,7 +1322,7 @@ export class EXTStructuralMetadata extends Extension {
     }
 
     const propertyAttributeDef: PropertyAttributeDef = {
-      name: propertyAttribute.getObjectName(),
+      name: propertyAttribute.getObjectName() ?? undefined,
       class: propertyAttribute.getClass(),
       properties: propertyDefs,
     };
