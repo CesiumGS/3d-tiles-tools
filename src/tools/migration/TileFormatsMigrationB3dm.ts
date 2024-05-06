@@ -1,3 +1,5 @@
+import { Accessor } from "@gltf-transform/core";
+
 import { BatchTable } from "../../structure";
 import { B3dmFeatureTable } from "../../structure";
 
@@ -74,6 +76,8 @@ export class TileFormatsMigrationB3dm {
           batchTableBinary,
           numRows
         );
+
+      const batchIdToFeatureIdAccessor = new Map<Accessor, Accessor>();
       const meshes = root.listMeshes();
       for (const mesh of meshes) {
         const primitives = mesh.listPrimitives();
@@ -83,12 +87,19 @@ export class TileFormatsMigrationB3dm {
           const featureId =
             TileTableDataToMeshFeatures.convertBatchIdToMeshFeatures(
               document,
-              primitive
+              primitive,
+              batchIdToFeatureIdAccessor
             );
           if (propertyTable) {
             featureId.setPropertyTable(propertyTable);
           }
         }
+      }
+
+      // Dispose all former batch ID accessors that have been
+      // converted into feature ID accessors
+      for (const batchIdAccessor of batchIdToFeatureIdAccessor.keys()) {
+        batchIdAccessor.dispose();
       }
     }
 
