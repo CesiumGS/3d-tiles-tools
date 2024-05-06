@@ -37,16 +37,9 @@
     },
     {
       "type": "SCALAR",
-      "componentType": 5126,
-      "count": 240,
-      "bufferView": 1,
-      "byteOffset": 0
-    },
-    {
-      "type": "SCALAR",
       "componentType": 5123,
       "count": 360,
-      "bufferView": 2,
+      "bufferView": 1,
       "byteOffset": 0
     }
   ],
@@ -61,59 +54,54 @@
     {
       "buffer": 0,
       "byteOffset": 6720,
-      "byteLength": 960
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 7680,
       "byteLength": 720,
       "target": 34963
     },
     {
       "buffer": 0,
-      "byteOffset": 8400,
+      "byteOffset": 7440,
       "byteLength": 10
     },
     {
       "buffer": 0,
-      "byteOffset": 8410,
+      "byteOffset": 7450,
       "byteLength": 40
     },
     {
       "buffer": 0,
-      "byteOffset": 8450,
+      "byteOffset": 7490,
       "byteLength": 40
     },
     {
       "buffer": 0,
-      "byteOffset": 8490,
+      "byteOffset": 7530,
       "byteLength": 40
     },
     {
       "buffer": 0,
-      "byteOffset": 8530,
+      "byteOffset": 7570,
       "byteLength": 290
     },
     {
       "buffer": 0,
-      "byteOffset": 8820,
+      "byteOffset": 7860,
       "byteLength": 44
     },
     {
       "buffer": 0,
-      "byteOffset": 8864,
+      "byteOffset": 7904,
       "byteLength": 210
     },
     {
       "buffer": 0,
-      "byteOffset": 9074,
+      "byteOffset": 8114,
       "byteLength": 124
     }
   ],
   "buffers": [
     {
       "name": "buffer",
-      "byteLength": 9198
+      "byteLength": 8238
     }
   ],
   "materials": [
@@ -134,7 +122,7 @@
           },
           "mode": 4,
           "material": 0,
-          "indices": 4,
+          "indices": 3,
           "extensions": {
             "EXT_mesh_features": {
               "featureIds": [
@@ -245,24 +233,24 @@
           "count": 10,
           "properties": {
             "id": {
-              "values": 3
+              "values": 2
             },
             "Longitude": {
-              "values": 4
+              "values": 3
             },
             "Latitude": {
-              "values": 5
+              "values": 4
             },
             "Height": {
-              "values": 6
+              "values": 5
             },
             "info": {
-              "values": 7,
-              "stringOffsets": 8
+              "values": 6,
+              "stringOffsets": 7
             },
             "rooms": {
-              "values": 9,
-              "stringOffsets": 10
+              "values": 8,
+              "stringOffsets": 9
             }
           }
         }

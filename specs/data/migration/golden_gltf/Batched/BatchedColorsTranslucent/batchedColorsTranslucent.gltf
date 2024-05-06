@@ -37,142 +37,72 @@
     },
     {
       "type": "SCALAR",
-      "componentType": 5126,
-      "count": 240,
+      "componentType": 5123,
+      "count": 36,
       "bufferView": 1,
       "byteOffset": 0
     },
     {
       "type": "SCALAR",
-      "componentType": 5126,
-      "count": 240,
-      "bufferView": 2,
-      "byteOffset": 0
-    },
-    {
-      "type": "SCALAR",
-      "componentType": 5126,
-      "count": 240,
-      "bufferView": 3,
-      "byteOffset": 0
-    },
-    {
-      "type": "SCALAR",
-      "componentType": 5126,
-      "count": 240,
-      "bufferView": 4,
-      "byteOffset": 0
-    },
-    {
-      "type": "SCALAR",
-      "componentType": 5126,
-      "count": 240,
-      "bufferView": 5,
-      "byteOffset": 0
-    },
-    {
-      "type": "SCALAR",
-      "componentType": 5126,
-      "count": 240,
-      "bufferView": 6,
-      "byteOffset": 0
-    },
-    {
-      "type": "SCALAR",
-      "componentType": 5126,
-      "count": 240,
-      "bufferView": 7,
-      "byteOffset": 0
-    },
-    {
-      "type": "SCALAR",
-      "componentType": 5126,
-      "count": 240,
-      "bufferView": 8,
-      "byteOffset": 0
-    },
-    {
-      "type": "SCALAR",
-      "componentType": 5126,
-      "count": 240,
-      "bufferView": 9,
-      "byteOffset": 0
-    },
-    {
-      "type": "SCALAR",
-      "componentType": 5126,
-      "count": 240,
-      "bufferView": 10,
-      "byteOffset": 0
-    },
-    {
-      "type": "SCALAR",
       "componentType": 5123,
       "count": 36,
-      "bufferView": 11,
-      "byteOffset": 0
-    },
-    {
-      "type": "SCALAR",
-      "componentType": 5123,
-      "count": 36,
-      "bufferView": 11,
+      "bufferView": 1,
       "byteOffset": 72
     },
     {
       "type": "SCALAR",
       "componentType": 5123,
       "count": 36,
-      "bufferView": 11,
+      "bufferView": 1,
       "byteOffset": 144
     },
     {
       "type": "SCALAR",
       "componentType": 5123,
       "count": 36,
-      "bufferView": 11,
+      "bufferView": 1,
       "byteOffset": 216
     },
     {
       "type": "SCALAR",
       "componentType": 5123,
       "count": 36,
-      "bufferView": 11,
+      "bufferView": 1,
       "byteOffset": 288
     },
     {
       "type": "SCALAR",
       "componentType": 5123,
       "count": 36,
-      "bufferView": 11,
+      "bufferView": 1,
       "byteOffset": 360
     },
     {
       "type": "SCALAR",
       "componentType": 5123,
       "count": 36,
-      "bufferView": 11,
+      "bufferView": 1,
       "byteOffset": 432
     },
     {
       "type": "SCALAR",
       "componentType": 5123,
       "count": 36,
-      "bufferView": 11,
+      "bufferView": 1,
       "byteOffset": 504
     },
     {
       "type": "SCALAR",
       "componentType": 5123,
       "count": 36,
-      "bufferView": 11,
+      "bufferView": 1,
       "byteOffset": 576
     },
     {
       "type": "SCALAR",
       "componentType": 5123,
       "count": 36,
-      "bufferView": 11,
+      "bufferView": 1,
       "byteOffset": 648
     }
   ],
@@ -187,102 +117,34 @@
     {
       "buffer": 0,
       "byteOffset": 6720,
-      "byteLength": 960,
-      "byteStride": 4,
-      "target": 34962
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 7680,
-      "byteLength": 960,
-      "byteStride": 4,
-      "target": 34962
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 8640,
-      "byteLength": 960,
-      "byteStride": 4,
-      "target": 34962
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 9600,
-      "byteLength": 960,
-      "byteStride": 4,
-      "target": 34962
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 10560,
-      "byteLength": 960,
-      "byteStride": 4,
-      "target": 34962
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 11520,
-      "byteLength": 960,
-      "byteStride": 4,
-      "target": 34962
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 12480,
-      "byteLength": 960,
-      "byteStride": 4,
-      "target": 34962
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 13440,
-      "byteLength": 960,
-      "byteStride": 4,
-      "target": 34962
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 14400,
-      "byteLength": 960,
-      "byteStride": 4,
-      "target": 34962
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 15360,
-      "byteLength": 960
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 16320,
       "byteLength": 720,
       "target": 34963
     },
     {
       "buffer": 0,
-      "byteOffset": 17040,
+      "byteOffset": 7440,
       "byteLength": 10
     },
     {
       "buffer": 0,
-      "byteOffset": 17050,
+      "byteOffset": 7450,
       "byteLength": 40
     },
     {
       "buffer": 0,
-      "byteOffset": 17090,
+      "byteOffset": 7490,
       "byteLength": 40
     },
     {
       "buffer": 0,
-      "byteOffset": 17130,
+      "byteOffset": 7530,
       "byteLength": 40
     }
   ],
   "buffers": [
     {
       "name": "buffer",
-      "byteLength": 17170
+      "byteLength": 7570
     }
   ],
   "materials": [
@@ -428,7 +290,7 @@
           },
           "mode": 4,
           "material": 0,
-          "indices": 13,
+          "indices": 3,
           "extensions": {
             "EXT_mesh_features": {
               "featureIds": [
@@ -445,11 +307,11 @@
           "attributes": {
             "POSITION": 0,
             "NORMAL": 1,
-            "_FEATURE_ID_0": 3
+            "_FEATURE_ID_0": 2
           },
           "mode": 4,
           "material": 1,
-          "indices": 14,
+          "indices": 4,
           "extensions": {
             "EXT_mesh_features": {
               "featureIds": [
@@ -466,11 +328,11 @@
           "attributes": {
             "POSITION": 0,
             "NORMAL": 1,
-            "_FEATURE_ID_0": 4
+            "_FEATURE_ID_0": 2
           },
           "mode": 4,
           "material": 2,
-          "indices": 15,
+          "indices": 5,
           "extensions": {
             "EXT_mesh_features": {
               "featureIds": [
@@ -487,11 +349,11 @@
           "attributes": {
             "POSITION": 0,
             "NORMAL": 1,
-            "_FEATURE_ID_0": 5
+            "_FEATURE_ID_0": 2
           },
           "mode": 4,
           "material": 3,
-          "indices": 16,
+          "indices": 6,
           "extensions": {
             "EXT_mesh_features": {
               "featureIds": [
@@ -508,11 +370,11 @@
           "attributes": {
             "POSITION": 0,
             "NORMAL": 1,
-            "_FEATURE_ID_0": 6
+            "_FEATURE_ID_0": 2
           },
           "mode": 4,
           "material": 4,
-          "indices": 17,
+          "indices": 7,
           "extensions": {
             "EXT_mesh_features": {
               "featureIds": [
@@ -529,11 +391,11 @@
           "attributes": {
             "POSITION": 0,
             "NORMAL": 1,
-            "_FEATURE_ID_0": 7
+            "_FEATURE_ID_0": 2
           },
           "mode": 4,
           "material": 5,
-          "indices": 18,
+          "indices": 8,
           "extensions": {
             "EXT_mesh_features": {
               "featureIds": [
@@ -550,11 +412,11 @@
           "attributes": {
             "POSITION": 0,
             "NORMAL": 1,
-            "_FEATURE_ID_0": 8
+            "_FEATURE_ID_0": 2
           },
           "mode": 4,
           "material": 6,
-          "indices": 19,
+          "indices": 9,
           "extensions": {
             "EXT_mesh_features": {
               "featureIds": [
@@ -571,11 +433,11 @@
           "attributes": {
             "POSITION": 0,
             "NORMAL": 1,
-            "_FEATURE_ID_0": 9
+            "_FEATURE_ID_0": 2
           },
           "mode": 4,
           "material": 7,
-          "indices": 20,
+          "indices": 10,
           "extensions": {
             "EXT_mesh_features": {
               "featureIds": [
@@ -592,11 +454,11 @@
           "attributes": {
             "POSITION": 0,
             "NORMAL": 1,
-            "_FEATURE_ID_0": 10
+            "_FEATURE_ID_0": 2
           },
           "mode": 4,
           "material": 8,
-          "indices": 21,
+          "indices": 11,
           "extensions": {
             "EXT_mesh_features": {
               "featureIds": [
@@ -613,11 +475,11 @@
           "attributes": {
             "POSITION": 0,
             "NORMAL": 1,
-            "_FEATURE_ID_0": 11
+            "_FEATURE_ID_0": 2
           },
           "mode": 4,
           "material": 9,
-          "indices": 22,
+          "indices": 12,
           "extensions": {
             "EXT_mesh_features": {
               "featureIds": [
@@ -714,16 +576,16 @@
           "count": 10,
           "properties": {
             "id": {
-              "values": 12
+              "values": 2
             },
             "Longitude": {
-              "values": 13
+              "values": 3
             },
             "Latitude": {
-              "values": 14
+              "values": 4
             },
             "Height": {
-              "values": 15
+              "values": 5
             }
           }
         }
