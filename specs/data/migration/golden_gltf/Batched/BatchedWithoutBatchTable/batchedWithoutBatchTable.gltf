@@ -37,16 +37,9 @@
     },
     {
       "type": "SCALAR",
-      "componentType": 5126,
-      "count": 240,
-      "bufferView": 1,
-      "byteOffset": 0
-    },
-    {
-      "type": "SCALAR",
       "componentType": 5123,
       "count": 360,
-      "bufferView": 2,
+      "bufferView": 1,
       "byteOffset": 0
     }
   ],
@@ -61,11 +54,6 @@
     {
       "buffer": 0,
       "byteOffset": 6720,
-      "byteLength": 960
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 7680,
       "byteLength": 720,
       "target": 34963
     }
@@ -73,7 +61,7 @@
   "buffers": [
     {
       "name": "buffer",
-      "byteLength": 8400
+      "byteLength": 7440
     }
   ],
   "materials": [
@@ -94,7 +82,7 @@
           },
           "mode": 4,
           "material": 0,
-          "indices": 4,
+          "indices": 3,
           "extensions": {
             "EXT_mesh_features": {
               "featureIds": [

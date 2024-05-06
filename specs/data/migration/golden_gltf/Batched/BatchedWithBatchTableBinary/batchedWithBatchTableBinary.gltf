@@ -37,16 +37,9 @@
     },
     {
       "type": "SCALAR",
-      "componentType": 5126,
-      "count": 240,
-      "bufferView": 1,
-      "byteOffset": 0
-    },
-    {
-      "type": "SCALAR",
       "componentType": 5123,
       "count": 360,
-      "bufferView": 2,
+      "bufferView": 1,
       "byteOffset": 0
     }
   ],
@@ -61,49 +54,44 @@
     {
       "buffer": 0,
       "byteOffset": 6720,
-      "byteLength": 960
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 7680,
       "byteLength": 720,
       "target": 34963
     },
     {
       "buffer": 0,
-      "byteOffset": 8400,
+      "byteOffset": 7440,
       "byteLength": 10
     },
     {
       "buffer": 0,
-      "byteOffset": 8410,
+      "byteOffset": 7450,
       "byteLength": 40
     },
     {
       "buffer": 0,
-      "byteOffset": 8450,
+      "byteOffset": 7490,
       "byteLength": 40
     },
     {
       "buffer": 0,
-      "byteOffset": 8490,
+      "byteOffset": 7530,
       "byteLength": 40
     },
     {
       "buffer": 0,
-      "byteOffset": 8530,
+      "byteOffset": 7570,
       "byteLength": 240
     },
     {
       "buffer": 0,
-      "byteOffset": 8770,
+      "byteOffset": 7810,
       "byteLength": 10
     }
   ],
   "buffers": [
     {
       "name": "buffer",
-      "byteLength": 8780
+      "byteLength": 7820
     }
   ],
   "materials": [
@@ -124,7 +112,7 @@
           },
           "mode": 4,
           "material": 0,
-          "indices": 4,
+          "indices": 3,
           "extensions": {
             "EXT_mesh_features": {
               "featureIds": [
@@ -235,22 +223,22 @@
           "count": 10,
           "properties": {
             "id": {
-              "values": 3
+              "values": 2
             },
             "Longitude": {
-              "values": 4
+              "values": 3
             },
             "Latitude": {
-              "values": 5
+              "values": 4
             },
             "Height": {
-              "values": 6
+              "values": 5
             },
             "cartographic": {
-              "values": 7
+              "values": 6
             },
             "code": {
-              "values": 8
+              "values": 7
             }
           }
         }

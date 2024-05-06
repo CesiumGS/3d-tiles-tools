@@ -37,8 +37,8 @@
     },
     {
       "type": "SCALAR",
-      "componentType": 5126,
-      "count": 240,
+      "componentType": 5123,
+      "count": 360,
       "bufferView": 1,
       "byteOffset": 0
     },
@@ -46,8 +46,8 @@
       "type": "VEC3",
       "componentType": 5126,
       "count": 3,
-      "bufferView": 1,
-      "byteOffset": 960
+      "bufferView": 2,
+      "byteOffset": 0
     },
     {
       "type": "SCALAR",
@@ -59,15 +59,8 @@
       "min": [
         0
       ],
-      "bufferView": 1,
-      "byteOffset": 996
-    },
-    {
-      "type": "SCALAR",
-      "componentType": 5123,
-      "count": 360,
       "bufferView": 2,
-      "byteOffset": 0
+      "byteOffset": 36
     }
   ],
   "bufferViews": [
@@ -81,39 +74,39 @@
     {
       "buffer": 0,
       "byteOffset": 6720,
-      "byteLength": 1008
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 7728,
       "byteLength": 720,
       "target": 34963
     },
     {
       "buffer": 0,
-      "byteOffset": 8448,
+      "byteOffset": 7440,
+      "byteLength": 48
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 7488,
       "byteLength": 10
     },
     {
       "buffer": 0,
-      "byteOffset": 8458,
+      "byteOffset": 7498,
       "byteLength": 40
     },
     {
       "buffer": 0,
-      "byteOffset": 8498,
+      "byteOffset": 7538,
       "byteLength": 40
     },
     {
       "buffer": 0,
-      "byteOffset": 8538,
+      "byteOffset": 7578,
       "byteLength": 40
     }
   ],
   "buffers": [
     {
       "name": "buffer",
-      "byteLength": 8578
+      "byteLength": 7618
     }
   ],
   "materials": [
@@ -134,7 +127,7 @@
           },
           "mode": 4,
           "material": 0,
-          "indices": 6,
+          "indices": 3,
           "extensions": {
             "EXT_mesh_features": {
               "featureIds": [
