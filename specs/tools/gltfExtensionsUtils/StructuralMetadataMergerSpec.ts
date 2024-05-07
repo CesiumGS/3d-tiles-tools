@@ -1,14 +1,23 @@
 import { Document } from "@gltf-transform/core";
 
+import NdArray from "ndarray";
+import { savePixels } from "ndarray-pixels";
+
 import { EXTStructuralMetadata } from "../../../src/gltf-extensions";
+import { MeshPrimitiveStructuralMetadata } from "../../../src/gltf-extensions";
 import { StructuralMetadata } from "../../../src/gltf-extensions";
 import { StructuralMetadataSchema as Schema } from "../../../src/gltf-extensions";
 import { StructuralMetadataClass as Class } from "../../../src/gltf-extensions";
 import { StructuralMetadataPropertyTable as PropertyTable } from "../../../src/gltf-extensions";
+import { StructuralMetadataPropertyAttribute as PropertyAttribute } from "../../../src/gltf-extensions";
+import { StructuralMetadataPropertyTexture as PropertyTexture } from "../../../src/gltf-extensions";
 
 import { BinaryPropertyTableBuilder } from "../../../src/metadata/";
 
-import { StructuralMetadataPropertyTables } from "../../../src/tools/";
+import {
+  GltfTransform,
+  StructuralMetadataPropertyTables,
+} from "../../../src/tools/";
 import { StructuralMetadataMerger } from "../../../src/tools/";
 
 // A dummy resolver for the `schemaUri` that may be found in metadata
@@ -117,6 +126,46 @@ function getNumPropertyTables(document: Document): number {
 }
 
 /**
+ * Returns the number of property attributes of the `EXT_structural_metadata`
+ * extension in the given document, or -1 if the extension does not
+ * exist.
+ *
+ * @param document - The glTF-Transform document
+ * @returns The number of property attributes
+ */
+function getNumPropertyAttributes(document: Document): number {
+  const root = document.getRoot();
+  const structuralMetadata = root.getExtension<StructuralMetadata>(
+    "EXT_structural_metadata"
+  );
+  if (structuralMetadata === null) {
+    return -1;
+  }
+  const propertyAttributes = structuralMetadata.listPropertyAttributes();
+  return propertyAttributes.length;
+}
+
+/**
+ * Returns the number of property textures of the `EXT_structural_metadata`
+ * extension in the given document, or -1 if the extension does not
+ * exist.
+ *
+ * @param document - The glTF-Transform document
+ * @returns The number of property textures
+ */
+function getNumPropertyTextures(document: Document): number {
+  const root = document.getRoot();
+  const structuralMetadata = root.getExtension<StructuralMetadata>(
+    "EXT_structural_metadata"
+  );
+  if (structuralMetadata === null) {
+    return -1;
+  }
+  const propertyTextures = structuralMetadata.listPropertyTextures();
+  return propertyTextures.length;
+}
+
+/**
  * Returns the property table with the given index from the
  * `EXT_structural_metadata`, throwing up if this does not
  * exist.
@@ -135,6 +184,54 @@ function getPropertyTable(document: Document, index: number): PropertyTable {
   }
   const propertyTables = structuralMetadata.listPropertyTables();
   return propertyTables[index];
+}
+
+/**
+ * Returns the property attribute with the given index from the
+ * `EXT_structural_metadata`, throwing up if this does not
+ * exist.
+ *
+ * @param document - The glTF-Transform document
+ * @param index The index of the property attribute
+ * @returns The property attribute
+ */
+function getPropertyAttribute(
+  document: Document,
+  index: number
+): PropertyAttribute {
+  const root = document.getRoot();
+  const structuralMetadata = root.getExtension<StructuralMetadata>(
+    "EXT_structural_metadata"
+  );
+  if (structuralMetadata === null) {
+    throw new Error("Document does not contain metadata");
+  }
+  const propertyAttributes = structuralMetadata.listPropertyAttributes();
+  return propertyAttributes[index];
+}
+
+/**
+ * Returns the property texture with the given index from the
+ * `EXT_structural_metadata`, throwing up if this does not
+ * exist.
+ *
+ * @param document - The glTF-Transform document
+ * @param index The index of the property texture
+ * @returns The property texture
+ */
+function getPropertyTexture(
+  document: Document,
+  index: number
+): PropertyTexture {
+  const root = document.getRoot();
+  const structuralMetadata = root.getExtension<StructuralMetadata>(
+    "EXT_structural_metadata"
+  );
+  if (structuralMetadata === null) {
+    throw new Error("Document does not contain metadata");
+  }
+  const propertyTextures = structuralMetadata.listPropertyTextures();
+  return propertyTextures[index];
 }
 
 /**
@@ -213,7 +310,154 @@ function addPropertyTable(
   structuralMetadata.addPropertyTable(propertyTable);
 }
 
-fdescribe("StructuralMetadataMerger", function () {
+/**
+ * Add a property attribute to the StructuralMetadata in the given document.
+ *
+ * This method does name assumptions about the structure of the
+ * metadata class. It assumes that the class contains a property
+ * that is called "example_INT8_SCALAR" (with UINT8 scalar type)
+ * and it will create...
+ *
+ * - a property attribute in the top-level metadata extension object for
+ *   such a property. It will refer to a mesh primitive attribute that
+ *   will be called "_EXAMPLE_ATTRIBUTE"
+ * - a mesh with a primitive that contains such a "_EXAMPLE_ATTRIBUTE"
+ *   containing "dummy" data for such an attribute
+ *
+ * @param document - The document
+ * @param className - The metadata class name
+ */
+function addSpecPropertyAttribute(document: Document, className: string) {
+  const propertyName = "example_INT8_SCALAR";
+  const attributeName = "_EXAMPLE_ATTRIBUTE";
+
+  // Obtain the top-level extension object
+  const extStructuralMetadata = document.createExtension(EXTStructuralMetadata);
+  const structuralMetadata = obtainStructuralMetadata(document);
+
+  // Create and add a property attribute with the following structure:
+  // {
+  //   className: className
+  //   properties: {
+  //     example_INT8_SCALAR : {
+  //       attribute: "_EXAMPLE_ATTRIBUTE"
+  //     }
+  //   }
+  // }
+  const propertyAttribute = extStructuralMetadata.createPropertyAttribute();
+  propertyAttribute.setClass(className);
+  const propertyAttributeProperty =
+    extStructuralMetadata.createPropertyAttributeProperty();
+  propertyAttributeProperty.setAttribute(attributeName);
+  propertyAttribute.setProperty(propertyName, propertyAttributeProperty);
+  structuralMetadata.addPropertyAttribute(propertyAttribute);
+
+  // Create a dummy mesh with one primitive
+  const mesh = document.createMesh();
+  const primitive = document.createPrimitive();
+  primitive.setExtension;
+  mesh.addPrimitive(primitive);
+
+  // Create an accessor with dummy UINT8 scalar data
+  // to hold the property attribute values, and store
+  // it as the "_EXAMPLE_ATTRIBUTE" in the primitive
+  const accessor = document.createAccessor();
+  const buffer = document.getRoot().listBuffers()[0];
+  accessor.setBuffer(buffer);
+  accessor.setType("SCALAR");
+  const array = new Int8Array([0, 1, 2, 3]);
+  accessor.setArray(array);
+  primitive.setAttribute(attributeName, accessor);
+
+  // Define the metadata for the mesh primitive, and let it
+  // refer to the property attribute that was created above
+  const meshPrimitiveStructuralMetadata =
+    extStructuralMetadata.createMeshPrimitiveStructuralMetadata();
+  meshPrimitiveStructuralMetadata.addPropertyAttribute(propertyAttribute);
+  primitive.setExtension<MeshPrimitiveStructuralMetadata>(
+    "EXT_structural_metadata",
+    meshPrimitiveStructuralMetadata
+  );
+}
+
+/**
+ * Add a property texture to the StructuralMetadata in the given document.
+ *
+ * This method does name assumptions about the structure of the
+ * metadata class. It assumes that the class contains a property
+ * that is called "example_INT8_SCALAR" (with UINT8 scalar type)
+ * and it will create...
+ *
+ * - a property texture in the top-level metadata extension object for
+ *   such a property. It will refer to the texture with index 0,
+ *   texture coordinate set 0, and channels [0]
+ * - a texture that contains "dummy" data in channel 0
+ *
+ * @param document - The document
+ * @param className - The metadata class name
+ */
+async function addSpecPropertyTexture(document: Document, className: string) {
+  const propertyName = "example_INT8_SCALAR";
+
+  // Obtain the top-level extension object
+  const extStructuralMetadata = document.createExtension(EXTStructuralMetadata);
+  const structuralMetadata = obtainStructuralMetadata(document);
+
+  // Create an image with integer values in channel 0,
+  // and a texture that refers to this image
+  const sizeX = 2;
+  const sizeY = 2;
+  const pixels = NdArray(new Uint8Array(sizeX * sizeY), [sizeX, sizeY, 4]);
+  for (let x = 0; x < pixels.shape[0]; x++) {
+    for (let y = 0; y < pixels.shape[1]; y++) {
+      pixels.set(x, y, 0, x * sizeY + y);
+    }
+  }
+  const image = await savePixels(pixels, "image/png");
+  const texture = document.createTexture();
+  texture.setImage(image);
+  texture.setURI("propertyTextuer.png");
+
+  // Create and add a property texture with the following structure:
+  // {
+  //   className: className
+  //   properties: {
+  //     example_INT8_SCALAR : {
+  //       index: 0,
+  //       texCoord: 0,
+  //       channels: [0]
+  //     }
+  //   }
+  // }
+  // (The texture and texCoord will be filled in by glTF-Transform,
+  // due to the reference to the texture that was created above)
+  const propertyTexture = extStructuralMetadata.createPropertyTexture();
+  propertyTexture.setClass(className);
+  const propertyTextureProperty =
+    extStructuralMetadata.createPropertyTextureProperty();
+  propertyTextureProperty.setTexture(texture);
+  propertyTextureProperty.setChannels([0]);
+  propertyTexture.setProperty(propertyName, propertyTextureProperty);
+  structuralMetadata.addPropertyTexture(propertyTexture);
+
+  // Create a dummy mesh with one primitive
+  const mesh = document.createMesh();
+  const primitive = document.createPrimitive();
+  primitive.setExtension;
+  mesh.addPrimitive(primitive);
+
+  // Define the metadata for the mesh primitive, and let it
+  // refer to the property texture that was created above
+  const meshPrimitiveStructuralMetadata =
+    extStructuralMetadata.createMeshPrimitiveStructuralMetadata();
+  meshPrimitiveStructuralMetadata.addPropertyTexture(propertyTexture);
+  primitive.setExtension<MeshPrimitiveStructuralMetadata>(
+    "EXT_structural_metadata",
+    meshPrimitiveStructuralMetadata
+  );
+}
+
+describe("StructuralMetadataMerger", function () {
   //==========================================================================
   // Basic class merging
 
@@ -262,7 +506,7 @@ fdescribe("StructuralMetadataMerger", function () {
     assignMetadataSchema(documentB, schemaB);
 
     const document = new Document();
-    StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
       document,
       documentA,
       specSchemaUriResolver
@@ -272,7 +516,7 @@ fdescribe("StructuralMetadataMerger", function () {
     // There should be one class
     expect(getMetadataClassNames(document).length).toBe(1);
 
-    StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
       document,
       documentB,
       specSchemaUriResolver
@@ -329,7 +573,7 @@ fdescribe("StructuralMetadataMerger", function () {
     assignMetadataSchema(documentB, schemaB);
 
     const document = new Document();
-    StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
       document,
       documentA,
       specSchemaUriResolver
@@ -339,7 +583,7 @@ fdescribe("StructuralMetadataMerger", function () {
     // There should be one class
     expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
 
-    StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
       document,
       documentB,
       specSchemaUriResolver
@@ -397,7 +641,7 @@ fdescribe("StructuralMetadataMerger", function () {
     assignMetadataSchema(documentB, schemaB);
 
     const document = new Document();
-    StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
       document,
       documentA,
       specSchemaUriResolver
@@ -407,7 +651,7 @@ fdescribe("StructuralMetadataMerger", function () {
     // There should be one class
     expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
 
-    StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
       document,
       documentB,
       specSchemaUriResolver
@@ -501,7 +745,7 @@ fdescribe("StructuralMetadataMerger", function () {
     assignMetadataSchema(documentB, schemaB);
 
     const document = new Document();
-    StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
       document,
       documentA,
       specSchemaUriResolver
@@ -512,7 +756,7 @@ fdescribe("StructuralMetadataMerger", function () {
     expect(getMetadataEnumNames(document)).toEqual(["exampleEnum"]);
     expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
 
-    StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
       document,
       documentB,
       specSchemaUriResolver
@@ -539,7 +783,7 @@ fdescribe("StructuralMetadataMerger", function () {
   //==========================================================================
   // Basic property table merging
 
-  it("merges the set of property tables for one resulting class", async function () {
+  fit("merges the set of property tables for one resulting class", async function () {
     // The classes have the same name/key
     // The classes are structurally equal
     // The property tables refer to the respective class (which turns out to be equal)
@@ -602,7 +846,7 @@ fdescribe("StructuralMetadataMerger", function () {
     addPropertyTable(documentB, schemaB, propertyTableB);
 
     const document = new Document();
-    StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
       document,
       documentA,
       specSchemaUriResolver
@@ -614,7 +858,7 @@ fdescribe("StructuralMetadataMerger", function () {
     expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
     expect(getNumPropertyTables(document)).toBe(1);
 
-    StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
       document,
       documentB,
       specSchemaUriResolver
@@ -625,15 +869,23 @@ fdescribe("StructuralMetadataMerger", function () {
     // There should be two property tables
     expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
     expect(getNumPropertyTables(document)).toBe(2);
+
+    // XXX Try to write the document as a basic consistency check:
+    {
+      const io = await GltfTransform.getIO();
+      const jsonDocument = await io.writeJSON(document);
+      console.log(JSON.stringify(jsonDocument.json, null, 2));
+    }
   });
 
-  it("merges the set of property tables and updates their class for disambiguated classes", async function () {
+  fit("merges the set of property tables and updates their class for disambiguated classes", async function () {
     // The classes have the same name/key
-    // The classes are structurally equal
-    // The property tables refer to the respective class (which turns out to be equal)
+    // The classes are structurally different
+    // The property tables refer to the respective class
     // The result should be:
     // One class
     // Two property tables
+    // One referring to the disambiguated class
 
     const schemaA = {
       id: "EXAMPLE_SCHEMA_ID",
@@ -690,7 +942,7 @@ fdescribe("StructuralMetadataMerger", function () {
     addPropertyTable(documentB, schemaB, propertyTableB);
 
     const document = new Document();
-    StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
       document,
       documentA,
       specSchemaUriResolver
@@ -702,7 +954,7 @@ fdescribe("StructuralMetadataMerger", function () {
     expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
     expect(getNumPropertyTables(document)).toBe(1);
 
-    StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
       document,
       documentB,
       specSchemaUriResolver
@@ -720,5 +972,397 @@ fdescribe("StructuralMetadataMerger", function () {
     // renamed class
     const propertyTable1 = getPropertyTable(document, 1);
     expect(propertyTable1.getClass()).toBe("exampleClass_0");
+
+    // XXX Try to write the document as a basic consistency check:
+    {
+      const io = await GltfTransform.getIO();
+      const jsonDocument = await io.writeJSON(document);
+      console.log(JSON.stringify(jsonDocument.json, null, 2));
+    }
+  });
+
+  //==========================================================================
+  // Basic property attribute merging
+
+  fit("merges the set of property attributes for one resulting class", async function () {
+    // The classes have the same name/key
+    // The classes are structurally equal
+    // The property attributes refer to the respective class (which turns out to be equal)
+    // The result should be:
+    // One class
+    // Two property attributes
+
+    const schemaA = {
+      id: "EXAMPLE_SCHEMA_ID",
+      classes: {
+        exampleClass: {
+          name: "Example Class",
+          properties: {
+            example_INT8_SCALAR: {
+              name: "Example SCALAR property with INT8 components",
+              description:
+                "An example property, with type SCALAR, with component type INT8",
+              type: "SCALAR",
+              componentType: "INT8",
+              array: false,
+              normalized: false,
+            },
+          },
+        },
+      },
+    };
+
+    const schemaB = {
+      id: "EXAMPLE_SCHEMA_ID",
+      classes: {
+        exampleClass: {
+          name: "Example Class",
+          properties: {
+            example_INT8_SCALAR: {
+              name: "Example SCALAR property with INT8 components",
+              description:
+                "An example property, with type SCALAR, with component type INT8",
+              type: "SCALAR",
+              componentType: "INT8",
+              array: false,
+              normalized: false,
+            },
+          },
+        },
+      },
+    };
+
+    const documentA = new Document();
+    documentA.createBuffer();
+    assignMetadataSchema(documentA, schemaA);
+    addSpecPropertyAttribute(documentA, "exampleClass");
+
+    const documentB = new Document();
+    documentB.createBuffer();
+    assignMetadataSchema(documentB, schemaB);
+    addSpecPropertyAttribute(documentB, "exampleClass");
+
+    const document = new Document();
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+      document,
+      documentA,
+      specSchemaUriResolver
+    );
+
+    // After merging in the first document:
+    // There should be one class
+    // There should be one property attribute
+    expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
+    expect(getNumPropertyAttributes(document)).toBe(1);
+
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+      document,
+      documentB,
+      specSchemaUriResolver
+    );
+
+    // After merging in the second document:
+    // There should still be one class
+    // There should be two property attributes
+    expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
+    expect(getNumPropertyAttributes(document)).toBe(2);
+
+    // XXX Try to write the document as a basic consistency check:
+    {
+      const io = await GltfTransform.getIO();
+      const jsonDocument = await io.writeJSON(document);
+      console.log(JSON.stringify(jsonDocument.json, null, 2));
+    }
+  });
+
+  fit("merges the set of property attributes and updates their class for disambiguated classes", async function () {
+    // The classes have the same name/key
+    // The classes are structurally different
+    // The property attributes refer to the respective class
+    // The result should be:
+    // Two classes
+    // Two property attributes
+
+    const schemaA = {
+      id: "EXAMPLE_SCHEMA_ID",
+      classes: {
+        exampleClass: {
+          name: "Example Class",
+          properties: {
+            example_INT8_SCALAR: {
+              name: "Example SCALAR property with INT8 components",
+              description:
+                "An example property, with type SCALAR, with component type INT8",
+              type: "SCALAR",
+              componentType: "INT8",
+              array: false,
+              normalized: false,
+            },
+          },
+        },
+      },
+    };
+
+    const schemaB = {
+      id: "EXAMPLE_SCHEMA_ID",
+      classes: {
+        exampleClass: {
+          name: "Example Class but with a difference", // Structural difference!
+          properties: {
+            example_INT8_SCALAR: {
+              name: "Example SCALAR property with INT8 components",
+              description:
+                "An example property, with type SCALAR, with component type INT8",
+              type: "SCALAR",
+              componentType: "INT8",
+              array: false,
+              normalized: false,
+            },
+          },
+        },
+      },
+    };
+
+    const documentA = new Document();
+    documentA.createBuffer();
+    assignMetadataSchema(documentA, schemaA);
+    addSpecPropertyAttribute(documentA, "exampleClass");
+
+    const documentB = new Document();
+    documentB.createBuffer();
+    assignMetadataSchema(documentB, schemaB);
+    addSpecPropertyAttribute(documentB, "exampleClass");
+
+    const document = new Document();
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+      document,
+      documentA,
+      specSchemaUriResolver
+    );
+
+    // After merging in the first document:
+    // There should be one class
+    // There should be one property attribute
+    expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
+    expect(getNumPropertyAttributes(document)).toBe(1);
+
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+      document,
+      documentB,
+      specSchemaUriResolver
+    );
+
+    // After merging in the second document:
+    // There should be two classes
+    // There should be two property attributes
+    expect(getMetadataClassNames(document).sort()).toEqual(
+      ["exampleClass", "exampleClass_0"].sort()
+    );
+    expect(getNumPropertyAttributes(document)).toBe(2);
+
+    // Expect the second property attribute to refer to the
+    // renamed class
+    const propertyAttribute1 = getPropertyAttribute(document, 1);
+    expect(propertyAttribute1.getClass()).toBe("exampleClass_0");
+
+    // XXX Try to write the document as a basic consistency check:
+    {
+      const io = await GltfTransform.getIO();
+      const jsonDocument = await io.writeJSON(document);
+      console.log(JSON.stringify(jsonDocument.json, null, 2));
+    }
+  });
+
+  //==========================================================================
+  // Basic property texture merging
+
+  fit("merges the set of property textures for one resulting class", async function () {
+    // The classes have the same name/key
+    // The classes are structurally equal
+    // The property textures refer to the respective class (which turns out to be equal)
+    // The result should be:
+    // One class
+    // Two property textures
+
+    const schemaA = {
+      id: "EXAMPLE_SCHEMA_ID",
+      classes: {
+        exampleClass: {
+          name: "Example Class",
+          properties: {
+            example_INT8_SCALAR: {
+              name: "Example SCALAR property with INT8 components",
+              description:
+                "An example property, with type SCALAR, with component type INT8",
+              type: "SCALAR",
+              componentType: "INT8",
+              array: false,
+              normalized: false,
+            },
+          },
+        },
+      },
+    };
+
+    const schemaB = {
+      id: "EXAMPLE_SCHEMA_ID",
+      classes: {
+        exampleClass: {
+          name: "Example Class",
+          properties: {
+            example_INT8_SCALAR: {
+              name: "Example SCALAR property with INT8 components",
+              description:
+                "An example property, with type SCALAR, with component type INT8",
+              type: "SCALAR",
+              componentType: "INT8",
+              array: false,
+              normalized: false,
+            },
+          },
+        },
+      },
+    };
+
+    const documentA = new Document();
+    documentA.createBuffer();
+    assignMetadataSchema(documentA, schemaA);
+    await addSpecPropertyTexture(documentA, "exampleClass");
+
+    const documentB = new Document();
+    documentB.createBuffer();
+    assignMetadataSchema(documentB, schemaB);
+    await addSpecPropertyTexture(documentB, "exampleClass");
+
+    const document = new Document();
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+      document,
+      documentA,
+      specSchemaUriResolver
+    );
+
+    // After merging in the first document:
+    // There should be one class
+    // There should be one property texture
+    expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
+    expect(getNumPropertyTextures(document)).toBe(1);
+
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+      document,
+      documentB,
+      specSchemaUriResolver
+    );
+
+    // After merging in the second document:
+    // There should still be one class
+    // There should be two property textures
+    expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
+    expect(getNumPropertyTextures(document)).toBe(2);
+
+    // XXX Try to write the document as a basic consistency check:
+    {
+      const io = await GltfTransform.getIO();
+      const jsonDocument = await io.writeJSON(document);
+      console.log(JSON.stringify(jsonDocument.json, null, 2));
+    }
+  });
+
+  fit("merges the set of property textures and updates their class for disambiguated classes", async function () {
+    // The classes have the same name/key
+    // The classes are structurally different
+    // The property textures refer to the respective class
+    // The result should be:
+    // One class
+    // Two property textures
+    // One referring to the disambiguated class
+
+    const schemaA = {
+      id: "EXAMPLE_SCHEMA_ID",
+      classes: {
+        exampleClass: {
+          name: "Example Class",
+          properties: {
+            example_INT8_SCALAR: {
+              name: "Example SCALAR property with INT8 components",
+              description:
+                "An example property, with type SCALAR, with component type INT8",
+              type: "SCALAR",
+              componentType: "INT8",
+              array: false,
+              normalized: false,
+            },
+          },
+        },
+      },
+    };
+
+    const schemaB = {
+      id: "EXAMPLE_SCHEMA_ID",
+      classes: {
+        exampleClass: {
+          name: "Example Class but with a difference", // Structural difference!
+          properties: {
+            example_INT8_SCALAR: {
+              name: "Example SCALAR property with INT8 components",
+              description:
+                "An example property, with type SCALAR, with component type INT8",
+              type: "SCALAR",
+              componentType: "INT8",
+              array: false,
+              normalized: false,
+            },
+          },
+        },
+      },
+    };
+
+    const documentA = new Document();
+    documentA.createBuffer();
+    assignMetadataSchema(documentA, schemaA);
+    await addSpecPropertyTexture(documentA, "exampleClass");
+
+    const documentB = new Document();
+    documentB.createBuffer();
+    assignMetadataSchema(documentB, schemaB);
+    await addSpecPropertyTexture(documentB, "exampleClass");
+
+    const document = new Document();
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+      document,
+      documentA,
+      specSchemaUriResolver
+    );
+
+    // After merging in the first document:
+    // There should be one class
+    // There should be one property texture
+    expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
+    expect(getNumPropertyTextures(document)).toBe(1);
+
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+      document,
+      documentB,
+      specSchemaUriResolver
+    );
+
+    // After merging in the second document:
+    // There should be two classes
+    // There should be two property textures
+    expect(getMetadataClassNames(document).sort()).toEqual(
+      ["exampleClass", "exampleClass_0"].sort()
+    );
+    expect(getNumPropertyTextures(document)).toBe(2);
+
+    // Expect the second property texture to refer to the
+    // renamed class
+    const propertyTexture1 = getPropertyTexture(document, 1);
+    expect(propertyTexture1.getClass()).toBe("exampleClass_0");
+
+    // XXX Try to write the document as a basic consistency check:
+    {
+      const io = await GltfTransform.getIO();
+      const jsonDocument = await io.writeJSON(document);
+      console.log(JSON.stringify(jsonDocument.json, null, 2));
+    }
   });
 });

@@ -1,10 +1,10 @@
 // NOTE: The functions in this class are "ported" from
 // https://github.com/donmccurdy/glTF-Transform/pull/1375/files
 //
-// The only exported function is "copyToDocument", which will be replaced
-// by the `copyToDocument` functionality of glTF-Transform 4.0
+// The only exported functions are "mergeDocuments" and "copyToDocument",
+// which will be replaced by the functions from glTF-Transform 4.0
 
-import { Document } from "@gltf-transform/core";
+import { Document, Extension } from "@gltf-transform/core";
 import { Graph } from "@gltf-transform/core";
 import { Property } from "@gltf-transform/core";
 import { PropertyType } from "@gltf-transform/core";
@@ -13,6 +13,37 @@ import { PropertyResolver } from "@gltf-transform/core/dist/properties";
 const { TEXTURE_INFO, ROOT } = PropertyType;
 type PropertyConstructor = new (g: Graph<Property>) => Property;
 const NO_TRANSFER_TYPES = new Set<string>([TEXTURE_INFO, ROOT]);
+
+function listNonRootProperties(document: Document): Property[] {
+  const visited = new Set<Property>();
+  for (const edge of document.getGraph().listEdges()) {
+    visited.add(edge.getChild());
+  }
+  return Array.from(visited);
+}
+
+export function mergeDocuments(
+  target: Document,
+  source: Document,
+  resolve?: PropertyResolver<Property>
+): Map<Property, Property> {
+  resolve ||= createDefaultPropertyResolver(target, source);
+
+  for (const sourceExtension of source.getRoot().listExtensionsUsed()) {
+    const targetExtension = target.createExtension(
+      sourceExtension.constructor as new (doc: Document) => Extension
+    );
+    if (sourceExtension.isRequired()) targetExtension.setRequired(true);
+  }
+
+  // Root properties (name, asset, default scene, extras) are not overwritten.
+  return _copyToDocument(
+    target,
+    source,
+    listNonRootProperties(source),
+    resolve
+  );
+}
 
 export function copyToDocument(
   target: Document,

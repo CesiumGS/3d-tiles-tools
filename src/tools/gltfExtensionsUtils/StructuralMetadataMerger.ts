@@ -1,14 +1,19 @@
 import crypto from "crypto";
 
-import { Document } from "@gltf-transform/core";
+import { Document, Primitive } from "@gltf-transform/core";
 import { Property } from "@gltf-transform/core";
 import { IProperty } from "@gltf-transform/core";
 
+import { EXTStructuralMetadata } from "../../gltf-extensions/";
 import { StructuralMetadata } from "../../gltf-extensions/";
+import { MeshPrimitiveStructuralMetadata } from "../../gltf-extensions/";
 import { StructuralMetadataSchema as Schema } from "../../gltf-extensions/";
 import { StructuralMetadataClass as Class } from "../../gltf-extensions/";
-import { EXTStructuralMetadata } from "../../gltf-extensions/";
+import { StructuralMetadataPropertyTable as PropertyTable } from "../../gltf-extensions/";
+import { StructuralMetadataPropertyTexture as PropertyTexture } from "../../gltf-extensions/";
+import { StructuralMetadataPropertyAttribute as PropertyAttribute } from "../../gltf-extensions/";
 
+import { mergeDocuments } from "./StructuralMetadataMergeUtilities";
 import { copyToDocument } from "./StructuralMetadataMergeUtilities";
 
 import { MetadataError } from "../../metadata";
@@ -32,7 +37,7 @@ export class StructuralMetadataMerger {
    * Merge two glTF-Transform documents, taking into account that
    * they might contain the `EXT_structural_metadata` extension.
    *
-   * This will perform a default `document.merge` operation, but apply
+   * This will perform a default merge operation, but apply
    * special treatment for the case that either or both of the documents
    * contain the extension: It will merge the top-level extension
    * object, and assign the merged one to the root of the target
@@ -55,7 +60,7 @@ export class StructuralMetadataMerger {
       targetRoot.getExtension<StructuralMetadata>("EXT_structural_metadata");
     const sourceStructuralMetadata =
       sourceRoot.getExtension<StructuralMetadata>("EXT_structural_metadata");
-    targetDocument.merge(sourceDocument);
+    const mainMergeMap = mergeDocuments(targetDocument, sourceDocument);
 
     // Early bailout for the cases where NOT BOTH of the documents
     // contain the extension
@@ -84,9 +89,20 @@ export class StructuralMetadataMerger {
       log(
         "Only source contains structural metadata - copying source to target"
       );
-      copyToDocument(targetDocument, sourceDocument, [
-        sourceStructuralMetadata,
-      ]);
+
+      // The default glTF-Transform merge operation will copy the
+      // structural metadata (and store the mapping from the source
+      // to the target object), but it will not assign the extension
+      // object to the target root. So here, the copied object is
+      // obtained from the merge mapping, and assigned to the target
+      const targetRoot = targetDocument.getRoot();
+      const copiedStructuralMetadata = mainMergeMap.get(
+        sourceStructuralMetadata
+      ) as StructuralMetadata;
+      targetRoot.setExtension<StructuralMetadata>(
+        "EXT_structural_metadata",
+        copiedStructuralMetadata
+      );
       return;
     }
 
@@ -102,6 +118,7 @@ export class StructuralMetadataMerger {
         targetStructuralMetadata,
         sourceDocument,
         sourceStructuralMetadata,
+        mainMergeMap,
         schemaUriResolver
       );
     }
@@ -116,6 +133,7 @@ export class StructuralMetadataMerger {
    * @param targetStructuralMetadata - The target extension object
    * @param sourceDocument - The source document
    * @param sourceStructuralMetadata - The source extension object
+   * @param mainMergeMap - The map from `mergeDocuments`
    * @param schemaUriResolver - A function that can resolve the `schemaUri`
    * and return the metadata schema JSON object
    * @returns A promise that resolves when the operation is finished
@@ -125,6 +143,7 @@ export class StructuralMetadataMerger {
     targetStructuralMetadata: StructuralMetadata,
     sourceDocument: Document,
     sourceStructuralMetadata: StructuralMetadata,
+    mainMergeMap: Map<Property, Property>,
     schemaUriResolver: (schemaUri: string) => Promise<any>
   ) {
     const targetExtStructuralMetadata = targetDocument.createExtension(
@@ -173,6 +192,10 @@ export class StructuralMetadataMerger {
     }
 
     log("Merging schemas...");
+
+    // Store the names/keys of the classes and enums in the
+    // target, as a baseline way of identifying whether
+    // the target schema changes during the merge
     const oldClassKeys = targetSchema.listClassKeys();
     const oldEnumKeys = targetSchema.listEnumKeys();
 
@@ -183,6 +206,8 @@ export class StructuralMetadataMerger {
       sourceSchema
     );
 
+    // If new classes or enums have been added, then assign
+    // a new ID to the schema
     const newClassKeys = targetSchema.listClassKeys();
     const newEnumKeys = targetSchema.listEnumKeys();
     if (oldClassKeys != newClassKeys || oldEnumKeys != newEnumKeys) {
@@ -193,29 +218,36 @@ export class StructuralMetadataMerger {
 
     log("Merging property tables...");
     StructuralMetadataMerger.mergePropertyTables(
-      targetDocument,
       targetStructuralMetadata,
-      sourceDocument,
       sourceStructuralMetadata,
+      mainMergeMap,
       sourceClassNamesInTarget
     );
 
     log("Merging property textures...");
     StructuralMetadataMerger.mergePropertyTextures(
-      targetDocument,
       targetStructuralMetadata,
-      sourceDocument,
       sourceStructuralMetadata,
+      mainMergeMap,
       sourceClassNamesInTarget
+    );
+    log("Updating mesh primitive property textures...");
+    StructuralMetadataMerger.updateMeshPrimitivePropertyTextures(
+      sourceDocument,
+      mainMergeMap
     );
 
     log("Merging property attributes...");
     StructuralMetadataMerger.mergePropertyAttributes(
-      targetDocument,
       targetStructuralMetadata,
-      sourceDocument,
       sourceStructuralMetadata,
+      mainMergeMap,
       sourceClassNamesInTarget
+    );
+    log("Updating mesh primitive property attributes...");
+    StructuralMetadataMerger.updateMeshPrimitivePropertyAttributes(
+      sourceDocument,
+      mainMergeMap
     );
 
     const targetRoot = targetDocument.getRoot();
@@ -231,28 +263,21 @@ export class StructuralMetadataMerger {
    * This will update the 'class' of the copied property tables according
    * to the given name mapping.
    *
-   * @param targetDocument - The target document
    * @param targetStructuralMetadata - The target extension object
-   * @param sourceDocument - The source document
    * @param sourceStructuralMetadata - The source extension object
+   * @param mainMergeMap - The mapping from `mergeDocuments`
    * @param sourceClassNamesInTarget - The mapping from class names in
    * the source schema to the names that they have in the target schema.
    */
   private static mergePropertyTables(
-    targetDocument: Document,
     targetStructuralMetadata: StructuralMetadata,
-    sourceDocument: Document,
     sourceStructuralMetadata: StructuralMetadata,
+    mainMergeMap: Map<Property, Property>,
     sourceClassNamesInTarget: { [key: string]: string }
   ) {
     const sourcePropertyTables = sourceStructuralMetadata.listPropertyTables();
-    const targetPropertyTables = StructuralMetadataMerger.copyArray(
-      targetDocument,
-      sourceDocument,
-      sourcePropertyTables
-    );
-    for (const targetPropertyTable of targetPropertyTables) {
-      const sourceClassName = targetPropertyTable.getClass();
+    for (const sourcePropertyTable of sourcePropertyTables) {
+      const sourceClassName = sourcePropertyTable.getClass();
       const targetClassName = sourceClassNamesInTarget[sourceClassName];
       log(
         "Property table referred to class " +
@@ -260,6 +285,9 @@ export class StructuralMetadataMerger {
           " and now refers to class " +
           targetClassName
       );
+      const targetPropertyTable = mainMergeMap.get(
+        sourcePropertyTable
+      ) as PropertyTable;
       targetPropertyTable.setClass(targetClassName);
       targetStructuralMetadata.addPropertyTable(targetPropertyTable);
     }
@@ -271,29 +299,22 @@ export class StructuralMetadataMerger {
    * This will update the 'class' of the copied property textures according
    * to the given name mapping.
    *
-   * @param targetDocument - The target document
    * @param targetStructuralMetadata - The target extension object
-   * @param sourceDocument - The source document
    * @param sourceStructuralMetadata - The source extension object
+   * @param mainMergeMap  - The mapping from `mergeDocuments`
    * @param sourceClassNamesInTarget - The mapping from class names in
    * the source schema to the names that they have in the target schema.
    */
   private static mergePropertyTextures(
-    targetDocument: Document,
     targetStructuralMetadata: StructuralMetadata,
-    sourceDocument: Document,
     sourceStructuralMetadata: StructuralMetadata,
+    mainMergeMap: Map<Property, Property>,
     sourceClassNamesInTarget: { [key: string]: string }
   ) {
     const sourcePropertyTextures =
       sourceStructuralMetadata.listPropertyTextures();
-    const targetPropertyTextures = StructuralMetadataMerger.copyArray(
-      targetDocument,
-      sourceDocument,
-      sourcePropertyTextures
-    );
-    for (const targetPropertyTexture of targetPropertyTextures) {
-      const sourceClassName = targetPropertyTexture.getClass();
+    for (const sourcePropertyTexture of sourcePropertyTextures) {
+      const sourceClassName = sourcePropertyTexture.getClass();
       const targetClassName = sourceClassNamesInTarget[sourceClassName];
       log(
         "Property texture referred to class " +
@@ -301,8 +322,81 @@ export class StructuralMetadataMerger {
           " and now refers to class " +
           targetClassName
       );
+      const targetPropertyTexture = mainMergeMap.get(
+        sourcePropertyTexture
+      ) as PropertyTexture;
       targetPropertyTexture.setClass(targetClassName);
       targetStructuralMetadata.addPropertyTexture(targetPropertyTexture);
+    }
+  }
+
+  /**
+   * Updates all mesh primitives to refer to the merged property textures.
+   *
+   * This will examine all mesh primitives in the given source document,
+   * and check whether they (and their counterpart in the target document)
+   * contain the `EXT_structural_metadata` extension object with
+   * property textures.
+   *
+   * If the extension object is found, then the property textures in
+   * the target will be cleared, and replaced by the property textures
+   * that have been created during the `mergeDocuments` call, to
+   * ensure that the property textures in the target are THE actual
+   * PropertyTexture objects that also appear in the top-level
+   * extension object.
+   *
+   * @param sourceDocument - The source document
+   * @param mainMergeMap - The mapping from `mergeDocuments`
+   */
+  private static updateMeshPrimitivePropertyTextures(
+    sourceDocument: Document,
+    mainMergeMap: Map<Property, Property>
+  ) {
+    const sourceRoot = sourceDocument.getRoot();
+    const sourceMeshes = sourceRoot.listMeshes();
+    for (const sourceMesh of sourceMeshes) {
+      const sourcePrimitives = sourceMesh.listPrimitives();
+      for (const sourcePrimitive of sourcePrimitives) {
+        const targetPrimitive = mainMergeMap.get(sourcePrimitive) as Primitive;
+
+        // Obtain the extension object from the source- and target
+        // mesh primitive
+        const sourceMeshPrimitiveStructuralMetadata =
+          sourcePrimitive.getExtension<MeshPrimitiveStructuralMetadata>(
+            "EXT_structural_metadata"
+          );
+        const targetMeshPrimitiveStructuralMetadata =
+          targetPrimitive.getExtension<MeshPrimitiveStructuralMetadata>(
+            "EXT_structural_metadata"
+          );
+        if (
+          sourceMeshPrimitiveStructuralMetadata &&
+          targetMeshPrimitiveStructuralMetadata
+        ) {
+          // Clear the property textures from the target mesh primitive
+          const oldTargetPropertyTextures =
+            targetMeshPrimitiveStructuralMetadata.listPropertyTextures();
+          for (const oldTargetPropertyTexture of oldTargetPropertyTextures) {
+            targetMeshPrimitiveStructuralMetadata.removePropertyTexture(
+              oldTargetPropertyTexture
+            );
+          }
+
+          // Replace the property textures from the target mesh
+          // primitive with the ones that have been created during
+          // the `mergeDocuments` operation
+          const sourcePropertyTextures =
+            sourceMeshPrimitiveStructuralMetadata.listPropertyTextures();
+          for (const sourcePropertyTexture of sourcePropertyTextures) {
+            const targetPropertyTexture = mainMergeMap.get(
+              sourcePropertyTexture
+            ) as PropertyTexture;
+            targetMeshPrimitiveStructuralMetadata.addPropertyTexture(
+              targetPropertyTexture
+            );
+          }
+        }
+      }
     }
   }
 
@@ -312,29 +406,22 @@ export class StructuralMetadataMerger {
    * This will update the 'class' of the copied property attributes according
    * to the given name mapping.
    *
-   * @param targetDocument - The target document
    * @param targetStructuralMetadata - The target extension object
-   * @param sourceDocument - The source document
    * @param sourceStructuralMetadata - The source extension object
+   * @param mainMergeMap - The mapping from `mergeDocuments`
    * @param sourceClassNamesInTarget - The mapping from class names in
    * the source schema to the names that they have in the target schema.
    */
   private static mergePropertyAttributes(
-    targetDocument: Document,
     targetStructuralMetadata: StructuralMetadata,
-    sourceDocument: Document,
     sourceStructuralMetadata: StructuralMetadata,
+    mainMergeMap: Map<Property, Property>,
     sourceClassNamesInTarget: { [key: string]: string }
   ) {
     const sourcePropertyAttributes =
       sourceStructuralMetadata.listPropertyAttributes();
-    const targetPropertyAttributes = StructuralMetadataMerger.copyArray(
-      targetDocument,
-      sourceDocument,
-      sourcePropertyAttributes
-    );
-    for (const targetPropertyAttribute of targetPropertyAttributes) {
-      const sourceClassName = targetPropertyAttribute.getClass();
+    for (const sourcePropertyAttribute of sourcePropertyAttributes) {
+      const sourceClassName = sourcePropertyAttribute.getClass();
       const targetClassName = sourceClassNamesInTarget[sourceClassName];
       log(
         "Property attribute referred to class " +
@@ -342,8 +429,81 @@ export class StructuralMetadataMerger {
           " and now refers to class " +
           targetClassName
       );
+      const targetPropertyAttribute = mainMergeMap.get(
+        sourcePropertyAttribute
+      ) as PropertyAttribute;
       targetPropertyAttribute.setClass(targetClassName);
       targetStructuralMetadata.addPropertyAttribute(targetPropertyAttribute);
+    }
+  }
+
+  /**
+   * Updates all mesh primitives to refer to the merged property attributes.
+   *
+   * This will examine all mesh primitives in the given source document,
+   * and check whether they (and their counterpart in the target document)
+   * contain the `EXT_structural_metadata` extension object with
+   * property attributes.
+   *
+   * If the extension object is found, then the property attributes in
+   * the target will be cleared, and replaced by the property attributes
+   * that have been created during the `mergeDocuments` call, to
+   * ensure that the property attributes in the target are THE actual
+   * PropertyAttribute objects that also appear in the top-level
+   * extension object.
+   *
+   * @param sourceDocument - The source document
+   * @param mainMergeMap - The mapping from `mergeDocuments`
+   */
+  private static updateMeshPrimitivePropertyAttributes(
+    sourceDocument: Document,
+    mainMergeMap: Map<Property, Property>
+  ) {
+    const sourceRoot = sourceDocument.getRoot();
+    const sourceMeshes = sourceRoot.listMeshes();
+    for (const sourceMesh of sourceMeshes) {
+      const sourcePrimitives = sourceMesh.listPrimitives();
+      for (const sourcePrimitive of sourcePrimitives) {
+        const targetPrimitive = mainMergeMap.get(sourcePrimitive) as Primitive;
+
+        // Obtain the extension object from the source- and target
+        // mesh primitive
+        const sourceMeshPrimitiveStructuralMetadata =
+          sourcePrimitive.getExtension<MeshPrimitiveStructuralMetadata>(
+            "EXT_structural_metadata"
+          );
+        const targetMeshPrimitiveStructuralMetadata =
+          targetPrimitive.getExtension<MeshPrimitiveStructuralMetadata>(
+            "EXT_structural_metadata"
+          );
+        if (
+          sourceMeshPrimitiveStructuralMetadata &&
+          targetMeshPrimitiveStructuralMetadata
+        ) {
+          // Clear the property attributes from the target mesh primitive
+          const oldTargetPropertyAttributes =
+            targetMeshPrimitiveStructuralMetadata.listPropertyAttributes();
+          for (const oldTargetPropertyAttribute of oldTargetPropertyAttributes) {
+            targetMeshPrimitiveStructuralMetadata.removePropertyAttribute(
+              oldTargetPropertyAttribute
+            );
+          }
+
+          // Replace the property attributes from the target mesh
+          // primitive with the ones that have been created during
+          // the `mergeDocuments` operation
+          const sourcePropertyAttributes =
+            sourceMeshPrimitiveStructuralMetadata.listPropertyAttributes();
+          for (const sourcePropertyAttribute of sourcePropertyAttributes) {
+            const targetPropertyAttribute = mainMergeMap.get(
+              sourcePropertyAttribute
+            ) as PropertyAttribute;
+            targetMeshPrimitiveStructuralMetadata.addPropertyAttribute(
+              targetPropertyAttribute
+            );
+          }
+        }
+      }
     }
   }
 
@@ -682,29 +842,6 @@ export class StructuralMetadataMerger {
     ]);
     const targetElement = mapping.get(sourceElement) as T;
     return targetElement;
-  }
-
-  /**
-   * Copy an array of objects from the given source document to the
-   * given target document, and return the copies.
-   *
-   * @param targetDocument - The target document
-   * @param sourceDocument - The source document
-   * @param sourceElement - The source objects
-   * @returns The target objects
-   */
-  private static copyArray<T extends Property<IProperty>>(
-    targetDocument: Document,
-    sourceDocument: Document,
-    sourceElements: T[]
-  ): T[] {
-    const mapping = copyToDocument(
-      targetDocument,
-      sourceDocument,
-      sourceElements
-    );
-    const targetElements = sourceElements.map((e: T) => mapping.get(e) as T);
-    return targetElements;
   }
 
   /**
