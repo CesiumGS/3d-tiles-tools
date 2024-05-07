@@ -416,7 +416,7 @@ async function addSpecPropertyTexture(document: Document, className: string) {
   const image = await savePixels(pixels, "image/png");
   const texture = document.createTexture();
   texture.setImage(image);
-  texture.setURI("propertyTextuer.png");
+  texture.setURI("propertyTexture.png");
 
   // Create and add a property texture with the following structure:
   // {

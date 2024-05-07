@@ -4,6 +4,8 @@ import { Document, Primitive } from "@gltf-transform/core";
 import { Property } from "@gltf-transform/core";
 import { IProperty } from "@gltf-transform/core";
 
+import { unpartition } from "@gltf-transform/functions";
+
 import { EXTStructuralMetadata } from "../../gltf-extensions/";
 import { StructuralMetadata } from "../../gltf-extensions/";
 import { MeshPrimitiveStructuralMetadata } from "../../gltf-extensions/";
@@ -103,6 +105,7 @@ export class StructuralMetadataMerger {
         "EXT_structural_metadata",
         copiedStructuralMetadata
       );
+      await targetDocument.transform(unpartition());
       return;
     }
 
@@ -121,6 +124,7 @@ export class StructuralMetadataMerger {
         mainMergeMap,
         schemaUriResolver
       );
+      await targetDocument.transform(unpartition());
     }
   }
 
