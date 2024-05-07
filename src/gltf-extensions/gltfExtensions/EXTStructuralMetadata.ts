@@ -1114,13 +1114,13 @@ export class EXTStructuralMetadata extends Extension {
       array: ifNot(classProperty.getArray(), false) ?? undefined,
       count: classProperty.getCount() ?? undefined,
       normalized: ifNot(classProperty.getNormalized(), false) ?? undefined,
-      offset: classProperty.getOffset(),
-      scale: classProperty.getScale(),
-      max: classProperty.getMax(),
-      min: classProperty.getMin(),
+      offset: classProperty.getOffset() ?? undefined,
+      scale: classProperty.getScale() ?? undefined,
+      max: classProperty.getMax() ?? undefined,
+      min: classProperty.getMin() ?? undefined,
       required: ifNot(classProperty.getRequired(), false) ?? undefined,
-      noData: classProperty.getNoData(),
-      default: classProperty.getDefault(),
+      noData: classProperty.getNoData() ?? undefined,
+      default: classProperty.getDefault() ?? undefined,
     };
     return classPropertyDef;
   }
@@ -1228,10 +1228,10 @@ export class EXTStructuralMetadata extends Extension {
       stringOffsetType:
         ifNot(propertyTableProperty.getStringOffsetType(), "UINT32") ??
         undefined,
-      offset: propertyTableProperty.getOffset(),
-      scale: propertyTableProperty.getScale(),
-      max: propertyTableProperty.getMax(),
-      min: propertyTableProperty.getMin(),
+      offset: propertyTableProperty.getOffset() ?? undefined,
+      scale: propertyTableProperty.getScale() ?? undefined,
+      max: propertyTableProperty.getMax() ?? undefined,
+      min: propertyTableProperty.getMin() ?? undefined,
     };
     return propertyTablePropertyDef;
   }
@@ -1291,10 +1291,10 @@ export class EXTStructuralMetadata extends Extension {
       channels: ifNot(propertyTextureProperty.getChannels(), [0]) ?? undefined,
       index: basicTextureDef.index,
       texCoord: basicTextureDef.texCoord,
-      offset: propertyTextureProperty.getOffset(),
-      scale: propertyTextureProperty.getScale(),
-      max: propertyTextureProperty.getMax(),
-      min: propertyTextureProperty.getMin(),
+      offset: propertyTextureProperty.getOffset() ?? undefined,
+      scale: propertyTextureProperty.getScale() ?? undefined,
+      max: propertyTextureProperty.getMax() ?? undefined,
+      min: propertyTextureProperty.getMin() ?? undefined,
     };
     return propertyTexturePropertyDef;
   }
@@ -1332,10 +1332,10 @@ export class EXTStructuralMetadata extends Extension {
   ) {
     const propertyAttributePropertyDef: PropertyAttributePropertyDef = {
       attribute: propertyAttributeProperty.getAttribute(),
-      offset: propertyAttributeProperty.getOffset(),
-      scale: propertyAttributeProperty.getScale(),
-      max: propertyAttributeProperty.getMax(),
-      min: propertyAttributeProperty.getMin(),
+      offset: propertyAttributeProperty.getOffset() ?? undefined,
+      scale: propertyAttributeProperty.getScale() ?? undefined,
+      max: propertyAttributeProperty.getMax() ?? undefined,
+      min: propertyAttributeProperty.getMin() ?? undefined,
     };
     return propertyAttributePropertyDef;
   }
