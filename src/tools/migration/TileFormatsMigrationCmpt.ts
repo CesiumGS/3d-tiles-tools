@@ -20,8 +20,8 @@ export class TileFormatsMigrationCmpt {
    * Convert the given CMPT data into a glTF asset
    *
    * @param cmptBuffer - The CMPT buffer
-   * @param externalGlbResolver - A function that will be used to resolve
-   * external GLB data if the CMPT contains I3DM that use
+   * @param externalResourceResolver - A function that will be used to resolve
+   * external resources, like GLB data if the CMPT contains I3DM that use
    * `header.gltfFormat=0` (meaning that the payload is not GLB data,
    * but only a GLB URI).
    * @returns The GLB buffer
@@ -30,7 +30,7 @@ export class TileFormatsMigrationCmpt {
    */
   static async convertCmptToGlb(
     cmptBuffer: Buffer,
-    externalGlbResolver: (uri: string) => Promise<Buffer | undefined>
+    externalResourceResolver: (uri: string) => Promise<Buffer | undefined>
   ): Promise<Buffer> {
     const compositeTileData = TileFormats.readCompositeTileData(cmptBuffer);
     const innerTileBuffers = compositeTileData.innerTileBuffers;
@@ -57,14 +57,14 @@ export class TileFormatsMigrationCmpt {
         logger.trace("Converting inner I3DM tile to GLB...");
         const innerTileGlb = await TileFormatsMigration.convertI3dmToGlb(
           innerTileBuffer,
-          externalGlbResolver
+          externalResourceResolver
         );
         innerTileGlbs.push(innerTileGlb);
       } else if (innerTileType === ContentDataTypes.CONTENT_TYPE_CMPT) {
         logger.trace("Converting inner CMPT tile to GLB...");
         const innerTileGlb = await TileFormatsMigration.convertCmptToGlb(
           innerTileBuffer,
-          externalGlbResolver
+          externalResourceResolver
         );
         innerTileGlbs.push(innerTileGlb);
       } else {
@@ -75,7 +75,29 @@ export class TileFormatsMigrationCmpt {
         );
       }
     }
-    const document = await GltfTransform.merge(innerTileGlbs);
+
+    // Create a resolver for the "schemaUri" strings that could
+    // be contained in the resulting GLBs. (There won't be any
+    // schema URIs, because the migration will only ever create
+    // schemas that are inlined, but the case has to be handled
+    // by the generic glTF merging process nevertheless...)
+    const schemaUriResolver = async (schemaUri: string) => {
+      const schemaJsonBuffer = await externalResourceResolver(schemaUri);
+      if (schemaJsonBuffer === undefined) {
+        return undefined;
+      }
+      try {
+        const schemaJson = JSON.parse(schemaJsonBuffer.toString());
+        return schemaJson;
+      } catch (e) {
+        console.error("Could not parse schema from " + schemaUri);
+        return undefined;
+      }
+    };
+    const document = await GltfTransform.merge(
+      innerTileGlbs,
+      schemaUriResolver
+    );
     const io = await GltfTransform.getIO();
     const glb = await io.writeBinary(document);
     return Buffer.from(glb);

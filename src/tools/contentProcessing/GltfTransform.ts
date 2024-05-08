@@ -17,6 +17,8 @@ import { EXTStructuralMetadata } from "../../gltf-extensions";
 import { EXTMeshFeatures } from "../../gltf-extensions";
 import { EXTInstanceFeatures } from "../../gltf-extensions";
 
+import { StructuralMetadataMerger } from "../gltfExtensionsUtils/StructuralMetadataMerger";
+
 /**
  * Utilities for using glTF-Transform in the 3D Tiles tools
  *
@@ -122,15 +124,24 @@ export class GltfTransform {
    * GLBs.
    *
    * @param inputGlbBuffers - The buffers containing GLB data
+   * @param schemaUriResolver - A function that can resolve the `schemaUri`
+   * and return the metadata schema JSON object
    * @returns The merged document
    */
-  static async merge(inputGlbBuffers: Buffer[]): Promise<Document> {
+  static async merge(
+    inputGlbBuffers: Buffer[],
+    schemaUriResolver: (schemaUri: string) => Promise<any>
+  ): Promise<Document> {
     // Create one document from each buffer and merge them
     const io = await GltfTransform.getIO();
     const mergedDocument = new Document();
     for (const inputGlbBuffer of inputGlbBuffers) {
       const inputDocument = await io.readBinary(inputGlbBuffer);
-      mergedDocument.merge(inputDocument);
+      await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+        mergedDocument,
+        inputDocument,
+        schemaUriResolver
+      );
     }
     // Combine all scenes into one
     await GltfTransform.combineScenes(mergedDocument);

@@ -421,9 +421,10 @@ export class TilesetUpgrader {
 
       targetKey = this.processContentUri(sourceKey);
 
-      // Define the resolver for external GLB files in CMPT files:
-      // It will look up the entry using the 'tilesetProcessor'
-      const externalGlbResolver = async (
+      // Define the resolver for resources like external GLB files
+      // in CMPT files: It will look up the entry using the
+      // 'tilesetProcessor'
+      const externalResourceResolver = async (
         uri: string
       ): Promise<Buffer | undefined> => {
         if (!this.tilesetProcessor) {
@@ -439,7 +440,7 @@ export class TilesetUpgrader {
       };
       targetValue = await TileFormatsMigration.convertCmptToGlb(
         sourceValue,
-        externalGlbResolver
+        externalResourceResolver
       );
     } else {
       logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
