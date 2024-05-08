@@ -236,9 +236,9 @@ export class StructuralMetadataMerger {
       sourceClassNamesInTarget
     );
     log("Updating mesh primitive property textures...");
-    StructuralMetadataMerger.updateMeshPrimitivePropertyTextures(
-      sourceDocument,
-      mainMergeMap
+    StructuralMetadataMerger.updateMeshPrimitivesPropertyTextures(
+      targetDocument,
+      targetStructuralMetadata
     );
 
     log("Merging property attributes...");
@@ -249,9 +249,9 @@ export class StructuralMetadataMerger {
       sourceClassNamesInTarget
     );
     log("Updating mesh primitive property attributes...");
-    StructuralMetadataMerger.updateMeshPrimitivePropertyAttributes(
-      sourceDocument,
-      mainMergeMap
+    StructuralMetadataMerger.updateMeshPrimitivesPropertyAttributes(
+      targetDocument,
+      targetStructuralMetadata
     );
 
     const targetRoot = targetDocument.getRoot();
@@ -303,6 +303,12 @@ export class StructuralMetadataMerger {
    * This will update the 'class' of the copied property textures according
    * to the given name mapping.
    *
+   * The given target structural metadata will afterwards contain the set
+   * of unique textures. This means that when there are two textures
+   * that are `equal` according to the glTF-Transform `Property.equal`
+   * implementation, then the texture will only be added once to the
+   * target.
+   *
    * @param targetStructuralMetadata - The target extension object
    * @param sourceStructuralMetadata - The source extension object
    * @param mainMergeMap  - The mapping from `mergeDocuments`
@@ -317,6 +323,8 @@ export class StructuralMetadataMerger {
   ) {
     const sourcePropertyTextures =
       sourceStructuralMetadata.listPropertyTextures();
+    const targetPropertyTextures =
+      targetStructuralMetadata.listPropertyTextures();
     for (const sourcePropertyTexture of sourcePropertyTextures) {
       const sourceClassName = sourcePropertyTexture.getClass();
       const targetClassName = sourceClassNamesInTarget[sourceClassName];
@@ -330,76 +338,112 @@ export class StructuralMetadataMerger {
         sourcePropertyTexture
       ) as PropertyTexture;
       targetPropertyTexture.setClass(targetClassName);
-      targetStructuralMetadata.addPropertyTexture(targetPropertyTexture);
+      const alreadyExists = StructuralMetadataMerger.containsEqual(
+        targetPropertyTextures,
+        targetPropertyTexture
+      );
+      if (!alreadyExists) {
+        targetPropertyTextures.push(targetPropertyTexture);
+        targetStructuralMetadata.addPropertyTexture(targetPropertyTexture);
+      }
     }
   }
 
   /**
    * Updates all mesh primitives to refer to the merged property textures.
    *
-   * This will examine all mesh primitives in the given source document,
-   * and check whether they (and their counterpart in the target document)
-   * contain the `EXT_structural_metadata` extension object with
-   * property textures.
+   * This will examine all mesh primitives in the given target document,
+   * and check whether they contain the `EXT_structural_metadata` extension
+   * object with property textures.
    *
    * If the extension object is found, then the property textures in
-   * the target will be cleared, and replaced by the property textures
-   * that have been created during the `mergeDocuments` call, to
-   * ensure that the property textures in the target are THE actual
-   * PropertyTexture objects that also appear in the top-level
-   * extension object.
+   * the target mesh primitive will be updated, using
+   * `updateMeshPrimitivePropertyTextures`.
    *
-   * @param sourceDocument - The source document
-   * @param mainMergeMap - The mapping from `mergeDocuments`
+   * @param targetDocument - The target document
+   * @param targetStructuralMetadata - The target root extension object
    */
-  private static updateMeshPrimitivePropertyTextures(
-    sourceDocument: Document,
-    mainMergeMap: Map<Property, Property>
+  private static updateMeshPrimitivesPropertyTextures(
+    targetDocument: Document,
+    targetStructuralMetadata: StructuralMetadata
   ) {
-    const sourceRoot = sourceDocument.getRoot();
-    const sourceMeshes = sourceRoot.listMeshes();
-    for (const sourceMesh of sourceMeshes) {
-      const sourcePrimitives = sourceMesh.listPrimitives();
-      for (const sourcePrimitive of sourcePrimitives) {
-        const targetPrimitive = mainMergeMap.get(sourcePrimitive) as Primitive;
+    const targetRootPropertyTextures =
+      targetStructuralMetadata.listPropertyTextures();
 
-        // Obtain the extension object from the source- and target
-        // mesh primitive
-        const sourceMeshPrimitiveStructuralMetadata =
-          sourcePrimitive.getExtension<MeshPrimitiveStructuralMetadata>(
-            "EXT_structural_metadata"
-          );
+    const targetRoot = targetDocument.getRoot();
+    const targetMeshes = targetRoot.listMeshes();
+    for (const targetMesh of targetMeshes) {
+      const targetPrimitives = targetMesh.listPrimitives();
+      for (const targetPrimitive of targetPrimitives) {
         const targetMeshPrimitiveStructuralMetadata =
           targetPrimitive.getExtension<MeshPrimitiveStructuralMetadata>(
             "EXT_structural_metadata"
           );
-        if (
-          sourceMeshPrimitiveStructuralMetadata &&
-          targetMeshPrimitiveStructuralMetadata
-        ) {
-          // Clear the property textures from the target mesh primitive
-          const oldTargetPropertyTextures =
-            targetMeshPrimitiveStructuralMetadata.listPropertyTextures();
-          for (const oldTargetPropertyTexture of oldTargetPropertyTextures) {
-            targetMeshPrimitiveStructuralMetadata.removePropertyTexture(
-              oldTargetPropertyTexture
-            );
-          }
-
-          // Replace the property textures from the target mesh
-          // primitive with the ones that have been created during
-          // the `mergeDocuments` operation
-          const sourcePropertyTextures =
-            sourceMeshPrimitiveStructuralMetadata.listPropertyTextures();
-          for (const sourcePropertyTexture of sourcePropertyTextures) {
-            const targetPropertyTexture = mainMergeMap.get(
-              sourcePropertyTexture
-            ) as PropertyTexture;
-            targetMeshPrimitiveStructuralMetadata.addPropertyTexture(
-              targetPropertyTexture
-            );
-          }
+        if (targetMeshPrimitiveStructuralMetadata) {
+          StructuralMetadataMerger.updateMeshPrimitivePropertyTextures(
+            targetRootPropertyTextures,
+            targetMeshPrimitiveStructuralMetadata
+          );
         }
+      }
+    }
+  }
+
+  /**
+   * Updates the extension object of a mesh primitive to refer to the
+   * merged property textures.
+   *
+   * The property textures in the given extension object will be
+   * cleared, and replaced by the property textures that have been
+   * created in the root extension object, to ensure that the property
+   * textures in the mesh primitive extension object are THE actual
+   * PropertyTexture objects that also appear in the top-level
+   * extension object.
+   *
+   * @param targetRootPropertyTextures - The property textures from
+   * the root extension object of the target
+   * @param targetMeshPrimitiveStructuralMetadata - The extension object
+   * from a mesh primitive
+   */
+  private static updateMeshPrimitivePropertyTextures(
+    targetRootPropertyTextures: PropertyTexture[],
+    targetMeshPrimitiveStructuralMetadata: MeshPrimitiveStructuralMetadata
+  ) {
+    // Clear the property textures from the target mesh primitive
+    const oldTargetMeshPrimitivePropertyTextures =
+      targetMeshPrimitiveStructuralMetadata.listPropertyTextures();
+    for (const oldTargetMeshPrimitivePropertyTexture of oldTargetMeshPrimitivePropertyTextures) {
+      targetMeshPrimitiveStructuralMetadata.removePropertyTexture(
+        oldTargetMeshPrimitivePropertyTexture
+      );
+    }
+
+    // Go through the list of old property texture objects,
+    // and replace them with the ones from the root extension
+    // object that are 'equal' to the old ones. (They will
+    // not be 'identical', as in '==' or '===' - what counts
+    // here is equality in the sense of the glTF-Transform
+    // `Property.equals` function)
+    for (const oldTargetMeshPrimitivePropertyTexture of oldTargetMeshPrimitivePropertyTextures) {
+      let newTargetMeshPrimitivePropertyTexture: PropertyTexture | null = null;
+      for (let i = 0; i < targetRootPropertyTextures.length; i++) {
+        if (
+          oldTargetMeshPrimitivePropertyTexture.equals(
+            targetRootPropertyTextures[i]
+          )
+        ) {
+          newTargetMeshPrimitivePropertyTexture = targetRootPropertyTextures[i];
+          break;
+        }
+      }
+      if (newTargetMeshPrimitivePropertyTexture === null) {
+        throw new MetadataError(
+          "Could not find mesh primitive property texture in root extension object"
+        );
+      } else {
+        targetMeshPrimitiveStructuralMetadata.addPropertyTexture(
+          newTargetMeshPrimitivePropertyTexture
+        );
       }
     }
   }
@@ -409,6 +453,12 @@ export class StructuralMetadataMerger {
    *
    * This will update the 'class' of the copied property attributes according
    * to the given name mapping.
+   *
+   * The given target structural metadata will afterwards contain the set
+   * of unique attributes. This means that when there are two attributes
+   * that are `equal` according to the glTF-Transform `Property.equal`
+   * implementation, then the attribute will only be added once to the
+   * target.
    *
    * @param targetStructuralMetadata - The target extension object
    * @param sourceStructuralMetadata - The source extension object
@@ -424,6 +474,8 @@ export class StructuralMetadataMerger {
   ) {
     const sourcePropertyAttributes =
       sourceStructuralMetadata.listPropertyAttributes();
+    const targetPropertyAttributes =
+      targetStructuralMetadata.listPropertyAttributes();
     for (const sourcePropertyAttribute of sourcePropertyAttributes) {
       const sourceClassName = sourcePropertyAttribute.getClass();
       const targetClassName = sourceClassNamesInTarget[sourceClassName];
@@ -437,76 +489,114 @@ export class StructuralMetadataMerger {
         sourcePropertyAttribute
       ) as PropertyAttribute;
       targetPropertyAttribute.setClass(targetClassName);
-      targetStructuralMetadata.addPropertyAttribute(targetPropertyAttribute);
+      const alreadyExists = StructuralMetadataMerger.containsEqual(
+        targetPropertyAttributes,
+        targetPropertyAttribute
+      );
+      if (!alreadyExists) {
+        targetPropertyAttributes.push(targetPropertyAttribute);
+        targetStructuralMetadata.addPropertyAttribute(targetPropertyAttribute);
+      }
     }
   }
 
   /**
    * Updates all mesh primitives to refer to the merged property attributes.
    *
-   * This will examine all mesh primitives in the given source document,
-   * and check whether they (and their counterpart in the target document)
-   * contain the `EXT_structural_metadata` extension object with
-   * property attributes.
+   * This will examine all mesh primitives in the given target document,
+   * and check whether they contain the `EXT_structural_metadata` extension
+   * object with property attributes.
    *
    * If the extension object is found, then the property attributes in
-   * the target will be cleared, and replaced by the property attributes
-   * that have been created during the `mergeDocuments` call, to
-   * ensure that the property attributes in the target are THE actual
-   * PropertyAttribute objects that also appear in the top-level
-   * extension object.
+   * the target mesh primitive will be updated, using
+   * `updateMeshPrimitivePropertyAttributes`.
    *
-   * @param sourceDocument - The source document
-   * @param mainMergeMap - The mapping from `mergeDocuments`
+   * @param targetDocument - The target document
+   * @param targetStructuralMetadata - The target root extension object
    */
-  private static updateMeshPrimitivePropertyAttributes(
-    sourceDocument: Document,
-    mainMergeMap: Map<Property, Property>
+  private static updateMeshPrimitivesPropertyAttributes(
+    targetDocument: Document,
+    targetStructuralMetadata: StructuralMetadata
   ) {
-    const sourceRoot = sourceDocument.getRoot();
-    const sourceMeshes = sourceRoot.listMeshes();
-    for (const sourceMesh of sourceMeshes) {
-      const sourcePrimitives = sourceMesh.listPrimitives();
-      for (const sourcePrimitive of sourcePrimitives) {
-        const targetPrimitive = mainMergeMap.get(sourcePrimitive) as Primitive;
+    const targetRootPropertyAttributes =
+      targetStructuralMetadata.listPropertyAttributes();
 
-        // Obtain the extension object from the source- and target
-        // mesh primitive
-        const sourceMeshPrimitiveStructuralMetadata =
-          sourcePrimitive.getExtension<MeshPrimitiveStructuralMetadata>(
-            "EXT_structural_metadata"
-          );
+    const targetRoot = targetDocument.getRoot();
+    const targetMeshes = targetRoot.listMeshes();
+    for (const targetMesh of targetMeshes) {
+      const targetPrimitives = targetMesh.listPrimitives();
+      for (const targetPrimitive of targetPrimitives) {
         const targetMeshPrimitiveStructuralMetadata =
           targetPrimitive.getExtension<MeshPrimitiveStructuralMetadata>(
             "EXT_structural_metadata"
           );
-        if (
-          sourceMeshPrimitiveStructuralMetadata &&
-          targetMeshPrimitiveStructuralMetadata
-        ) {
-          // Clear the property attributes from the target mesh primitive
-          const oldTargetPropertyAttributes =
-            targetMeshPrimitiveStructuralMetadata.listPropertyAttributes();
-          for (const oldTargetPropertyAttribute of oldTargetPropertyAttributes) {
-            targetMeshPrimitiveStructuralMetadata.removePropertyAttribute(
-              oldTargetPropertyAttribute
-            );
-          }
-
-          // Replace the property attributes from the target mesh
-          // primitive with the ones that have been created during
-          // the `mergeDocuments` operation
-          const sourcePropertyAttributes =
-            sourceMeshPrimitiveStructuralMetadata.listPropertyAttributes();
-          for (const sourcePropertyAttribute of sourcePropertyAttributes) {
-            const targetPropertyAttribute = mainMergeMap.get(
-              sourcePropertyAttribute
-            ) as PropertyAttribute;
-            targetMeshPrimitiveStructuralMetadata.addPropertyAttribute(
-              targetPropertyAttribute
-            );
-          }
+        if (targetMeshPrimitiveStructuralMetadata) {
+          StructuralMetadataMerger.updateMeshPrimitivePropertyAttributes(
+            targetRootPropertyAttributes,
+            targetMeshPrimitiveStructuralMetadata
+          );
         }
+      }
+    }
+  }
+
+  /**
+   * Updates the extension object of a mesh primitive to refer to the
+   * merged property attributes.
+   *
+   * The property attributes in the given extension object will be
+   * cleared, and replaced by the property attributes that have been
+   * created in the root extension object, to ensure that the property
+   * attributes in the mesh primitive extension object are THE actual
+   * PropertyAttribute objects that also appear in the top-level
+   * extension object.
+   *
+   * @param targetRootPropertyAttributes - The property attributes from
+   * the root extension object of the target
+   * @param targetMeshPrimitiveStructuralMetadata - The extension object
+   * from a mesh primitive
+   */
+  private static updateMeshPrimitivePropertyAttributes(
+    targetRootPropertyAttributes: PropertyAttribute[],
+    targetMeshPrimitiveStructuralMetadata: MeshPrimitiveStructuralMetadata
+  ) {
+    // Clear the property attributes from the target mesh primitive
+    const oldTargetMeshPrimitivePropertyAttributes =
+      targetMeshPrimitiveStructuralMetadata.listPropertyAttributes();
+    for (const oldTargetMeshPrimitivePropertyAttribute of oldTargetMeshPrimitivePropertyAttributes) {
+      targetMeshPrimitiveStructuralMetadata.removePropertyAttribute(
+        oldTargetMeshPrimitivePropertyAttribute
+      );
+    }
+
+    // Go through the list of old property attribute objects,
+    // and replace them with the ones from the root extension
+    // object that are 'equal' to the old ones. (They will
+    // not be 'identical', as in '==' or '===' - what counts
+    // here is equality in the sense of the glTF-Transform
+    // `Property.equals` function)
+    for (const oldTargetMeshPrimitivePropertyAttribute of oldTargetMeshPrimitivePropertyAttributes) {
+      let newTargetMeshPrimitivePropertyAttribute: PropertyAttribute | null =
+        null;
+      for (let i = 0; i < targetRootPropertyAttributes.length; i++) {
+        if (
+          oldTargetMeshPrimitivePropertyAttribute.equals(
+            targetRootPropertyAttributes[i]
+          )
+        ) {
+          newTargetMeshPrimitivePropertyAttribute =
+            targetRootPropertyAttributes[i];
+          break;
+        }
+      }
+      if (newTargetMeshPrimitivePropertyAttribute === null) {
+        throw new MetadataError(
+          "Could not find mesh primitive property attribute in root extension object"
+        );
+      } else {
+        targetMeshPrimitiveStructuralMetadata.addPropertyAttribute(
+          newTargetMeshPrimitivePropertyAttribute
+        );
       }
     }
   }
@@ -624,7 +714,7 @@ export class StructuralMetadataMerger {
         log(
           "Source enum " +
             sourceEnumKey +
-            " is stored as " +
+            " is copied and stored as " +
             targetEnumKey +
             " in the target"
         );
@@ -738,7 +828,11 @@ export class StructuralMetadataMerger {
           if (sourceClass.equals(existingTargetClass)) {
             // When the source class and the existing target class
             // are equal, then nothing has to be done
-            log("Source class " + sourceClassKey + " already exists ");
+            log(
+              "Source class " +
+                sourceClassKey +
+                " is equal to one that already exists in the target"
+            );
             sourceClassNamesInTarget[sourceClassKey] = sourceClassKey;
           } else {
             // Otherwise, the source class is copied to the target and
@@ -825,6 +919,24 @@ export class StructuralMetadataMerger {
         }
       }
     }
+  }
+
+  /**
+   * Returns whether the given array of glTF-Transform `Property` objects
+   * contains an objec that is equal to the given one, based on the
+   * glTF-Transform `Property.equal` implementation.
+   *
+   * @param properties - The properties
+   * @param property - The property
+   * @returns The result
+   */
+  private static containsEqual(properties: Property[], property: Property) {
+    for (const p of properties) {
+      if (p.equals(property)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

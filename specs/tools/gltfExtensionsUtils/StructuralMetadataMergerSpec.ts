@@ -14,11 +14,20 @@ import { StructuralMetadataPropertyTexture as PropertyTexture } from "../../../s
 
 import { BinaryPropertyTableBuilder } from "../../../src/metadata/";
 
-import {
-  GltfTransform,
-  StructuralMetadataPropertyTables,
-} from "../../../src/tools/";
+import { GltfTransform } from "../../../src/tools/";
+import { StructuralMetadataPropertyTables } from "../../../src/tools/";
 import { StructuralMetadataMerger } from "../../../src/tools/";
+
+// A compile-time flag that indicates that the documents that result
+// from the merge operation should be serialized with glTF-Transform.
+// This does impose an overhead, but should usually be `true`, because
+// it is a very thorough consistency check.
+const SERIALIZE_DOCUMENTS = true;
+
+// A compile-time flag that indicates that the documents that are
+// created due to the SERIALIZE_DOCUMENTS flag should be logged
+// to the console. This should be `true` ONLY for debugging!
+const LOG_SERIALIZED_DOCUMENTS = true;
 
 // A dummy resolver for the `schemaUri` that may be found in metadata
 const specSchemaUriResolver = async (schemaUri: string) => {
@@ -391,12 +400,18 @@ function addSpecPropertyAttribute(document: Document, className: string) {
  * - a property texture in the top-level metadata extension object for
  *   such a property. It will refer to the texture with index 0,
  *   texture coordinate set 0, and channels [0]
- * - a texture that contains "dummy" data in channel 0
+ * - a texture that contains dummy data in channel 0
  *
  * @param document - The document
  * @param className - The metadata class name
+ * @param redPixelValue - The value of the 'red' component of the
+ * pixels, i.e. the values in channel 0
  */
-async function addSpecPropertyTexture(document: Document, className: string) {
+async function addSpecPropertyTexture(
+  document: Document,
+  className: string,
+  redPixelValue: number
+) {
   const propertyName = "example_INT8_SCALAR";
 
   // Obtain the top-level extension object
@@ -410,7 +425,7 @@ async function addSpecPropertyTexture(document: Document, className: string) {
   const pixels = NdArray(new Uint8Array(sizeX * sizeY), [sizeX, sizeY, 4]);
   for (let x = 0; x < pixels.shape[0]; x++) {
     for (let y = 0; y < pixels.shape[1]; y++) {
-      pixels.set(x, y, 0, x * sizeY + y);
+      pixels.set(x, y, 0, redPixelValue);
     }
   }
   const image = await savePixels(pixels, "image/png");
@@ -457,7 +472,7 @@ async function addSpecPropertyTexture(document: Document, className: string) {
   );
 }
 
-describe("StructuralMetadataMerger", function () {
+fdescribe("StructuralMetadataMerger", function () {
   //==========================================================================
   // Basic class merging
 
@@ -783,7 +798,7 @@ describe("StructuralMetadataMerger", function () {
   //==========================================================================
   // Basic property table merging
 
-  fit("merges the set of property tables for one resulting class", async function () {
+  it("merges the set of property tables for one resulting class", async function () {
     // The classes have the same name/key
     // The classes are structurally equal
     // The property tables refer to the respective class (which turns out to be equal)
@@ -870,15 +885,16 @@ describe("StructuralMetadataMerger", function () {
     expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
     expect(getNumPropertyTables(document)).toBe(2);
 
-    // XXX Try to write the document as a basic consistency check:
-    {
+    if (SERIALIZE_DOCUMENTS) {
       const io = await GltfTransform.getIO();
       const jsonDocument = await io.writeJSON(document);
-      console.log(JSON.stringify(jsonDocument.json, null, 2));
+      if (LOG_SERIALIZED_DOCUMENTS) {
+        console.log(JSON.stringify(jsonDocument.json, null, 2));
+      }
     }
   });
 
-  fit("merges the set of property tables and updates their class for disambiguated classes", async function () {
+  it("merges the set of property tables and updates their class for disambiguated classes", async function () {
     // The classes have the same name/key
     // The classes are structurally different
     // The property tables refer to the respective class
@@ -973,24 +989,25 @@ describe("StructuralMetadataMerger", function () {
     const propertyTable1 = getPropertyTable(document, 1);
     expect(propertyTable1.getClass()).toBe("exampleClass_0");
 
-    // XXX Try to write the document as a basic consistency check:
-    {
+    if (SERIALIZE_DOCUMENTS) {
       const io = await GltfTransform.getIO();
       const jsonDocument = await io.writeJSON(document);
-      console.log(JSON.stringify(jsonDocument.json, null, 2));
+      if (LOG_SERIALIZED_DOCUMENTS) {
+        console.log(JSON.stringify(jsonDocument.json, null, 2));
+      }
     }
   });
 
   //==========================================================================
   // Basic property attribute merging
 
-  fit("merges the set of property attributes for one resulting class", async function () {
+  it("merges the set of property attributes for one resulting class", async function () {
     // The classes have the same name/key
     // The classes are structurally equal
     // The property attributes refer to the respective class (which turns out to be equal)
     // The result should be:
     // One class
-    // Two property attributes
+    // ONE property attribute (because the property attributes turn out to be equal as well!)
 
     const schemaA = {
       id: "EXAMPLE_SCHEMA_ID",
@@ -1063,25 +1080,26 @@ describe("StructuralMetadataMerger", function () {
 
     // After merging in the second document:
     // There should still be one class
-    // There should be two property attributes
+    // There should be ONE property attribute (because they are equal)
     expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
-    expect(getNumPropertyAttributes(document)).toBe(2);
+    expect(getNumPropertyAttributes(document)).toBe(1);
 
-    // XXX Try to write the document as a basic consistency check:
-    {
+    if (SERIALIZE_DOCUMENTS) {
       const io = await GltfTransform.getIO();
       const jsonDocument = await io.writeJSON(document);
-      console.log(JSON.stringify(jsonDocument.json, null, 2));
+      if (LOG_SERIALIZED_DOCUMENTS) {
+        console.log(JSON.stringify(jsonDocument.json, null, 2));
+      }
     }
   });
 
-  fit("merges the set of property attributes and updates their class for disambiguated classes", async function () {
+  it("merges the set of property attributes and updates their class for disambiguated classes", async function () {
     // The classes have the same name/key
     // The classes are structurally different
     // The property attributes refer to the respective class
     // The result should be:
     // Two classes
-    // Two property attributes
+    // Two property attributes (because the second one refers to a different class now!)
 
     const schemaA = {
       id: "EXAMPLE_SCHEMA_ID",
@@ -1165,21 +1183,116 @@ describe("StructuralMetadataMerger", function () {
     const propertyAttribute1 = getPropertyAttribute(document, 1);
     expect(propertyAttribute1.getClass()).toBe("exampleClass_0");
 
-    // XXX Try to write the document as a basic consistency check:
-    {
+    if (SERIALIZE_DOCUMENTS) {
       const io = await GltfTransform.getIO();
       const jsonDocument = await io.writeJSON(document);
-      console.log(JSON.stringify(jsonDocument.json, null, 2));
+      if (LOG_SERIALIZED_DOCUMENTS) {
+        console.log(JSON.stringify(jsonDocument.json, null, 2));
+      }
     }
   });
 
   //==========================================================================
   // Basic property texture merging
 
-  fit("merges the set of property textures for one resulting class", async function () {
+  fit("merges the set of equal property textures for one resulting class", async function () {
     // The classes have the same name/key
     // The classes are structurally equal
     // The property textures refer to the respective class (which turns out to be equal)
+    // The property textures have the same content (i.e. they are equal)
+    // The result should be:
+    // One class
+    // ONE property texture (because they turn out to be equal)
+
+    const schemaA = {
+      id: "EXAMPLE_SCHEMA_ID",
+      classes: {
+        exampleClass: {
+          name: "Example Class",
+          properties: {
+            example_INT8_SCALAR: {
+              name: "Example SCALAR property with INT8 components",
+              description:
+                "An example property, with type SCALAR, with component type INT8",
+              type: "SCALAR",
+              componentType: "INT8",
+              array: false,
+              normalized: false,
+            },
+          },
+        },
+      },
+    };
+
+    const schemaB = {
+      id: "EXAMPLE_SCHEMA_ID",
+      classes: {
+        exampleClass: {
+          name: "Example Class",
+          properties: {
+            example_INT8_SCALAR: {
+              name: "Example SCALAR property with INT8 components",
+              description:
+                "An example property, with type SCALAR, with component type INT8",
+              type: "SCALAR",
+              componentType: "INT8",
+              array: false,
+              normalized: false,
+            },
+          },
+        },
+      },
+    };
+
+    const documentA = new Document();
+    documentA.createBuffer();
+    assignMetadataSchema(documentA, schemaA);
+    await addSpecPropertyTexture(documentA, "exampleClass", 12); // Same as below
+
+    const documentB = new Document();
+    documentB.createBuffer();
+    assignMetadataSchema(documentB, schemaB);
+    await addSpecPropertyTexture(documentB, "exampleClass", 12); // Same as above
+
+    const document = new Document();
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+      document,
+      documentA,
+      specSchemaUriResolver
+    );
+
+    // After merging in the first document:
+    // There should be one class
+    // There should be one property texture
+    expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
+    expect(getNumPropertyTextures(document)).toBe(1);
+
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+      document,
+      documentB,
+      specSchemaUriResolver
+    );
+
+    // After merging in the second document:
+    // There should still be one class
+    // There should be ONE property texture (because the inputs are equal)
+    expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
+    expect(getNumPropertyTextures(document)).toBe(1);
+
+    if (SERIALIZE_DOCUMENTS) {
+      const io = await GltfTransform.getIO();
+      const jsonDocument = await io.writeJSON(document);
+      if (LOG_SERIALIZED_DOCUMENTS) {
+        console.log(JSON.stringify(jsonDocument.json, null, 2));
+      }
+    }
+  });
+
+  fit("merges the set of different property textures for one resulting class", async function () {
+    // The classes have the same name/key
+    // The classes are structurally equal
+    // The property textures refer to the respective class (which turns out to be equal)
+    // The property textures have different content (i.e. they are not equal)
     // The result should be:
     // One class
     // Two property textures
@@ -1227,12 +1340,12 @@ describe("StructuralMetadataMerger", function () {
     const documentA = new Document();
     documentA.createBuffer();
     assignMetadataSchema(documentA, schemaA);
-    await addSpecPropertyTexture(documentA, "exampleClass");
+    await addSpecPropertyTexture(documentA, "exampleClass", 12); // Other than below
 
     const documentB = new Document();
     documentB.createBuffer();
     assignMetadataSchema(documentB, schemaB);
-    await addSpecPropertyTexture(documentB, "exampleClass");
+    await addSpecPropertyTexture(documentB, "exampleClass", 23); // Other than above
 
     const document = new Document();
     await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
@@ -1259,15 +1372,16 @@ describe("StructuralMetadataMerger", function () {
     expect(getMetadataClassNames(document)).toEqual(["exampleClass"]);
     expect(getNumPropertyTextures(document)).toBe(2);
 
-    // XXX Try to write the document as a basic consistency check:
-    {
+    if (SERIALIZE_DOCUMENTS) {
       const io = await GltfTransform.getIO();
       const jsonDocument = await io.writeJSON(document);
-      console.log(JSON.stringify(jsonDocument.json, null, 2));
+      if (LOG_SERIALIZED_DOCUMENTS) {
+        console.log(JSON.stringify(jsonDocument.json, null, 2));
+      }
     }
   });
 
-  fit("merges the set of property textures and updates their class for disambiguated classes", async function () {
+  it("merges the set of property textures and updates their class for disambiguated classes", async function () {
     // The classes have the same name/key
     // The classes are structurally different
     // The property textures refer to the respective class
@@ -1319,12 +1433,12 @@ describe("StructuralMetadataMerger", function () {
     const documentA = new Document();
     documentA.createBuffer();
     assignMetadataSchema(documentA, schemaA);
-    await addSpecPropertyTexture(documentA, "exampleClass");
+    await addSpecPropertyTexture(documentA, "exampleClass", 12);
 
     const documentB = new Document();
     documentB.createBuffer();
     assignMetadataSchema(documentB, schemaB);
-    await addSpecPropertyTexture(documentB, "exampleClass");
+    await addSpecPropertyTexture(documentB, "exampleClass", 23);
 
     const document = new Document();
     await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
@@ -1358,11 +1472,12 @@ describe("StructuralMetadataMerger", function () {
     const propertyTexture1 = getPropertyTexture(document, 1);
     expect(propertyTexture1.getClass()).toBe("exampleClass_0");
 
-    // XXX Try to write the document as a basic consistency check:
-    {
+    if (SERIALIZE_DOCUMENTS) {
       const io = await GltfTransform.getIO();
       const jsonDocument = await io.writeJSON(document);
-      console.log(JSON.stringify(jsonDocument.json, null, 2));
+      if (LOG_SERIALIZED_DOCUMENTS) {
+        console.log(JSON.stringify(jsonDocument.json, null, 2));
+      }
     }
   });
 });
