@@ -151,6 +151,9 @@ export class EXTInstanceFeatures extends Extension {
       if (structuralMetadata) {
         const propertyTables = structuralMetadata.listPropertyTables();
         propertyTableDef = propertyTables.indexOf(propertyTable);
+        if (propertyTableDef < 0) {
+          throw new Error(`${NAME}: Invalid property table in feature ID`);
+        }
       } else {
         throw new Error(
           `${NAME}: No EXT_structural_metadata definition for looking up property table index`
