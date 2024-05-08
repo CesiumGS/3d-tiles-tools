@@ -2,6 +2,7 @@ import fs from "fs";
 
 import { Paths } from "../../../src/base";
 
+import { StructuralMetadataMerger } from "../../../src/tools";
 import { TilesetOperations } from "../../../src/tools";
 import { GltfUtilities } from "../../../src/tools";
 
@@ -85,6 +86,9 @@ async function computeJsonStrings(
 describe("TileFormatsMigration", function () {
   afterEach(function () {
     //SpecHelpers.forceDeleteDirectory(outputDir);
+  });
+  beforeEach(function () {
+    StructuralMetadataMerger.setMergedSchemaIdSuffix("SPEC-SCHEMA-ID-SUFFIX");
   });
 
   //==========================================================================

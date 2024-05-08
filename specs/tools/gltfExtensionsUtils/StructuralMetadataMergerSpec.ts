@@ -27,7 +27,7 @@ const SERIALIZE_DOCUMENTS = true;
 // A compile-time flag that indicates that the documents that are
 // created due to the SERIALIZE_DOCUMENTS flag should be logged
 // to the console. This should be `true` ONLY for debugging!
-const LOG_SERIALIZED_DOCUMENTS = true;
+const LOG_SERIALIZED_DOCUMENTS = false;
 
 // A dummy resolver for the `schemaUri` that may be found in metadata
 const specSchemaUriResolver = async (schemaUri: string) => {
@@ -472,7 +472,7 @@ async function addSpecPropertyTexture(
   );
 }
 
-fdescribe("StructuralMetadataMerger", function () {
+describe("StructuralMetadataMerger", function () {
   //==========================================================================
   // Basic class merging
 
@@ -540,6 +540,14 @@ fdescribe("StructuralMetadataMerger", function () {
     // After merging in the second document:
     // There should still be one class
     expect(getMetadataClassNames(document).length).toBe(1);
+
+    if (SERIALIZE_DOCUMENTS) {
+      const io = await GltfTransform.getIO();
+      const jsonDocument = await io.writeJSON(document);
+      if (LOG_SERIALIZED_DOCUMENTS) {
+        console.log(JSON.stringify(jsonDocument.json, null, 2));
+      }
+    }
   });
 
   it("creates two classes if the input classes have different keys/names (even though they are structurally equal)", async function () {
@@ -609,6 +617,14 @@ fdescribe("StructuralMetadataMerger", function () {
     expect(getMetadataClassNames(document).sort()).toEqual(
       ["exampleClass", "exampleClassButWithDifferentName"].sort()
     );
+
+    if (SERIALIZE_DOCUMENTS) {
+      const io = await GltfTransform.getIO();
+      const jsonDocument = await io.writeJSON(document);
+      if (LOG_SERIALIZED_DOCUMENTS) {
+        console.log(JSON.stringify(jsonDocument.json, null, 2));
+      }
+    }
   });
 
   it("creates two classes if the input classes have the same keys/names but are NOT structurally equal", async function () {
@@ -677,6 +693,14 @@ fdescribe("StructuralMetadataMerger", function () {
     expect(getMetadataClassNames(document).sort()).toEqual(
       ["exampleClass", "exampleClass_0"].sort()
     );
+
+    if (SERIALIZE_DOCUMENTS) {
+      const io = await GltfTransform.getIO();
+      const jsonDocument = await io.writeJSON(document);
+      if (LOG_SERIALIZED_DOCUMENTS) {
+        console.log(JSON.stringify(jsonDocument.json, null, 2));
+      }
+    }
   });
 
   it("creates two classes if the input classes have the same keys/names and appear to be structurally equal, but are no longer equal after disambiguating enums", async function () {
@@ -793,6 +817,115 @@ fdescribe("StructuralMetadataMerger", function () {
     const exampleClass_0 = getMetadataClass(document, "exampleClass_0");
     const property = exampleClass_0.getProperty("example_ENUM");
     expect(property?.getEnumType()).toEqual("exampleEnum_0");
+
+    if (SERIALIZE_DOCUMENTS) {
+      const io = await GltfTransform.getIO();
+      const jsonDocument = await io.writeJSON(document);
+      if (LOG_SERIALIZED_DOCUMENTS) {
+        console.log(JSON.stringify(jsonDocument.json, null, 2));
+      }
+    }
+  });
+
+  //==========================================================================
+  // Handling of schemaUri
+
+  it("resolve schemas from schemaUri and merges them into one that is inlined", async function () {
+    // These objects will be returned by the "localSchemaUriResolver"
+    // that is defined below, emulating the schemas that are resolved
+    // from schema URIs
+    const schemaA = {
+      id: "EXAMPLE_SCHEMA_ID",
+      classes: {
+        exampleClass: {
+          name: "Example Class",
+          properties: {
+            example_STRING: {
+              name: "Example STRING property",
+              type: "STRING",
+            },
+          },
+        },
+      },
+    };
+
+    const schemaB = {
+      id: "EXAMPLE_SCHEMA_ID",
+      classes: {
+        exampleClass: {
+          name: "Example Class but with a difference", // Structural difference!
+          properties: {
+            example_STRING: {
+              name: "Example STRING property",
+              type: "STRING",
+            },
+          },
+        },
+      },
+    };
+
+    const localSchemaUriResolver = async (schemaUri: string) => {
+      if (schemaUri === "schemaA.json") {
+        return schemaA;
+      }
+      if (schemaUri === "schemaB.json") {
+        return schemaB;
+      }
+      console.error("Unexpected schema URI: " + schemaUri);
+      const schema = {
+        id: "SPEC_SCHEMA_FROM_URI_" + schemaUri,
+      };
+      return schema;
+    };
+
+    const documentA = new Document();
+    documentA.createBuffer();
+    const structuralMetadataA = obtainStructuralMetadata(documentA);
+    structuralMetadataA.setSchemaUri("schemaA.json");
+
+    const documentB = new Document();
+    documentB.createBuffer();
+    const structuralMetadataB = obtainStructuralMetadata(documentB);
+    structuralMetadataB.setSchemaUri("schemaB.json");
+
+    const document = new Document();
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+      document,
+      documentA,
+      localSchemaUriResolver
+    );
+
+    // After merging in the first document:
+    // There should be one class
+    expect(getMetadataClassNames(document).length).toBe(1);
+
+    // The schemaUri in the result should be "null"
+    const root = document.getRoot();
+    const structuralMetadata = root.getExtension<StructuralMetadata>(
+      "EXT_structural_metadata"
+    );
+    expect(structuralMetadata?.getSchemaUri()).toBe(null);
+
+    await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
+      document,
+      documentB,
+      localSchemaUriResolver
+    );
+
+    // After merging in the second document:
+    // There should be two classes
+    expect(getMetadataClassNames(document).length).toBe(2);
+
+    // The schemaUri in the result should still be "null"
+    expect(structuralMetadata?.getSchemaUri()).toBe(null);
+
+    if (SERIALIZE_DOCUMENTS) {
+      const io = await GltfTransform.getIO();
+      const jsonDocument = await io.writeJSON(document);
+      if (LOG_SERIALIZED_DOCUMENTS) {
+        console.log(JSON.stringify(jsonDocument.json, null, 2));
+      }
+    }
   });
 
   //==========================================================================
@@ -1195,7 +1328,7 @@ fdescribe("StructuralMetadataMerger", function () {
   //==========================================================================
   // Basic property texture merging
 
-  fit("merges the set of equal property textures for one resulting class", async function () {
+  it("merges the set of equal property textures for one resulting class", async function () {
     // The classes have the same name/key
     // The classes are structurally equal
     // The property textures refer to the respective class (which turns out to be equal)
@@ -1288,7 +1421,7 @@ fdescribe("StructuralMetadataMerger", function () {
     }
   });
 
-  fit("merges the set of different property textures for one resulting class", async function () {
+  it("merges the set of different property textures for one resulting class", async function () {
     // The classes have the same name/key
     // The classes are structurally equal
     // The property textures refer to the respective class (which turns out to be equal)
