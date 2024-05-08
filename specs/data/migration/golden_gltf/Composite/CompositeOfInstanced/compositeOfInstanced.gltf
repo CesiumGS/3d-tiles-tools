@@ -158,11 +158,16 @@
       "buffer": 0,
       "byteOffset": 3400,
       "byteLength": 25
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 3425,
+      "byteLength": 25
     }
   ],
   "buffers": [
     {
-      "byteLength": 3425
+      "byteLength": 3450
     }
   ],
   "materials": [
@@ -222,7 +227,7 @@
             {
               "featureCount": 25,
               "attribute": 0,
-              "propertyTable": -1
+              "propertyTable": 0
             }
           ]
         }
@@ -254,7 +259,7 @@
             {
               "featureCount": 25,
               "attribute": 0,
-              "propertyTable": 0
+              "propertyTable": 1
             }
           ]
         }
@@ -291,7 +296,7 @@
   "extensions": {
     "EXT_structural_metadata": {
       "schema": {
-        "id": "ID_batch_table",
+        "id": "SCHEMA-ID-SPEC-SCHEMA-ID-SUFFIX",
         "name": "Generated from batch_table",
         "classes": {
           "class_batch_table": {
@@ -315,6 +320,15 @@
           "properties": {
             "Height": {
               "values": 5
+            }
+          }
+        },
+        {
+          "class": "class_batch_table",
+          "count": 25,
+          "properties": {
+            "Height": {
+              "values": 6
             }
           }
         }

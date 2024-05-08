@@ -131,13 +131,33 @@
     {
       "buffer": 0,
       "byteOffset": 9140,
+      "byteLength": 10
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 9150,
+      "byteLength": 40
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 9190,
+      "byteLength": 40
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 9230,
+      "byteLength": 40
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 9270,
       "byteLength": 25
     }
   ],
   "buffers": [
     {
       "name": "buffer",
-      "byteLength": 9165
+      "byteLength": 9295
     }
   ],
   "materials": [
@@ -169,7 +189,8 @@
               "featureIds": [
                 {
                   "featureCount": 10,
-                  "attribute": 0
+                  "attribute": 0,
+                  "propertyTable": 0
                 }
               ]
             }
@@ -227,7 +248,7 @@
             {
               "featureCount": 25,
               "attribute": 0,
-              "propertyTable": 0
+              "propertyTable": 1
             }
           ]
         }
@@ -265,10 +286,43 @@
   "extensions": {
     "EXT_structural_metadata": {
       "schema": {
-        "id": "ID_batch_table",
+        "id": "SCHEMA-ID-SPEC-SCHEMA-ID-SUFFIX",
         "name": "Generated from batch_table",
         "classes": {
           "class_batch_table": {
+            "name": "Generated from batch_table",
+            "properties": {
+              "id": {
+                "name": "id",
+                "description": "Generated from id",
+                "type": "SCALAR",
+                "componentType": "UINT8",
+                "required": true
+              },
+              "Longitude": {
+                "name": "Longitude",
+                "description": "Generated from Longitude",
+                "type": "SCALAR",
+                "componentType": "FLOAT32",
+                "required": true
+              },
+              "Latitude": {
+                "name": "Latitude",
+                "description": "Generated from Latitude",
+                "type": "SCALAR",
+                "componentType": "FLOAT32",
+                "required": true
+              },
+              "Height": {
+                "name": "Height",
+                "description": "Generated from Height",
+                "type": "SCALAR",
+                "componentType": "FLOAT32",
+                "required": true
+              }
+            }
+          },
+          "class_batch_table_0": {
             "name": "Generated from batch_table",
             "properties": {
               "Height": {
@@ -285,10 +339,28 @@
       "propertyTables": [
         {
           "class": "class_batch_table",
+          "count": 10,
+          "properties": {
+            "id": {
+              "values": 4
+            },
+            "Longitude": {
+              "values": 5
+            },
+            "Latitude": {
+              "values": 6
+            },
+            "Height": {
+              "values": 7
+            }
+          }
+        },
+        {
+          "class": "class_batch_table_0",
           "count": 25,
           "properties": {
             "Height": {
-              "values": 4
+              "values": 8
             }
           }
         }
