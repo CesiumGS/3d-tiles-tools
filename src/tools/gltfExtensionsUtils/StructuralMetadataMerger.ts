@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-import { Document, Primitive } from "@gltf-transform/core";
+import { Document } from "@gltf-transform/core";
 import { Property } from "@gltf-transform/core";
 import { IProperty } from "@gltf-transform/core";
 
@@ -22,12 +22,8 @@ import { MetadataError } from "../../metadata";
 import { Loggers } from "../../base/";
 
 const logger = Loggers.get("gltfExtensionsUtils");
-logger.level = "debug";
-
-// TODO This logging is for first drafts/experiments only!
 function log(object: any) {
-  //logger.info(object);
-  console.log(object);
+  logger.debug(object);
 }
 
 /**
@@ -35,6 +31,23 @@ function log(object: any) {
  * the `EXT_structural_metadata` extension.
  */
 export class StructuralMetadataMerger {
+  /**
+   * A suffix that will be appended to an unspecified schema ID
+   * for merged schemas. This is ONLY used for unit tests.
+   */
+  private static mergedSchemaIdSuffix: string | undefined = undefined;
+
+  /**
+   * Set a suffix that will be appended to an unspecified schema ID
+   * for merged schemas. This is ONLY used for unit tests. Clients
+   * should never call this function.
+   *
+   * @param mergedSchemaIdSuffix - The suffix for merged schema IDs
+   */
+  static setMergedSchemaIdSuffix(mergedSchemaIdSuffix: string | undefined) {
+    StructuralMetadataMerger.mergedSchemaIdSuffix = mergedSchemaIdSuffix;
+  }
+
   /**
    * Merge two glTF-Transform documents, taking into account that
    * they might contain the `EXT_structural_metadata` extension.
@@ -105,6 +118,21 @@ export class StructuralMetadataMerger {
         "EXT_structural_metadata",
         copiedStructuralMetadata
       );
+
+      // For the copied metadata, ensure that it does not use a schemaUri
+      // any more, but instead, contains the inlined schema directly
+      const copiedSchemaUri = copiedStructuralMetadata.getSchemaUri();
+      if (copiedSchemaUri !== null) {
+        const targetExtStructuralMetadata = targetDocument.createExtension(
+          EXTStructuralMetadata
+        );
+        const copiedSchemaJson = await schemaUriResolver(copiedSchemaUri);
+        const copiedSchema =
+          targetExtStructuralMetadata.createSchemaFrom(copiedSchemaJson);
+        copiedStructuralMetadata.setSchema(copiedSchema);
+        copiedStructuralMetadata.setSchemaUri(null);
+      }
+
       await targetDocument.transform(unpartition());
       return;
     }
@@ -215,7 +243,11 @@ export class StructuralMetadataMerger {
     const newClassKeys = targetSchema.listClassKeys();
     const newEnumKeys = targetSchema.listEnumKeys();
     if (oldClassKeys != newClassKeys || oldEnumKeys != newEnumKeys) {
-      const newId = "SCHEMA-ID-" + crypto.randomUUID();
+      let schemaIdSuffix = StructuralMetadataMerger.mergedSchemaIdSuffix;
+      if (schemaIdSuffix === undefined) {
+        schemaIdSuffix = crypto.randomUUID();
+      }
+      const newId = "SCHEMA-ID-" + schemaIdSuffix;
       log("Target schema was modified - assigning ID " + newId);
       targetSchema.setId(newId);
     }
