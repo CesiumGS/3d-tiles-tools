@@ -296,7 +296,7 @@
   "extensions": {
     "EXT_structural_metadata": {
       "schema": {
-        "id": "SCHEMA-ID-SPEC-SCHEMA-ID-SUFFIX",
+        "id": "SCHEMA_ID_SPEC_SCHEMA_ID_SUFFIX",
         "name": "Generated from batch_table",
         "classes": {
           "class_batch_table": {
