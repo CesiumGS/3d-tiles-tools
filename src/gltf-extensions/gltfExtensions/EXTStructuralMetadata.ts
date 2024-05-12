@@ -1360,13 +1360,13 @@ export class EXTStructuralMetadata extends Extension {
   }
 
   /**
-   * Prepares writing a document that contains  this extension.
+   * Prepares writing a document that contains this extension.
    *
    * This will collect all buffer views that are referred to by the
    * property tables, and store them as "otherBufferViews" of
    * the writer context (for the main buffer), to make sure
    * that they are part of the buffer when it is eventually
-   * writenn in Writer.ts.
+   * written in Writer.ts.
    *
    * @param context - The writer context
    * @returns The deep void of space
