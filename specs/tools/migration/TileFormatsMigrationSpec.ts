@@ -88,7 +88,7 @@ describe("TileFormatsMigration", function () {
     //SpecHelpers.forceDeleteDirectory(outputDir);
   });
   beforeEach(function () {
-    StructuralMetadataMerger.setMergedSchemaIdSuffix("SPEC-SCHEMA-ID-SUFFIX");
+    StructuralMetadataMerger.setMergedSchemaIdSuffix("SPEC_SCHEMA_ID_SUFFIX");
   });
 
   //==========================================================================

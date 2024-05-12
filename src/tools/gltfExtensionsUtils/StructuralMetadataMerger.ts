@@ -247,7 +247,8 @@ export class StructuralMetadataMerger {
       if (schemaIdSuffix === undefined) {
         schemaIdSuffix = crypto.randomUUID();
       }
-      const newId = "SCHEMA-ID-" + schemaIdSuffix;
+      schemaIdSuffix = schemaIdSuffix.replace(/-/g, "_");
+      const newId = "SCHEMA_ID_" + schemaIdSuffix;
       log("Target schema was modified - assigning ID " + newId);
       targetSchema.setId(newId);
     }
