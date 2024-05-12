@@ -364,7 +364,6 @@ function addSpecPropertyAttribute(document: Document, className: string) {
   // Create a dummy mesh with one primitive
   const mesh = document.createMesh();
   const primitive = document.createPrimitive();
-  primitive.setExtension;
   mesh.addPrimitive(primitive);
 
   // Create an accessor with dummy UINT8 scalar data
@@ -458,7 +457,6 @@ async function addSpecPropertyTexture(
   // Create a dummy mesh with one primitive
   const mesh = document.createMesh();
   const primitive = document.createPrimitive();
-  primitive.setExtension;
   mesh.addPrimitive(primitive);
 
   // Define the metadata for the mesh primitive, and let it
