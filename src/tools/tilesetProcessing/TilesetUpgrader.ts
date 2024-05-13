@@ -83,6 +83,7 @@ export class TilesetUpgrader {
         upgradePntsToGlb: false,
         upgradeB3dmToGlb: false,
         upgradeI3dmToGlb: false,
+        upgradeCmptToGlb: false,
       };
       return options;
     }
@@ -103,6 +104,7 @@ export class TilesetUpgrader {
         upgradePntsToGlb: true,
         upgradeB3dmToGlb: true,
         upgradeI3dmToGlb: true,
+        upgradeCmptToGlb: true,
       };
       return options;
     }
@@ -216,6 +218,11 @@ export class TilesetUpgrader {
         return Paths.replaceExtension(uri, ".glb");
       }
     }
+    if (this.upgradeOptions.upgradeCmptToGlb) {
+      if (Paths.hasExtension(uri, ".cmpt")) {
+        return Paths.replaceExtension(uri, ".glb");
+      }
+    }
     return uri;
   };
 
@@ -263,11 +270,12 @@ export class TilesetUpgrader {
   ): Promise<TilesetEntry> => {
     if (type === ContentDataTypes.CONTENT_TYPE_PNTS) {
       return this.processEntryPnts(sourceEntry);
-    }
-    if (type === ContentDataTypes.CONTENT_TYPE_B3DM) {
+    } else if (type === ContentDataTypes.CONTENT_TYPE_B3DM) {
       return this.processEntryB3dm(sourceEntry);
     } else if (type === ContentDataTypes.CONTENT_TYPE_I3DM) {
       return this.processEntryI3dm(sourceEntry);
+    } else if (type === ContentDataTypes.CONTENT_TYPE_CMPT) {
+      return this.processEntryCmpt(sourceEntry);
     } else if (type == ContentDataTypes.CONTENT_TYPE_TILESET) {
       return this.processEntryTileset(sourceEntry);
     }
@@ -383,6 +391,56 @@ export class TilesetUpgrader {
       targetValue = await ContentUpgrades.upgradeI3dmGltf1ToGltf2(
         sourceValue,
         this.gltfUpgradeOptions
+      );
+    } else {
+      logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
+    }
+    const targetEntry = {
+      key: targetKey,
+      value: targetValue,
+    };
+    return targetEntry;
+  };
+
+  /**
+   * Process the given tileset (content) entry that contains CMPT,
+   * and return the result.
+   *
+   * @param sourceEntry - The source entry
+   * @returns The processed entry
+   */
+  private processEntryCmpt = async (
+    sourceEntry: TilesetEntry
+  ): Promise<TilesetEntry> => {
+    const sourceKey = sourceEntry.key;
+    const sourceValue = sourceEntry.value;
+    let targetKey = sourceKey;
+    let targetValue = sourceValue;
+    if (this.upgradeOptions.upgradeCmptToGlb) {
+      logger.debug(`  Upgrading CMPT to GLB for ${sourceKey}`);
+
+      targetKey = this.processContentUri(sourceKey);
+
+      // Define the resolver for resources like external GLB files
+      // in CMPT files: It will look up the entry using the
+      // 'tilesetProcessor'
+      const externalResourceResolver = async (
+        uri: string
+      ): Promise<Buffer | undefined> => {
+        if (!this.tilesetProcessor) {
+          return undefined;
+        }
+        const externalGlbEntry = await this.tilesetProcessor.fetchSourceEntry(
+          uri
+        );
+        if (!externalGlbEntry) {
+          return undefined;
+        }
+        return externalGlbEntry.value;
+      };
+      targetValue = await TileFormatsMigration.convertCmptToGlb(
+        sourceValue,
+        externalResourceResolver
       );
     } else {
       logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);

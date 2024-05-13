@@ -15,9 +15,9 @@ interface IInstanceFeatures extends IProperty {
 }
 interface IFeatureId extends IProperty {
   featureCount: number;
-  nullFeatureId: number;
-  label: string;
-  attribute: FeatureIdAttribute;
+  nullFeatureId: number | null;
+  label: string | null;
+  attribute: FeatureIdAttribute | null;
   propertyTable: PropertyTable;
 }
 type FeatureIdAttribute = number;
@@ -80,7 +80,12 @@ export class FeatureId extends ExtensionProperty<IFeatureId> {
   }
 
   protected override getDefaults() {
-    return Object.assign(super.getDefaults(), {});
+    return Object.assign(super.getDefaults(), {
+      nullFeatureId: null,
+      label: null,
+      attribute: null,
+      propertyTable: null,
+    });
   }
 
   getFeatureCount(): number {
@@ -90,24 +95,24 @@ export class FeatureId extends ExtensionProperty<IFeatureId> {
     return this.set("featureCount", featureCount);
   }
 
-  getNullFeatureId(): number {
+  getNullFeatureId(): number | null {
     return this.get("nullFeatureId");
   }
-  setNullFeatureId(nullFeatureId: number) {
+  setNullFeatureId(nullFeatureId: number | null) {
     return this.set("nullFeatureId", nullFeatureId);
   }
 
-  getLabel(): string {
+  getLabel(): string | null {
     return this.get("label");
   }
-  setLabel(label: string) {
+  setLabel(label: string | null) {
     return this.set("label", label);
   }
 
-  getAttribute(): FeatureIdAttribute {
+  getAttribute(): FeatureIdAttribute | null {
     return this.get("attribute");
   }
-  setAttribute(attribute: FeatureIdAttribute) {
+  setAttribute(attribute: FeatureIdAttribute | null) {
     return this.set("attribute", attribute);
   }
 

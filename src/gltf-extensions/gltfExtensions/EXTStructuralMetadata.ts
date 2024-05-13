@@ -28,16 +28,16 @@ const NAME = "EXT_structural_metadata";
  * Returns the given value if it is **NOT** equal to the given
  * default value.
  *
- * Returns `undefined` if the given value **IS** equal to the
+ * Returns `null` if the given value **IS** equal to the
  * given default value.
  *
  * @param value - The value
  * @param defaultValue - The default value
  * @returns The result
  */
-function ifNot<T>(value: T, defaultValue: T): T | undefined {
-  if (value === defaultValue) {
-    return undefined;
+function ifNot<T>(value: T, defaultValue: T): T | null {
+  if (value == defaultValue) {
+    return null;
   }
   return value;
 }
@@ -973,7 +973,7 @@ export class EXTStructuralMetadata extends Extension {
       if (propertyTableIndex >= 0) {
         const elementStructuralMetadataDef: ElementStructuralMetadataDef = {
           propertyTable: propertyTableIndex,
-          index: elementStructuralMetadata.getIndex(),
+          index: elementStructuralMetadata.getIndex() ?? undefined,
         };
         nodeDef.extensions = nodeDef.extensions || {};
         nodeDef.extensions[NAME] = elementStructuralMetadataDef;
@@ -995,7 +995,7 @@ export class EXTStructuralMetadata extends Extension {
       structuralMetadataDef.schema = schemaDef;
     }
     const schemaUri = structuralMetadata.getSchemaUri();
-    if (schemaUri !== undefined) {
+    if (schemaUri !== null) {
       structuralMetadataDef.schemaUri = schemaUri;
     }
 
@@ -1069,9 +1069,9 @@ export class EXTStructuralMetadata extends Extension {
 
     const schemaDef: SchemaDef = {
       id: schema.getId(),
-      name: schema.getObjectName(),
-      description: schema.getDescription(),
-      version: schema.getVersion(),
+      name: schema.getObjectName() ?? undefined,
+      description: schema.getDescription() ?? undefined,
+      version: schema.getVersion() ?? undefined,
       classes: classes,
       enums: enums,
     };
@@ -1095,8 +1095,8 @@ export class EXTStructuralMetadata extends Extension {
     }
 
     const classDef: ClassDef = {
-      name: classObject.getObjectName(),
-      description: classObject.getDescription(),
+      name: classObject.getObjectName() ?? undefined,
+      description: classObject.getDescription() ?? undefined,
       properties: properties,
     };
     return classDef;
@@ -1106,21 +1106,21 @@ export class EXTStructuralMetadata extends Extension {
     classProperty: ClassProperty
   ): ClassPropertyDef {
     const classPropertyDef: ClassPropertyDef = {
-      name: classProperty.getObjectName(),
-      description: classProperty.getDescription(),
+      name: classProperty.getObjectName() ?? undefined,
+      description: classProperty.getDescription() ?? undefined,
       type: classProperty.getType(),
-      componentType: classProperty.getComponentType(),
-      enumType: classProperty.getEnumType(),
-      array: ifNot(classProperty.getArray(), false),
-      count: classProperty.getCount(),
-      normalized: ifNot(classProperty.getNormalized(), false),
-      offset: classProperty.getOffset(),
-      scale: classProperty.getScale(),
-      max: classProperty.getMax(),
-      min: classProperty.getMin(),
-      required: ifNot(classProperty.getRequired(), false),
-      noData: classProperty.getNoData(),
-      default: classProperty.getDefault(),
+      componentType: classProperty.getComponentType() ?? undefined,
+      enumType: classProperty.getEnumType() ?? undefined,
+      array: ifNot(classProperty.getArray(), false) ?? undefined,
+      count: classProperty.getCount() ?? undefined,
+      normalized: ifNot(classProperty.getNormalized(), false) ?? undefined,
+      offset: classProperty.getOffset() ?? undefined,
+      scale: classProperty.getScale() ?? undefined,
+      max: classProperty.getMax() ?? undefined,
+      min: classProperty.getMin() ?? undefined,
+      required: ifNot(classProperty.getRequired(), false) ?? undefined,
+      noData: classProperty.getNoData() ?? undefined,
+      default: classProperty.getDefault() ?? undefined,
     };
     return classPropertyDef;
   }
@@ -1135,9 +1135,9 @@ export class EXTStructuralMetadata extends Extension {
     }
 
     const enumDef: EnumDef = {
-      name: enumObject.getObjectName(),
-      description: enumObject.getDescription(),
-      valueType: ifNot(enumObject.getValueType(), "UINT16"),
+      name: enumObject.getObjectName() ?? undefined,
+      description: enumObject.getDescription() ?? undefined,
+      valueType: ifNot(enumObject.getValueType(), "UINT16") ?? undefined,
       values: valueDefs,
     };
     return enumDef;
@@ -1146,7 +1146,7 @@ export class EXTStructuralMetadata extends Extension {
   private createEnumValueDef(enumValue: EnumValue): EnumValueDef {
     const enumValueDef: EnumValueDef = {
       name: enumValue.getObjectName(),
-      description: enumValue.getDescription(),
+      description: enumValue.getDescription() ?? undefined,
       value: enumValue.getValue(),
     };
     return enumValueDef;
@@ -1175,7 +1175,7 @@ export class EXTStructuralMetadata extends Extension {
     }
 
     const propertyTableDef: PropertyTableDef = {
-      name: propertyTable.getObjectName(),
+      name: propertyTable.getObjectName() ?? undefined,
       class: propertyTable.getClass(),
       count: propertyTable.getCount(),
       properties: propertyDefs,
@@ -1222,18 +1222,16 @@ export class EXTStructuralMetadata extends Extension {
       values: values,
       arrayOffsets: arrayOffsets,
       stringOffsets: stringOffsets,
-      arrayOffsetType: ifNot(
-        propertyTableProperty.getArrayOffsetType(),
-        "UINT32"
-      ),
-      stringOffsetType: ifNot(
-        propertyTableProperty.getStringOffsetType(),
-        "UINT32"
-      ),
-      offset: propertyTableProperty.getOffset(),
-      scale: propertyTableProperty.getScale(),
-      max: propertyTableProperty.getMax(),
-      min: propertyTableProperty.getMin(),
+      arrayOffsetType:
+        ifNot(propertyTableProperty.getArrayOffsetType(), "UINT32") ??
+        undefined,
+      stringOffsetType:
+        ifNot(propertyTableProperty.getStringOffsetType(), "UINT32") ??
+        undefined,
+      offset: propertyTableProperty.getOffset() ?? undefined,
+      scale: propertyTableProperty.getScale() ?? undefined,
+      max: propertyTableProperty.getMax() ?? undefined,
+      min: propertyTableProperty.getMin() ?? undefined,
     };
     return propertyTablePropertyDef;
   }
@@ -1264,7 +1262,7 @@ export class EXTStructuralMetadata extends Extension {
     }
 
     const propertyTextureDef: PropertyTextureDef = {
-      name: propertyTexture.getObjectName(),
+      name: propertyTexture.getObjectName() ?? undefined,
       class: propertyTexture.getClass(),
       properties: propertyDefs,
     };
@@ -1290,13 +1288,13 @@ export class EXTStructuralMetadata extends Extension {
     }
     const basicTextureDef = context.createTextureInfoDef(texture, textureInfo);
     const propertyTexturePropertyDef: PropertyTexturePropertyDef = {
-      channels: propertyTextureProperty.getChannels(),
+      channels: ifNot(propertyTextureProperty.getChannels(), [0]) ?? undefined,
       index: basicTextureDef.index,
       texCoord: basicTextureDef.texCoord,
-      offset: propertyTextureProperty.getOffset(),
-      scale: propertyTextureProperty.getScale(),
-      max: propertyTextureProperty.getMax(),
-      min: propertyTextureProperty.getMin(),
+      offset: propertyTextureProperty.getOffset() ?? undefined,
+      scale: propertyTextureProperty.getScale() ?? undefined,
+      max: propertyTextureProperty.getMax() ?? undefined,
+      min: propertyTextureProperty.getMin() ?? undefined,
     };
     return propertyTexturePropertyDef;
   }
@@ -1322,7 +1320,7 @@ export class EXTStructuralMetadata extends Extension {
     }
 
     const propertyAttributeDef: PropertyAttributeDef = {
-      name: propertyAttribute.getObjectName(),
+      name: propertyAttribute.getObjectName() ?? undefined,
       class: propertyAttribute.getClass(),
       properties: propertyDefs,
     };
@@ -1334,10 +1332,10 @@ export class EXTStructuralMetadata extends Extension {
   ) {
     const propertyAttributePropertyDef: PropertyAttributePropertyDef = {
       attribute: propertyAttributeProperty.getAttribute(),
-      offset: propertyAttributeProperty.getOffset(),
-      scale: propertyAttributeProperty.getScale(),
-      max: propertyAttributeProperty.getMax(),
-      min: propertyAttributeProperty.getMin(),
+      offset: propertyAttributeProperty.getOffset() ?? undefined,
+      scale: propertyAttributeProperty.getScale() ?? undefined,
+      max: propertyAttributeProperty.getMax() ?? undefined,
+      min: propertyAttributeProperty.getMin() ?? undefined,
     };
     return propertyAttributePropertyDef;
   }
@@ -1362,13 +1360,13 @@ export class EXTStructuralMetadata extends Extension {
   }
 
   /**
-   * Prepares writing a document that contains  this extension.
+   * Prepares writing a document that contains this extension.
    *
    * This will collect all buffer views that are referred to by the
    * property tables, and store them as "otherBufferViews" of
    * the writer context (for the main buffer), to make sure
    * that they are part of the buffer when it is eventually
-   * writenn in Writer.ts.
+   * written in Writer.ts.
    *
    * @param context - The writer context
    * @returns The deep void of space

@@ -2,6 +2,7 @@ import fs from "fs";
 
 import { Paths } from "../../../src/base";
 
+import { StructuralMetadataMerger } from "../../../src/tools";
 import { TilesetOperations } from "../../../src/tools";
 import { GltfUtilities } from "../../../src/tools";
 
@@ -85,6 +86,9 @@ async function computeJsonStrings(
 describe("TileFormatsMigration", function () {
   afterEach(function () {
     //SpecHelpers.forceDeleteDirectory(outputDir);
+  });
+  beforeEach(function () {
+    StructuralMetadataMerger.setMergedSchemaIdSuffix("SPEC_SCHEMA_ID_SUFFIX");
   });
 
   //==========================================================================
@@ -826,6 +830,45 @@ describe("TileFormatsMigration", function () {
     const subDir = "BatchedLegacy/";
     const name = "BatchedWithGltf1With2DNormals";
     const fileNameWithoutExtension = "batchedWithGltf1With2DNormals";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  //==========================================================================
+  // CMPT
+
+  it("converts Composite to the expected output", async function () {
+    const subDir = "Composite/";
+    const name = "Composite";
+    const fileNameWithoutExtension = "composite";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts CompositeOfComposite to the expected output", async function () {
+    const subDir = "Composite/";
+    const name = "CompositeOfComposite";
+    const fileNameWithoutExtension = "compositeOfComposite";
+    const jsonStrings = await computeJsonStrings(
+      subDir,
+      name,
+      fileNameWithoutExtension
+    );
+    expect(jsonStrings.outputJsonString).toEqual(jsonStrings.goldenJsonString);
+  });
+
+  it("converts CompositeOfInstanced to the expected output", async function () {
+    const subDir = "Composite/";
+    const name = "CompositeOfInstanced";
+    const fileNameWithoutExtension = "compositeOfInstanced";
     const jsonStrings = await computeJsonStrings(
       subDir,
       name,

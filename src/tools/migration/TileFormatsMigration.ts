@@ -3,6 +3,7 @@ import { Document } from "@gltf-transform/core";
 import { TileFormatsMigrationPnts } from "./TileFormatsMigrationPnts";
 import { TileFormatsMigrationB3dm } from "./TileFormatsMigrationB3dm";
 import { TileFormatsMigrationI3dm } from "./TileFormatsMigrationI3dm";
+import { TileFormatsMigrationCmpt } from "./TileFormatsMigrationCmpt";
 
 /**
  * Methods for converting "legacy" tile formats into glTF assets
@@ -42,18 +43,38 @@ export class TileFormatsMigration {
    * Convert the given I3DM data into a glTF asset
    *
    * @param i3dmBuffer - The I3DM buffer
-   * @param externalGlbResolver - A function that will be used to resolve
-   * external GLB data if the I3DM uses `header.gltfFormat=0` (meaning
-   * that the payload is not GLB data, but only a GLB URI).
+   * @param externalResourceResolver - A function that will be used to resolve
+   * external resources, like GLB data if the I3DM uses `header.gltfFormat=0`
+   * (meaning that the payload is not GLB data, but only a GLB URI).
    * @returns The GLB buffer
    */
   static async convertI3dmToGlb(
     i3dmBuffer: Buffer,
-    externalGlbResolver: (uri: string) => Promise<Buffer | undefined>
+    externalResourceResolver: (uri: string) => Promise<Buffer | undefined>
   ): Promise<Buffer> {
     return await TileFormatsMigrationI3dm.convertI3dmToGlb(
       i3dmBuffer,
-      externalGlbResolver
+      externalResourceResolver
+    );
+  }
+
+  /**
+   * Convert the given CMPT data into a single glTF asset
+   *
+   * @param cmptBuffer - The CMPT buffer
+   * @param externalResourceResolver - A function that will be used to resolve
+   * external resources, like GLB data if the CMPT contains I3DM that use
+   * `header.gltfFormat=0` (meaning that the payload is not GLB data,
+   * but only a GLB URI).
+   * @returns The GLB buffer
+   */
+  static async convertCmptToGlb(
+    cmptBuffer: Buffer,
+    externalResourceResolver: (uri: string) => Promise<Buffer | undefined>
+  ): Promise<Buffer> {
+    return await TileFormatsMigrationCmpt.convertCmptToGlb(
+      cmptBuffer,
+      externalResourceResolver
     );
   }
 

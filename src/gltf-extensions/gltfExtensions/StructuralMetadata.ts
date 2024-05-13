@@ -25,22 +25,22 @@ const NAME = "EXT_structural_metadata";
 
 interface IStructuralMetadata extends IProperty {
   schema: Schema;
-  schemaUri: string;
+  schemaUri: string | null;
   propertyTables: PropertyTable[];
   propertyTextures: PropertyTexture[];
   propertyAttributes: PropertyAttribute[];
 }
 interface ISchema extends IProperty {
   id: string;
-  objectName: string;
-  description: string;
-  version: string;
+  objectName: string | null;
+  description: string | null;
+  version: string | null;
   classes: { [key: string]: Class };
   enums: { [key: string]: Enum };
 }
 interface IClass extends IProperty {
-  objectName: string;
-  description: string;
+  objectName: string | null;
+  description: string | null;
   properties: { [key: string]: ClassProperty };
 }
 
@@ -58,13 +58,13 @@ type AnyValue =
 */
 
 interface IClassProperty extends IProperty {
-  objectName: string;
-  description: string;
+  objectName: string | null;
+  description: string | null;
   type: ClassPropertyType;
-  componentType: ClassPropertyComponentType;
-  enumType: string;
+  componentType: ClassPropertyComponentType | null;
+  enumType: string | null;
   array: boolean;
-  count: number;
+  count: number | null;
   normalized: boolean;
   offset: any;
   scale: any;
@@ -76,20 +76,20 @@ interface IClassProperty extends IProperty {
 }
 
 interface IEnum extends IProperty {
-  objectName: string;
-  description: string;
+  objectName: string | null;
+  description: string | null;
   valueType: EnumValueType;
   values: EnumValue[];
 }
 
 interface IEnumValue extends IProperty {
   objectName: string;
-  description: string;
+  description: string | null;
   value: number;
 }
 
 interface IPropertyTable extends IProperty {
-  objectName: string;
+  objectName: string | null;
   class: string;
   count: number;
   properties: { [key: string]: PropertyTableProperty };
@@ -108,7 +108,7 @@ interface IPropertyTableProperty extends IProperty {
 }
 
 interface IPropertyTexture extends IProperty {
-  objectName: string;
+  objectName: string | null;
   class: string;
   properties: { [key: string]: PropertyTextureProperty };
 }
@@ -124,7 +124,7 @@ interface IPropertyTextureProperty extends IProperty {
 }
 
 interface IPropertyAttribute extends IProperty {
-  objectName: string;
+  objectName: string | null;
   class: string;
   properties: { [key: string]: PropertyAttributeProperty };
 }
@@ -143,7 +143,7 @@ interface IPropertyAttributeProperty extends IProperty {
 // the specification text for now
 interface IElementStructuralMetadata extends IProperty {
   propertyTable: PropertyTable;
-  index: number;
+  index: number | null;
 }
 
 // This corresponds to the mesh.primitive.EXT_structural_metadata.schema.json
@@ -179,6 +179,8 @@ export class StructuralMetadata extends ExtensionProperty<IStructuralMetadata> {
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
+      schema: null,
+      schemaUri: null,
       propertyTables: [],
       propertyTextures: [],
       propertyAttributes: [],
@@ -192,11 +194,11 @@ export class StructuralMetadata extends ExtensionProperty<IStructuralMetadata> {
     return this.setRef("schema", schema);
   }
 
-  getSchemaUri(): string {
+  getSchemaUri(): string | null {
     return this.get("schemaUri");
   }
-  setSchemaUri(name: string) {
-    return this.set("schemaUri", name);
+  setSchemaUri(schemaUri: string | null) {
+    return this.set("schemaUri", schemaUri);
   }
 
   listPropertyTables(): PropertyTable[] {
@@ -249,6 +251,9 @@ export class Schema extends ExtensionProperty<ISchema> {
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
+      objectName: null,
+      description: null,
+      version: null,
       classes: {},
       enums: {},
     });
@@ -261,24 +266,24 @@ export class Schema extends ExtensionProperty<ISchema> {
     return this.set("id", name);
   }
 
-  getObjectName(): string {
+  getObjectName(): string | null {
     return this.get("objectName");
   }
-  setObjectName(name: string) {
+  setObjectName(name: string | null) {
     return this.set("objectName", name);
   }
 
-  getDescription(): string {
+  getDescription(): string | null {
     return this.get("description");
   }
-  setDescription(description: string) {
+  setDescription(description: string | null) {
     return this.set("description", description);
   }
 
-  getVersion(): string {
+  getVersion(): string | null {
     return this.get("version");
   }
-  setVersion(version: string) {
+  setVersion(version: string | null) {
     return this.set("version", version);
   }
 
@@ -328,21 +333,23 @@ export class Class extends ExtensionProperty<IClass> {
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
+      objectName: null,
+      description: null,
       properties: {},
     });
   }
 
-  getObjectName(): string {
+  getObjectName(): string | null {
     return this.get("objectName");
   }
-  setObjectName(name: string) {
+  setObjectName(name: string | null) {
     return this.set("objectName", name);
   }
 
-  getDescription(): string {
+  getDescription(): string | null {
     return this.get("description");
   }
-  setDescription(description: string) {
+  setDescription(description: string | null) {
     return this.set("description", description);
   }
 
@@ -379,23 +386,34 @@ export class ClassProperty extends ExtensionProperty<IClassProperty> {
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
-      array: false,
-      normalized: false,
-      required: false,
+      objectName: null,
+      description: null,
+      componentType: null,
+      enumType: null,
+      array: null,
+      count: null,
+      normalized: null,
+      offset: null,
+      scale: null,
+      max: null,
+      min: null,
+      required: null,
+      noData: null,
+      default: null,
     });
   }
 
-  getObjectName(): string {
+  getObjectName(): string | null {
     return this.get("objectName");
   }
-  setObjectName(name: string) {
+  setObjectName(name: string | null) {
     return this.set("objectName", name);
   }
 
-  getDescription(): string {
+  getDescription(): string | null {
     return this.get("description");
   }
-  setDescription(description: string) {
+  setDescription(description: string | null) {
     return this.set("description", description);
   }
 
@@ -406,17 +424,17 @@ export class ClassProperty extends ExtensionProperty<IClassProperty> {
     return this.set("type", type);
   }
 
-  getComponentType(): ClassPropertyComponentType {
+  getComponentType(): ClassPropertyComponentType | null {
     return this.get("componentType");
   }
-  setComponentType(componentType: ClassPropertyComponentType) {
+  setComponentType(componentType: ClassPropertyComponentType | null) {
     return this.set("componentType", componentType);
   }
 
-  getEnumType(): string {
+  getEnumType(): string | null {
     return this.get("enumType");
   }
-  setEnumType(enumType: string) {
+  setEnumType(enumType: string | null) {
     return this.set("enumType", enumType);
   }
 
@@ -427,10 +445,10 @@ export class ClassProperty extends ExtensionProperty<IClassProperty> {
     return this.set("array", array);
   }
 
-  getCount(): number {
+  getCount(): number | null {
     return this.get("count");
   }
-  setCount(count: number) {
+  setCount(count: number | null) {
     return this.set("count", count);
   }
 
@@ -510,22 +528,24 @@ export class Enum extends ExtensionProperty<IEnum> {
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
+      objectName: null,
+      description: null,
       valueType: "UINT16",
       values: [],
     });
   }
 
-  getObjectName(): string {
+  getObjectName(): string | null {
     return this.get("objectName");
   }
-  setObjectName(name: string) {
+  setObjectName(name: string | null) {
     return this.set("objectName", name);
   }
 
-  getDescription(): string {
+  getDescription(): string | null {
     return this.get("description");
   }
-  setDescription(description: string) {
+  setDescription(description: string | null) {
     return this.set("description", description);
   }
 
@@ -565,7 +585,9 @@ export class EnumValue extends ExtensionProperty<IEnumValue> {
   }
 
   protected override getDefaults() {
-    return Object.assign(super.getDefaults(), {});
+    return Object.assign(super.getDefaults(), {
+      description: null,
+    });
   }
 
   getObjectName(): string {
@@ -575,10 +597,10 @@ export class EnumValue extends ExtensionProperty<IEnumValue> {
     return this.set("objectName", name);
   }
 
-  getDescription(): string {
+  getDescription(): string | null {
     return this.get("description");
   }
-  setDescription(description: string) {
+  setDescription(description: string | null) {
     return this.set("description", description);
   }
 
@@ -609,14 +631,15 @@ export class PropertyTable extends ExtensionProperty<IPropertyTable> {
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
+      objectName: null,
       properties: {},
     });
   }
 
-  getObjectName(): string {
+  getObjectName(): string | null {
     return this.get("objectName");
   }
-  setObjectName(name: string) {
+  setObjectName(name: string | null) {
     return this.set("objectName", name);
   }
 
@@ -667,8 +690,14 @@ export class PropertyTableProperty extends ExtensionProperty<IPropertyTablePrope
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
-      arrayOffsetType: "UINT32",
-      stringOffsetType: "UINT32",
+      arrayOffsets: null,
+      stringOffsets: null,
+      arrayOffsetType: null,
+      stringOffsetType: null,
+      offset: null,
+      scale: null,
+      max: null,
+      min: null,
     });
   }
 
@@ -755,14 +784,15 @@ export class PropertyTexture extends ExtensionProperty<IPropertyTexture> {
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
+      objectName: null,
       properties: {},
     });
   }
 
-  getObjectName(): string {
+  getObjectName(): string | null {
     return this.get("objectName");
   }
-  setObjectName(name: string) {
+  setObjectName(name: string | null) {
     return this.set("objectName", name);
   }
 
@@ -812,6 +842,10 @@ export class PropertyTextureProperty extends ExtensionProperty<IPropertyTextureP
       channels: [0],
       texture: null,
       textureInfo: defaultTextureInfo,
+      offset: null,
+      scale: null,
+      max: null,
+      min: null,
     });
   }
 
@@ -881,14 +915,15 @@ export class PropertyAttribute extends ExtensionProperty<IPropertyAttribute> {
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
+      objectName: null,
       properties: {},
     });
   }
 
-  getObjectName(): string {
+  getObjectName(): string | null {
     return this.get("objectName");
   }
-  setObjectName(name: string) {
+  setObjectName(name: string | null) {
     return this.set("objectName", name);
   }
 
@@ -931,7 +966,12 @@ export class PropertyAttributeProperty extends ExtensionProperty<IPropertyAttrib
   }
 
   protected override getDefaults() {
-    return Object.assign(super.getDefaults(), {});
+    return Object.assign(super.getDefaults(), {
+      offset: null,
+      scale: null,
+      max: null,
+      min: null,
+    });
   }
 
   getAttribute(): string {
@@ -998,10 +1038,10 @@ export class ElementStructuralMetadata extends ExtensionProperty<IElementStructu
     return this.setRef("propertyTable", propertyTable);
   }
 
-  getIndex(): number {
+  getIndex(): number | null {
     return this.get("index");
   }
-  setIndex(index: number) {
+  setIndex(index: number | null) {
     return this.set("index", index);
   }
 }

@@ -32,14 +32,25 @@ const NAME = "EXT_mesh_features";
 // These interfaces are NOT publicly visible. They only serve as the type
 // pararameter for the `ExtensionProperty` class, which is the base
 // for the actual "model" classes that are exposed to the user.
+//
+// In these interfaces, optional properties are generally represented
+// with the type being `... | null` when they have primitive types.
+// In the model classes, the respective getters and setters will
+// return/accept the `... null` type accordingly.
+//
+// For "reference typed" properties (i.e. references to other model
+// classes), the fact that they are optional is built-in into the
+// reference type itself: The corresponding methods of the model
+// classes will return or accept the `...|null` type automatically.
+
 interface IMeshFeatures extends IProperty {
   featureIds: FeatureId[];
 }
 interface IFeatureId extends IProperty {
   featureCount: number;
-  nullFeatureId: number;
-  label: string;
-  attribute: FeatureIdAttribute;
+  nullFeatureId: number | null;
+  label: string | null;
+  attribute: FeatureIdAttribute | null;
   texture: FeatureIdTexture;
   propertyTable: PropertyTable;
 }
@@ -74,7 +85,7 @@ interface IFeatureIdTexture extends IProperty {
 // Each texture in these classes is modeled as a property with the
 // type `Texture`, and an associated `TextureInfo`. The `TextureInfo`
 // can only be accessed with a `get` method, but not explicitly
-// set: It is managed internally by glTF-Transform. So the for
+// set: It is managed internally by glTF-Transform. So for
 // an `exampleTextureInfo: TextureInfo` property, there will only
 // be a getter, implemented as
 // ```
@@ -136,7 +147,13 @@ export class FeatureId extends ExtensionProperty<IFeatureId> {
   }
 
   protected override getDefaults() {
-    return Object.assign(super.getDefaults(), {});
+    return Object.assign(super.getDefaults(), {
+      nullFeatureId: null,
+      label: null,
+      attribute: null,
+      texture: null,
+      propertyTable: null,
+    });
   }
 
   getFeatureCount(): number {
@@ -146,24 +163,24 @@ export class FeatureId extends ExtensionProperty<IFeatureId> {
     return this.set("featureCount", featureCount);
   }
 
-  getNullFeatureId(): number {
+  getNullFeatureId(): number | null {
     return this.get("nullFeatureId");
   }
-  setNullFeatureId(nullFeatureId: number) {
+  setNullFeatureId(nullFeatureId: number | null) {
     return this.set("nullFeatureId", nullFeatureId);
   }
 
-  getLabel(): string {
+  getLabel(): string | null {
     return this.get("label");
   }
-  setLabel(label: string) {
+  setLabel(label: string | null) {
     return this.set("label", label);
   }
 
-  getAttribute(): FeatureIdAttribute {
+  getAttribute(): FeatureIdAttribute | null {
     return this.get("attribute");
   }
-  setAttribute(attribute: FeatureIdAttribute) {
+  setAttribute(attribute: FeatureIdAttribute | null) {
     return this.set("attribute", attribute);
   }
 

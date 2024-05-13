@@ -76,3 +76,4 @@ export * from "./gltfExtensionsUtils/MeshFeaturesUtils";
 export * from "./gltfExtensionsUtils/StringBuilder";
 export * from "./gltfExtensionsUtils/StructuralMetadataPropertyTables";
 export * from "./gltfExtensionsUtils/StructuralMetadataUtils";
+export * from "./gltfExtensionsUtils/StructuralMetadataMerger";

@@ -43,16 +43,16 @@ export class TileFormatsMigrationI3dm {
    * Convert the given I3DM data into a glTF asset
    *
    * @param i3dmBuffer - The I3DM buffer
-   * @param externalGlbResolver - A function that will be used to resolve
-   * external GLB data if the I3DM uses `header.gltfFormat=0` (meaning
-   * that the payload is not GLB data, but only a GLB URI).
+   * @param externalResourceResolver - A function that will be used to resolve
+   * external resources, like GLB data if the I3DM uses `header.gltfFormat=0`
+   * (meaning that the payload is not GLB data, but only a GLB URI).
    * @returns The GLB buffer
    * @throws TileFormatError If the I3DM contained an external GLB URI
    * that could not resolved by the given resolver
    */
   static async convertI3dmToGlb(
     i3dmBuffer: Buffer,
-    externalGlbResolver: (uri: string) => Promise<Buffer | undefined>
+    externalResourceResolver: (uri: string) => Promise<Buffer | undefined>
   ): Promise<Buffer> {
     const tileData = TileFormats.readTileData(i3dmBuffer);
 
@@ -77,7 +77,7 @@ export class TileFormatsMigrationI3dm {
     // the payload is a URI that has to be resolved.
     const glbBuffer = await TileFormats.obtainGlbPayload(
       tileData,
-      externalGlbResolver
+      externalResourceResolver
     );
     if (!glbBuffer) {
       throw new TileFormatError(
