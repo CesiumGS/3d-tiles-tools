@@ -287,7 +287,7 @@ export class TilesetCombiner {
    * combined tileset JSON (with the given name) is added
    * to the target.
    *
-   * @param tilesetTargetJsonFileName The name of the target file
+   * @param tilesetTargetJsonFileName - The name of the target file
    * that will contain the combined tileset JSON
    */
   private copyResources(tilesetTargetJsonFileName: string): void {
