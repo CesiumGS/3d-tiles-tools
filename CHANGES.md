@@ -1,9 +1,12 @@
 Change Log
 ==========
 
-### 0.4.2 - yyyy-mm-dd
+### 0.4.2 - 2024-05-15
 
-- The `createTilesetJson` command has been extended to receive an optional cartographic position, which serves as the position of generated tileset.
+- When upgrading a tileset to version 1.1, then the `upgrade` command did not yet convert CMPT files into GLB. This functionality was now added via [#117](https://github.com/CesiumGS/3d-tiles-tools/pull/117), including an attempt to merge multiple GLB files that contain the Cesium glTF metadata extensions. Details of the merge process are not yet specified, but should cover the most common cases that appear during the conversion of CMPT files.
+- When upgrading B3DM to GLB, it was possible that the GLB that was contained in the B3DM contained the same accessor for the batch ID attribute in multiple mesh primitives. This could cause the data to be duplicated during the conversion to feature IDs. This was fixed in [#124](https://github.com/CesiumGS/3d-tiles-tools/pull/124).
+- Fixed a bug where the `combine` operation discarded the transforms and bounding volumes of the input tilesets ([#113](https://github.com/CesiumGS/3d-tiles-tools/pull/113)).
+- The `createTilesetJson` command has been extended to receive an optional cartographic position, which serves as the position of generated tileset ([#105](https://github.com/CesiumGS/3d-tiles-tools/pull/105)).
 
 
 ### 0.4.1 - 2024-02-20
