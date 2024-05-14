@@ -733,7 +733,7 @@ export class ElementStructuralMetadata extends ExtensionProperty<IElementStructu
     // (undocumented)
     protected getDefaults(): Nullable<IElementStructuralMetadata>;
     // (undocumented)
-    getIndex(): number;
+    getIndex(): number | null;
     // (undocumented)
     getPropertyTable(): StructuralMetadataPropertyTable | null;
     // (undocumented)
@@ -743,7 +743,7 @@ export class ElementStructuralMetadata extends ExtensionProperty<IElementStructu
     // (undocumented)
     propertyType: "ElementStructuralMetadata";
     // (undocumented)
-    setIndex(index: number): this;
+    setIndex(index: number | null): this;
     // (undocumented)
     setPropertyTable(propertyTable: StructuralMetadataPropertyTable | null): this;
 }
@@ -982,6 +982,7 @@ export class GltfPipelineLegacy {
 // @internal
 export class GltfTransform {
     static getIO(): Promise<NodeIO>;
+    static merge(inputGlbBuffers: Buffer[], schemaUriResolver: (schemaUri: string) => Promise<any>): Promise<Document>;
     static process(inputGlb: Buffer, ...transforms: Transform[]): Promise<Buffer>;
 }
 
@@ -1144,15 +1145,20 @@ export class InstanceFeaturesFeatureId extends ExtensionProperty<IFeatureId> {
     // Warning: (ae-forgotten-export) The symbol "FeatureIdAttribute" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    getAttribute(): FeatureIdAttribute;
+    getAttribute(): FeatureIdAttribute | null;
     // (undocumented)
-    protected getDefaults(): Nullable<IFeatureId>;
+    protected getDefaults(): Nullable<IFeatureId> & {
+        nullFeatureId: null;
+        label: null;
+        attribute: null;
+        propertyTable: null;
+    };
     // (undocumented)
     getFeatureCount(): number;
     // (undocumented)
-    getLabel(): string;
+    getLabel(): string | null;
     // (undocumented)
-    getNullFeatureId(): number;
+    getNullFeatureId(): number | null;
     // (undocumented)
     getPropertyTable(): StructuralMetadataPropertyTable | null;
     // (undocumented)
@@ -1162,13 +1168,13 @@ export class InstanceFeaturesFeatureId extends ExtensionProperty<IFeatureId> {
     // (undocumented)
     propertyType: "FeatureId";
     // (undocumented)
-    setAttribute(attribute: FeatureIdAttribute): this;
+    setAttribute(attribute: FeatureIdAttribute | null): this;
     // (undocumented)
     setFeatureCount(featureCount: number): this;
     // (undocumented)
-    setLabel(label: string): this;
+    setLabel(label: string | null): this;
     // (undocumented)
-    setNullFeatureId(nullFeatureId: number): this;
+    setNullFeatureId(nullFeatureId: number | null): this;
     // (undocumented)
     setPropertyTable(propertyTable: StructuralMetadataPropertyTable | null): this;
 }
@@ -1280,15 +1286,21 @@ export class MeshFeaturesFeatureId extends ExtensionProperty<IFeatureId_2> {
     // Warning: (ae-forgotten-export) The symbol "FeatureIdAttribute_2" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    getAttribute(): FeatureIdAttribute_2;
+    getAttribute(): FeatureIdAttribute_2 | null;
     // (undocumented)
-    protected getDefaults(): Nullable<IFeatureId_2>;
+    protected getDefaults(): Nullable<IFeatureId_2> & {
+        nullFeatureId: null;
+        label: null;
+        attribute: null;
+        texture: null;
+        propertyTable: null;
+    };
     // (undocumented)
     getFeatureCount(): number;
     // (undocumented)
-    getLabel(): string;
+    getLabel(): string | null;
     // (undocumented)
-    getNullFeatureId(): number;
+    getNullFeatureId(): number | null;
     // (undocumented)
     getPropertyTable(): StructuralMetadataPropertyTable | null;
     // (undocumented)
@@ -1300,13 +1312,13 @@ export class MeshFeaturesFeatureId extends ExtensionProperty<IFeatureId_2> {
     // (undocumented)
     propertyType: "FeatureId";
     // (undocumented)
-    setAttribute(attribute: FeatureIdAttribute_2): this;
+    setAttribute(attribute: FeatureIdAttribute_2 | null): this;
     // (undocumented)
     setFeatureCount(featureCount: number): this;
     // (undocumented)
-    setLabel(label: string): this;
+    setLabel(label: string | null): this;
     // (undocumented)
-    setNullFeatureId(nullFeatureId: number): this;
+    setNullFeatureId(nullFeatureId: number | null): this;
     // (undocumented)
     setPropertyTable(propertyTable: StructuralMetadataPropertyTable | null): this;
     // (undocumented)
@@ -1832,6 +1844,8 @@ export class StructuralMetadata extends ExtensionProperty<IStructuralMetadata> {
     extensionName: typeof NAME;
     // (undocumented)
     protected getDefaults(): Nullable<IStructuralMetadata> & {
+        schema: null;
+        schemaUri: null;
         propertyTables: never[];
         propertyTextures: never[];
         propertyAttributes: never[];
@@ -1839,7 +1853,7 @@ export class StructuralMetadata extends ExtensionProperty<IStructuralMetadata> {
     // (undocumented)
     getSchema(): StructuralMetadataSchema | null;
     // (undocumented)
-    getSchemaUri(): string;
+    getSchemaUri(): string | null;
     // (undocumented)
     protected init(): void;
     // (undocumented)
@@ -1861,7 +1875,7 @@ export class StructuralMetadata extends ExtensionProperty<IStructuralMetadata> {
     // (undocumented)
     setSchema(schema: StructuralMetadataSchema | null): this;
     // (undocumented)
-    setSchemaUri(name: string): this;
+    setSchemaUri(schemaUri: string | null): this;
 }
 
 // Warning: (ae-forgotten-export) The symbol "IClass" needs to be exported by the entry point index.d.ts
@@ -1874,12 +1888,14 @@ export class StructuralMetadataClass extends ExtensionProperty<IClass> {
     extensionName: typeof NAME;
     // (undocumented)
     protected getDefaults(): Nullable<IClass> & {
+        objectName: null;
+        description: null;
         properties: {};
     };
     // (undocumented)
-    getDescription(): string;
+    getDescription(): string | null;
     // (undocumented)
-    getObjectName(): string;
+    getObjectName(): string | null;
     // (undocumented)
     getProperty(key: string): StructuralMetadataClassProperty | null;
     // (undocumented)
@@ -1893,9 +1909,9 @@ export class StructuralMetadataClass extends ExtensionProperty<IClass> {
     // (undocumented)
     propertyType: "Class";
     // (undocumented)
-    setDescription(description: string): this;
+    setDescription(description: string | null): this;
     // (undocumented)
-    setObjectName(name: string): this;
+    setObjectName(name: string | null): this;
     // (undocumented)
     setProperty(key: string, value: StructuralMetadataClassProperty | null): this;
 }
@@ -1913,21 +1929,32 @@ export class StructuralMetadataClassProperty extends ExtensionProperty<IClassPro
     // Warning: (ae-forgotten-export) The symbol "ClassPropertyComponentType" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    getComponentType(): ClassPropertyComponentType;
+    getComponentType(): ClassPropertyComponentType | null;
     // (undocumented)
-    getCount(): number;
+    getCount(): number | null;
     // (undocumented)
     getDefault(): any;
     // (undocumented)
     protected getDefaults(): Nullable<IClassProperty> & {
-        array: boolean;
-        normalized: boolean;
-        required: boolean;
+        objectName: null;
+        description: null;
+        componentType: null;
+        enumType: null;
+        array: null;
+        count: null;
+        normalized: null;
+        offset: null;
+        scale: null;
+        max: null;
+        min: null;
+        required: null;
+        noData: null;
+        default: null;
     };
     // (undocumented)
-    getDescription(): string;
+    getDescription(): string | null;
     // (undocumented)
-    getEnumType(): string;
+    getEnumType(): string | null;
     // (undocumented)
     getMax(): any;
     // (undocumented)
@@ -1937,7 +1964,7 @@ export class StructuralMetadataClassProperty extends ExtensionProperty<IClassPro
     // (undocumented)
     getNormalized(): boolean;
     // (undocumented)
-    getObjectName(): string;
+    getObjectName(): string | null;
     // (undocumented)
     getOffset(): any;
     // (undocumented)
@@ -1957,15 +1984,15 @@ export class StructuralMetadataClassProperty extends ExtensionProperty<IClassPro
     // (undocumented)
     setArray(array: boolean): this;
     // (undocumented)
-    setComponentType(componentType: ClassPropertyComponentType): this;
+    setComponentType(componentType: ClassPropertyComponentType | null): this;
     // (undocumented)
-    setCount(count: number): this;
+    setCount(count: number | null): this;
     // (undocumented)
     setDefault(defaultValue: any): this;
     // (undocumented)
-    setDescription(description: string): this;
+    setDescription(description: string | null): this;
     // (undocumented)
-    setEnumType(enumType: string): this;
+    setEnumType(enumType: string | null): this;
     // (undocumented)
     setMax(max: any): this;
     // (undocumented)
@@ -1975,7 +2002,7 @@ export class StructuralMetadataClassProperty extends ExtensionProperty<IClassPro
     // (undocumented)
     setNormalized(normalized: boolean): this;
     // (undocumented)
-    setObjectName(name: string): this;
+    setObjectName(name: string | null): this;
     // (undocumented)
     setOffset(offset: any): this;
     // (undocumented)
@@ -1998,13 +2025,15 @@ export class StructuralMetadataEnum extends ExtensionProperty<IEnum> {
     extensionName: typeof NAME;
     // (undocumented)
     protected getDefaults(): Nullable<IEnum> & {
+        objectName: null;
+        description: null;
         valueType: string;
         values: never[];
     };
     // (undocumented)
-    getDescription(): string;
+    getDescription(): string | null;
     // (undocumented)
-    getObjectName(): string;
+    getObjectName(): string | null;
     // Warning: (ae-forgotten-export) The symbol "EnumValueType" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -2020,9 +2049,9 @@ export class StructuralMetadataEnum extends ExtensionProperty<IEnum> {
     // (undocumented)
     removeEnumValue(enumValue: StructuralMetadataEnumValue): this;
     // (undocumented)
-    setDescription(description: string): this;
+    setDescription(description: string | null): this;
     // (undocumented)
-    setObjectName(name: string): this;
+    setObjectName(name: string | null): this;
     // (undocumented)
     setValueType(valueType: EnumValueType): this;
 }
@@ -2036,9 +2065,11 @@ export class StructuralMetadataEnumValue extends ExtensionProperty<IEnumValue> {
     // (undocumented)
     extensionName: typeof NAME;
     // (undocumented)
-    protected getDefaults(): Nullable<IEnumValue>;
+    protected getDefaults(): Nullable<IEnumValue> & {
+        description: null;
+    };
     // (undocumented)
-    getDescription(): string;
+    getDescription(): string | null;
     // (undocumented)
     getObjectName(): string;
     // (undocumented)
@@ -2050,11 +2081,17 @@ export class StructuralMetadataEnumValue extends ExtensionProperty<IEnumValue> {
     // (undocumented)
     propertyType: "EnumValue";
     // (undocumented)
-    setDescription(description: string): this;
+    setDescription(description: string | null): this;
     // (undocumented)
     setObjectName(name: string): this;
     // (undocumented)
     setValue(value: number): this;
+}
+
+// @internal
+export class StructuralMetadataMerger {
+    static mergeDocumentsWithStructuralMetadata(targetDocument: Document, sourceDocument: Document, schemaUriResolver: (schemaUri: string) => Promise<any>): Promise<void>;
+    static setMergedSchemaIdSuffix(mergedSchemaIdSuffix: string | undefined): void;
 }
 
 // Warning: (ae-forgotten-export) The symbol "IPropertyAttribute" needs to be exported by the entry point index.d.ts
@@ -2069,10 +2106,11 @@ export class StructuralMetadataPropertyAttribute extends ExtensionProperty<IProp
     getClass(): string;
     // (undocumented)
     protected getDefaults(): Nullable<IPropertyAttribute> & {
+        objectName: null;
         properties: {};
     };
     // (undocumented)
-    getObjectName(): string;
+    getObjectName(): string | null;
     // (undocumented)
     getProperty(key: string): StructuralMetadataPropertyAttributeProperty | null;
     // (undocumented)
@@ -2088,7 +2126,7 @@ export class StructuralMetadataPropertyAttribute extends ExtensionProperty<IProp
     // (undocumented)
     setClass(_class: string): this;
     // (undocumented)
-    setObjectName(name: string): this;
+    setObjectName(name: string | null): this;
     // (undocumented)
     setProperty(key: string, value: StructuralMetadataPropertyAttributeProperty | null): this;
 }
@@ -2104,7 +2142,12 @@ export class StructuralMetadataPropertyAttributeProperty extends ExtensionProper
     // (undocumented)
     getAttribute(): string;
     // (undocumented)
-    protected getDefaults(): Nullable<IPropertyAttributeProperty>;
+    protected getDefaults(): Nullable<IPropertyAttributeProperty> & {
+        offset: null;
+        scale: null;
+        max: null;
+        min: null;
+    };
     // (undocumented)
     getMax(): any;
     // (undocumented)
@@ -2145,10 +2188,11 @@ export class StructuralMetadataPropertyTable extends ExtensionProperty<IProperty
     getCount(): number;
     // (undocumented)
     protected getDefaults(): Nullable<IPropertyTable> & {
+        objectName: null;
         properties: {};
     };
     // (undocumented)
-    getObjectName(): string;
+    getObjectName(): string | null;
     // (undocumented)
     getProperty(key: string): StructuralMetadataPropertyTableProperty | null;
     // (undocumented)
@@ -2166,7 +2210,7 @@ export class StructuralMetadataPropertyTable extends ExtensionProperty<IProperty
     // (undocumented)
     setCount(count: number): this;
     // (undocumented)
-    setObjectName(name: string): this;
+    setObjectName(name: string | null): this;
     // (undocumented)
     setProperty(key: string, value: StructuralMetadataPropertyTableProperty | null): this;
 }
@@ -2185,8 +2229,14 @@ export class StructuralMetadataPropertyTableProperty extends ExtensionProperty<I
     getArrayOffsetType(): PropertyTablePropertyOffsetType;
     // (undocumented)
     protected getDefaults(): Nullable<IPropertyTableProperty> & {
-        arrayOffsetType: string;
-        stringOffsetType: string;
+        arrayOffsets: null;
+        stringOffsets: null;
+        arrayOffsetType: null;
+        stringOffsetType: null;
+        offset: null;
+        scale: null;
+        max: null;
+        min: null;
     };
     // (undocumented)
     getMax(): any;
@@ -2245,10 +2295,11 @@ export class StructuralMetadataPropertyTexture extends ExtensionProperty<IProper
     getClass(): string;
     // (undocumented)
     protected getDefaults(): Nullable<IPropertyTexture> & {
+        objectName: null;
         properties: {};
     };
     // (undocumented)
-    getObjectName(): string;
+    getObjectName(): string | null;
     // (undocumented)
     getProperty(key: string): StructuralMetadataPropertyTextureProperty | null;
     // (undocumented)
@@ -2264,7 +2315,7 @@ export class StructuralMetadataPropertyTexture extends ExtensionProperty<IProper
     // (undocumented)
     setClass(_class: string): this;
     // (undocumented)
-    setObjectName(name: string): this;
+    setObjectName(name: string | null): this;
     // (undocumented)
     setProperty(key: string, value: StructuralMetadataPropertyTextureProperty | null): this;
 }
@@ -2284,6 +2335,10 @@ export class StructuralMetadataPropertyTextureProperty extends ExtensionProperty
         channels: number[];
         texture: null;
         textureInfo: TextureInfo;
+        offset: null;
+        scale: null;
+        max: null;
+        min: null;
     };
     // (undocumented)
     getMax(): any;
@@ -2329,19 +2384,22 @@ export class StructuralMetadataSchema extends ExtensionProperty<ISchema> {
     getClass(key: string): StructuralMetadataClass | null;
     // (undocumented)
     protected getDefaults(): Nullable<ISchema> & {
+        objectName: null;
+        description: null;
+        version: null;
         classes: {};
         enums: {};
     };
     // (undocumented)
-    getDescription(): string;
+    getDescription(): string | null;
     // (undocumented)
     getEnum(key: string): StructuralMetadataEnum | null;
     // (undocumented)
     getId(): string;
     // (undocumented)
-    getObjectName(): string;
+    getObjectName(): string | null;
     // (undocumented)
-    getVersion(): string;
+    getVersion(): string | null;
     // (undocumented)
     protected init(): void;
     // (undocumented)
@@ -2359,15 +2417,15 @@ export class StructuralMetadataSchema extends ExtensionProperty<ISchema> {
     // (undocumented)
     setClass(key: string, value: StructuralMetadataClass | null): this;
     // (undocumented)
-    setDescription(description: string): this;
+    setDescription(description: string | null): this;
     // (undocumented)
     setEnum(key: string, value: StructuralMetadataEnum | null): this;
     // (undocumented)
     setId(name: string): this;
     // (undocumented)
-    setObjectName(name: string): this;
+    setObjectName(name: string | null): this;
     // (undocumented)
-    setVersion(version: string): this;
+    setVersion(version: string | null): this;
 }
 
 // @internal
@@ -2623,7 +2681,8 @@ export class TileFormats {
 export class TileFormatsMigration {
     static applyRtcCenter(document: Document, rtcCenter: number[]): void;
     static convertB3dmToGlb(b3dmBuffer: Buffer): Promise<Buffer>;
-    static convertI3dmToGlb(i3dmBuffer: Buffer, externalGlbResolver: (uri: string) => Promise<Buffer | undefined>): Promise<Buffer>;
+    static convertCmptToGlb(cmptBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>): Promise<Buffer>;
+    static convertI3dmToGlb(i3dmBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>): Promise<Buffer>;
     static convertPntsToGlb(pntsBuffer: Buffer): Promise<Buffer>;
     // (undocumented)
     static readonly DEBUG_LOG_FILE_CONTENT = false;
@@ -2637,7 +2696,7 @@ export class TileFormatsMigrationB3dm {
 
 // @internal
 export class TileFormatsMigrationI3dm {
-    static convertI3dmToGlb(i3dmBuffer: Buffer, externalGlbResolver: (uri: string) => Promise<Buffer | undefined>): Promise<Buffer>;
+    static convertI3dmToGlb(i3dmBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>): Promise<Buffer>;
 }
 
 // @internal
@@ -2724,6 +2783,7 @@ export class TilesetInMemory implements TilesetSource, TilesetTarget {
 
 // @internal
 export class TilesetJsonCreator {
+    static computeTransformFromCartographicPositionDegrees(cartographicPositionDegrees: number[]): number[];
     static createTilesetFromContents(baseDir: string, contentUris: string[]): Promise<Tileset>;
 }
 
@@ -2941,6 +3001,7 @@ export type TilesetUpgradeOptions = {
     upgradePntsToGlb: boolean;
     upgradeB3dmToGlb: boolean;
     upgradeI3dmToGlb: boolean;
+    upgradeCmptToGlb: boolean;
 };
 
 // @internal
@@ -2995,7 +3056,7 @@ export class TileTableDataPnts {
 
 // @internal
 export class TileTableDataToMeshFeatures {
-    static convertBatchIdToMeshFeatures(document: Document, primitive: Primitive): MeshFeaturesFeatureId;
+    static convertBatchIdToMeshFeatures(document: Document, primitive: Primitive, batchIdToFeatureIdAccessor: Map<Accessor, Accessor>): MeshFeaturesFeatureId;
 }
 
 // @internal

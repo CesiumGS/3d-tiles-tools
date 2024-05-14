@@ -29,6 +29,8 @@ function log(object: any) {
 /**
  * A class for merging two glTF-Transform documents that may contain
  * the `EXT_structural_metadata` extension.
+ *
+ * @internal
  */
 export class StructuralMetadataMerger {
   /**
