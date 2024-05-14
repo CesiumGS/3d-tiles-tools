@@ -2088,7 +2088,7 @@ export class StructuralMetadataEnumValue extends ExtensionProperty<IEnumValue> {
     setValue(value: number): this;
 }
 
-// @public
+// @internal
 export class StructuralMetadataMerger {
     static mergeDocumentsWithStructuralMetadata(targetDocument: Document, sourceDocument: Document, schemaUriResolver: (schemaUri: string) => Promise<any>): Promise<void>;
     static setMergedSchemaIdSuffix(mergedSchemaIdSuffix: string | undefined): void;
