@@ -52,6 +52,11 @@ npx 3d-tiles-tools ungzip -i ./specs/data/TilesetOfTilesets-gzipped/ -o ./output
 #### combine
 
 Combines all external tilesets into a single tileset.
+
+> **Note** about the difference between `merge` and `combine`: The `combine` command takes a tileset that already _refers_ to _external_ tilesets. And it creates a new tileset where the former _external_ tilesets are "inlined". So the result will be a single tileset, without external references.
+
+Example:
+
 ```
 npx 3d-tiles-tools combine -i ./specs/data/combineTilesets/input -o ./specs/data/combineTilesets/output
 ```
@@ -59,6 +64,10 @@ npx 3d-tiles-tools combine -i ./specs/data/combineTilesets/input -o ./specs/data
 #### merge
 
 Merge multiple tilesets into a single one that refers to the input tilesets as external tilesets.
+
+> **Note** about the difference between `merge` and `combine`: The `merge` command creates a _new_ tileset that _refers_ to the given ones as _external_ tilsets. This means that the resulting tileset is not complete _without_ the ones that are used as the inputs for the `merge` command.
+
+Example:
 ```
 npx 3d-tiles-tools merge -i ./specs/data/mergeTilesets/TilesetA -i ./specs/data/mergeTilesets/sub/TilesetA -o ./specs/data/mergeTilesets/output
 ```
