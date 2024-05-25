@@ -14,6 +14,8 @@ If you want to work directly with a clone of the Git repository, see [Developer 
 
 ## Command Line Usage
 
+> **Note:** All input- and output paths for the 3D Tiles Tools are _case sensitive_. Even though some operating systems (like Windows) usually do not differentiate between uppercase and lowercase, the file- and directory names that are given at the command line must exactly match the actual names.
+
 #### Common command line options for each function:
 
 |Flag|Description|Required|
