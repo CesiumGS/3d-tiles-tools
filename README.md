@@ -101,11 +101,11 @@ When `--targetVersion 1.1` is given, then this will upgrade legacy tilesets to c
 - The `refine` value will be converted to be in all-uppercase.
 - glTF 1.0 models in B3DM or I3DM will be upgraded to glTF 2.0.
 - The `3DTILES_content_gltf` extension declaration will be removed.
-- PNTS, B3DM, and I3DM content will be converted to glTF.
+- PNTS, B3DM, I3DM, and CMPT content will be converted to glTF.
 
 > Implementation note:
 > 
-> The conversion of the legacy tile formats to glTF should be considered as a _preview feature_. There are corner cases where the conversion is not possible generically - for example, when I3DM tile content contains glTF data that contains _animations_. The conditions under which the conversion is possible may be specified more explicitly in the future. 
+> The conversion of the legacy tile formats to glTF should be considered as a _preview feature_. There are corner cases where the conversion is not possible generically - for example, when I3DM tile content contains glTF data that contains _animations_, or when a CMPT (indirectly) contains multiple glTF assets that already use the `EXT_structural_metadata` extension. The conditions under which the conversion is possible may be specified more explicitly in the future. 
 
 
 
