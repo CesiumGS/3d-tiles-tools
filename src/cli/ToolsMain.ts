@@ -3,16 +3,13 @@ import path from "path";
 
 import { Paths } from "../base";
 import { DeveloperError } from "../base";
-import { Buffers } from "../base";
 import { Iterables } from "../base";
 import { ContentDataTypes } from "../base";
 
 import { TileFormats } from "../tilesets";
-import { TileDataLayouts } from "../tilesets";
 import { TileFormatError } from "../tilesets";
 
 import { ContentOps } from "../tools";
-import { GltfUtilities } from "../tools";
 
 import { PipelineExecutor } from "../tools";
 import { Pipelines } from "../tools";
@@ -22,7 +19,10 @@ import { TileFormatsMigration } from "../tools";
 import { TilesetConverter } from "../tools";
 import { TilesetJsonCreator } from "../tools";
 
-import { ContentDataTypeRegistry } from "../base";
+import { FileExtensions } from "../base";
+
+import { ToolsUtilities } from "./ToolsUtilities";
+import { ContentAnalyzer } from "./ContentAnalyzer";
 
 import { Loggers } from "../base";
 const logger = Loggers.get("CLI");
@@ -48,7 +48,7 @@ export class ToolsMain {
     logger.debug(`  output: ${output}`);
     logger.debug(`  force: ${force}`);
 
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const inputTileData = TileFormats.readTileData(inputBuffer);
     const outputBuffer = TileFormats.extractGlbPayload(inputTileData);
@@ -62,7 +62,7 @@ export class ToolsMain {
     logger.debug(`  output: ${output}`);
     logger.debug(`  force: ${force}`);
 
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const outputBuffer = await TileFormatsMigration.convertB3dmToGlb(
       inputBuffer
@@ -77,7 +77,7 @@ export class ToolsMain {
     logger.debug(`  output: ${output}`);
     logger.debug(`  force: ${force}`);
 
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const outputBuffer = await TileFormatsMigration.convertPntsToGlb(
       inputBuffer
@@ -93,11 +93,11 @@ export class ToolsMain {
     logger.debug(`  output: ${output}`);
     logger.debug(`  force: ${force}`);
 
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
 
     // Prepare the resolver for external GLBs in I3DM
-    const externalGlbResolver = ToolsMain.createResolver(input);
+    const externalGlbResolver = ToolsUtilities.createResolver(input);
     const outputBuffer = await TileFormatsMigration.convertI3dmToGlb(
       inputBuffer,
       externalGlbResolver
@@ -113,11 +113,11 @@ export class ToolsMain {
     logger.debug(`  output: ${output}`);
     logger.debug(`  force: ${force}`);
 
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const inputTileData = TileFormats.readTileData(inputBuffer);
     // Prepare the resolver for external GLBs in I3DM
-    const externalGlbResolver = ToolsMain.createResolver(input);
+    const externalGlbResolver = ToolsUtilities.createResolver(input);
     const outputBuffer = await TileFormats.obtainGlbPayload(
       inputTileData,
       externalGlbResolver
@@ -138,7 +138,7 @@ export class ToolsMain {
     logger.debug(`  force: ${force}`);
 
     const inputBuffer = fs.readFileSync(input);
-    const externalGlbResolver = ToolsMain.createResolver(input);
+    const externalGlbResolver = ToolsUtilities.createResolver(input);
     const glbBuffers = await TileFormats.extractGlbBuffers(
       inputBuffer,
       externalGlbResolver
@@ -157,7 +157,7 @@ export class ToolsMain {
     }
     for (let i = 0; i < glbsLength; i++) {
       const glbPath = glbPaths[i];
-      ToolsMain.ensureCanWrite(glbPath, force);
+      ToolsUtilities.ensureCanWrite(glbPath, force);
       const glbBuffer = glbBuffers[i];
       fs.writeFileSync(glbPath, glbBuffer);
     }
@@ -182,29 +182,18 @@ export class ToolsMain {
     for (let i = 0; i < outputBuffers.length; i++) {
       const outputBuffer = outputBuffers[i];
       const prefix = Paths.replaceExtension(output, "");
-      const extension = await ToolsMain.determineFileExtension(outputBuffer);
+      const extension = await FileExtensions.determineFileExtension(
+        outputBuffer
+      );
+      if (extension === "") {
+        logger.warn("Could not determine type of inner tile");
+      }
       const outputPath = `${prefix}_${i}.${extension}`;
-      ToolsMain.ensureCanWrite(outputPath, force);
+      ToolsUtilities.ensureCanWrite(outputPath, force);
       fs.writeFileSync(outputPath, outputBuffer);
     }
 
     logger.debug(`Executing splitCmpt DONE`);
-  }
-
-  private static async determineFileExtension(data: Buffer): Promise<string> {
-    const type = await ContentDataTypeRegistry.findType("", data);
-    switch (type) {
-      case ContentDataTypes.CONTENT_TYPE_B3DM:
-        return "b3dm";
-      case ContentDataTypes.CONTENT_TYPE_I3DM:
-        return "i3dm";
-      case ContentDataTypes.CONTENT_TYPE_PNTS:
-        return "pnts";
-      case ContentDataTypes.CONTENT_TYPE_CMPT:
-        return "cmpt";
-    }
-    logger.warn("Could not determine type of inner tile");
-    return "UNKNOWN";
   }
 
   static async glbToB3dm(input: string, output: string, force: boolean) {
@@ -213,7 +202,7 @@ export class ToolsMain {
     logger.debug(`  output: ${output}`);
     logger.debug(`  force: ${force}`);
 
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const outputTileData =
       TileFormats.createDefaultB3dmTileDataFromGlb(inputBuffer);
@@ -228,7 +217,7 @@ export class ToolsMain {
     logger.debug(`  output: ${output}`);
     logger.debug(`  force: ${force}`);
 
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const outputTileData =
       TileFormats.createDefaultI3dmTileDataFromGlb(inputBuffer);
@@ -249,7 +238,7 @@ export class ToolsMain {
     logger.debug(`  force: ${force}`);
     logger.debug(`  options: ${JSON.stringify(options)}`);
 
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const outputBuffer = await ContentOps.optimizeB3dmBuffer(
       inputBuffer,
@@ -271,7 +260,7 @@ export class ToolsMain {
     logger.debug(`  force: ${force}`);
     logger.debug(`  options: ${JSON.stringify(options)}`);
 
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
     const outputBuffer = await ContentOps.optimizeI3dmBuffer(
       inputBuffer,
@@ -292,131 +281,13 @@ export class ToolsMain {
 
     const inputBaseName = path.basename(inputFileName);
     const inputBuffer = fs.readFileSync(inputFileName);
-    ToolsMain.analyzeInternal(
+    ContentAnalyzer.analyze(
       inputBaseName,
       inputBuffer,
       outputDirectoryName,
       force
     );
     logger.info(`Analyzing ${inputFileName} DONE`);
-  }
-  static analyzeInternal(
-    inputBaseName: string,
-    inputBuffer: Buffer,
-    outputDirectoryName: string,
-    force: boolean
-  ) {
-    // A function to create a JSON string from an
-    // object. The formatting will be controlled
-    // via a command line flag in the future.
-    const doFormatJson = true;
-    const stringify = (input: any) => {
-      if (doFormatJson) {
-        return JSON.stringify(input, null, 2);
-      }
-      return JSON.stringify(input);
-    };
-
-    // A function to write a JSON string to a file, if
-    // the JSON string does not represent an empty
-    // object, and if the file can be written.
-    const writeJsonFileOptional = (jsonString: string, fileName: string) => {
-      if (jsonString === "{}") {
-        return;
-      }
-      if (!ToolsMain.canWrite(fileName, force)) {
-        logger.error(`Cannot write ${fileName}`);
-        return;
-      }
-      logger.info(`Writing ${fileName}`);
-      fs.writeFileSync(fileName, Buffer.from(jsonString));
-    };
-
-    // A function to write a buffer to a file, if
-    // the buffer is not empty, and if the file
-    // can be written.
-    const writeFileOptional = (buffer: Buffer, fileName: string) => {
-      if (buffer.length === 0) {
-        return;
-      }
-      if (!ToolsMain.canWrite(fileName, force)) {
-        logger.error(`Cannot write ${fileName}`);
-        return;
-      }
-      logger.info(`Writing ${fileName}`);
-      fs.writeFileSync(fileName, buffer);
-    };
-
-    // Read the buffer and its magic header
-    const magic = Buffers.getMagicString(inputBuffer, 0);
-
-    if (magic === "b3dm" || magic === "i3dm" || magic === "pnts") {
-      // Handle the basic legacy tile formats
-      const tileDataLayout = TileDataLayouts.create(inputBuffer);
-      const tileData = TileFormats.extractTileData(inputBuffer, tileDataLayout);
-
-      // Create the JSON strings for the layout information,
-      // feature table, batch table, and the GLB JSON
-      const layoutJsonString = stringify(tileDataLayout);
-      const featureTableJsonString = stringify(tileData.featureTable.json);
-      const batchTableJsonString = stringify(tileData.batchTable.json);
-      let glbJsonString = "{}";
-      if (tileData.payload.length !== 0) {
-        const glbJsonBuffer = GltfUtilities.extractJsonFromGlb(
-          tileData.payload
-        );
-        glbJsonString = glbJsonBuffer.toString();
-      }
-      if (doFormatJson) {
-        const glbJson = JSON.parse(glbJsonString);
-        glbJsonString = stringify(glbJson);
-      }
-
-      // Determine the output file names. They are files in the
-      // output directory, prefixed with the name of the input
-      // file, and with suffixes that indicate the actual contents
-      const outputBaseName = Paths.resolve(outputDirectoryName, inputBaseName);
-      const layoutFileName = outputBaseName + ".layout.json";
-      const featureTableJsonFileName = outputBaseName + ".featureTable.json";
-      const batchTableJsonFileName = outputBaseName + ".batchTable.json";
-      const glbFileName = outputBaseName + ".glb";
-      const glbJsonFileName = outputBaseName + ".glb.json";
-
-      // Write all output files
-      Paths.ensureDirectoryExists(outputDirectoryName);
-      writeJsonFileOptional(layoutJsonString, layoutFileName);
-      writeFileOptional(tileData.payload, glbFileName);
-      writeJsonFileOptional(featureTableJsonString, featureTableJsonFileName);
-      writeJsonFileOptional(batchTableJsonString, batchTableJsonFileName);
-      writeJsonFileOptional(glbJsonString, glbJsonFileName);
-    } else if (magic === "cmpt") {
-      // Handle composite tiles
-      const compositeTileData = TileFormats.readCompositeTileData(inputBuffer);
-      const n = compositeTileData.innerTileBuffers.length;
-      for (let i = 0; i < n; i++) {
-        const innerTileDataBuffer = compositeTileData.innerTileBuffers[i];
-        const innerTileBaseName = `${inputBaseName}.inner[${i}]`;
-        ToolsMain.analyzeInternal(
-          innerTileBaseName,
-          innerTileDataBuffer,
-          outputDirectoryName,
-          force
-        );
-      }
-    } else if (magic === "glTF") {
-      // Handle GLB files
-      let glbJsonString = "{}";
-      const glbJsonBuffer = GltfUtilities.extractJsonFromGlb(inputBuffer);
-      glbJsonString = glbJsonBuffer.toString();
-      if (doFormatJson) {
-        const glbJson = JSON.parse(glbJsonString);
-        glbJsonString = stringify(glbJson);
-      }
-      const outputBaseName = Paths.resolve(outputDirectoryName, inputBaseName);
-      const glbJsonFileName = outputBaseName + ".glb.json";
-      Paths.ensureDirectoryExists(outputDirectoryName);
-      writeJsonFileOptional(glbJsonString, glbJsonFileName);
-    }
   }
 
   private static createGzipPipelineJson(
@@ -457,7 +328,7 @@ export class ToolsMain {
     force: boolean,
     tilesOnly: boolean
   ) {
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
 
     const pipelineJson = ToolsMain.createGzipPipelineJson(
       input,
@@ -486,7 +357,7 @@ export class ToolsMain {
   }
 
   static async ungzip(input: string, output: string, force: boolean) {
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
 
     const pipelineJson = ToolsMain.createUngzipPipelineJson(input, output);
     const pipeline = Pipelines.createPipeline(pipelineJson);
@@ -499,7 +370,7 @@ export class ToolsMain {
     output: string,
     force: boolean
   ) {
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
     await TilesetConverter.convert(
       input,
       inputTilesetJsonFileName,
@@ -509,7 +380,7 @@ export class ToolsMain {
   }
 
   static async combine(input: string, output: string, force: boolean) {
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
     await TilesetOperations.combine(input, output, force);
   }
 
@@ -527,7 +398,7 @@ export class ToolsMain {
     logger.debug(`  targetVersion: ${targetVersion}`);
     logger.debug(`  gltfUpgradeOptions: ${JSON.stringify(gltfUpgradeOptions)}`);
 
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
     await TilesetOperations.upgrade(
       input,
       output,
@@ -545,7 +416,7 @@ export class ToolsMain {
     logger.debug(`  output: ${output}`);
     logger.debug(`  force: ${force}`);
 
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
     await TilesetOperations.merge(inputs, output, force);
 
     logger.debug(`Executing merge DONE`);
@@ -575,7 +446,7 @@ export class ToolsMain {
     logger.debug(`  output: ${output}`);
     logger.debug(`  force: ${force}`);
 
-    ToolsMain.ensureCanWrite(output, force);
+    ToolsUtilities.ensureCanWrite(output, force);
     let baseDir = inputName;
     let contentUris: string[] = [];
     if (!Paths.isDirectory(inputName)) {
@@ -613,71 +484,5 @@ export class ToolsMain {
     fs.writeFileSync(output, Buffer.from(tilesetJsonString));
 
     logger.debug(`Executing createTilesetJson DONE`);
-  }
-
-  /**
-   * Creates a function that can resolve URIs relative to
-   * the given input file.
-   *
-   * The function will resolve relative URIs against the
-   * base directory of the given input file name, and
-   * return the corresponding file data. If the data
-   * cannot be read, then the function will print an
-   * error message and return  `undefined`.
-   *
-   * @param input - The input file name
-   * @returns The resolver function
-   */
-  private static createResolver(
-    input: string
-  ): (uri: string) => Promise<Buffer | undefined> {
-    const baseDir = path.dirname(input);
-    const resolver = async (uri: string): Promise<Buffer | undefined> => {
-      const externalGlbUri = path.resolve(baseDir, uri);
-      try {
-        return fs.readFileSync(externalGlbUri);
-      } catch (error) {
-        logger.error(`Could not resolve ${uri} against ${baseDir}`);
-      }
-    };
-    return resolver;
-  }
-
-  /**
-   * Returns whether the specified file can be written.
-   *
-   * This is the case when `force` is `true`, or when it does not
-   * exist yet.
-   *
-   * @param fileName - The file name
-   * @param force The 'force' flag state from the command line
-   * @returns Whether the file can be written
-   */
-  static canWrite(fileName: string, force: boolean): boolean {
-    if (force) {
-      return true;
-    }
-    if (!fs.existsSync(fileName)) {
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Ensures that the specified file can be written, and throws
-   * a `DeveloperError` otherwise.
-   *
-   * @param fileName - The file name
-   * @param force The 'force' flag state from the command line
-   * @returns Whether the file can be written
-   * @throws DeveloperError When the file exists and `force` was `false`.
-   */
-  static ensureCanWrite(fileName: string, force: boolean): true {
-    if (ToolsMain.canWrite(fileName, force)) {
-      return true;
-    }
-    throw new DeveloperError(
-      `File ${fileName} already exists. Specify -f or --force to overwrite existing files.`
-    );
   }
 }

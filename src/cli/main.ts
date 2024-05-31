@@ -11,7 +11,7 @@ let logger = Loggers.get("CLI");
 // the `--options` will be passed to downstream
 // calls (e.g. calls to `gltf-pipeline`)
 const optionsIndex = process.argv.indexOf("--options");
-let toolArgs;
+let toolArgs: string[];
 let optionArgs: string[];
 if (optionsIndex < 0) {
   toolArgs = process.argv.slice(2);
