@@ -1,4 +1,5 @@
 import { TileFormats } from "../../tilesets";
+import { CompositeTileData } from "../../tilesets";
 
 import { GltfUtilities } from "./GltfUtilities";
 
@@ -147,6 +148,47 @@ export class ContentOps {
       inputTileData.batchTable.binary
     );
     const outputBuffer = TileFormats.createTileDataBuffer(outputTileData);
+    return outputBuffer;
+  }
+
+  /**
+   * Update the alignment of the given tile data buffer.
+   *
+   * This can be applied to B3DM, I3DM, PNTS, or CMPT tile data. It will
+   * read the tile data from the input, and generate a new tile data
+   * buffer with the same contents, but ensuring that the alignment
+   * requirements for the batch- and feature tables and the tile data
+   * as a whole are met. For CMPT tile data, the data of inner tiles
+   * will be updated recursively.
+   *
+   * @param inputBuffer - The input buffer
+   * @returns The resulting buffer
+   */
+  static updateAlignment(inputBuffer: Buffer): Buffer {
+    const isComposite = TileFormats.isComposite(inputBuffer);
+    if (isComposite) {
+      const inputCompositeTileData =
+        TileFormats.readCompositeTileData(inputBuffer);
+      const header = inputCompositeTileData.header;
+      const inputInnerTileBuffers = inputCompositeTileData.innerTileBuffers;
+      const outputInnerTileBuffers: Buffer[] = [];
+      for (let i = 0; i < inputInnerTileBuffers.length; i++) {
+        const inputInnerTileBuffer = inputInnerTileBuffers[i];
+        const outputInnerTileBuffer =
+          ContentOps.updateAlignment(inputInnerTileBuffer);
+        outputInnerTileBuffers.push(outputInnerTileBuffer);
+      }
+      const outputCompositeTileData: CompositeTileData = {
+        header: header,
+        innerTileBuffers: outputInnerTileBuffers,
+      };
+      const outputBuffer = TileFormats.createCompositeTileDataBuffer(
+        outputCompositeTileData
+      );
+      return outputBuffer;
+    }
+    const tileData = TileFormats.readTileData(inputBuffer);
+    const outputBuffer = TileFormats.createTileDataBuffer(tileData);
     return outputBuffer;
   }
 }
