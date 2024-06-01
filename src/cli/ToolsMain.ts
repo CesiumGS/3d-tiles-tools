@@ -22,7 +22,7 @@ import { TilesetJsonCreator } from "../tools";
 import { FileExtensions } from "../base";
 
 import { ToolsUtilities } from "./ToolsUtilities";
-import { ContentAnalyzer } from "./ContentAnalyzer";
+import { Analyzer } from "./Analyzer";
 
 import { Loggers } from "../base";
 const logger = Loggers.get("CLI");
@@ -271,7 +271,7 @@ export class ToolsMain {
     logger.debug(`Executing optimizeI3dm DONE`);
   }
 
-  static analyze(
+  static async analyze(
     inputFileName: string,
     outputDirectoryName: string,
     force: boolean
@@ -279,9 +279,11 @@ export class ToolsMain {
     logger.info(`Analyzing ${inputFileName}`);
     logger.info(`writing results to ${outputDirectoryName}`);
 
+    const inputDirectoryName = path.dirname(inputFileName);
     const inputBaseName = path.basename(inputFileName);
     const inputBuffer = fs.readFileSync(inputFileName);
-    ContentAnalyzer.analyze(
+    await Analyzer.analyze(
+      inputDirectoryName,
       inputBaseName,
       inputBuffer,
       outputDirectoryName,

@@ -526,7 +526,7 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   } else if (command === "pipeline") {
     await ToolsMain.pipeline(input, force);
   } else if (command === "analyze") {
-    ToolsMain.analyze(input, output, force);
+    await ToolsMain.analyze(input, output, force);
   } else if (command === "createTilesetJson") {
     const cartographicPositionDegrees = validateOptionalNumberArray(
       toolArgs.cartographicPositionDegrees,
