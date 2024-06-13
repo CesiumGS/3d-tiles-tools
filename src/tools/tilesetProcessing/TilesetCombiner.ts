@@ -17,6 +17,9 @@ import { TilesetTargets } from "../../tilesets";
 import { Tiles } from "../../tilesets";
 import { Tilesets } from "../../tilesets";
 
+import { Loggers } from "../../base";
+const logger = Loggers.get("tilesetProcessing");
+
 /**
  * A class for combining external tileset of a given tileset, to
  * create a new, combined tileset.
@@ -78,6 +81,10 @@ export class TilesetCombiner {
     tilesetTargetName: string,
     overwrite: boolean
   ): Promise<void> {
+    logger.debug(`Running combine`);
+    logger.debug(`  tilesetSourceName: ${tilesetSourceName}`);
+    logger.debug(`  tilesetTargetName: ${tilesetTargetName}`);
+
     const tilesetSource = TilesetSources.createAndOpen(tilesetSourceName);
     const tilesetTarget = TilesetTargets.createAndBegin(
       tilesetTargetName,
@@ -232,7 +239,6 @@ export class TilesetCombiner {
     if (!this.tilesetSource || !this.tilesetTarget) {
       throw new DeveloperError("The source and target must be defined");
     }
-
     const contentUri = content.uri;
     if (!contentUri) {
       // This is the case for legacy data (including some of the
@@ -240,19 +246,29 @@ export class TilesetCombiner {
       throw new TilesetError("Content does not have a URI");
     }
     const externalFileName = Paths.join(currentDirectory, contentUri);
+
+    logger.debug(`Running combineContentInternal`);
+    logger.debug(`  currentDirectory: ${currentDirectory}`);
+    logger.debug(`  contentUri: ${contentUri}`);
+    logger.debug(`  externalFileName: ${externalFileName}`);
+
     const externalFileBuffer = this.tilesetSource.getValue(externalFileName);
     if (!externalFileBuffer) {
       throw new TilesetError(`No data found for ${externalFileName}`);
     }
     const contentData = new BufferedContentData(contentUri, externalFileBuffer);
     const isTileset = await this.externalTilesetDetector(contentData);
+
     if (!isTileset) {
       // When the data is not an external tileset, then just update
       // the content URI to point to the path that the content data
       // will end up in
       const newUri = Paths.relativize(".", externalFileName);
+      logger.debug(`  newUri: ${newUri}`);
       content.uri = newUri;
     } else {
+      logger.debug(`  Found external tileset at ${contentUri}`);
+
       // When the data is an external tileset, recursively combine
       // ("inline") that tileset, and insert its content, contents
       // and children into the current tile
