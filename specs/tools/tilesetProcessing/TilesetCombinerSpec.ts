@@ -12,7 +12,7 @@ const OUTPUT_BASE_DIRECTORY =
   SPECS_DATA_BASE_DIRECTORY + "/output/combineTilesets/";
 const overwrite = true;
 
-fdescribe("TilesetCombiner", function () {
+describe("TilesetCombiner", function () {
   afterEach(function () {
     SpecHelpers.forceDeleteDirectory(
       SPECS_DATA_BASE_DIRECTORY + "/output/combineTilesets"
