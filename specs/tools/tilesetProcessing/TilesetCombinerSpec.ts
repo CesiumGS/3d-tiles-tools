@@ -190,4 +190,33 @@ describe("TilesetCombiner", function () {
     ];
     expect(actualContentUris).toEqual(expectedContentUris);
   });
+
+  it("handles legacy 'url' properties for content", async function () {
+    const testDirectoryName = "externalWithUrl";
+    const input = INPUT_BASE_DIRECTORY + testDirectoryName;
+    const output = OUTPUT_BASE_DIRECTORY + testDirectoryName;
+
+    await TilesetOperations.combine(input, output, overwrite);
+
+    // Ensure that the output directory contains the expected files:
+    // All files of the input, except for the external tileset JSON files
+    const actualRelativeFiles = SpecHelpers.collectRelativeFileNames(output);
+    actualRelativeFiles.sort();
+    const expectedRelativeFiles = ["README.md", "tile.b3dm", "tileset.json"];
+    expect(actualRelativeFiles).toEqual(expectedRelativeFiles);
+
+    // Ensure that the single 'tileset.json' contains the
+    // proper content URIs for the combined output
+    const tilesetJsonBuffer = fs.readFileSync(
+      Paths.join(output, "tileset.json")
+    );
+    const tileset = JSON.parse(tilesetJsonBuffer.toString());
+    const actualContentUris = await SpecHelpers.collectExplicitContentUris(
+      tileset.root
+    );
+    actualContentUris.sort();
+
+    const expectedContentUris = ["tile.b3dm"];
+    expect(actualContentUris).toEqual(expectedContentUris);
+  });
 });
