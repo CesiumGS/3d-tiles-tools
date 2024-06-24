@@ -20,6 +20,7 @@ export * from "./contentTypes/ContentDataTypeEntry";
 export * from "./contentTypes/ContentDataTypeRegistry";
 export * from "./contentTypes/ContentDataTypes";
 export * from "./contentTypes/LazyContentData";
+export * from "./contentTypes/FileExtensions";
 
 export * from "./io/FileResourceResolver";
 export * from "./io/ResourceResolver";
