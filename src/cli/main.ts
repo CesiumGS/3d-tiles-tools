@@ -457,6 +457,8 @@ async function run() {
   await runCommand(command, parsedToolArgs, optionArgs);
   const afterMs = performance.now();
   logger.info(`Total: ${(afterMs - beforeMs).toFixed(3)} ms`);
+  // This is not part of the Logger API!:
+  logger.flush();
 }
 
 async function runCommand(command: string, toolArgs: any, optionArgs: any) {

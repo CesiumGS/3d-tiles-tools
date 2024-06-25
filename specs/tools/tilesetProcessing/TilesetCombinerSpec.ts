@@ -7,17 +7,9 @@ import { TilesetOperations } from "../../../src/tools";
 import { SpecHelpers } from "../../SpecHelpers";
 
 const SPECS_DATA_BASE_DIRECTORY = SpecHelpers.getSpecsDataBaseDirectory();
-
-const nestedExteralInput =
-  SPECS_DATA_BASE_DIRECTORY + "/combineTilesets/nestedExternal";
-const nestedExteralOutput =
-  SPECS_DATA_BASE_DIRECTORY + "/output/combineTilesets/nestedExternal";
-
-const externalsWithTransformInput =
-  SPECS_DATA_BASE_DIRECTORY + "/combineTilesets/externalsWithTransform";
-const externalsWithTransformOutput =
-  SPECS_DATA_BASE_DIRECTORY + "/output/combineTilesets/externalsWithTransform";
-
+const INPUT_BASE_DIRECTORY = SPECS_DATA_BASE_DIRECTORY + "/combineTilesets/";
+const OUTPUT_BASE_DIRECTORY =
+  SPECS_DATA_BASE_DIRECTORY + "/output/combineTilesets/";
 const overwrite = true;
 
 describe("TilesetCombiner", function () {
@@ -27,17 +19,16 @@ describe("TilesetCombiner", function () {
     );
   });
 
-  it("combines external tilesets into a single tileset", async function () {
-    await TilesetOperations.combine(
-      nestedExteralInput,
-      nestedExteralOutput,
-      overwrite
-    );
+  it("combines external tilesets into a single tileset in nestedExternal", async function () {
+    const testDirectoryName = "nestedExternal";
+    const input = INPUT_BASE_DIRECTORY + testDirectoryName;
+    const output = OUTPUT_BASE_DIRECTORY + testDirectoryName;
+
+    await TilesetOperations.combine(input, output, overwrite);
 
     // Ensure that the output directory contains the expected files:
     // All files of the input, except for the external tileset JSON files
-    const actualRelativeFiles =
-      SpecHelpers.collectRelativeFileNames(nestedExteralOutput);
+    const actualRelativeFiles = SpecHelpers.collectRelativeFileNames(output);
     actualRelativeFiles.sort();
     const expectedRelativeFiles = [
       "README.md",
@@ -54,7 +45,7 @@ describe("TilesetCombiner", function () {
     // Ensure that the single 'tileset.json' contains the
     // proper content URIs for the combined output
     const tilesetJsonBuffer = fs.readFileSync(
-      Paths.join(nestedExteralOutput, "tileset.json")
+      Paths.join(output, "tileset.json")
     );
     const tileset = JSON.parse(tilesetJsonBuffer.toString());
     const actualContentUris = await SpecHelpers.collectExplicitContentUris(
@@ -73,17 +64,17 @@ describe("TilesetCombiner", function () {
     expect(actualContentUris).toEqual(expectedContentUris);
   });
 
-  it("retains the transforms of root nodes of external tilesets", async function () {
-    await TilesetOperations.combine(
-      externalsWithTransformInput,
-      externalsWithTransformOutput,
-      overwrite
-    );
+  it("retains the transforms of root nodes of external tilesets in externalsWithTransform", async function () {
+    const testDirectoryName = "externalsWithTransform";
+    const input = INPUT_BASE_DIRECTORY + testDirectoryName;
+    const output = OUTPUT_BASE_DIRECTORY + testDirectoryName;
+
+    await TilesetOperations.combine(input, output, overwrite);
 
     // Ensure that the resulting tileset JSON contains the
     // proper content transforms and bounding volumes
     const tilesetJsonBuffer = fs.readFileSync(
-      Paths.join(externalsWithTransformOutput, "tileset.json")
+      Paths.join(output, "tileset.json")
     );
     const tileset = JSON.parse(tilesetJsonBuffer.toString());
 
@@ -121,5 +112,111 @@ describe("TilesetCombiner", function () {
     const expectedTransformB = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 5, 1];
     const childTransformB = tileset.root.children[2].transform;
     expect(childTransformB).toEqual(expectedTransformB);
+  });
+
+  it("generates proper content URIs for externalInSameDirectory", async function () {
+    const testDirectoryName = "externalInSameDirectory";
+    const input = INPUT_BASE_DIRECTORY + testDirectoryName;
+    const output = OUTPUT_BASE_DIRECTORY + testDirectoryName;
+
+    await TilesetOperations.combine(input, output, overwrite);
+
+    // Ensure that the output directory contains the expected files:
+    // All files of the input, except for the external tileset JSON files
+    const actualRelativeFiles = SpecHelpers.collectRelativeFileNames(output);
+    actualRelativeFiles.sort();
+    const expectedRelativeFiles = [
+      "README.md",
+      "sub0/tileA.b3dm",
+      "sub0/tileB.b3dm",
+      "tileset.json",
+    ];
+    expect(actualRelativeFiles).toEqual(expectedRelativeFiles);
+
+    // Ensure that the single 'tileset.json' contains the
+    // proper content URIs for the combined output
+    const tilesetJsonBuffer = fs.readFileSync(
+      Paths.join(output, "tileset.json")
+    );
+    const tileset = JSON.parse(tilesetJsonBuffer.toString());
+    const actualContentUris = await SpecHelpers.collectExplicitContentUris(
+      tileset.root
+    );
+    actualContentUris.sort();
+
+    const expectedContentUris = ["sub0/tileA.b3dm", "sub0/tileB.b3dm"];
+    expect(actualContentUris).toEqual(expectedContentUris);
+  });
+
+  it("handles multiple contents with external tilesets in externalMultipleContents", async function () {
+    const testDirectoryName = "externalMultipleContents";
+    const input = INPUT_BASE_DIRECTORY + testDirectoryName;
+    const output = OUTPUT_BASE_DIRECTORY + testDirectoryName;
+
+    await TilesetOperations.combine(input, output, overwrite);
+
+    // Ensure that the output directory contains the expected files:
+    // All files of the input, except for the external tileset JSON files
+    const actualRelativeFiles = SpecHelpers.collectRelativeFileNames(output);
+    actualRelativeFiles.sort();
+    const expectedRelativeFiles = [
+      "README.md",
+      "subA/tileA0.b3dm",
+      "subA/tileA1.b3dm",
+      "subB/tileB0x.b3dm",
+      "subB/tileB0y.b3dm",
+      "tile.b3dm",
+      "tileset.json",
+    ];
+    expect(actualRelativeFiles).toEqual(expectedRelativeFiles);
+
+    // Ensure that the single 'tileset.json' contains the
+    // proper content URIs for the combined output
+    const tilesetJsonBuffer = fs.readFileSync(
+      Paths.join(output, "tileset.json")
+    );
+    const tileset = JSON.parse(tilesetJsonBuffer.toString());
+    const actualContentUris = await SpecHelpers.collectExplicitContentUris(
+      tileset.root
+    );
+    actualContentUris.sort();
+
+    const expectedContentUris = [
+      "subA/tileA0.b3dm",
+      "subA/tileA1.b3dm",
+      "subB/tileB0x.b3dm",
+      "subB/tileB0y.b3dm",
+      "tile.b3dm",
+    ];
+    expect(actualContentUris).toEqual(expectedContentUris);
+  });
+
+  it("handles legacy 'url' properties for content", async function () {
+    const testDirectoryName = "externalWithUrl";
+    const input = INPUT_BASE_DIRECTORY + testDirectoryName;
+    const output = OUTPUT_BASE_DIRECTORY + testDirectoryName;
+
+    await TilesetOperations.combine(input, output, overwrite);
+
+    // Ensure that the output directory contains the expected files:
+    // All files of the input, except for the external tileset JSON files
+    const actualRelativeFiles = SpecHelpers.collectRelativeFileNames(output);
+    actualRelativeFiles.sort();
+    const expectedRelativeFiles = ["README.md", "tile.b3dm", "tileset.json"];
+    expect(actualRelativeFiles).toEqual(expectedRelativeFiles);
+
+    // Ensure that the single 'tileset.json' contains the
+    // proper content URIs for the combined output
+    const tilesetJsonBuffer = fs.readFileSync(
+      Paths.join(output, "tileset.json")
+    );
+    const tileset = JSON.parse(tilesetJsonBuffer.toString());
+    const actualContentUris = await SpecHelpers.collectExplicitContentUris(
+      tileset.root
+    );
+    actualContentUris.sort();
+
+    const expectedContentUris = ["tile.b3dm"];
+    expect(actualContentUris).toEqual(expectedContentUris);
   });
 });
