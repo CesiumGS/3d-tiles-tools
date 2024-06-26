@@ -282,6 +282,20 @@ export class ToolsMain {
     logger.debug(`Executing optimizeI3dm DONE`);
   }
 
+  static updateAlignment(input: string, output: string, force: boolean) {
+    logger.debug(`Executing updateAlignment`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
+    ToolsMain.ensureCanWrite(output, force);
+    const inputBuffer = fs.readFileSync(input);
+    const outputBuffer = ContentOps.updateAlignment(inputBuffer);
+    fs.writeFileSync(output, outputBuffer);
+
+    logger.debug(`Executing updateAlignment DONE`);
+  }
+
   static analyze(
     inputFileName: string,
     outputDirectoryName: string,

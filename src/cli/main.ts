@@ -225,6 +225,16 @@ function parseToolArgs(a: string[]) {
         },
       }
     )
+    .command(
+      "updateAlignment",
+      "Update the alignment of the batch- and feature table and the tile data" +
+        "as a whole, to meet the alignment requirements of the specification. " +
+        "This can be applied to B3DM, I3DM, PNTS, or CMPT tile data.",
+      {
+        i: inputStringDefinition,
+        o: outputStringDefinition,
+      }
+    )
     .command("gzip", "Gzips the input tileset directory.", {
       i: inputStringDefinition,
       o: outputStringDefinition,
@@ -490,6 +500,8 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
     await ToolsMain.optimizeB3dm(input, output, force, parsedOptionArgs);
   } else if (command === "optimizeI3dm") {
     await ToolsMain.optimizeI3dm(input, output, force, parsedOptionArgs);
+  } else if (command === "updateAlignment") {
+    await ToolsMain.updateAlignment(input, output, force);
   } else if (command === "gzip") {
     const tilesOnly = toolArgs.tilesOnly === true;
     await ToolsMain.gzip(input, output, force, tilesOnly);

@@ -265,12 +265,22 @@ This example optimizes the b3dm and compresses the meshes using Draco, with a hi
 
 #### optimizeI3dm
 
-Optimize a i3dm using [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md).
+Optimize an i3dm using [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline/blob/main/README.md).
 ```
 npx 3d-tiles-tools optimizeI3dm -i ./specs/data/instancedWithBatchTableBinary.i3dm -o ./output/optimized.i3dm
 ```
 See [optimizeB3dm](#optimizeb3dm) for further examples.
 
+
+#### updateAlignment
+
+Update a B3DM, I3DM, PNTS or CMPT file to ensure that the alignment requirements
+for the batch- and feature tables and the tile data as a whole are met. For CMPT
+tile data, the data of inner tiles will be updated recursively.
+
+```
+npx 3d-tiles-tools updateAlignment -i ./specs/data/updateAlignment/testComposite.cmpt -o ./output/testCompositeFixed.cmpt
+```
 
 
 #### analyze
