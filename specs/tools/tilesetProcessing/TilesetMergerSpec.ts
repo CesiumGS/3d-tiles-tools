@@ -15,6 +15,7 @@ const basicInputs = [
 const basicOutput =
   SPECS_DATA_BASE_DIRECTORY + "/output/mergeTilesets/basicMerge";
 const overwrite = true;
+const jsonOnly = false;
 
 describe("TilesetMerger", function () {
   afterEach(function () {
@@ -24,7 +25,7 @@ describe("TilesetMerger", function () {
   });
 
   it("merges tilesets into a single tileset", async function () {
-    await TilesetOperations.merge(basicInputs, basicOutput, overwrite);
+    await TilesetOperations.merge(basicInputs, basicOutput, overwrite, jsonOnly);
 
     // Ensure that the output directory contains the expected files:
     // All files of the input, disambiguated for the same base name
