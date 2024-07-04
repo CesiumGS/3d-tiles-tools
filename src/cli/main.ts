@@ -257,12 +257,13 @@ function parseToolArgs(a: string[]) {
     .command(
       "merge",
       "Merge any number of tilesets together into a single tileset.",
-      { 
-        i: inputArrayDefinition, 
-        o: outputStringDefinition, 
+      {
+        i: inputArrayDefinition,
+        o: outputStringDefinition,
         jsonOnly: {
           default: false,
-          description: "Whether to copy resources to output directory - tileset.json and tile contents",
+          description:
+            "Whether to copy resources to output directory - tileset.json and tile contents",
           type: "boolean",
         },
       }

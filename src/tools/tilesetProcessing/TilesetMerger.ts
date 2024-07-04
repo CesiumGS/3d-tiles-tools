@@ -72,7 +72,7 @@ export class TilesetMerger {
    * @param tilesetSourceNames - The tileset source names
    * @param tilesetTargetName - The tileset target name
    * @param overwrite - Whether target files should be overwritten
-   * @param jsonOnly - Whether to copy resources to output directory 
+   * @param jsonOnly - Whether to copy resources to output directory
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError When the input could not be processed
    * @throws TilesetError When the output already exists
@@ -109,9 +109,7 @@ export class TilesetMerger {
       this.tilesetSources.push(tilesetSource);
       this.tilesetSourceJsonFileNames.push(tilesetSourceJsonFileName);
       this.tilesetSourceIdentifiers.push(
-        !jsonOnly ? 
-        tilesetSourceIdentifier : 
-        tilesetSourceName 
+        !jsonOnly ? tilesetSourceIdentifier : tilesetSourceName
       );
     }
 
@@ -198,8 +196,7 @@ export class TilesetMerger {
     );
 
     // Copy the resources from the sources to the target
-    if (!jsonOnly)
-      this.copyResources();
+    if (!jsonOnly) this.copyResources();
   }
 
   /**

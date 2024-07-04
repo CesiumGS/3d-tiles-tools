@@ -48,7 +48,7 @@ export class TilesetOperations {
    * @param tilesetTargetName - The tileset target name
    * @param overwrite - Whether the target should be overwritten if
    * it already exists
-   * @param jsonOnly - Whether to copy resources to output directory 
+   * @param jsonOnly - Whether to copy resources to output directory
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError When the input could not be processed,
    * or when the output already exists and `overwrite` was `false`.
@@ -60,7 +60,12 @@ export class TilesetOperations {
     jsonOnly: boolean
   ): Promise<void> {
     const tilesetMerger = new TilesetMerger();
-    await tilesetMerger.merge(tilesetSourceNames, tilesetTargetName, overwrite, jsonOnly);
+    await tilesetMerger.merge(
+      tilesetSourceNames,
+      tilesetTargetName,
+      overwrite,
+      jsonOnly
+    );
   }
 
   /**

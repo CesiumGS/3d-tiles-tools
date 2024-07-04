@@ -553,7 +553,12 @@ export class ToolsMain {
     logger.debug(`Executing upgrade DONE`);
   }
 
-  static async merge(inputs: string[], output: string, force: boolean, jsonOnly: boolean) {
+  static async merge(
+    inputs: string[],
+    output: string,
+    force: boolean,
+    jsonOnly: boolean
+  ) {
     logger.debug(`Executing merge`);
     logger.debug(`  inputs: ${inputs}`);
     logger.debug(`  output: ${output}`);
