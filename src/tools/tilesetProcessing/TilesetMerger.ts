@@ -72,6 +72,7 @@ export class TilesetMerger {
    * @param tilesetSourceNames - The tileset source names
    * @param tilesetTargetName - The tileset target name
    * @param overwrite - Whether target files should be overwritten
+   * @param jsonOnly - Whether to copy resources to output directory 
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError When the input could not be processed
    * @throws TilesetError When the output already exists
@@ -80,7 +81,8 @@ export class TilesetMerger {
   async merge(
     tilesetSourceNames: string[],
     tilesetTargetName: string,
-    overwrite: boolean
+    overwrite: boolean,
+    jsonOnly: boolean
   ): Promise<void> {
     // Create the sources and target
     for (const tilesetSourceName of tilesetSourceNames) {
@@ -106,7 +108,11 @@ export class TilesetMerger {
       const tilesetSource = TilesetSources.createAndOpen(tilesetSourceName);
       this.tilesetSources.push(tilesetSource);
       this.tilesetSourceJsonFileNames.push(tilesetSourceJsonFileName);
-      this.tilesetSourceIdentifiers.push(tilesetSourceIdentifier);
+      this.tilesetSourceIdentifiers.push(
+        !jsonOnly ? 
+        tilesetSourceIdentifier : 
+        tilesetSourceName 
+      );
     }
 
     this.tilesetTargetJsonFileName =
@@ -117,7 +123,7 @@ export class TilesetMerger {
     );
 
     // Perform the actual merge
-    this.mergeInternal();
+    this.mergeInternal(jsonOnly);
 
     // Clean up by closing the sources and the target
     for (const tilesetSource of this.tilesetSources) {
@@ -134,7 +140,7 @@ export class TilesetMerger {
   /**
    * Internal method for `merge`
    */
-  private mergeInternal() {
+  private mergeInternal(jsonOnly: boolean) {
     if (
       this.tilesetSources.length == 0 ||
       !this.tilesetTarget ||
@@ -192,7 +198,8 @@ export class TilesetMerger {
     );
 
     // Copy the resources from the sources to the target
-    this.copyResources();
+    if (!jsonOnly)
+      this.copyResources();
   }
 
   /**
