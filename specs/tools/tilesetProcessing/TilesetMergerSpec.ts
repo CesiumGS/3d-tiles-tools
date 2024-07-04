@@ -25,7 +25,12 @@ describe("TilesetMerger", function () {
   });
 
   it("merges tilesets into a single tileset", async function () {
-    await TilesetOperations.merge(basicInputs, basicOutput, overwrite, jsonOnly);
+    await TilesetOperations.merge(
+      basicInputs,
+      basicOutput,
+      overwrite,
+      jsonOnly
+    );
 
     // Ensure that the output directory contains the expected files:
     // All files of the input, disambiguated for the same base name
