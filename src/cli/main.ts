@@ -257,7 +257,18 @@ function parseToolArgs(a: string[]) {
     .command(
       "merge",
       "Merge any number of tilesets together into a single tileset.",
-      { i: inputArrayDefinition, o: outputStringDefinition }
+      {
+        i: inputArrayDefinition,
+        o: outputStringDefinition,
+      }
+    )
+    .command(
+      "mergeJson",
+      "Merge any number of tilesets together into a single tileset without copying resources to output directory.",
+      {
+        i: inputArrayDefinition,
+        o: outputStringDefinition,
+      }
     )
     .command(
       "upgrade",
@@ -537,6 +548,8 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
     );
   } else if (command === "merge") {
     await ToolsMain.merge(inputs, output, force);
+  } else if (command === "mergeJson") {
+    await ToolsMain.mergeJson(inputs, output, force);
   } else if (command === "pipeline") {
     await ToolsMain.pipeline(input, force);
   } else if (command === "analyze") {

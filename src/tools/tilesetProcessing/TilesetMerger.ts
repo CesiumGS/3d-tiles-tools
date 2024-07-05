@@ -82,6 +82,50 @@ export class TilesetMerger {
     tilesetTargetName: string,
     overwrite: boolean
   ): Promise<void> {
+    return this.mergeOperation(
+      tilesetSourceNames,
+      tilesetTargetName,
+      overwrite,
+      false
+    );
+  }
+
+  /**
+   * Merges the tileset from the specified sources into one tileset
+   * that refers to the sources as external ones, and writes the
+   * result into the given target without copying resources to
+   * output directory.
+   *
+   * @param tilesetSourceNames - The tileset source names
+   * @param tilesetTargetName - The tileset target name
+   * @param overwrite - Whether target files should be overwritten
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError When the input could not be processed
+   * @throws TilesetError When the output already exists
+   * and `overwrite` was `false`.
+   */
+  async mergeJson(
+    tilesetSourceNames: string[],
+    tilesetTargetName: string,
+    overwrite: boolean
+  ): Promise<void> {
+    return this.mergeOperation(
+      tilesetSourceNames,
+      tilesetTargetName,
+      overwrite,
+      true
+    );
+  }
+
+  /**
+   * Internal method to differentiate between `merge` and `mergeJson`
+   */
+  async mergeOperation(
+    tilesetSourceNames: string[],
+    tilesetTargetName: string,
+    overwrite: boolean,
+    jsonOnly: boolean
+  ): Promise<void> {
     // Create the sources and target
     for (const tilesetSourceName of tilesetSourceNames) {
       // Determine the name of the file that contains the tileset JSON data
@@ -106,7 +150,9 @@ export class TilesetMerger {
       const tilesetSource = TilesetSources.createAndOpen(tilesetSourceName);
       this.tilesetSources.push(tilesetSource);
       this.tilesetSourceJsonFileNames.push(tilesetSourceJsonFileName);
-      this.tilesetSourceIdentifiers.push(tilesetSourceIdentifier);
+      this.tilesetSourceIdentifiers.push(
+        !jsonOnly ? tilesetSourceIdentifier : tilesetSourceName
+      );
     }
 
     this.tilesetTargetJsonFileName =
@@ -117,7 +163,7 @@ export class TilesetMerger {
     );
 
     // Perform the actual merge
-    this.mergeInternal();
+    this.mergeInternal(jsonOnly);
 
     // Clean up by closing the sources and the target
     for (const tilesetSource of this.tilesetSources) {
@@ -134,7 +180,7 @@ export class TilesetMerger {
   /**
    * Internal method for `merge`
    */
-  private mergeInternal() {
+  private mergeInternal(jsonOnly: boolean) {
     if (
       this.tilesetSources.length == 0 ||
       !this.tilesetTarget ||
@@ -192,7 +238,7 @@ export class TilesetMerger {
     );
 
     // Copy the resources from the sources to the target
-    this.copyResources();
+    if (!jsonOnly) this.copyResources();
   }
 
   /**

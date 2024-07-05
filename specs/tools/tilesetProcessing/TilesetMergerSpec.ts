@@ -67,4 +67,32 @@ describe("TilesetMerger", function () {
     ];
     expect(actualContentUris).toEqual(expectedContentUris);
   });
+
+  it("merges tilesets into a single tileset for mergeJson", async function () {
+    await TilesetOperations.mergeJson(basicInputs, basicOutput, overwrite);
+
+    // Ensure that the output directory contains the expected files:
+    const actualRelativeFiles =
+      SpecHelpers.collectRelativeFileNames(basicOutput);
+    actualRelativeFiles.sort();
+    const expectedRelativeFiles = ["tileset.json"];
+    expect(actualRelativeFiles).toEqual(expectedRelativeFiles);
+
+    // Ensure that the single 'tileset.json' contains the
+    // proper content URIs for the external tilesets:
+    const tilesetJsonBuffer = fs.readFileSync(
+      Paths.join(basicOutput, "tileset.json")
+    );
+    const tileset = JSON.parse(tilesetJsonBuffer.toString());
+    const actualContentUris = await SpecHelpers.collectExplicitContentUris(
+      tileset.root
+    );
+    actualContentUris.sort();
+
+    const expectedContentUris = [
+      "specs/data/mergeTilesets/basicMerge/TilesetA/tileset.json",
+      "specs/data/mergeTilesets/basicMerge/sub/TilesetA/tileset.json",
+    ];
+    expect(actualContentUris).toEqual(expectedContentUris);
+  });
 });
