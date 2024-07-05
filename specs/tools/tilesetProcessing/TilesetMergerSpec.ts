@@ -24,11 +24,7 @@ describe("TilesetMerger", function () {
   });
 
   it("merges tilesets into a single tileset", async function () {
-    await TilesetOperations.merge(
-      basicInputs,
-      basicOutput,
-      overwrite
-    );
+    await TilesetOperations.merge(basicInputs, basicOutput, overwrite);
 
     // Ensure that the output directory contains the expected files:
     // All files of the input, disambiguated for the same base name
@@ -73,19 +69,13 @@ describe("TilesetMerger", function () {
   });
 
   it("merges tilesets into a single tileset for mergeJson", async function () {
-    await TilesetOperations.mergeJson(
-      basicInputs,
-      basicOutput,
-      overwrite
-    );
+    await TilesetOperations.mergeJson(basicInputs, basicOutput, overwrite);
 
     // Ensure that the output directory contains the expected files:
     const actualRelativeFiles =
       SpecHelpers.collectRelativeFileNames(basicOutput);
     actualRelativeFiles.sort();
-    const expectedRelativeFiles = [
-      "tileset.json",
-    ];
+    const expectedRelativeFiles = ["tileset.json"];
     expect(actualRelativeFiles).toEqual(expectedRelativeFiles);
 
     // Ensure that the single 'tileset.json' contains the
