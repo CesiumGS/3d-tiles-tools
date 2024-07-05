@@ -553,20 +553,26 @@ export class ToolsMain {
     logger.debug(`Executing upgrade DONE`);
   }
 
-  static async merge(
-    inputs: string[],
-    output: string,
-    force: boolean,
-    jsonOnly: boolean
-  ) {
+  static async merge(inputs: string[], output: string, force: boolean) {
     logger.debug(`Executing merge`);
     logger.debug(`  inputs: ${inputs}`);
     logger.debug(`  output: ${output}`);
     logger.debug(`  force: ${force}`);
-    logger.debug(`  jsonOnly: ${jsonOnly}`);
 
     ToolsMain.ensureCanWrite(output, force);
-    await TilesetOperations.merge(inputs, output, force, jsonOnly);
+    await TilesetOperations.merge(inputs, output, force);
+
+    logger.debug(`Executing merge DONE`);
+  }
+
+  static async mergeJson(inputs: string[], output: string, force: boolean) {
+    logger.debug(`Executing mergeJson`);
+    logger.debug(`  inputs: ${inputs}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
+    ToolsMain.ensureCanWrite(output, force);
+    await TilesetOperations.mergeJson(inputs, output, force);
 
     logger.debug(`Executing merge DONE`);
   }

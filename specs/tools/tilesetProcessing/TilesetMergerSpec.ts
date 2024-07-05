@@ -15,7 +15,6 @@ const basicInputs = [
 const basicOutput =
   SPECS_DATA_BASE_DIRECTORY + "/output/mergeTilesets/basicMerge";
 const overwrite = true;
-const jsonOnly = false;
 
 describe("TilesetMerger", function () {
   afterEach(function () {
@@ -28,8 +27,7 @@ describe("TilesetMerger", function () {
     await TilesetOperations.merge(
       basicInputs,
       basicOutput,
-      overwrite,
-      jsonOnly
+      overwrite
     );
 
     // Ensure that the output directory contains the expected files:
@@ -70,6 +68,40 @@ describe("TilesetMerger", function () {
     const expectedContentUris = [
       "TilesetA-0/tileset.json",
       "TilesetA/tileset.json",
+    ];
+    expect(actualContentUris).toEqual(expectedContentUris);
+  });
+
+  it("merges tilesets into a single tileset for mergeJson", async function () {
+    await TilesetOperations.mergeJson(
+      basicInputs,
+      basicOutput,
+      overwrite
+    );
+
+    // Ensure that the output directory contains the expected files:
+    const actualRelativeFiles =
+      SpecHelpers.collectRelativeFileNames(basicOutput);
+    actualRelativeFiles.sort();
+    const expectedRelativeFiles = [
+      "tileset.json",
+    ];
+    expect(actualRelativeFiles).toEqual(expectedRelativeFiles);
+
+    // Ensure that the single 'tileset.json' contains the
+    // proper content URIs for the external tilesets:
+    const tilesetJsonBuffer = fs.readFileSync(
+      Paths.join(basicOutput, "tileset.json")
+    );
+    const tileset = JSON.parse(tilesetJsonBuffer.toString());
+    const actualContentUris = await SpecHelpers.collectExplicitContentUris(
+      tileset.root
+    );
+    actualContentUris.sort();
+
+    const expectedContentUris = [
+      "specs/data/mergeTilesets/basicMerge/TilesetA/tileset.json",
+      "specs/data/mergeTilesets/basicMerge/sub/TilesetA/tileset.json",
     ];
     expect(actualContentUris).toEqual(expectedContentUris);
   });

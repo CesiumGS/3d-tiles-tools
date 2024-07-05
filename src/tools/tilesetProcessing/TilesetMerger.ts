@@ -72,13 +72,55 @@ export class TilesetMerger {
    * @param tilesetSourceNames - The tileset source names
    * @param tilesetTargetName - The tileset target name
    * @param overwrite - Whether target files should be overwritten
-   * @param jsonOnly - Whether to copy resources to output directory
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError When the input could not be processed
    * @throws TilesetError When the output already exists
    * and `overwrite` was `false`.
    */
   async merge(
+    tilesetSourceNames: string[],
+    tilesetTargetName: string,
+    overwrite: boolean
+  ): Promise<void> {
+    return this.mergeOperation(
+      tilesetSourceNames,
+      tilesetTargetName,
+      overwrite,
+      false
+    );
+  }
+
+  /**
+   * Merges the tileset from the specified sources into one tileset
+   * that refers to the sources as external ones, and writes the
+   * result into the given target without copying resources to
+   * output directory.
+   *
+   * @param tilesetSourceNames - The tileset source names
+   * @param tilesetTargetName - The tileset target name
+   * @param overwrite - Whether target files should be overwritten
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError When the input could not be processed
+   * @throws TilesetError When the output already exists
+   * and `overwrite` was `false`.
+   */
+  async mergeJson(
+    tilesetSourceNames: string[],
+    tilesetTargetName: string,
+    overwrite: boolean
+  ): Promise<void> {
+    return this.mergeOperation(
+      tilesetSourceNames,
+      tilesetTargetName,
+      overwrite,
+      true
+    );
+  }
+
+  /**
+   * Internal method to differentiate between `merge` and `mergeJson`
+   */
+  async mergeOperation(
     tilesetSourceNames: string[],
     tilesetTargetName: string,
     overwrite: boolean,

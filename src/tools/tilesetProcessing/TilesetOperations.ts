@@ -48,7 +48,6 @@ export class TilesetOperations {
    * @param tilesetTargetName - The tileset target name
    * @param overwrite - Whether the target should be overwritten if
    * it already exists
-   * @param jsonOnly - Whether to copy resources to output directory
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError When the input could not be processed,
    * or when the output already exists and `overwrite` was `false`.
@@ -56,15 +55,33 @@ export class TilesetOperations {
   static async merge(
     tilesetSourceNames: string[],
     tilesetTargetName: string,
-    overwrite: boolean,
-    jsonOnly: boolean
+    overwrite: boolean
   ): Promise<void> {
     const tilesetMerger = new TilesetMerger();
-    await tilesetMerger.merge(
+    await tilesetMerger.merge(tilesetSourceNames, tilesetTargetName, overwrite);
+  }
+
+  /**
+   * Performs the `mergeJson` command line operation.
+   *
+   * @param tilesetSourceName - The tileset source name
+   * @param tilesetTargetName - The tileset target name
+   * @param overwrite - Whether the target should be overwritten if
+   * it already exists
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError When the input could not be processed,
+   * or when the output already exists and `overwrite` was `false`.
+   */
+  static async mergeJson(
+    tilesetSourceNames: string[],
+    tilesetTargetName: string,
+    overwrite: boolean
+  ): Promise<void> {
+    const tilesetMerger = new TilesetMerger();
+    await tilesetMerger.mergeJson(
       tilesetSourceNames,
       tilesetTargetName,
-      overwrite,
-      jsonOnly
+      overwrite
     );
   }
 

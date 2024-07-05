@@ -260,12 +260,14 @@ function parseToolArgs(a: string[]) {
       {
         i: inputArrayDefinition,
         o: outputStringDefinition,
-        jsonOnly: {
-          default: false,
-          description:
-            "Whether to copy resources to output directory - tileset.json and tile contents",
-          type: "boolean",
-        },
+      }
+    )
+    .command(
+      "mergeJson",
+      "Merge any number of tilesets together into a single tileset without copying resources to output directory.",
+      {
+        i: inputArrayDefinition,
+        o: outputStringDefinition,
       }
     )
     .command(
@@ -545,8 +547,9 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
       parsedOptionArgs
     );
   } else if (command === "merge") {
-    const jsonOnly = toolArgs.jsonOnly === true;
-    await ToolsMain.merge(inputs, output, force, jsonOnly);
+    await ToolsMain.merge(inputs, output, force);
+  } else if (command === "mergeJson") {
+    await ToolsMain.mergeJson(inputs, output, force);
   } else if (command === "pipeline") {
     await ToolsMain.pipeline(input, force);
   } else if (command === "analyze") {
