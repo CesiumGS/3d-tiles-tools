@@ -90,8 +90,8 @@ describe("TilesetMerger", function () {
     actualContentUris.sort();
 
     const expectedContentUris = [
-      "specs/data/mergeTilesets/basicMerge/TilesetA/tileset.json",
-      "specs/data/mergeTilesets/basicMerge/sub/TilesetA/tileset.json",
+      "../../mergeTilesets/basicMerge/TilesetA/tileset.json",
+      "../../mergeTilesets/basicMerge/sub/TilesetA/tileset.json",
     ];
     expect(actualContentUris).toEqual(expectedContentUris);
   });
