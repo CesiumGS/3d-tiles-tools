@@ -142,12 +142,17 @@ export class TilesetMerger {
       }
       const tilesetSourceDirectoryName = path.basename(tilesetSourceName);
 
-      const tilesetTargetDirectoryPath = Paths.isDirectory(tilesetTargetName) ? tilesetTargetName : path.dirname(tilesetTargetName)
+      const tilesetTargetDirectoryPath = Paths.isDirectory(tilesetTargetName)
+        ? tilesetTargetName
+        : path.dirname(tilesetTargetName);
       const tilesetSourceIdentifier = TilesetMerger.createIdentifier(
         tilesetSourceDirectoryName,
         this.tilesetSourceIdentifiers
       );
-      const relativeTilesetIdentifier = path.relative(tilesetTargetDirectoryPath, tilesetSourceDirectoryPath);
+      const relativeTilesetIdentifier = path.relative(
+        tilesetTargetDirectoryPath,
+        tilesetSourceDirectoryPath
+      );
 
       const tilesetSource = TilesetSources.createAndOpen(tilesetSourceName);
       this.tilesetSources.push(tilesetSource);
