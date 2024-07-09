@@ -134,24 +134,26 @@ export class TilesetMerger {
 
       // Determine an "identifier" for the tileset source
       // (see `tilesetSourceIdentifiers` for details)
-      let tilesetSourceDirectoryName;
+      let tilesetSourceDirectoryPath;
       if (Paths.isDirectory(tilesetSourceName)) {
-        tilesetSourceDirectoryName = path.basename(tilesetSourceName);
+        tilesetSourceDirectoryPath = tilesetSourceName;
       } else {
-        tilesetSourceDirectoryName = path.basename(
-          path.dirname(tilesetSourceName)
-        );
+        tilesetSourceDirectoryPath = path.dirname(tilesetSourceName);
       }
+      const tilesetSourceDirectoryName = path.basename(tilesetSourceName);
+
+      const tilesetTargetDirectoryPath = Paths.isDirectory(tilesetTargetName) ? tilesetTargetName : path.dirname(tilesetTargetName)
       const tilesetSourceIdentifier = TilesetMerger.createIdentifier(
         tilesetSourceDirectoryName,
         this.tilesetSourceIdentifiers
       );
+      const relativeTilesetIdentifier = path.relative(tilesetTargetDirectoryPath, tilesetSourceDirectoryPath);
 
       const tilesetSource = TilesetSources.createAndOpen(tilesetSourceName);
       this.tilesetSources.push(tilesetSource);
       this.tilesetSourceJsonFileNames.push(tilesetSourceJsonFileName);
       this.tilesetSourceIdentifiers.push(
-        !jsonOnly ? tilesetSourceIdentifier : tilesetSourceName
+        !jsonOnly ? tilesetSourceIdentifier : relativeTilesetIdentifier
       );
     }
 
