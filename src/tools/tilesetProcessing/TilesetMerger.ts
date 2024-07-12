@@ -37,12 +37,24 @@ export class TilesetMerger {
   private tilesetSourceJsonFileNames: string[];
 
   /**
-   * Identifiers for the external tilesets. These will usually
-   * be just the last component of the directory name. For example,
-   * for a tileset like "./data/example/tileset.json", this will
-   * be "example". But the names are disambiguated, just in case...
+   * The directories that will contain the external tilesets.
+   *
+   * For the default `merge` operation, these will be the last component
+   * of the source directory name. For example, for a tileset like
+   * "./data/example/tileset.json", this will be "example".
+   * The merger will create subdirectories in the target directory,
+   * and copy the source tilesets into these directories. The merged
+   * tileset will then refer to these (copied) tilesets. Duplicate
+   * names will be disambiguated.
+   *
+   * For the `mergeJson` operation, these will be relative paths,
+   * pointing from the target directory to the original source
+   * directories.
+   *
+   * In both cases, these will be the directories that appear in
+   * the `content.uri` of the merged tileset.
    */
-  private tilesetSourceIdentifiers: string[];
+  private externalTilesetDirectories: string[];
 
   /**
    * The target that the resulting tileset will be written to.
@@ -61,7 +73,7 @@ export class TilesetMerger {
   constructor() {
     this.tilesetSources = [];
     this.tilesetSourceJsonFileNames = [];
-    this.tilesetSourceIdentifiers = [];
+    this.externalTilesetDirectories = [];
   }
 
   /**
@@ -119,40 +131,61 @@ export class TilesetMerger {
 
   /**
    * Internal method to differentiate between `merge` and `mergeJson`
+   *
+   * @param tilesetSourceNames - The tileset source names
+   * @param tilesetTargetName - The tileset target name
+   * @param overwrite - Whether target files should be overwritten
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError When the input could not be processed
    */
-  async mergeOperation(
+  private async mergeOperation(
     tilesetSourceNames: string[],
     tilesetTargetName: string,
     overwrite: boolean,
     jsonOnly: boolean
   ): Promise<void> {
-    // Create the sources and target
+    const tilesetTargetDirectory =
+      Tilesets.determineTilesetDirectoryName(tilesetTargetName);
+
     for (const tilesetSourceName of tilesetSourceNames) {
-      // Determine the name of the file that contains the tileset JSON data
+      // Determine the name of the file that contains the tileset JSON data,
+      // and the source directory
       const tilesetSourceJsonFileName =
         Tilesets.determineTilesetJsonFileName(tilesetSourceName);
-
-      // Determine an "identifier" for the tileset source
-      // (see `tilesetSourceIdentifiers` for details)
-      let tilesetSourceDirectoryName;
-      if (Paths.isDirectory(tilesetSourceName)) {
-        tilesetSourceDirectoryName = path.basename(tilesetSourceName);
-      } else {
-        tilesetSourceDirectoryName = path.basename(
-          path.dirname(tilesetSourceName)
-        );
-      }
-      const tilesetSourceIdentifier = TilesetMerger.createIdentifier(
-        tilesetSourceDirectoryName,
-        this.tilesetSourceIdentifiers
-      );
+      const externalTilesetDirectory =
+        Tilesets.determineTilesetDirectoryName(tilesetSourceName);
 
       const tilesetSource = TilesetSources.createAndOpen(tilesetSourceName);
       this.tilesetSources.push(tilesetSource);
       this.tilesetSourceJsonFileNames.push(tilesetSourceJsonFileName);
-      this.tilesetSourceIdentifiers.push(
-        !jsonOnly ? tilesetSourceIdentifier : tilesetSourceName
-      );
+
+      // Determine the directory name that will be used for referring
+      // to the source tileset (via the `content.uri` in the merged
+      // tileset), and store it in the 'externalTilesetDirectories'.
+      if (jsonOnly) {
+        // When only a merged JSON should be created, then the
+        // external tileset directory will be a relative path,
+        // pointing from the original source to the target
+        const relativeExternalTilesetDirectory = Paths.relativize(
+          tilesetTargetDirectory,
+          externalTilesetDirectory
+        );
+
+        this.externalTilesetDirectories.push(relativeExternalTilesetDirectory);
+      } else {
+        // When a full merge operation is performed, then the
+        // source tilesets are copied into the target directory,
+        // using a name that just consists of the base name (last
+        // path component) of the source directory, disambiguated
+        const externalTilesetDirectoryBaseName = path.basename(
+          externalTilesetDirectory
+        );
+        const uniqueExternalTilesetDirectory = TilesetMerger.createUnique(
+          externalTilesetDirectoryBaseName,
+          this.externalTilesetDirectories
+        );
+        this.externalTilesetDirectories.push(uniqueExternalTilesetDirectory);
+      }
     }
 
     this.tilesetTargetJsonFileName =
@@ -162,8 +195,14 @@ export class TilesetMerger {
       overwrite
     );
 
-    // Perform the actual merge
-    this.mergeInternal(jsonOnly);
+    // Perform the actual merge, creating the merged tileset JSON
+    // in the target
+    this.mergeInternal();
+
+    // Copy the resources from the sources to the target
+    if (!jsonOnly) {
+      this.copyResources();
+    }
 
     // Clean up by closing the sources and the target
     for (const tilesetSource of this.tilesetSources) {
@@ -172,15 +211,16 @@ export class TilesetMerger {
     await this.tilesetTarget.end();
 
     this.tilesetSources.length = 0;
-    this.tilesetSourceIdentifiers.length = 0;
+    this.externalTilesetDirectories.length = 0;
     this.tilesetTarget = undefined;
     this.tilesetTargetJsonFileName = undefined;
   }
 
   /**
-   * Internal method for `merge`
+   * Internal method for `merge`, only creating the actual merged
+   * tileset JSON and putting it into the target.
    */
-  private mergeInternal(jsonOnly: boolean) {
+  private mergeInternal() {
     if (
       this.tilesetSources.length == 0 ||
       !this.tilesetTarget ||
@@ -211,7 +251,7 @@ export class TilesetMerger {
     const box = TilesetMerger.getMergedBox(tilesets);
     const children = TilesetMerger.getChildren(
       tilesets,
-      this.tilesetSourceIdentifiers,
+      this.externalTilesetDirectories,
       this.tilesetSourceJsonFileNames
     );
     const mergedTileset = {
@@ -236,17 +276,14 @@ export class TilesetMerger {
       this.tilesetTargetJsonFileName,
       mergedTilesetBuffer
     );
-
-    // Copy the resources from the sources to the target
-    if (!jsonOnly) this.copyResources();
   }
 
   /**
    * Copy the resources from the source tilesets into the target.
    *
    * This will obtain the entries of all sources, and add them
-   * to the target, adding the `tilesetSourceIdentifier` to the
-   * path for disambiguation.
+   * to the target, adding the `externalTilesetDirectory` to the
+   * path.
    */
   private copyResources(): void {
     if (this.tilesetSources.length == 0 || !this.tilesetTarget) {
@@ -256,11 +293,11 @@ export class TilesetMerger {
     const length = this.tilesetSources.length;
     for (let i = 0; i < length; ++i) {
       const tilesetSource = this.tilesetSources[i];
-      const tilesetSourceIdentifier = this.tilesetSourceIdentifiers[i];
+      const externalTilesetDirectory = this.externalTilesetDirectories[i];
       const sourceKeys = tilesetSource.getKeys();
       for (const sourceKey of sourceKeys) {
         const value = tilesetSource.getValue(sourceKey);
-        const targetKey = tilesetSourceIdentifier + "/" + sourceKey;
+        const targetKey = Paths.join(externalTilesetDirectory, sourceKey);
         if (value) {
           this.tilesetTarget.addEntry(targetKey, value);
         }
@@ -269,29 +306,26 @@ export class TilesetMerger {
   }
 
   /**
-   * Creates an identifier that does not exist yet.
+   * Creates a string that does not exist yet.
    *
    * If the given prefix is not yet contained in the given list,
    * then it is returned. Otherwise, it is made "unique" in an
    * unspecified way, and then returned.
    *
-   * This does NOT add the new identifier to the given list!
+   * This does NOT add the new string to the given list!
    *
    * @param prefix - The prefix
-   * @param existingIdentifiers - The existing identifiers
-   * @returns The new identifier
+   * @param existing - The existing strings
+   * @returns The unique string
    */
-  private static createIdentifier(
-    prefix: string,
-    existingIdentifiers: string[]
-  ): string {
-    let identifier = prefix;
+  private static createUnique(prefix: string, existing: string[]): string {
+    let result = prefix;
     let counter = 0;
     for (;;) {
-      if (!existingIdentifiers.includes(identifier)) {
-        return identifier;
+      if (!existing.includes(result)) {
+        return result;
       }
-      identifier = `${prefix}-${counter}`;
+      result = `${prefix}-${counter}`;
       counter++;
     }
   }
@@ -304,16 +338,16 @@ export class TilesetMerger {
 
   private static getChildren(
     tilesets: Tileset[],
-    tilesetSourceIdentifiers: string[],
+    externalTilesetDirectories: string[],
     tilesetJsonFileNames: string[]
   ) {
     const length = tilesets.length;
     const children = Array<Tile>(length);
     for (let i = 0; i < length; ++i) {
       const tilesetJsonFileName = tilesetJsonFileNames[i];
-      const tilesetSourceIdentifier = tilesetSourceIdentifiers[i];
+      const externalTilesetDirectory = externalTilesetDirectories[i];
       const tilesetUrl = Paths.join(
-        tilesetSourceIdentifier,
+        externalTilesetDirectory,
         tilesetJsonFileName
       );
 
