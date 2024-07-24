@@ -33,6 +33,40 @@ export class Tilesets {
   }
 
   /**
+   * Determine a directory name from the given tileset name.
+   *
+   * When the given name ends with `.json`, `.3tz`, or `.3dtiles`
+   * (case-insensitively), then the directory name of that file
+   * name is returned. Otherwise, the given name is assumed to
+   * be a directory name and returned directly.
+   *
+   * NOTE: This is working around the ambiguity that is related to
+   * https://github.com/CesiumGS/3d-tiles/issues/184 : When someone
+   * uses a path like "./data/target" as a target name, then it is
+   * not clear whether the result should be
+   *
+   * - a JSON file "./data/target" (without extension)
+   * - a file called "./data/target/tileset.json"
+   *
+   * The latter is the default assumption that is used for source
+   * data: When the source is a directory, then it assumes
+   * that there is a 'tileset.json' file in this directory.
+   *
+   * For the target, checking whether there is a file extension
+   * seems to be a reasonable workaround.
+   *
+   * @param tilesetName - The tileset name
+   * @returns The directory name
+   */
+  static determineTilesetDirectoryName(tilesetName: string) {
+    const n = tilesetName.toLowerCase();
+    if (n.endsWith(".json") || n.endsWith(".3tz") || n.endsWith(".3dtiles")) {
+      return path.dirname(tilesetName);
+    }
+    return tilesetName;
+  }
+
+  /**
    * Returns whether the given names likely refer to the same package.
    *
    * This will interpret the given strings as paths and normalize them.

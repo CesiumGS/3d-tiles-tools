@@ -102,6 +102,17 @@ export class Paths {
    * the result uses `/` forward slashes as the directory
    * separator.
    *
+   * Note:
+   * - The first argument is assumed to be a directory
+   * - The second argument is assumed to be a file name
+   * - The result is the relativized file name
+   *
+   * For example: In a call like
+   * `relativize("./example/directoryA", "./example/directoryB/file.txt")`
+   * the second argument has to be the file name, and the result
+   * will be "../directoryB/file.txt", which is the path of the
+   * file _relative to_ the directory that is given as the first argument.
+   *
    * @param directory - The directory
    * @param fileName - The file name
    * @returns The resulting path
