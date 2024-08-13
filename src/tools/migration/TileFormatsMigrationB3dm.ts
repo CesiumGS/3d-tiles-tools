@@ -90,8 +90,10 @@ export class TileFormatsMigrationB3dm {
               primitive,
               batchIdToFeatureIdAccessor
             );
-          if (propertyTable) {
-            featureId.setPropertyTable(propertyTable);
+          if (featureId) {
+            if (propertyTable) {
+              featureId.setPropertyTable(propertyTable);
+            }
           }
         }
       }
