@@ -23,10 +23,14 @@ export class TileTableDataToMeshFeatures {
    * extension that is associated with this primitive, storing
    * the former batch ID attribute as a new `_FEATURE_ID_0` attribute.
    *
-   * Note that this will remove the former batch ID attributes
+   * Note that this will set the former batch ID attributes
    * in the given primitive to `null`, but it will not dispose
    * the corresponding accessors. These have to be disposed
    * after all primitives have been processed.
+   *
+   * If the given primitive does not contain a batch ID attribute,
+   * then a warning will be printed, and `undefined` will be
+   * returned.
    *
    * @param document - The glTF-Transform document
    * @param primitive - The glTF-Transform primitive
@@ -42,7 +46,7 @@ export class TileTableDataToMeshFeatures {
     document: Document,
     primitive: Primitive,
     batchIdToFeatureIdAccessor: Map<Accessor, Accessor>
-  ): FeatureId {
+  ): FeatureId | undefined {
     let batchIdAttribute = primitive.getAttribute("_BATCHID");
     if (!batchIdAttribute) {
       batchIdAttribute = primitive.getAttribute("BATCHID");
@@ -52,9 +56,10 @@ export class TileTableDataToMeshFeatures {
             "should be _BATCHID, starting with an underscore"
         );
       } else {
-        throw new TileFormatError(
-          "The primitive did not contain a _BATCHID attribute"
+        logger.warn(
+          "The primitive did not contain a _BATCHID or BATCHID attribute"
         );
+        return undefined;
       }
     }
 
