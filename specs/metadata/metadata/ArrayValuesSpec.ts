@@ -632,4 +632,23 @@ describe("metadata/ArrayValues", function () {
     const actual = ArrayValues.anyDeepGreaterThan(a, b);
     expect(actual).toEqual(expected);
   });
+
+  //==========================================================================
+  // Error cases for deepMin/deepMax
+
+  it("throws error for non-numeric types in deepMin", function () {
+    expect(function () {
+      const a = [5, 2];
+      const b = [3, "NOT_A_NUMBER"];
+      ArrayValues.deepMin(a, b);
+    }).toThrowError();
+  });
+
+  it("throws error for non-numeric types in deepMax", function () {
+    expect(function () {
+      const a = [5, 2];
+      const b = [3, "NOT_A_NUMBER"];
+      ArrayValues.deepMax(a, b);
+    }).toThrowError();
+  });
 });

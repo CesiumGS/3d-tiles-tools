@@ -43,7 +43,7 @@ export class ArrayValues {
   // Implementation note:
   // The methods here are supposed to be called in a context
   // where no (compile-time) type information is available.
-  // Thes are offered to operate on "any" types, but usually
+  // These are offered to operate on "any" types, but usually
   // delegate to "...Internal" methods with more specific
   // type signatures. This does not imply any compile-time
   // checks, but these specific signatures might be exposed
@@ -63,7 +63,7 @@ export class ArrayValues {
     if (typeof value === "bigint") {
       return true;
     }
-    return true;
+    return false;
   }
 
   /**
