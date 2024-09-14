@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+### 0.4.3 - 2024-09-14
+
+- Fixed the handling of legacy B3DM files that contain glTF 1.0 data with texture coordinates that are stored as "quantized" 3D coordinates, via [#148](https://github.com/CesiumGS/3d-tiles-tools/pull/148)
+- Fixed the `upgrade` command for `targetVersion 1.1` for the case that the input data contains very old B3DM files that do not define a `BATCHID` attribute, via [#147](https://github.com/CesiumGS/3d-tiles-tools/pull/147).
+- Added a `mergeJson` command to create a tileset JSON that refers to other tilesets as external tilesets, without copying the input tilesets to the output directory, via [#140](https://github.com/CesiumGS/3d-tiles-tools/pull/140) and [#143](https://github.com/CesiumGS/3d-tiles-tools/pull/143).
+- Fixed a bug where the `combine` command did not properly update the content URIs when an external tileset in a subdirectory referred to another external tileset in the same subdirectory, via [#139](https://github.com/CesiumGS/3d-tiles-tools/pull/139)
+- Added an `updateAlignment` command that can process a B3DM, I3DM, PNGS, or CMPT file, to ensure that the alignment requirements for the batch- and feature table and the tile data as a whole are met, via [#136](https://github.com/CesiumGS/3d-tiles-tools/pull/136)
+
 ### 0.4.2 - 2024-05-15
 
 - When upgrading a tileset to version 1.1, then the `upgrade` command did not yet convert CMPT files into GLB. This functionality was now added via [#117](https://github.com/CesiumGS/3d-tiles-tools/pull/117), including an attempt to merge multiple GLB files that contain the Cesium glTF metadata extensions. Details of the merge process are not yet specified, but should cover the most common cases that appear during the conversion of CMPT files.
