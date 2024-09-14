@@ -74,6 +74,17 @@ Example:
 npx 3d-tiles-tools merge -i ./specs/data/mergeTilesets/TilesetA -i ./specs/data/mergeTilesets/sub/TilesetA -o ./specs/data/mergeTilesets/output
 ```
 
+#### mergeJson
+
+Merge multiple tilesets into a single tileset JSON file that refers to the input tilesets as external tilesets. 
+
+This differs from the `merge` command insofar that it does not copy the input tilesets to the output directory, but only creates the JSON file for the merged tileset, which uses relative paths to refer to the input tilesets. A common use case for this is to create a tileset JSON file in a certain directory, with the input tilesets being located in subdirectories.
+
+Example:
+```
+npx 3d-tiles-tools mergeJson -i ./example/TilesetA/tileset.json -i ./example/TilesetB/tileset.json -o ./example/mergedTileset.json
+```
+
 #### upgrade
 
 Upgrade a tileset to the latest 3D Tiles version.
