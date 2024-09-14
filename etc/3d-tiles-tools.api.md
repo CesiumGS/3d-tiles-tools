@@ -580,6 +580,7 @@ export class ContentOps {
     static i3dmToGlbBuffer(inputBuffer: Buffer): Buffer;
     static optimizeB3dmBuffer(inputBuffer: Buffer, options: any): Promise<Buffer>;
     static optimizeI3dmBuffer(inputBuffer: Buffer, options: any): Promise<Buffer>;
+    static updateAlignment(inputBuffer: Buffer): Buffer;
 }
 
 // @internal
@@ -2791,6 +2792,7 @@ export class TilesetJsonCreator {
 export class TilesetMerger {
     constructor();
     merge(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    mergeJson(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
 }
 
 // @internal
@@ -2803,6 +2805,7 @@ export class TilesetObjectUpgrader {
 export class TilesetOperations {
     static combine(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<void>;
     static merge(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    static mergeJson(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
     static upgrade(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean, targetVersion: string, gltfUpgradeOptions: any): Promise<void>;
     static upgradeTileset(tileset: Tileset, targetVersion: string): Promise<void>;
 }
@@ -2855,6 +2858,7 @@ export class TilesetProcessorContexts {
 // @internal
 export class Tilesets {
     static areEqualPackages(tilesetPackageName0: string, tilesetPackageName1: string): boolean;
+    static determineTilesetDirectoryName(tilesetName: string): string;
     static determineTilesetJsonFileName(tilesetDataName: string): string;
 }
 
@@ -3056,7 +3060,7 @@ export class TileTableDataPnts {
 
 // @internal
 export class TileTableDataToMeshFeatures {
-    static convertBatchIdToMeshFeatures(document: Document, primitive: Primitive, batchIdToFeatureIdAccessor: Map<Accessor, Accessor>): MeshFeaturesFeatureId;
+    static convertBatchIdToMeshFeatures(document: Document, primitive: Primitive, batchIdToFeatureIdAccessor: Map<Accessor, Accessor>): MeshFeaturesFeatureId | undefined;
 }
 
 // @internal
