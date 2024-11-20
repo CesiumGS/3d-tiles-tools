@@ -23,8 +23,11 @@ export class TilesetProcessing {
    * @throws DeveloperError When the source is not opened
    * @throws TilesetError When the given key cannot be found
    */
-  static getSourceValue(tilesetSource: TilesetSource, key: string): Buffer {
-    const buffer = tilesetSource.getValue(key);
+  static async getSourceValue(
+    tilesetSource: TilesetSource,
+    key: string
+  ): Promise<Buffer> {
+    const buffer = await tilesetSource.getValue(key);
     if (!buffer) {
       const message = `No ${key} found in input`;
       throw new TilesetError(message);
@@ -46,15 +49,15 @@ export class TilesetProcessing {
    * @throws TilesetError If the schema from the `schemaUri`
    * could not be resolved or parsed.
    */
-  static resolveSchema(
+  static async resolveSchema(
     tilesetSource: TilesetSource,
     tileset: Tileset
-  ): Schema | undefined {
+  ): Promise<Schema | undefined> {
     if (tileset.schema) {
       return tileset.schema;
     }
     if (tileset.schemaUri) {
-      const schema = TilesetProcessing.parseSourceValue<Schema>(
+      const schema = await TilesetProcessing.parseSourceValue<Schema>(
         tilesetSource,
         tileset.schemaUri
       );
@@ -77,8 +80,11 @@ export class TilesetProcessing {
    * entry cannot be found, or the entry data could not be unzipped
    * (if it was zipped), or it could not be parsed as JSON.
    */
-  static parseSourceValue<T>(tilesetSource: TilesetSource, key: string): T {
-    let value = TilesetProcessing.getSourceValue(tilesetSource, key);
+  static async parseSourceValue<T>(
+    tilesetSource: TilesetSource,
+    key: string
+  ): Promise<T> {
+    let value = await TilesetProcessing.getSourceValue(tilesetSource, key);
     if (Buffers.isGzipped(value)) {
       try {
         value = Buffers.gunzip(value);

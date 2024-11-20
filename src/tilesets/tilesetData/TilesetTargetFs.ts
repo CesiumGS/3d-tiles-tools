@@ -31,7 +31,7 @@ export class TilesetTargetFs implements TilesetTarget {
   }
 
   /** {@inheritDoc TilesetTarget.begin} */
-  begin(fullOutputName: string, overwrite: boolean) {
+  async begin(fullOutputName: string, overwrite: boolean) {
     if (this.fullOutputName) {
       throw new TilesetError("Target already opened");
     }
@@ -43,7 +43,7 @@ export class TilesetTargetFs implements TilesetTarget {
   }
 
   /** {@inheritDoc TilesetTarget.addEntry} */
-  addEntry(key: string, content: Buffer) {
+  async addEntry(key: string, content: Buffer) {
     if (!this.fullOutputName) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");
     }

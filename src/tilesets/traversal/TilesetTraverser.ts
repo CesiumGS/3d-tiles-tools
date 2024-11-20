@@ -166,6 +166,7 @@ export class TilesetTraverser {
       schema,
       this.resourceResolver
     );
+
     stack.push(traversalRoot);
 
     while (stack.length > 0) {

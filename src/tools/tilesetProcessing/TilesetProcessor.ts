@@ -128,8 +128,8 @@ export abstract class TilesetProcessor {
   ) {
     const context = this.getContext();
     const tilesetSource = context.tilesetSource;
-    const sourceKeys = tilesetSource.getKeys();
-    for (const sourceKey of sourceKeys) {
+    const sourceKeys = await tilesetSource.getKeys();
+    for await (const sourceKey of sourceKeys) {
       await this.processEntry(sourceKey, entryProcessor);
     }
   }
@@ -179,7 +179,7 @@ export abstract class TilesetProcessor {
     if (targetEntry) {
       this.putTargetKey(sourceEntry.key, targetEntry.key);
       this.markAsProcessed(targetEntry.key);
-      this.storeTargetEntries(targetEntry);
+      await this.storeTargetEntries(targetEntry);
     }
   }
 
@@ -228,7 +228,7 @@ export abstract class TilesetProcessor {
     const tilesetSource = context.tilesetSource;
 
     const sourceKey = key;
-    const sourceValue = tilesetSource.getValue(sourceKey);
+    const sourceValue = await tilesetSource.getValue(sourceKey);
     if (!sourceValue) {
       logger.warn(`No input found for ${sourceKey}`);
       return undefined;
@@ -245,11 +245,11 @@ export abstract class TilesetProcessor {
    *
    * @param targetEntries - The target entries
    */
-  storeTargetEntries(...targetEntries: TilesetEntry[]) {
+  async storeTargetEntries(...targetEntries: TilesetEntry[]) {
     const context = this.getContext();
     const tilesetTarget = context.tilesetTarget;
     for (const targetEntry of targetEntries) {
-      tilesetTarget.addEntry(targetEntry.key, targetEntry.value);
+      await tilesetTarget.addEntry(targetEntry.key, targetEntry.value);
     }
   }
 

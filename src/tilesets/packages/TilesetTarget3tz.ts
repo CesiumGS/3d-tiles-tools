@@ -46,7 +46,7 @@ export class TilesetTarget3tz implements TilesetTarget {
   }
 
   /** {@inheritDoc TilesetTarget.begin} */
-  begin(fullOutputName: string, overwrite: boolean) {
+  async begin(fullOutputName: string, overwrite: boolean) {
     if (fs.existsSync(fullOutputName)) {
       if (overwrite) {
         fs.unlinkSync(fullOutputName);
@@ -108,7 +108,7 @@ export class TilesetTarget3tz implements TilesetTarget {
   }
 
   /** {@inheritDoc TilesetTarget.addEntry} */
-  addEntry(key: string, content: Buffer) {
+  async addEntry(key: string, content: Buffer) {
     if (!this.archive) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");
     }

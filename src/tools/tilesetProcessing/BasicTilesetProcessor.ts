@@ -123,8 +123,8 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     const context = this.getContext();
     const tilesetSource = context.tilesetSource;
     const tilesetSourceJsonFileName = context.tilesetSourceJsonFileName;
-    const sourceKeys = tilesetSource.getKeys();
-    for (const sourceKey of sourceKeys) {
+    const sourceKeys = await tilesetSource.getKeys();
+    for await (const sourceKey of sourceKeys) {
       if (sourceKey !== tilesetSourceJsonFileName) {
         await this.processEntry(sourceKey, entryProcessor);
       }

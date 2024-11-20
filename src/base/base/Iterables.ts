@@ -12,6 +12,79 @@ import { DeveloperError } from "./DeveloperError";
  */
 export class Iterables {
   /**
+   * Creates an asynchronous iterable from the given synchronous one.
+   *
+   * @param delegateIterable - The delegate
+   * @returns The iterable
+   */
+  static makeAsync<T>(delegateIterable: Iterable<T>): AsyncIterable<T> {
+    const resultIterable = {
+      [Symbol.asyncIterator]: async function* (): AsyncIterator<T> {
+        for (const element of delegateIterable) {
+          yield element;
+        }
+      },
+    };
+    return resultIterable;
+  }
+
+  /**
+   * Creates an iterable from the given one, applying the
+   * given function to each element.
+   *
+   * @param iterable - The iterable object
+   * @param mapper - The mapper function
+   * @returns The mapped iterable
+   */
+  static mapAsync<S, T>(
+    iterable: AsyncIterable<S>,
+    mapper: (element: S) => Promise<T>
+  ): AsyncIterable<T> {
+    const resultIterable = {
+      [Symbol.asyncIterator]: async function* (): AsyncIterator<T> {
+        for await (const element of iterable) {
+          yield Promise.resolve(mapper(element));
+        }
+      },
+    };
+    return resultIterable;
+  }
+
+  /**
+   * Creates an iterable that is a flat view on the given
+   * iterable.
+   *
+   * @param iterable - The iterable object
+   * @returns The flat iterable
+   */
+  static flattenAsync<T>(iterable: AsyncIterable<T[]>): AsyncIterable<T> {
+    const resultIterable = {
+      [Symbol.asyncIterator]: async function* (): AsyncIterator<T> {
+        for await (const element of iterable) {
+          for (const innerElement of element) {
+            yield innerElement;
+          }
+        }
+      },
+    };
+    return resultIterable;
+  }
+
+  /**
+   * Creates an array from the given iterable
+   *
+   * @param iterable - The iterable
+   * @returns The array
+   */
+  static async asyncToArray<T>(iterable: AsyncIterable<T>) {
+    const array: T[] = [];
+    for await (const element of iterable) {
+      array.push(element);
+    }
+    return array;
+  }
+
+  /**
    * Creates a generator that allows iterating over all files
    * in the given directory, and its subdirectories if
    * `recurse` is `true`.

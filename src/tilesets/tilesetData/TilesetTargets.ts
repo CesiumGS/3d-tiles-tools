@@ -6,7 +6,6 @@ import { TilesetTarget3dtiles } from "../packages/TilesetTarget3dtiles";
 import { TilesetTarget } from "./TilesetTarget";
 import { TilesetError } from "./TilesetError";
 import { TilesetTargetFs } from "./TilesetTargetFs";
-import { TilesetEntry } from "./TilesetEntry";
 
 import { Loggers } from "../../base";
 const logger = Loggers.get("tilesetData");
@@ -32,7 +31,10 @@ export class TilesetTargets {
    * @returns The `TilesetTarget`
    * @throws TilesetError If the output can not be opened
    */
-  static createAndBegin(name: string, overwrite: boolean): TilesetTarget {
+  static async createAndBegin(
+    name: string,
+    overwrite: boolean
+  ): Promise<TilesetTarget> {
     let extension = path.extname(name).toLowerCase();
     if (extension === ".json") {
       extension = "";
@@ -44,7 +46,7 @@ export class TilesetTargets {
         `Could not create tileset target for name ${name} with extension "${extension}"`
       );
     }
-    tilesetTarget.begin(name, overwrite);
+    await tilesetTarget.begin(name, overwrite);
     return tilesetTarget;
   }
 
@@ -69,20 +71,5 @@ export class TilesetTargets {
     }
     logger.error("Unknown target type: " + extension);
     return undefined;
-  }
-
-  /**
-   * Put all the given entries into the given tileset target.
-   *
-   * @param tilesetTarget - The `TilesetTarget`
-   * @param entries - The iterator over the entries
-   */
-  static putEntries(
-    tilesetTarget: TilesetTarget,
-    entries: Iterable<TilesetEntry>
-  ) {
-    for (const entry of entries) {
-      tilesetTarget.addEntry(entry.key, entry.value);
-    }
   }
 }

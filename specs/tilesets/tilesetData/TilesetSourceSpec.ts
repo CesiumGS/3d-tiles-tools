@@ -1,3 +1,5 @@
+import { Iterables } from "../../../src/base";
+
 import { TilesetSource } from "../../../src/tilesets";
 import { TilesetSourceFs } from "../../../src/tilesets";
 import { TilesetInMemory } from "../../../src/tilesets";
@@ -11,8 +13,8 @@ const SPECS_DATA_BASE_DIRECTORY = SpecHelpers.getSpecsDataBaseDirectory();
 
 async function createTilesetInMemory() {
   const tileset = new TilesetInMemory();
-  tileset.begin("", true);
-  tileset.addEntry("tileset.json", Buffer.alloc(0));
+  await tileset.begin("", true);
+  await tileset.addEntry("tileset.json", Buffer.alloc(0));
   await tileset.end();
   return tileset;
 }
@@ -52,53 +54,73 @@ for (const testCase of testCases) {
       sourceName = testCase.sourceName;
     });
 
-    it("throws when trying to access it before calling 'open'", function () {
-      expect(function () {
-        tilesetSource.getValue("tileset.json");
-      }).toThrowError();
+    it("throws when trying to access it before calling 'open'", async function () {
+      await expectAsync(
+        (async function () {
+          await tilesetSource.getValue("tileset.json");
+        })()
+        //  ^ This () is important to really CALL the anonymous function
+        // and return a promise.
+      ).toBeRejectedWithError();
     });
 
-    it("throws when trying to call 'close' before calling 'open'", function () {
-      expect(function () {
-        tilesetSource.close();
-      }).toThrowError();
+    it("throws when trying to call 'close' before calling 'open'", async function () {
+      await expectAsync(
+        (async function () {
+          await tilesetSource.close();
+        })()
+        //  ^ This () is important to really CALL the anonymous function
+        // and return a promise.
+      ).toBeRejectedWithError();
     });
 
-    it("throws when trying to call 'open' twice", function () {
-      tilesetSource.open(sourceName);
-      expect(function () {
-        tilesetSource.open(sourceName);
-      }).toThrowError();
+    it("throws when trying to call 'open' twice", async function () {
+      await tilesetSource.open(sourceName);
+      await expectAsync(
+        (async function () {
+          await tilesetSource.open(sourceName);
+        })()
+        //  ^ This () is important to really CALL the anonymous function
+        // and return a promise.
+      ).toBeRejectedWithError();
     });
 
-    it("allows access after calling 'open' and before calling 'close'", function () {
-      tilesetSource.open(sourceName);
-      const value = tilesetSource.getValue("tileset.json");
+    it("allows access after calling 'open' and before calling 'close'", async function () {
+      await tilesetSource.open(sourceName);
+      const value = await tilesetSource.getValue("tileset.json");
       expect(value).toBeDefined();
     });
 
-    it("allows iterating over the keys, multiple times, yielding the same results", function () {
-      tilesetSource.open(sourceName);
-      const keys = tilesetSource.getKeys();
-      const keysA = [...keys];
-      const keysB = [...keys];
+    it("allows iterating over the keys, multiple times, yielding the same results", async function () {
+      await tilesetSource.open(sourceName);
+      const keys = await tilesetSource.getKeys();
+      const keysA = await Iterables.asyncToArray(keys);
+      const keysB = await Iterables.asyncToArray(keys);
       expect(keysA).toEqual(keysB);
     });
 
-    it("throws when trying to access it after calling 'close'", function () {
-      tilesetSource.open(sourceName);
-      tilesetSource.close();
-      expect(function () {
-        tilesetSource.getValue("tileset.json");
-      }).toThrowError();
+    it("throws when trying to access it after calling 'close'", async function () {
+      await tilesetSource.open(sourceName);
+      await tilesetSource.close();
+      await expectAsync(
+        (async function () {
+          await tilesetSource.getValue("tileset.json");
+        })()
+        //  ^ This () is important to really CALL the anonymous function
+        // and return a promise.
+      ).toBeRejectedWithError();
     });
 
-    it("throws when trying to call 'close' twice", function () {
-      tilesetSource.open(sourceName);
-      tilesetSource.close();
-      expect(function () {
-        tilesetSource.close();
-      }).toThrowError();
+    it("throws when trying to call 'close' twice", async function () {
+      await tilesetSource.open(sourceName);
+      await tilesetSource.close();
+      await expectAsync(
+        (async function () {
+          await tilesetSource.close();
+        })()
+        //  ^ This () is important to really CALL the anonymous function
+        // and return a promise.
+      ).toBeRejectedWithError();
     });
   });
 }

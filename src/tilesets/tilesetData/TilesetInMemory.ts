@@ -1,6 +1,7 @@
 import { TilesetSource } from "./TilesetSource";
 import { TilesetError } from "./TilesetError";
 import { TilesetTarget } from "./TilesetTarget";
+import { Iterables } from "../../base";
 
 /**
  * Implementation of a TilesetSource and TilesetTarget that
@@ -42,7 +43,7 @@ export class TilesetInMemory implements TilesetSource, TilesetTarget {
 
   /** {@inheritDoc TilesetSource.open} */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  open(fullInputName: string) {
+  async open(fullInputName: string) {
     if (this.sourceIsOpen) {
       throw new TilesetError("Source already opened");
     }
@@ -50,15 +51,15 @@ export class TilesetInMemory implements TilesetSource, TilesetTarget {
   }
 
   /** {@inheritDoc TilesetSource.getKeys} */
-  getKeys() {
+  async getKeys() {
     if (!this.sourceIsOpen) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
-    return Object.keys(this.dataMap);
+    return Iterables.makeAsync(Object.keys(this.dataMap));
   }
 
   /** {@inheritDoc TilesetSource.getValue} */
-  getValue(key: string): Buffer | undefined {
+  async getValue(key: string): Promise<Buffer | undefined> {
     if (!this.sourceIsOpen) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
@@ -66,7 +67,7 @@ export class TilesetInMemory implements TilesetSource, TilesetTarget {
   }
 
   /** {@inheritDoc TilesetSource.close} */
-  close() {
+  async close() {
     if (!this.sourceIsOpen) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
@@ -74,7 +75,7 @@ export class TilesetInMemory implements TilesetSource, TilesetTarget {
   }
 
   /** {@inheritDoc TilesetTarget.begin} */
-  begin(fullOutputName: string, overwrite: boolean) {
+  async begin(fullOutputName: string, overwrite: boolean) {
     if (this.targetIsOpen) {
       throw new TilesetError("Target already opened");
     }
@@ -83,7 +84,7 @@ export class TilesetInMemory implements TilesetSource, TilesetTarget {
   }
 
   /** {@inheritDoc TilesetTarget.addEntry} */
-  addEntry(key: string, content: Buffer) {
+  async addEntry(key: string, content: Buffer) {
     if (!this.targetIsOpen) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");
     }

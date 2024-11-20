@@ -32,7 +32,7 @@ export class TilesetSources {
    * @returns The `TilesetSource`
    * @throws TilesetError If the input can not be opened
    */
-  static createAndOpen(name: string): TilesetSource {
+  static async createAndOpen(name: string): Promise<TilesetSource> {
     let extension = path.extname(name).toLowerCase();
     if (extension === ".json") {
       extension = "";
@@ -44,7 +44,7 @@ export class TilesetSources {
         `Could not create tileset source for name ${name} with extension "${extension}"`
       );
     }
-    tilesetSource.open(name);
+    await tilesetSource.open(name);
     return tilesetSource;
   }
 
@@ -78,10 +78,12 @@ export class TilesetSources {
    * @param tilesetSource - The `TilesetSource`
    * @returns The iterator over the entries
    */
-  static getEntries(tilesetSource: TilesetSource): Iterable<TilesetEntry> {
-    const keys = tilesetSource.getKeys();
-    const entries = Iterables.map(keys, (k) => {
-      const v = tilesetSource.getValue(k);
+  static async getEntries(
+    tilesetSource: TilesetSource
+  ): Promise<AsyncIterable<TilesetEntry>> {
+    const keys = await tilesetSource.getKeys();
+    const entries = Iterables.mapAsync(keys, async (k) => {
+      const v = await tilesetSource.getValue(k);
       if (!v) {
         throw new TilesetError(`No value found for key ${k}`);
       }

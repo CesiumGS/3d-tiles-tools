@@ -43,8 +43,8 @@ export class TilesetProcessorContexts {
     let tilesetSource;
     let tilesetTarget;
     try {
-      tilesetSource = TilesetSources.createAndOpen(tilesetSourceName);
-      tilesetTarget = TilesetTargets.createAndBegin(
+      tilesetSource = await TilesetSources.createAndOpen(tilesetSourceName);
+      tilesetTarget = await TilesetTargets.createAndBegin(
         tilesetTargetName,
         overwrite
       );
@@ -60,14 +60,14 @@ export class TilesetProcessorContexts {
         );
 
       // Obtain the tileset object from the tileset JSON file
-      const sourceTileset = TilesetProcessing.parseSourceValue<Tileset>(
+      const sourceTileset = await TilesetProcessing.parseSourceValue<Tileset>(
         tilesetSource,
         tilesetSourceJsonFileName
       );
 
       // Resolve the schema, either from the `tileset.schema`
       // or the `tileset.schemaUri`
-      const schema = TilesetProcessing.resolveSchema(
+      const schema = await TilesetProcessing.resolveSchema(
         tilesetSource,
         sourceTileset
       );
@@ -90,7 +90,7 @@ export class TilesetProcessorContexts {
     } catch (error) {
       if (tilesetSource) {
         try {
-          tilesetSource.close();
+          await tilesetSource.close();
         } catch (e) {
           // Error already about to be re-thrown
         }
@@ -115,7 +115,7 @@ export class TilesetProcessorContexts {
    */
   static async close(context: TilesetProcessorContext) {
     try {
-      context.tilesetSource.close();
+      await context.tilesetSource.close();
     } catch (error) {
       try {
         await context.tilesetTarget.end();
