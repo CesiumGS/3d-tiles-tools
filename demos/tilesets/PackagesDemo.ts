@@ -12,10 +12,10 @@ async function createPackageExample(fileName: string) {
   console.log("Creating package " + fileName);
 
   const overwrite = true;
-  const tilesetTarget = TilesetTargets.createAndBegin(fileName, overwrite);
+  const tilesetTarget = await TilesetTargets.createAndBegin(fileName, overwrite);
 
-  tilesetTarget.addEntry("example.json", Buffer.alloc(100));
-  tilesetTarget.addEntry("example.glb", Buffer.alloc(1000));
+  await tilesetTarget.addEntry("example.json", Buffer.alloc(100));
+  await tilesetTarget.addEntry("example.glb", Buffer.alloc(1000));
 
   await tilesetTarget.end();
 
@@ -30,20 +30,21 @@ async function createPackageExample(fileName: string) {
 async function readPackageExample(fileName: string) {
   console.log("Reading package " + fileName);
 
-  const tilesetSource = TilesetSources.createAndOpen(fileName);
+  const tilesetSource = await TilesetSources.createAndOpen(fileName);
 
   console.log("Package contents:");
-  for (const key of tilesetSource.getKeys()) {
+  const keys = await tilesetSource.getKeys();
+  for await (const key of keys) {
     console.log("  key: " + key);
   }
 
-  const valueA = tilesetSource.getValue("example.json");
+  const valueA = await tilesetSource.getValue("example.json");
   console.log("Value for example.json ", valueA);
 
-  const valueB = tilesetSource.getValue("example.glb");
+  const valueB = await tilesetSource.getValue("example.glb");
   console.log("Value for example.glb  ", valueB);
 
-  tilesetSource.close();
+  await tilesetSource.close();
 
   console.log("Reading package DONE");
 }
@@ -67,4 +68,4 @@ async function run() {
   console.log("Running test DONE");
 }
 
-run();
+void run();

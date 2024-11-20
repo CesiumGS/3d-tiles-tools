@@ -75,4 +75,4 @@ async function tilesetProcessingDemos() {
   );
 }
 
-tilesetProcessingDemos();
+void tilesetProcessingDemos();

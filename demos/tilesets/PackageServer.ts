@@ -90,7 +90,7 @@ function determineMimeType(fileName: string, content: Buffer | undefined) {
  * @param req The request
  * @param res The response
  */
-function handleRequest(
+async function handleRequest(
   tilesetSource: TilesetSource,
   req: http.IncomingMessage,
   res: http.ServerResponse<http.IncomingMessage>
@@ -124,7 +124,7 @@ function handleRequest(
   if (nameEnd != -1) {
     path = path.substring(0, nameEnd);
   }
-  const content = tilesetSource.getValue(path);
+  const content = await tilesetSource.getValue(path);
 
   //console.log("Content for " + path + " is " + content?.length);
 
@@ -154,7 +154,7 @@ function handleRequest(
  *
  * @param options The options
  */
-function startServer(options: any) {
+async function startServer(options: any) {
   const hostName = options.hostName;
   const port = options.port;
   const sourceName = options.sourceName;
@@ -165,7 +165,7 @@ function startServer(options: any) {
     console.log("Could not create source for " + sourceName);
     return;
   }
-  tilesetSource.open(sourceName);
+  await tilesetSource.open(sourceName);
   const server = http.createServer((req, res) =>
     handleRequest(tilesetSource, req, res)
   );
@@ -183,7 +183,7 @@ async function run() {
   if (options === undefined) {
     return;
   }
-  startServer(options);
+  await startServer(options);
 }
 
-run();
+void run();

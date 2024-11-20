@@ -135,4 +135,4 @@ async function runCreationExample() {
   console.log(JSON.stringify(written.json, null, 2));
 }
 
-runCreationExample();
+void runCreationExample();
