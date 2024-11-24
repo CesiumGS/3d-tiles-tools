@@ -294,7 +294,7 @@ export abstract class TilesetProcessor {
    *
    * When this is `undefined`, then this may either mean that
    * the entry was removed during processing, or that it has
-   * not been procesed yet. The latter can be checked with
+   * not been processed yet. The latter can be checked with
    * `isProcessed`.
    *
    * @param sourceKey - The key (file name)
