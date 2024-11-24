@@ -78,7 +78,10 @@ async function tilesetPackageConversion(options: any) {
     );
   } else {
     const tilesetSource = await TilesetSources.createAndOpen(input);
-    const tilesetTarget = await TilesetTargets.createAndBegin(output, overwrite);
+    const tilesetTarget = await TilesetTargets.createAndBegin(
+      output,
+      overwrite
+    );
 
     const keys = await tilesetSource.getKeys();
     for await (const key of keys) {

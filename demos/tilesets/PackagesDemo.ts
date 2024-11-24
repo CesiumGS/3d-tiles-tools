@@ -12,7 +12,10 @@ async function createPackageExample(fileName: string) {
   console.log("Creating package " + fileName);
 
   const overwrite = true;
-  const tilesetTarget = await TilesetTargets.createAndBegin(fileName, overwrite);
+  const tilesetTarget = await TilesetTargets.createAndBegin(
+    fileName,
+    overwrite
+  );
 
   await tilesetTarget.addEntry("example.json", Buffer.alloc(100));
   await tilesetTarget.addEntry("example.glb", Buffer.alloc(1000));
