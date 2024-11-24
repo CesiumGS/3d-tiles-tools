@@ -12,6 +12,27 @@ import { DeveloperError } from "./DeveloperError";
  */
 export class Iterables {
   /**
+   * Creates an iterable that represents a concatenation of the given ones
+   *
+   * @param delegateIterable - The delegate
+   * @returns The iterable
+   */
+  static concatAsync<T>(
+    delegateIterables: Iterable<AsyncIterable<T>>
+  ): AsyncIterable<T> {
+    const resultIterable = {
+      [Symbol.asyncIterator]: async function* (): AsyncIterator<T> {
+        for (const delegateIterable of delegateIterables) {
+          for await (const element of delegateIterable) {
+            yield element;
+          }
+        }
+      },
+    };
+    return resultIterable;
+  }
+
+  /**
    * Creates an asynchronous iterable from the given synchronous one.
    *
    * @param delegateIterable - The delegate

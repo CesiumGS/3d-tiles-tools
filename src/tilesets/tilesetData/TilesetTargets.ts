@@ -20,11 +20,8 @@ export class TilesetTargets {
    * Create a tileset target for the given name, and prepare
    * it to accept entries.
    *
-   * The given name may have the extension `.3tz` or `.3dtiles`,
-   * or no extension to indicate a directory.
-   *
-   * If the given name as the extension `.json`, then a target
-   * for the directory that contains the given file is created.
+   * This will call `createFromName`, and immediately call `begin`
+   * on the resulting target.
    *
    * @param name - The name
    * @param overwrite - Whether existing output files should be overwritten
@@ -35,6 +32,25 @@ export class TilesetTargets {
     name: string,
     overwrite: boolean
   ): Promise<TilesetTarget> {
+    const tilesetTarget = TilesetTargets.createFromName(name);
+    await tilesetTarget.begin(name, overwrite);
+    return tilesetTarget;
+  }
+
+  /**
+   * Create a tileset target for the given name.
+   *
+   * The given name may have the extension `.3tz` or `.3dtiles`,
+   * or no extension to indicate a directory.
+   *
+   * If the given name as the extension `.json`, then a target
+   * for the directory that contains the given file is created.
+   *
+   * @param name - The name
+   * @returns The `TilesetTarget`
+   * @throws TilesetError If the output can not be opened
+   */
+  static createFromName(name: string): TilesetTarget {
     let extension = path.extname(name).toLowerCase();
     if (extension === ".json") {
       extension = "";
@@ -46,7 +62,6 @@ export class TilesetTargets {
         `Could not create tileset target for name ${name} with extension "${extension}"`
       );
     }
-    await tilesetTarget.begin(name, overwrite);
     return tilesetTarget;
   }
 

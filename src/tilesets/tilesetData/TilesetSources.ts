@@ -1,6 +1,6 @@
 import path from "path";
 
-import { Iterables } from "../../base";
+import { Buffers, Iterables } from "../../base";
 
 import { TilesetSource3tz } from "../packages/TilesetSource3tz";
 import { TilesetSource3dtiles } from "../packages/TilesetSource3dtiles";
@@ -20,10 +20,27 @@ const logger = Loggers.get("tilesetData");
  */
 export class TilesetSources {
   /**
-   * Create and open a source for the given name.
+   * Convenience method to create and open a tileset source for
+   * the given name.
    *
-   * The given name may have the extension `.3tz` or `.3dtiles`,
-   * or no extension to indicate a directory.
+   * This will call `createFromName`, and immediately call `open`
+   * on the resulting source.
+   *
+   * @param name - The name
+   * @returns The `TilesetSource`
+   * @throws TilesetError If the input can not be opened
+   */
+  static async createAndOpen(name: string): Promise<TilesetSource> {
+    const tilesetSource = TilesetSources.createFromName(name);
+    await tilesetSource.open(name);
+    return tilesetSource;
+  }
+
+  /**
+   * Create a tileset source from a given (full) name.
+   *
+   * The given name may have the extension `.3tz`, `.3dtiles`,
+   * or `.json`, or no extension to indicate a directory.
    *
    * If the given name as the extension `.json`, then a source
    * for the directory that contains the given file is created.
@@ -32,7 +49,7 @@ export class TilesetSources {
    * @returns The `TilesetSource`
    * @throws TilesetError If the input can not be opened
    */
-  static async createAndOpen(name: string): Promise<TilesetSource> {
+  static createFromName(name: string): TilesetSource {
     let extension = path.extname(name).toLowerCase();
     if (extension === ".json") {
       extension = "";
@@ -44,7 +61,6 @@ export class TilesetSources {
         `Could not create tileset source for name ${name} with extension "${extension}"`
       );
     }
-    await tilesetSource.open(name);
     return tilesetSource;
   }
 
@@ -69,6 +85,65 @@ export class TilesetSources {
     }
     logger.error("Unknown tileset source type: " + extension);
     return undefined;
+  }
+
+  /**
+   * Parses the JSON from the value with the given key (file name),
+   * and returns the parsed result.
+   *
+   * This handles the case that the input data may be compressed
+   * with GZIP, and will uncompress the data if necessary.
+   *
+   * @param tilesetSource - The `TilesetSource`
+   * @param key - The key (file name)
+   * @returns The parsed result
+   * @throws TilesetError If the source is not opened, the specified
+   * entry cannot be found, or the entry data could not be unzipped
+   * (if it was zipped), or it could not be parsed as JSON.
+   */
+  static async parseSourceValue<T>(
+    tilesetSource: TilesetSource,
+    key: string
+  ): Promise<T> {
+    let value = await TilesetSources.getSourceValue(tilesetSource, key);
+    if (Buffers.isGzipped(value)) {
+      try {
+        value = Buffers.gunzip(value);
+      } catch (e) {
+        const message = `Could not unzip ${key}: ${e}`;
+        throw new TilesetError(message);
+      }
+    }
+    try {
+      const result = JSON.parse(value.toString()) as T;
+      return result;
+    } catch (e) {
+      const message = `Could not parse ${key}: ${e}`;
+      throw new TilesetError(message);
+    }
+  }
+
+  /**
+   * Obtains the value for the given key from the given tileset source,
+   * throwing an error if the source is not opened, or when the
+   * given key cannot be found.
+   *
+   * @param tilesetSource - The `TilesetSource`
+   * @param key - The key (file name)
+   * @returns The value (file contents)
+   * @throws DeveloperError When the source is not opened
+   * @throws TilesetError When the given key cannot be found
+   */
+  static async getSourceValue(
+    tilesetSource: TilesetSource,
+    key: string
+  ): Promise<Buffer> {
+    const buffer = await tilesetSource.getValue(key);
+    if (!buffer) {
+      const message = `No ${key} found in input`;
+      throw new TilesetError(message);
+    }
+    return buffer;
   }
 
   /**

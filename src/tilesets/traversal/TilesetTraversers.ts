@@ -49,6 +49,24 @@ export class TilesetTraversers {
       tilesetSource,
       tilesetJsonFileName
     );
+    return TilesetTraversers.createIterableFromTraversedTile(
+      traversedRootTile,
+      depthFirst
+    );
+  }
+
+  /**
+   * Creates an iterable over the traversed tile instances that start at
+   * the given traversed tile.
+   *
+   * @param traversedRootTile - The tile to start the traversal from
+   * @param depthFirst Whether the iteration order should be depth-first
+   * @returns The traversed tile iterable
+   */
+  static createIterableFromTraversedTile(
+    traversedRootTile: TraversedTile,
+    depthFirst: boolean
+  ): AsyncIterable<TraversedTile> {
     const resultIterable = {
       [Symbol.asyncIterator]: (): AsyncIterator<TraversedTile> => {
         const stack = [traversedRootTile];
@@ -81,7 +99,7 @@ export class TilesetTraversers {
    * @throws TilesetError If the given tileset source does not contain
    * a tileset JSON with the given name.
    */
-  private static async createTraversedRootTile(
+  static async createTraversedRootTile(
     tilesetSource: TilesetSource,
     tilesetJsonFileName: string
   ) {
@@ -104,7 +122,7 @@ export class TilesetTraversers {
    * @param tileset - The tileset from the tileset source
    * @returns The traversed tile
    */
-  private static async createTraversedRootTileForTileset(
+  static async createTraversedRootTileForTileset(
     tilesetSource: TilesetSource,
     tileset: Tileset
   ): Promise<TraversedTile> {
