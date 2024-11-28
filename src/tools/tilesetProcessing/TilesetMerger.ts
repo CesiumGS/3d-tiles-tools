@@ -334,7 +334,8 @@ export class TilesetMerger {
   // The following functions are ported from the `merge-tilesets` branch
   // at https://github.com/CesiumGS/3d-tiles-tools/blob/d7e76e59022fc5e5aa4b848730ec9f8f4dea6d4e/tools/lib/mergeTilesets.js
   // with slight modification of 'getChildren' for disambiguation
-  // and updates to compute bounding boxes instead of bounding spheres
+  // and updates to compute bounding boxes instead of bounding spheres,
+  // and a fix for https://github.com/CesiumGS/3d-tiles-tools/issues/157
 
   private static getChildren(
     tilesets: Tileset[],
@@ -360,6 +361,7 @@ export class TilesetMerger {
       };
       delete children[i].children;
       delete children[i].transform;
+      delete children[i].implicitTiling;
     }
     return children;
   }
