@@ -224,9 +224,10 @@ export class BinaryBufferDataResolver {
     const meshoptCount = meshopt.count;
     const meshoptByteStride = meshopt.byteStride;
     const uncompressedByteLength = meshoptByteStride * meshoptCount;
+    const bufferViewByteOffset = bufferView.byteOffset ?? 0;
     const uncompressedBufferViewData = uncompressedBufferData.subarray(
-      bufferView.byteOffset,
-      bufferView.byteOffset + uncompressedByteLength
+      bufferViewByteOffset,
+      bufferViewByteOffset + uncompressedByteLength
     );
 
     // Use the meshopt decoder to fill the uncompressed buffer view
