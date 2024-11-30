@@ -41,14 +41,28 @@ export class GltfUpgrade {
    * @returns A promise to the glTF-Transform `Document`
    */
   static async obtainDocument(glb: Buffer): Promise<Document> {
-    // Upgrade the GLB buffer to glTF 2.0 if necessary,
-    // and convert the CESIUM_RTC extension into a root
-    // node translation if necessary
     const gltfVersion = GltfUtilities.getGltfVersion(glb);
     if (gltfVersion < 2.0) {
       logger.info("Found glTF 1.0 - upgrading to glTF 2.0 with gltf-pipeline");
+
+      // Upgrade the GLB buffer to glTF 2.0 if necessary.
       glb = await GltfUtilities.upgradeGlb(glb, undefined);
+
+      // Convert the CESIUM_RTC extension into a root node
+      // translation if necessary.
       glb = await GltfUtilities.replaceCesiumRtcExtension(glb);
+
+      // Remove the WEB3D_quantized_attributes extension by deqantizing
+      // the respective accessors if necessary.
+      // Note: Most of the work for replacing the WEB3D_quantized_attributes
+      // extension is done based on a glTF-Transform document. But in order
+      // to replace the extension, information about the extension has to
+      // be extracted from the original glTF. And the extension has to be
+      // removed from the 'extensionsRequired' array before trying to
+      // create a glTF-Transform document from it. So this is a dedicated
+      // step (even though it also may have to create a glTF-Transform
+      // document internally)
+      glb = await GltfUtilities.replaceWeb3dQuantizedAttributesExtension(glb);
     }
 
     // Read the GLB data from the payload of the tile
