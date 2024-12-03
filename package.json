@@ -1,6 +1,6 @@
 {
   "name": "3d-tiles-tools",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "license": "Apache-2.0",
   "description": "3D Tiles tools",
   "author": {
@@ -24,7 +24,7 @@
     "url": "https://github.com/CesiumGS/3d-tiles-tools/issues"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@gltf-transform/core": "^3.9.0",
