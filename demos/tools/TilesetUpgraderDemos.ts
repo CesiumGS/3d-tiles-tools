@@ -57,16 +57,22 @@ async function upgradeTileset(
 }
 
 async function tilesetUpgraderDemos() {
-  await upgradeTilesetJson(
-    SPECS_DATA_BASE_DIRECTORY +
-      "/upgradeTileset/tilesetWithContentUrls/tileset.json",
-    "./output/upgradeTileset/tilesetWithContentUrls-upgraded/tileset.json"
-  );
-
   await upgradeTileset(
     SPECS_DATA_BASE_DIRECTORY +
       "/upgradeTileset/tilesetWithB3dmWithGltf1/tileset.json",
     "./output/upgradeTileset/tilesetWithB3dmWithGltf1-upgraded/tileset.json"
+  );
+
+  await upgradeTileset(
+    SPECS_DATA_BASE_DIRECTORY +
+      "/upgradeTileset/tilesetWithB3dmWithGltf1WithWeb3dQuantizedAttributes/tileset.json",
+    "./output/upgradeTileset/tilesetWithB3dmWithGltf1WithWeb3dQuantizedAttributes-upgraded/tileset.json"
+  );
+
+  await upgradeTilesetJson(
+    SPECS_DATA_BASE_DIRECTORY +
+      "/upgradeTileset/tilesetWithContentUrls/tileset.json",
+    "./output/upgradeTileset/tilesetWithContentUrls-upgraded/tileset.json"
   );
 
   await upgradeTileset(
