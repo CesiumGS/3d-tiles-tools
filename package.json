@@ -1,6 +1,6 @@
 {
   "name": "3d-tiles-tools",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "license": "Apache-2.0",
   "description": "3D Tiles tools",
   "author": {
@@ -24,14 +24,14 @@
     "url": "https://github.com/CesiumGS/3d-tiles-tools/issues"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@gltf-transform/core": "^3.9.0",
     "@gltf-transform/extensions": "^3.9.0",
     "@gltf-transform/functions": "^3.9.0",
     "archiver": "^5.3.1",
-    "better-sqlite3": "^8.0.1",
+    "better-sqlite3": "^11.5.0",
     "cesium": "^1.103.0",
     "draco3d": "^1.5.6",
     "draco3dgltf": "^1.5.6",
