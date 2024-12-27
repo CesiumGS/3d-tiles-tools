@@ -61,6 +61,12 @@ export class TilesetObjectUpgrader {
       logger.debug(`Upgrading extension declarations`);
       Extensions.removeExtensionUsed(tileset, "3DTILES_content_gltf");
     }
+
+    const asset = tileset.asset as any;
+    if (asset.gltfUpAxis !== undefined) {
+      logger.info(`Removing glTFUpAxis declaration`);
+      delete asset.gltfUpAxis;
+    }
   }
 
   /**

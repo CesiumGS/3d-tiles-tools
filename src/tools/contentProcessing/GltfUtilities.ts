@@ -8,6 +8,9 @@ import { Extensions } from "../../tilesets";
 import { GltfPipelineLegacy } from "./GltfPipelineLegacy";
 import { GltfWeb3dQuantizedAttributes } from "./GltfWeb3dQuantizedAttributes";
 
+import { Loggers } from "../../base";
+const logger = Loggers.get("contentProcessing");
+
 /**
  * Internal utility methods related to glTF/GLB data.
  *
@@ -293,11 +296,13 @@ export class GltfUtilities {
     if (!rtcExtension) {
       return;
     }
-    // Compute the translation, taking the y-up-vs-z-up transform into account
+
+    // Compute the translation
+    logger.info("Applying RTC for gltfUpAxis=Z");
     const rtcTranslation = [
       rtcExtension.center[0],
+      rtcExtension.center[1],
       rtcExtension.center[2],
-      -rtcExtension.center[1],
     ];
     const scenes = gltf.scenes;
     if (!scenes) {

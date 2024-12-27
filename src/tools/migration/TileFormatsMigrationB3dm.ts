@@ -56,12 +56,17 @@ export class TileFormatsMigrationB3dm {
     // a new root node above each scene node, that carries the
     // RTC_CENTER as its translation
     if (featureTable.RTC_CENTER) {
+      logger.info("Applying RTC center");
       const rtcCenter = TileTableData.obtainRtcCenter(
         featureTable.RTC_CENTER,
         featureTableBinary
       );
       TileFormatsMigration.applyRtcCenter(document, rtcCenter);
     }
+
+    logger.info("Applying axis conversions");
+    const axisConversion = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
+    TileFormatsMigration.applyTransform(document, axisConversion);
 
     // If there are batches, then convert the batch table into
     // an `EXT_structural_metadata` property table, and convert

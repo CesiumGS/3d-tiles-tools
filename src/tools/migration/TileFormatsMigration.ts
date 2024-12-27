@@ -1,4 +1,4 @@
-import { Document } from "@gltf-transform/core";
+import { Document, mat4 } from "@gltf-transform/core";
 
 import { TileFormatsMigrationPnts } from "./TileFormatsMigrationPnts";
 import { TileFormatsMigrationB3dm } from "./TileFormatsMigrationB3dm";
@@ -76,6 +76,31 @@ export class TileFormatsMigration {
       cmptBuffer,
       externalResourceResolver
     );
+  }
+
+  /**
+   * Apply the given transform to a new root in the given glTF-Transform
+   * document.
+   *
+   * The given transform is assumed to be a 16-element array that
+   * describes the 4x4 transform matrix, in column major order.
+   *
+   * @param document - The glTF-Transform document
+   * @param transform - The transform
+   */
+  static applyTransform(document: Document, transform: number[]) {
+    const root = document.getRoot();
+    const scenes = root.listScenes();
+    for (const scene of scenes) {
+      const oldChildren = scene.listChildren();
+      for (const oldChild of oldChildren) {
+        const newRoot = document.createNode();
+        newRoot.setMatrix(transform as mat4);
+        scene.removeChild(oldChild);
+        newRoot.addChild(oldChild);
+        scene.addChild(newRoot);
+      }
+    }
   }
 
   /**
