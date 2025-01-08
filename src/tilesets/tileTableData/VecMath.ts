@@ -36,7 +36,24 @@ export class VecMath {
    *
    * @returns The matrix
    */
-  static createYupToZupPacked4() {
+  static createYupToZupPacked4(): [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+  ] {
     return [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1];
   }
 
@@ -45,8 +62,51 @@ export class VecMath {
    *
    * @returns The matrix
    */
-  static createZupToYupPacked4() {
+  static createZupToYupPacked4(): [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+  ] {
     return [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
+  }
+
+  /**
+   * Create a 4x4 X-up-to-Y-up conversion matrix as a flat array
+   *
+   * @returns The matrix
+   */
+  static createXupToYupPacked4(): [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+  ] {
+    return [0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
   }
 
   /**
