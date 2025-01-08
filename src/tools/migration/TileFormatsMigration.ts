@@ -1,4 +1,6 @@
 import { Document } from "@gltf-transform/core";
+import { mat4 } from "@gltf-transform/core";
+import { vec3 } from "@gltf-transform/core";
 
 import { TileFormatsMigrationPnts } from "./TileFormatsMigrationPnts";
 import { TileFormatsMigrationB3dm } from "./TileFormatsMigrationB3dm";
@@ -33,10 +35,18 @@ export class TileFormatsMigration {
    * Convert the given B3DM data into a glTF asset
    *
    * @param b3dmBuffer - The B3DM buffer
+   * @param gltfUpAxis - The up-axis to assume for the glTF data in
+   * the given B3DM, defaulting to "Y".
    * @returns The GLB buffer
    */
-  static async convertB3dmToGlb(b3dmBuffer: Buffer): Promise<Buffer> {
-    return await TileFormatsMigrationB3dm.convertB3dmToGlb(b3dmBuffer);
+  static async convertB3dmToGlb(
+    b3dmBuffer: Buffer,
+    gltfUpAxis?: "X" | "Y" | "Z"
+  ): Promise<Buffer> {
+    return await TileFormatsMigrationB3dm.convertB3dmToGlb(
+      b3dmBuffer,
+      gltfUpAxis
+    );
   }
 
   /**
@@ -88,17 +98,28 @@ export class TileFormatsMigration {
    * @param rtcCenter - The RTC_CENTER
    */
   static applyRtcCenter(document: Document, rtcCenter: number[]) {
+    // Take the y-up-to-z-up transform into account
+    const tx = rtcCenter[0];
+    const ty = rtcCenter[2];
+    const tz = -rtcCenter[1];
+    TileFormatsMigration.applyTranslation(document, [tx, ty, tz]);
+  }
+
+  /**
+   * Apply the given translation to the given glTF-Transform document,
+   * by inserting a new root node that carries the given translation
+   *
+   * @param document - The glTF-Transform document
+   * @param rtcCenter - The RTC_CENTER
+   */
+  private static applyTranslation(document: Document, translation: vec3) {
     const root = document.getRoot();
     const scenes = root.listScenes();
     for (const scene of scenes) {
       const oldChildren = scene.listChildren();
       for (const oldChild of oldChildren) {
         const rtcRoot = document.createNode();
-        // Take the y-up-to-z-up transform into account
-        const tx = rtcCenter[0];
-        const ty = rtcCenter[2];
-        const tz = -rtcCenter[1];
-        rtcRoot.setTranslation([tx, ty, tz]);
+        rtcRoot.setTranslation(translation);
         scene.removeChild(oldChild);
         rtcRoot.addChild(oldChild);
         scene.addChild(rtcRoot);
@@ -107,10 +128,34 @@ export class TileFormatsMigration {
   }
 
   /**
+   * Apply the given transform to a new root in the given glTF-Transform
+   * document.
+   *
+   * The given transform is assumed to be a 16-element array that
+   * describes the 4x4 transform matrix, in column major order.
+   *
+   * @param document - The glTF-Transform document
+   * @param transform - The transform
+   */
+  static applyTransform(document: Document, transform: number[]) {
+    const root = document.getRoot();
+    const scenes = root.listScenes();
+    for (const scene of scenes) {
+      const oldChildren = scene.listChildren();
+      for (const oldChild of oldChildren) {
+        const newRoot = document.createNode();
+        newRoot.setMatrix(transform as mat4);
+        scene.removeChild(oldChild);
+        newRoot.addChild(oldChild);
+        scene.addChild(newRoot);
+      }
+    }
+  }
+  /**
    * Make sure that each scene in the given document has a single
    * root node. If there is a scene that contains multiple nodes
    * directly, then remove these nodes and insert a new root
-   * that has the former scene nodes as its chilldren.
+   * that has the former scene nodes as its children.
    *
    * @param document - The glTF-Transform document
    */

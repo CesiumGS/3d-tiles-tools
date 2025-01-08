@@ -3,7 +3,7 @@ import { Accessor } from "@gltf-transform/core";
 import { BatchTable } from "../../structure";
 import { B3dmFeatureTable } from "../../structure";
 
-import { TileFormats } from "../../tilesets";
+import { TileFormats, VecMath } from "../../tilesets";
 
 import { TileTableData } from "../../tilesets";
 
@@ -30,9 +30,14 @@ export class TileFormatsMigrationB3dm {
    * Convert the given B3DM data into a glTF asset
    *
    * @param b3dmBuffer - The B3DM buffer
+   * @param gltfUpAxis - The up-axis to assume for the glTF data in
+   * the given B3DM, defaulting to "Y".
    * @returns The GLB buffer
    */
-  static async convertB3dmToGlb(b3dmBuffer: Buffer): Promise<Buffer> {
+  static async convertB3dmToGlb(
+    b3dmBuffer: Buffer,
+    gltfUpAxis?: "X" | "Y" | "Z"
+  ): Promise<Buffer> {
     const tileData = TileFormats.readTileData(b3dmBuffer);
 
     const batchTable = tileData.batchTable.json as BatchTable;
@@ -51,6 +56,26 @@ export class TileFormatsMigrationB3dm {
 
     const document = await GltfUpgrade.obtainDocument(tileData.payload);
     const root = document.getRoot();
+
+    if (gltfUpAxis === "Z") {
+      logger.info("Applying axis conversion from Z-up to Y-up");
+      const axisConversion = VecMath.createZupToYupPacked4();
+      TileFormatsMigration.applyTransform(document, axisConversion);
+    } else if (gltfUpAxis === "X") {
+      logger.info("Applying axis conversion from X-up to Y-up");
+      // This obscure part has to take into account what CesiumJS is doing
+      // with its "getAxisCorrectionMatrix", depending on the various
+      // defaults. It was obtained via trial-and-error.
+      const matrixXupToYup = VecMath.createXupToYupPacked4();
+      const matrixZupToYup = VecMath.createZupToYupPacked4();
+      const axisConversion = VecMath.multiplyAll4([
+        matrixXupToYup,
+        matrixZupToYup,
+      ]);
+      TileFormatsMigration.applyTransform(document, axisConversion);
+    } else {
+      // The gltfUpAxis is "Y" or "undefined". No conversion needed.
+    }
 
     // If the feature table defines an `RTC_CENTER`, then insert
     // a new root node above each scene node, that carries the
