@@ -110,7 +110,7 @@ export class TileFormatsMigrationI3dm {
     document.setLogger(new Logger(Logger.Verbosity.WARN));
     await document.transform(prune());
 
-    // Insert a single root node above the "flatteded" nodes
+    // Insert a single root node above the "flattened" nodes
     TileFormatsMigration.makeSingleRoot(document);
 
     // Compute the positions in world space (taking the RTC_CENTER
