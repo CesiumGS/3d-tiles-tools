@@ -15,7 +15,7 @@
         },
         "geometricError" : 1.0,
         "content": {
-          "uri": "tileC.glb"
+          "uri": "tileB.glb"
         }
       },  {
         "boundingVolume" : {
@@ -23,7 +23,7 @@
         },
         "geometricError" : 1.0,
         "content": {
-          "uri": "sub01/tileD.glb"
+          "uri": "sub1/externalC.3tz"
         }
       }      
     ]
