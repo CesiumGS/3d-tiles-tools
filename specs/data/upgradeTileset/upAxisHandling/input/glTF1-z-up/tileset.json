@@ -1,0 +1,33 @@
+{
+  "asset": {
+    "version": "1.0"
+  },
+  "geometricError": 4096,
+  "root": {
+    "boundingVolume": {
+      "box": [1.0, 0.5, 1.0, 1.0, 0, 0, 0, 1.5, 0, 0, 0, 2.0]
+    },
+    "geometricError": 1024,
+    "refine": "ADD",
+    "children": [
+      {
+        "boundingVolume": {
+          "box": [0.5, -0.5, -0.5, 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5]
+        },
+        "geometricError": 512,
+        "content": {
+          "uri": "Axes-glTF1-z-up.b3dm"
+        }
+      },
+      {
+        "boundingVolume": {
+          "box": [1.5, 1.5, 2.5, 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5]
+        },
+        "geometricError": 512,
+        "content": {
+          "uri": "Axes-glTF1-z-up-RTC-1-2-3.b3dm"
+        }
+      }
+    ]
+  }
+}
