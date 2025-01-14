@@ -416,7 +416,8 @@ export class TilesetUpgrader {
       };
       targetValue = await TileFormatsMigration.convertI3dmToGlb(
         sourceValue,
-        externalGlbResolver
+        externalGlbResolver,
+        this.currentTilesetGltfUpAxis
       );
     } else if (this.upgradeOptions.upgradeI3dmGltf1ToGltf2) {
       logger.debug(`  Upgrading GLB in ${sourceKey}`);

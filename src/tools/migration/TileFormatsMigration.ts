@@ -7,6 +7,11 @@ import { TileFormatsMigrationB3dm } from "./TileFormatsMigrationB3dm";
 import { TileFormatsMigrationI3dm } from "./TileFormatsMigrationI3dm";
 import { TileFormatsMigrationCmpt } from "./TileFormatsMigrationCmpt";
 
+import { VecMath } from "../../tilesets/";
+
+import { Loggers } from "../../base";
+const logger = Loggers.get("migration");
+
 /**
  * Methods for converting "legacy" tile formats into glTF assets
  * that use metadata extensions to represent the information from
@@ -56,15 +61,19 @@ export class TileFormatsMigration {
    * @param externalResourceResolver - A function that will be used to resolve
    * external resources, like GLB data if the I3DM uses `header.gltfFormat=0`
    * (meaning that the payload is not GLB data, but only a GLB URI).
+   * @param gltfUpAxis - The up-axis to assume for the glTF data in
+   * the given I3DM, defaulting to "Y".
    * @returns The GLB buffer
    */
   static async convertI3dmToGlb(
     i3dmBuffer: Buffer,
-    externalResourceResolver: (uri: string) => Promise<Buffer | undefined>
+    externalResourceResolver: (uri: string) => Promise<Buffer | undefined>,
+    gltfUpAxis?: "X" | "Y" | "Z"
   ): Promise<Buffer> {
     return await TileFormatsMigrationI3dm.convertI3dmToGlb(
       i3dmBuffer,
-      externalResourceResolver
+      externalResourceResolver,
+      gltfUpAxis
     );
   }
 
@@ -86,6 +95,46 @@ export class TileFormatsMigration {
       cmptBuffer,
       externalResourceResolver
     );
+  }
+
+  /**
+   * Apply the transform for the given glTF up-axis to the given document.
+   *
+   * When the input glTF document was part of a (pre-1.0) legacy tileset,
+   * then this tileset may have specified an `asset.gltfUpAxis` that could
+   * be `X`, `Y`, or `Z`, denoting the up-axis to assume for the glTF.
+   * (With glTF 2.0, the up-axis became specified as "Y").
+   *
+   * If the given glTF up axis is not ("Y" or undefined), then this
+   * will insert a root node into the given glTF that matches the
+   * transform that was applied by clients to handle the `gltfUpAxis`.
+   *
+   * @param document - The document
+   * @param gltfUpAxis - The glTF up axis, defaulting to "Y"
+   */
+  static applyGltfUpAxis(
+    document: Document,
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
+  ) {
+    if (gltfUpAxis === "Z") {
+      logger.info("Applying axis conversion from Z-up to Y-up");
+      const axisConversion = VecMath.createZupToYupPacked4();
+      TileFormatsMigration.applyTransform(document, axisConversion);
+    } else if (gltfUpAxis === "X") {
+      logger.info("Applying axis conversion from X-up to Y-up");
+      // This obscure part has to take into account what CesiumJS is doing
+      // with its "getAxisCorrectionMatrix", depending on the various
+      // defaults. It was obtained via trial-and-error.
+      const matrixXupToYup = VecMath.createXupToYupPacked4();
+      const matrixZupToYup = VecMath.createZupToYupPacked4();
+      const axisConversion = VecMath.multiplyAll4([
+        matrixXupToYup,
+        matrixZupToYup,
+      ]);
+      TileFormatsMigration.applyTransform(document, axisConversion);
+    } else {
+      // The gltfUpAxis is "Y" or "undefined". No conversion needed.
+    }
   }
 
   /**

@@ -3,7 +3,7 @@ import { Accessor } from "@gltf-transform/core";
 import { BatchTable } from "../../structure";
 import { B3dmFeatureTable } from "../../structure";
 
-import { TileFormats, VecMath } from "../../tilesets";
+import { TileFormats } from "../../tilesets";
 
 import { TileTableData } from "../../tilesets";
 
@@ -54,28 +54,11 @@ export class TileFormatsMigrationB3dm {
       logger.trace("Feature table:\n" + JSON.stringify(featureTable, null, 2));
     }
 
-    const document = await GltfUpgrade.obtainDocument(tileData.payload);
+    const document = await GltfUpgrade.obtainDocument(
+      tileData.payload,
+      gltfUpAxis
+    );
     const root = document.getRoot();
-
-    if (gltfUpAxis === "Z") {
-      logger.info("Applying axis conversion from Z-up to Y-up");
-      const axisConversion = VecMath.createZupToYupPacked4();
-      TileFormatsMigration.applyTransform(document, axisConversion);
-    } else if (gltfUpAxis === "X") {
-      logger.info("Applying axis conversion from X-up to Y-up");
-      // This obscure part has to take into account what CesiumJS is doing
-      // with its "getAxisCorrectionMatrix", depending on the various
-      // defaults. It was obtained via trial-and-error.
-      const matrixXupToYup = VecMath.createXupToYupPacked4();
-      const matrixZupToYup = VecMath.createZupToYupPacked4();
-      const axisConversion = VecMath.multiplyAll4([
-        matrixXupToYup,
-        matrixZupToYup,
-      ]);
-      TileFormatsMigration.applyTransform(document, axisConversion);
-    } else {
-      // The gltfUpAxis is "Y" or "undefined". No conversion needed.
-    }
 
     // If the feature table defines an `RTC_CENTER`, then insert
     // a new root node above each scene node, that carries the

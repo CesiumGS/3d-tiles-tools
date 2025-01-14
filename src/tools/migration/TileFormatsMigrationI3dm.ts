@@ -46,13 +46,16 @@ export class TileFormatsMigrationI3dm {
    * @param externalResourceResolver - A function that will be used to resolve
    * external resources, like GLB data if the I3DM uses `header.gltfFormat=0`
    * (meaning that the payload is not GLB data, but only a GLB URI).
+   * @param gltfUpAxis - The up-axis to assume for the glTF data in
+   * the given B3DM, defaulting to "Y".
    * @returns The GLB buffer
    * @throws TileFormatError If the I3DM contained an external GLB URI
    * that could not resolved by the given resolver
    */
   static async convertI3dmToGlb(
     i3dmBuffer: Buffer,
-    externalResourceResolver: (uri: string) => Promise<Buffer | undefined>
+    externalResourceResolver: (uri: string) => Promise<Buffer | undefined>,
+    gltfUpAxis?: "X" | "Y" | "Z"
   ): Promise<Buffer> {
     const tileData = TileFormats.readTileData(i3dmBuffer);
 
@@ -85,7 +88,7 @@ export class TileFormatsMigrationI3dm {
       );
     }
 
-    const document = await GltfUpgrade.obtainDocument(glbBuffer);
+    const document = await GltfUpgrade.obtainDocument(glbBuffer, gltfUpAxis);
     const root = document.getRoot();
 
     const io = await GltfTransform.getIO();
