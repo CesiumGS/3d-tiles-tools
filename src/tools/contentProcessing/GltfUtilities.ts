@@ -257,12 +257,16 @@ export class GltfUtilities {
    * their translation.
    *
    * @param glbBuffer - The buffer containing the binary glTF.
+   * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
    * @returns A promise that resolves to the resulting binary glTF.
    */
-  static async replaceCesiumRtcExtension(glbBuffer: Buffer): Promise<Buffer> {
+  static async replaceCesiumRtcExtension(
+    glbBuffer: Buffer,
+    gltfUpAxis?: "X" | "Y" | "Z"
+  ): Promise<Buffer> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const customStage = (gltf: any, options: any) => {
-      GltfUtilities.replaceCesiumRtcExtensionInternal(gltf);
+      GltfUtilities.replaceCesiumRtcExtensionInternal(gltf, gltfUpAxis);
       return gltf;
     };
     const options = {
@@ -278,14 +282,19 @@ export class GltfUtilities {
    *
    * This will insert a new parent node above each root node of
    * a scene. These new parent nodes will have a `translation`
-   * that is directly taken from the `CESIUM_RTC` `center`.
+   * that is derived taken from the `CESIUM_RTC` `center`,
+   * possibly adjusted to take the up-axis of the glTF into account.
    *
    * The `CESIUM_RTC` extension object and its used/required
    * usage declarations will be removed.
    *
    * @param gltf - The glTF object
+   * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
    */
-  private static replaceCesiumRtcExtensionInternal(gltf: any) {
+  private static replaceCesiumRtcExtensionInternal(
+    gltf: any,
+    gltfUpAxis?: "X" | "Y" | "Z"
+  ) {
     if (!gltf.extensions) {
       return;
     }
@@ -293,12 +302,27 @@ export class GltfUtilities {
     if (!rtcExtension) {
       return;
     }
-    // Compute the translation, taking the y-up-vs-z-up transform into account
-    const rtcTranslation = [
-      rtcExtension.center[0],
-      rtcExtension.center[2],
-      -rtcExtension.center[1],
-    ];
+    // Compute the translation, taking the up-axis transform into account
+    let rtcTranslation: number[];
+    if (gltfUpAxis === "X") {
+      rtcTranslation = [
+        rtcExtension.center[1],
+        -rtcExtension.center[2],
+        -rtcExtension.center[0],
+      ];
+    } else if (gltfUpAxis === "Y" || gltfUpAxis === undefined) {
+      rtcTranslation = [
+        rtcExtension.center[0],
+        rtcExtension.center[2],
+        -rtcExtension.center[1],
+      ];
+    } else {
+      rtcTranslation = [
+        rtcExtension.center[0],
+        rtcExtension.center[1],
+        rtcExtension.center[2],
+      ];
+    }
     const scenes = gltf.scenes;
     if (!scenes) {
       return;

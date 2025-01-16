@@ -45,6 +45,12 @@ export class TilesetUpgrader {
   private tilesetProcessor: BasicTilesetProcessor | undefined;
 
   /**
+   * The value that was stored as the `tileset.asset.gltfUpAxis`
+   * of the tileset that is currently being processed.
+   */
+  private currentTilesetGltfUpAxis: "X" | "Y" | "Z" | undefined;
+
+  /**
    * Creates a new instance
    *
    * @param targetVersion - The target version - 1.0 or 1.1
@@ -71,9 +77,11 @@ export class TilesetUpgrader {
         upgradeExternalTilesets: true,
 
         upgradedAssetVersionNumber: "1.0",
+
         upgradeRefineCase: true,
         upgradeContentUrlToUri: true,
         upgradeEmptyChildrenToUndefined: true,
+        upgradeGltfUpAxis: true,
 
         upgradeContentGltfExtensionDeclarations: false,
 
@@ -92,9 +100,11 @@ export class TilesetUpgrader {
         upgradeExternalTilesets: true,
 
         upgradedAssetVersionNumber: "1.1",
+
         upgradeRefineCase: true,
         upgradeContentUrlToUri: true,
         upgradeEmptyChildrenToUndefined: true,
+        upgradeGltfUpAxis: true,
 
         upgradeContentGltfExtensionDeclarations: true,
 
@@ -112,6 +122,22 @@ export class TilesetUpgrader {
       `Invalid target version ${version} - ` +
         `only '1.0' and '1.1' are allowed`
     );
+  }
+
+  /**
+   * Returns the value that is stored as the `tileset.asset.gltfUpAxis`
+   * in the given tileset, in uppercase, or "Y" if this value is not
+   * defined.
+   *
+   * The result should always be a string, "X", "Y", or "Z".
+   *
+   * @param tileset - The tileset
+   * @returns The up axis
+   */
+  private static getGltfUpAxis(tileset: Tileset): "X" | "Y" | "Z" {
+    const asset = tileset.asset as any;
+    const gltfUpAxis = asset?.gltfUpAxis ?? "Y";
+    return gltfUpAxis.toUpperCase();
   }
 
   /**
@@ -152,7 +178,9 @@ export class TilesetUpgrader {
     // Perform the updates for the tile contents
     await this.performContentUpgrades(tilesetProcessor);
     await tilesetProcessor.end();
+
     delete this.tilesetProcessor;
+    delete this.currentTilesetGltfUpAxis;
   }
 
   /**
@@ -161,6 +189,7 @@ export class TilesetUpgrader {
    * @param tileset - The `Tileset` object
    */
   async upgradeTileset(tileset: Tileset) {
+    this.currentTilesetGltfUpAxis = TilesetUpgrader.getGltfUpAxis(tileset);
     const tilesetObjectUpgrader = new TilesetObjectUpgrader(
       this.upgradeOptions
     );
@@ -330,7 +359,10 @@ export class TilesetUpgrader {
       logger.debug(`  Upgrading B3DM to GLB for ${sourceKey}`);
 
       targetKey = this.processContentUri(sourceKey);
-      targetValue = await TileFormatsMigration.convertB3dmToGlb(sourceValue);
+      targetValue = await TileFormatsMigration.convertB3dmToGlb(
+        sourceValue,
+        this.currentTilesetGltfUpAxis
+      );
     } else if (this.upgradeOptions.upgradeB3dmGltf1ToGltf2) {
       logger.debug(`  Upgrading GLB in ${sourceKey}`);
       targetValue = await ContentUpgrades.upgradeB3dmGltf1ToGltf2(
@@ -384,7 +416,8 @@ export class TilesetUpgrader {
       };
       targetValue = await TileFormatsMigration.convertI3dmToGlb(
         sourceValue,
-        externalGlbResolver
+        externalGlbResolver,
+        this.currentTilesetGltfUpAxis
       );
     } else if (this.upgradeOptions.upgradeI3dmGltf1ToGltf2) {
       logger.debug(`  Upgrading GLB in ${sourceKey}`);
