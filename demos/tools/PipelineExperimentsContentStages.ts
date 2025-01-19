@@ -90,4 +90,4 @@ async function example() {
   );
 }
 
-example();
+void example();

@@ -155,7 +155,9 @@ export class TilesetMerger {
       const externalTilesetDirectory =
         Tilesets.determineTilesetDirectoryName(tilesetSourceName);
 
-      const tilesetSource = TilesetSources.createAndOpen(tilesetSourceName);
+      const tilesetSource = await TilesetSources.createAndOpen(
+        tilesetSourceName
+      );
       this.tilesetSources.push(tilesetSource);
       this.tilesetSourceJsonFileNames.push(tilesetSourceJsonFileName);
 
@@ -190,23 +192,23 @@ export class TilesetMerger {
 
     this.tilesetTargetJsonFileName =
       Tilesets.determineTilesetJsonFileName(tilesetTargetName);
-    this.tilesetTarget = TilesetTargets.createAndBegin(
+    this.tilesetTarget = await TilesetTargets.createAndBegin(
       tilesetTargetName,
       overwrite
     );
 
     // Perform the actual merge, creating the merged tileset JSON
     // in the target
-    this.mergeInternal();
+    await this.mergeInternal();
 
     // Copy the resources from the sources to the target
     if (!jsonOnly) {
-      this.copyResources();
+      await this.copyResources();
     }
 
     // Clean up by closing the sources and the target
     for (const tilesetSource of this.tilesetSources) {
-      tilesetSource.close();
+      await tilesetSource.close();
     }
     await this.tilesetTarget.end();
 
@@ -220,7 +222,7 @@ export class TilesetMerger {
    * Internal method for `merge`, only creating the actual merged
    * tileset JSON and putting it into the target.
    */
-  private mergeInternal() {
+  private async mergeInternal() {
     if (
       this.tilesetSources.length == 0 ||
       !this.tilesetTarget ||
@@ -235,7 +237,7 @@ export class TilesetMerger {
     for (let i = 0; i < length; ++i) {
       const tilesetSource = this.tilesetSources[i];
       const tilesetSourceJsonFileName = this.tilesetSourceJsonFileNames[i];
-      const tilesetJsonBuffer = tilesetSource.getValue(
+      const tilesetJsonBuffer = await tilesetSource.getValue(
         tilesetSourceJsonFileName
       );
       if (!tilesetJsonBuffer) {
@@ -272,7 +274,7 @@ export class TilesetMerger {
     // Write the merged tileset into the target
     const mergedTilesetJson = JSON.stringify(mergedTileset, null, 2);
     const mergedTilesetBuffer = Buffer.from(mergedTilesetJson);
-    this.tilesetTarget.addEntry(
+    await this.tilesetTarget.addEntry(
       this.tilesetTargetJsonFileName,
       mergedTilesetBuffer
     );
@@ -285,7 +287,7 @@ export class TilesetMerger {
    * to the target, adding the `externalTilesetDirectory` to the
    * path.
    */
-  private copyResources(): void {
+  private async copyResources(): Promise<void> {
     if (this.tilesetSources.length == 0 || !this.tilesetTarget) {
       throw new DeveloperError("The sources and target must be defined");
     }
@@ -294,12 +296,12 @@ export class TilesetMerger {
     for (let i = 0; i < length; ++i) {
       const tilesetSource = this.tilesetSources[i];
       const externalTilesetDirectory = this.externalTilesetDirectories[i];
-      const sourceKeys = tilesetSource.getKeys();
-      for (const sourceKey of sourceKeys) {
-        const value = tilesetSource.getValue(sourceKey);
+      const sourceKeys = await tilesetSource.getKeys();
+      for await (const sourceKey of sourceKeys) {
+        const value = await tilesetSource.getValue(sourceKey);
         const targetKey = Paths.join(externalTilesetDirectory, sourceKey);
         if (value) {
-          this.tilesetTarget.addEntry(targetKey, value);
+          await this.tilesetTarget.addEntry(targetKey, value);
         }
       }
     }

@@ -67,13 +67,13 @@ export class TilesetConverter {
       return;
     }
 
-    const tilesetSource = TilesetSources.createAndOpen(input);
-    const tilesetTarget = TilesetTargets.createAndBegin(output, force);
+    const tilesetSource = await TilesetSources.createAndOpen(input);
+    const tilesetTarget = await TilesetTargets.createAndBegin(output, force);
     let inputTilesetJsonFileNameWasFound = false;
     let causedDuplicate = false;
-    const keys = tilesetSource.getKeys();
-    for (const key of keys) {
-      const content = tilesetSource.getValue(key);
+    const keys = await tilesetSource.getKeys();
+    for await (const key of keys) {
+      const content = await tilesetSource.getValue(key);
       if (content) {
         if (key === inputTilesetJsonFileName) {
           inputTilesetJsonFileNameWasFound = true;
@@ -83,16 +83,16 @@ export class TilesetConverter {
                 `as ${outputTilesetJsonFileName} in ${output}`
             );
           }
-          tilesetTarget.addEntry(outputTilesetJsonFileName, content);
+          await tilesetTarget.addEntry(outputTilesetJsonFileName, content);
         } else {
           if (key === outputTilesetJsonFileName) {
             causedDuplicate = true;
           }
-          tilesetTarget.addEntry(key, content);
+          await tilesetTarget.addEntry(key, content);
         }
       }
     }
-    tilesetSource.close();
+    await tilesetSource.close();
     await tilesetTarget.end();
 
     if (!inputTilesetJsonFileNameWasFound) {

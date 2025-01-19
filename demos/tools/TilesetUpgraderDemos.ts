@@ -82,4 +82,4 @@ async function tilesetUpgraderDemos() {
   );
 }
 
-tilesetUpgraderDemos();
+void tilesetUpgraderDemos();

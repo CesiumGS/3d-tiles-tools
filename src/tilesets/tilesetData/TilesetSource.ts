@@ -1,6 +1,9 @@
 /**
  * An interface for a 3D Tiles tileset source
  *
+ * Note that all methods defined by this interface are *asynchronous*.
+ * Callers will usually have to `await` the result when calling them.
+ *
  * @internal
  */
 export interface TilesetSource {
@@ -11,15 +14,15 @@ export interface TilesetSource {
    *
    * @throws {@link TilesetError} If the input cannot be opened
    */
-  open(fullInputName: string): void;
+  open(fullInputName: string): Promise<void>;
 
   /**
-   * Returns an iterable over all keys of this soruce
+   * Returns an iterable over all keys of this source
    *
    * @returns The iterable
    * @throws {@link TilesetError} If `open` was not called yet
    */
-  getKeys(): Iterable<string>;
+  getKeys(): Promise<AsyncIterable<string>>;
 
   /**
    * Returns the value that is identified by the given key.
@@ -29,12 +32,12 @@ export interface TilesetSource {
    * `undefined` if there is no entry for the given key
    * @throws {@link TilesetError} If `open` was not called yet
    */
-  getValue(key: string): Buffer | undefined;
+  getValue(key: string): Promise<Buffer | undefined>;
 
   /**
    * Close this source
    *
    * @throws {@link TilesetError} If `open` was not called yet
    */
-  close(): void;
+  close(): Promise<void>;
 }

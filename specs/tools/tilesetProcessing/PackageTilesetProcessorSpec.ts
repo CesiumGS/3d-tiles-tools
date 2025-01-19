@@ -40,7 +40,7 @@ describe("BasicTilesetProcessor on packages", function () {
     await tilesetProcessor.begin(basicInput, basicOutput3tz, overwrite);
     await tilesetProcessor.end();
 
-    const difference = SpecHelpers.computePackageDifference(
+    const difference = await SpecHelpers.computePackageDifference(
       basicInput3tz,
       basicOutput3tz
     );
@@ -52,7 +52,7 @@ describe("BasicTilesetProcessor on packages", function () {
     await tilesetProcessor.begin(basicInput3tz, basicOutput, overwrite);
     await tilesetProcessor.end();
 
-    const difference = SpecHelpers.computePackageDifference(
+    const difference = await SpecHelpers.computePackageDifference(
       basicInput,
       basicOutput
     );
@@ -64,7 +64,7 @@ describe("BasicTilesetProcessor on packages", function () {
     await tilesetProcessor.begin(basicInput, basicOutput3dtiles, overwrite);
     await tilesetProcessor.end();
 
-    const difference = SpecHelpers.computePackageDifference(
+    const difference = await SpecHelpers.computePackageDifference(
       basicInput3dtiles,
       basicOutput3dtiles
     );
@@ -76,7 +76,7 @@ describe("BasicTilesetProcessor on packages", function () {
     await tilesetProcessor.begin(basicInput3dtiles, basicOutput, overwrite);
     await tilesetProcessor.end();
 
-    const difference = SpecHelpers.computePackageDifference(
+    const difference = await SpecHelpers.computePackageDifference(
       basicInput,
       basicOutput
     );
@@ -88,7 +88,7 @@ describe("BasicTilesetProcessor on packages", function () {
     await tilesetProcessor.begin(implicitInput, implicitOutput3tz, overwrite);
     await tilesetProcessor.end();
 
-    const difference = SpecHelpers.computePackageDifference(
+    const difference = await SpecHelpers.computePackageDifference(
       implicitInput3tz,
       implicitOutput3tz
     );
@@ -100,7 +100,7 @@ describe("BasicTilesetProcessor on packages", function () {
     await tilesetProcessor.begin(implicitInput3tz, implicitOutput, overwrite);
     await tilesetProcessor.end();
 
-    const difference = SpecHelpers.computePackageDifference(
+    const difference = await SpecHelpers.computePackageDifference(
       implicitInput,
       implicitOutput
     );
@@ -116,7 +116,7 @@ describe("BasicTilesetProcessor on packages", function () {
     );
     await tilesetProcessor.end();
 
-    const difference = SpecHelpers.computePackageDifference(
+    const difference = await SpecHelpers.computePackageDifference(
       implicitInput3dtiles,
       implicitOutput3dtiles
     );
@@ -132,7 +132,7 @@ describe("BasicTilesetProcessor on packages", function () {
     );
     await tilesetProcessor.end();
 
-    const difference = SpecHelpers.computePackageDifference(
+    const difference = await SpecHelpers.computePackageDifference(
       implicitInput,
       implicitOutput
     );

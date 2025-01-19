@@ -32,4 +32,4 @@ async function testContentDataTypeChecks() {
   }
 }
 
-testContentDataTypeChecks();
+void testContentDataTypeChecks();

@@ -40,7 +40,7 @@ export class ZipToPackage {
   ) {
     const zip = new StreamZip.async({ file: inputFileName });
 
-    const tilesetTarget = TilesetTargets.createAndBegin(
+    const tilesetTarget = await TilesetTargets.createAndBegin(
       outputFileName,
       overwrite
     );
@@ -71,7 +71,7 @@ export class ZipToPackage {
           if (key === outputTilesetJsonFileName) {
             outputTilesetJsonFileNameWasFound = true;
           }
-          tilesetTarget.addEntry(key, content);
+          await tilesetTarget.addEntry(key, content);
         }
       }
     }

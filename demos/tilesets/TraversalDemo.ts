@@ -58,4 +58,4 @@ async function runDemo() {
   await runExternalDemo();
 }
 
-runDemo();
+void runDemo();

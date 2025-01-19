@@ -44,7 +44,7 @@ export class TilesetSourceResourceResolver implements ResourceResolver {
       return null;
     }
     const localUri = Paths.join(this._basePath, uri);
-    const value = this._tilesetSource.getValue(localUri);
+    const value = await this._tilesetSource.getValue(localUri);
     if (!value) {
       return null;
     }

@@ -59,4 +59,4 @@ async function example() {
   await tilesetProcessor.end();
 }
 
-example();
+void example();

@@ -69,4 +69,4 @@ async function runDemos() {
   await testSubtreeInfo();
 }
 
-runDemos();
+void runDemos();

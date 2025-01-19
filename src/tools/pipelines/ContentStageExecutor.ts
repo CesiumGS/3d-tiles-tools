@@ -589,7 +589,7 @@ export class ContentStageExecutor {
           key: Paths.join(dirname, resourceKey),
           value: resourceValue,
         };
-        tilesetProcessor.storeTargetEntries(resourceTargetEntry);
+        await tilesetProcessor.storeTargetEntries(resourceTargetEntry);
         tilesetProcessor.markAsProcessed(resourceKey);
       }
       return targetEntry;

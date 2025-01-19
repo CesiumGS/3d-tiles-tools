@@ -5,3 +5,4 @@ dist
 etc
 generateThirdParty.js
 src/ktx/ktx/external/basis_encoder.cjs
+demos

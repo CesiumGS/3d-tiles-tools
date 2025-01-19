@@ -27,28 +27,32 @@ export class TilesetSourceFs implements TilesetSource {
   }
 
   /** {@inheritDoc TilesetSource.open} */
-  open(fullInputName: string) {
+  async open(fullInputName: string) {
     if (this.fullInputName) {
       throw new TilesetError("Source already opened");
     }
-    this.fullInputName = fullInputName;
+    if (Paths.isDirectory(fullInputName)) {
+      this.fullInputName = fullInputName;
+    } else {
+      this.fullInputName = path.dirname(fullInputName);
+    }
   }
 
   /** {@inheritDoc TilesetSource.getKeys} */
-  getKeys() {
+  async getKeys() {
     if (!this.fullInputName) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
     const files = Iterables.overFiles(this.fullInputName, true);
 
     const fullInputName = this.fullInputName;
-    return Iterables.map(files, (file) =>
-      Paths.relativize(fullInputName, file)
+    return Iterables.makeAsync(
+      Iterables.map(files, (file) => Paths.relativize(fullInputName, file))
     );
   }
 
   /** {@inheritDoc TilesetSource.getValue} */
-  getValue(key: string): Buffer | undefined {
+  async getValue(key: string): Promise<Buffer | undefined> {
     if (!this.fullInputName) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
@@ -64,7 +68,7 @@ export class TilesetSourceFs implements TilesetSource {
   }
 
   /** {@inheritDoc TilesetSource.close} */
-  close() {
+  async close() {
     if (!this.fullInputName) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
