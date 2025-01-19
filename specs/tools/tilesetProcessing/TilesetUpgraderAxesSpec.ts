@@ -32,7 +32,10 @@ describe("TilesetUpgrader Axes", function () {
       undefined
     );
 
-    const difference = SpecHelpers.computePackageDifference(output, golden);
+    const difference = await SpecHelpers.computePackageDifference(
+      output,
+      golden
+    );
     expect(difference).toBeUndefined();
   });
 
@@ -52,7 +55,10 @@ describe("TilesetUpgrader Axes", function () {
       undefined
     );
 
-    const difference = SpecHelpers.computePackageDifference(output, golden);
+    const difference = await SpecHelpers.computePackageDifference(
+      output,
+      golden
+    );
     expect(difference).toBeUndefined();
   });
 
@@ -72,7 +78,10 @@ describe("TilesetUpgrader Axes", function () {
       undefined
     );
 
-    const difference = SpecHelpers.computePackageDifference(output, golden);
+    const difference = await SpecHelpers.computePackageDifference(
+      output,
+      golden
+    );
     expect(difference).toBeUndefined();
   });
 
@@ -92,7 +101,10 @@ describe("TilesetUpgrader Axes", function () {
       undefined
     );
 
-    const difference = SpecHelpers.computePackageDifference(output, golden);
+    const difference = await SpecHelpers.computePackageDifference(
+      output,
+      golden
+    );
     expect(difference).toBeUndefined();
   });
 
@@ -112,7 +124,10 @@ describe("TilesetUpgrader Axes", function () {
       undefined
     );
 
-    const difference = SpecHelpers.computePackageDifference(output, golden);
+    const difference = await SpecHelpers.computePackageDifference(
+      output,
+      golden
+    );
     expect(difference).toBeUndefined();
   });
 
@@ -132,7 +147,10 @@ describe("TilesetUpgrader Axes", function () {
       undefined
     );
 
-    const difference = SpecHelpers.computePackageDifference(output, golden);
+    const difference = await SpecHelpers.computePackageDifference(
+      output,
+      golden
+    );
     expect(difference).toBeUndefined();
   });
 
@@ -152,7 +170,10 @@ describe("TilesetUpgrader Axes", function () {
       undefined
     );
 
-    const difference = SpecHelpers.computePackageDifference(output, golden);
+    const difference = await SpecHelpers.computePackageDifference(
+      output,
+      golden
+    );
     expect(difference).toBeUndefined();
   });
 
@@ -172,7 +193,10 @@ describe("TilesetUpgrader Axes", function () {
       undefined
     );
 
-    const difference = SpecHelpers.computePackageDifference(output, golden);
+    const difference = await SpecHelpers.computePackageDifference(
+      output,
+      golden
+    );
     expect(difference).toBeUndefined();
   });
 
@@ -192,7 +216,10 @@ describe("TilesetUpgrader Axes", function () {
       undefined
     );
 
-    const difference = SpecHelpers.computePackageDifference(output, golden);
+    const difference = await SpecHelpers.computePackageDifference(
+      output,
+      golden
+    );
     expect(difference).toBeUndefined();
   });
 });
