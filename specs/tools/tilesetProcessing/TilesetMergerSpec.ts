@@ -220,4 +220,44 @@ describe("TilesetMerger", function () {
     ];
     expect(actualContentUris).toEqual(expectedContentUris);
   });
+
+  it("merges two implicit tilesets into a valid output tileset", async function () {
+    // Regression test for https://github.com/CesiumGS/3d-tiles-tools/issues/157
+    // The input tileset is the 'dummy' implicit tileset that is used for other
+    // specs, and it is used TWICE - this doesn't make sense, but serves the
+    // purpose a spec for merging two implicit tilesets
+    const inputFiles = [
+      Paths.join(
+        SPECS_DATA_BASE_DIRECTORY,
+        "/tilesetProcessing/implicitProcessing"
+      ),
+      Paths.join(
+        SPECS_DATA_BASE_DIRECTORY,
+        "/tilesetProcessing/implicitProcessing"
+      ),
+    ];
+    const outputDirectory = Paths.join(
+      SPECS_DATA_BASE_DIRECTORY,
+      "output/mergeTilesets/mergeImplicit"
+    );
+    const outputFile = Paths.join(outputDirectory, "tileset.json");
+
+    await TilesetOperations.mergeJson(inputFiles, outputFile, overwrite);
+
+    // Ensure that the output directory contains the tileset JSON
+    const actualRelativeFiles =
+      SpecHelpers.collectRelativeFileNames(outputDirectory);
+    expect(actualRelativeFiles.includes("tileset.json")).toBeTrue();
+
+    // Ensure that the root of the resulting tileset has two children,
+    // and none of them defines the 'implicitTiling' (because this is
+    // defined in the roots of the external tilesets)
+    const tilesetJsonBuffer = fs.readFileSync(outputFile);
+    const tileset = JSON.parse(tilesetJsonBuffer.toString());
+    const root = tileset.root;
+    const children = root.children;
+    expect(children.length).toBe(2);
+    expect(children[0].implicitTiling).toBeUndefined();
+    expect(children[1].implicitTiling).toBeUndefined();
+  });
 });
