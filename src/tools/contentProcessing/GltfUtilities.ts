@@ -6,6 +6,7 @@ import { TileFormatError } from "../../tilesets";
 import { Extensions } from "../../tilesets";
 
 import { GltfPipelineLegacy } from "./GltfPipelineLegacy";
+import { GltfWeb3dQuantizedAttributes } from "./GltfWeb3dQuantizedAttributes";
 
 /**
  * Internal utility methods related to glTF/GLB data.
@@ -256,12 +257,16 @@ export class GltfUtilities {
    * their translation.
    *
    * @param glbBuffer - The buffer containing the binary glTF.
+   * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
    * @returns A promise that resolves to the resulting binary glTF.
    */
-  static async replaceCesiumRtcExtension(glbBuffer: Buffer): Promise<Buffer> {
+  static async replaceCesiumRtcExtension(
+    glbBuffer: Buffer,
+    gltfUpAxis?: "X" | "Y" | "Z"
+  ): Promise<Buffer> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const customStage = (gltf: any, options: any) => {
-      GltfUtilities.replaceCesiumRtcExtensionInternal(gltf);
+      GltfUtilities.replaceCesiumRtcExtensionInternal(gltf, gltfUpAxis);
       return gltf;
     };
     const options = {
@@ -277,14 +282,19 @@ export class GltfUtilities {
    *
    * This will insert a new parent node above each root node of
    * a scene. These new parent nodes will have a `translation`
-   * that is directly taken from the `CESIUM_RTC` `center`.
+   * that is derived taken from the `CESIUM_RTC` `center`,
+   * possibly adjusted to take the up-axis of the glTF into account.
    *
    * The `CESIUM_RTC` extension object and its used/required
    * usage declarations will be removed.
    *
    * @param gltf - The glTF object
+   * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
    */
-  private static replaceCesiumRtcExtensionInternal(gltf: any) {
+  private static replaceCesiumRtcExtensionInternal(
+    gltf: any,
+    gltfUpAxis?: "X" | "Y" | "Z"
+  ) {
     if (!gltf.extensions) {
       return;
     }
@@ -292,12 +302,27 @@ export class GltfUtilities {
     if (!rtcExtension) {
       return;
     }
-    // Compute the translation, taking the y-up-vs-z-up transform into account
-    const rtcTranslation = [
-      rtcExtension.center[0],
-      rtcExtension.center[2],
-      -rtcExtension.center[1],
-    ];
+    // Compute the translation, taking the up-axis transform into account
+    let rtcTranslation: number[];
+    if (gltfUpAxis === "X") {
+      rtcTranslation = [
+        rtcExtension.center[1],
+        -rtcExtension.center[2],
+        -rtcExtension.center[0],
+      ];
+    } else if (gltfUpAxis === "Y" || gltfUpAxis === undefined) {
+      rtcTranslation = [
+        rtcExtension.center[0],
+        rtcExtension.center[2],
+        -rtcExtension.center[1],
+      ];
+    } else {
+      rtcTranslation = [
+        rtcExtension.center[0],
+        rtcExtension.center[1],
+        rtcExtension.center[2],
+      ];
+    }
     const scenes = gltf.scenes;
     if (!scenes) {
       return;
@@ -319,5 +344,65 @@ export class GltfUtilities {
     }
     Extensions.removeExtensionUsed(gltf, "CESIUM_RTC");
     Extensions.removeExtension(gltf, "CESIUM_RTC");
+  }
+
+  /**
+   * Given an input buffer containing a binary glTF 2.0 asset, remove
+   * its use of the `WEB3D_quantized_attributes` extension.
+   *
+   * See `GltfWeb3dQuantizedAttributes` for further notes about
+   * the context where this is used.
+   *
+   * @param glbBuffer - The buffer containing the binary glTF.
+   * @returns A promise that resolves to the resulting binary glTF.
+   */
+  static async replaceWeb3dQuantizedAttributesExtension(
+    glbBuffer: Buffer
+  ): Promise<Buffer> {
+    // Process the GLB data with a custom gltf-pipeline stage that removes
+    // the WEB3D_quantized_attributes from the extensionsUsed/Required
+    // arrays, and collects the 'decodeMatrix' arrays from the extension
+    // objects in the accessors.
+    const extensionName = "WEB3D_quantized_attributes";
+    let usedExtension = false;
+    const decodeMatrices: (number[] | undefined)[] = [];
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const customStage = (gltf: any, options: any) => {
+      usedExtension = Extensions.usesExtension(gltf, extensionName);
+      if (usedExtension) {
+        Extensions.removeExtensionUsed(gltf, extensionName);
+
+        // Collect the 'decodeMatrix' arrays, one for each accessor
+        // (or 'undefined' if the accessor did not use the extension)
+        const accessors = gltf.accessors || [];
+        for (let i = 0; i < accessors.length; i++) {
+          const accessor = accessors[i];
+          const extensions = accessor.extensions || {};
+          const extension = extensions[extensionName] || {};
+          const decodeMatrix = extension.decodeMatrix;
+          decodeMatrices.push(decodeMatrix);
+        }
+      }
+      return gltf;
+    };
+    const options = {
+      customStages: [customStage],
+      keepUnusedElements: true,
+    };
+    const result = await GltfPipeline.processGlb(glbBuffer, options);
+    const preprocessedGlb = result.glb;
+
+    // If the glTF did not use the extension, then just return the result
+    if (!usedExtension) {
+      return preprocessedGlb;
+    }
+
+    // Otherwise, post-process the glTF to dequantize the accessors
+    // using the decode matrices that have been found for them.
+    return GltfWeb3dQuantizedAttributes.replaceWeb3dQuantizedAttributesExtension(
+      preprocessedGlb,
+      decodeMatrices
+    );
   }
 }

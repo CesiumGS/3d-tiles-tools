@@ -14,6 +14,7 @@ import { EXTMeshFeatures } from "../../gltf-extensions";
 import { Iterables } from "../../base";
 
 import { TileFormatError } from "../../tilesets";
+import { VecMath } from "../../tilesets";
 
 import { AccessorCreation } from "../migration/AccessorCreation";
 
@@ -167,7 +168,7 @@ export class GltfTransformPointClouds {
     // Create the node, with the the z-up-to-y-up transform
     // and the "global position" of the point cloud
     const node = document.createNode();
-    node.setMatrix([1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
+    node.setMatrix(VecMath.createZupToYupPacked4());
     const globalPosition = readablePointCloud.getGlobalPosition();
     if (globalPosition) {
       // The translation has to take the z-up-to-y-up

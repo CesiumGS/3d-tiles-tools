@@ -30,9 +30,14 @@ export class TileFormatsMigrationB3dm {
    * Convert the given B3DM data into a glTF asset
    *
    * @param b3dmBuffer - The B3DM buffer
+   * @param gltfUpAxis - The up-axis to assume for the glTF data in
+   * the given B3DM, defaulting to "Y".
    * @returns The GLB buffer
    */
-  static async convertB3dmToGlb(b3dmBuffer: Buffer): Promise<Buffer> {
+  static async convertB3dmToGlb(
+    b3dmBuffer: Buffer,
+    gltfUpAxis?: "X" | "Y" | "Z"
+  ): Promise<Buffer> {
     const tileData = TileFormats.readTileData(b3dmBuffer);
 
     const batchTable = tileData.batchTable.json as BatchTable;
@@ -49,7 +54,10 @@ export class TileFormatsMigrationB3dm {
       logger.trace("Feature table:\n" + JSON.stringify(featureTable, null, 2));
     }
 
-    const document = await GltfUpgrade.obtainDocument(tileData.payload);
+    const document = await GltfUpgrade.obtainDocument(
+      tileData.payload,
+      gltfUpAxis
+    );
     const root = document.getRoot();
 
     // If the feature table defines an `RTC_CENTER`, then insert

@@ -1,13 +1,20 @@
 Change Log
 ==========
 
+### 0.4.4 - 2024-12-03
+
+- Updated the `better-sqlite3` dependency from 8.0.1 to 11.5.0 to support NodeJS 22
+- Updated the NodeJS version requirement to >=18 for compatibility with latest CesiumJS version
+- Fixed a bug where applying the `merge` or `mergeJson` command to multiple implicit tilesets created an invalid result, via [#161](https://github.com/CesiumGS/3d-tiles-tools/pull/161)
+- Fixed a bug where resolving binary glTF data failed for glTF that used the `EXT_meshopt_compression` glTF extension with fallback buffers, via [#160](https://github.com/CesiumGS/3d-tiles-tools/pull/160)
+
 ### 0.4.3 - 2024-09-14
 
 - Fixed the handling of legacy B3DM files that contain glTF 1.0 data with texture coordinates that are stored as "quantized" 3D coordinates, via [#148](https://github.com/CesiumGS/3d-tiles-tools/pull/148)
 - Fixed the `upgrade` command for `targetVersion 1.1` for the case that the input data contains very old B3DM files that do not define a `BATCHID` attribute, via [#147](https://github.com/CesiumGS/3d-tiles-tools/pull/147).
 - Added a `mergeJson` command to create a tileset JSON that refers to other tilesets as external tilesets, without copying the input tilesets to the output directory, via [#140](https://github.com/CesiumGS/3d-tiles-tools/pull/140) and [#143](https://github.com/CesiumGS/3d-tiles-tools/pull/143).
 - Fixed a bug where the `combine` command did not properly update the content URIs when an external tileset in a subdirectory referred to another external tileset in the same subdirectory, via [#139](https://github.com/CesiumGS/3d-tiles-tools/pull/139)
-- Added an `updateAlignment` command that can process a B3DM, I3DM, PNGS, or CMPT file, to ensure that the alignment requirements for the batch- and feature table and the tile data as a whole are met, via [#136](https://github.com/CesiumGS/3d-tiles-tools/pull/136)
+- Added an `updateAlignment` command that can process a B3DM, I3DM, PNTS, or CMPT file, to ensure that the alignment requirements for the batch- and feature table and the tile data as a whole are met, via [#136](https://github.com/CesiumGS/3d-tiles-tools/pull/136)
 
 ### 0.4.2 - 2024-05-15
 

@@ -106,6 +106,30 @@ export class Extensions {
   }
 
   /**
+   * Returns whether the given extensible object declares the given
+   * extension in its `extensionsUsed` array.
+   *
+   * @param extensible - The object that may declare the used extension
+   * @param extension - The extension (i.e. its name as a string)
+   * @returns Whether the object declares the extension to be used
+   */
+  static usesExtension(extensible: Extensible, extension: string) {
+    return Extensions.contains(extensible, "extensionsUsed", extension);
+  }
+
+  /**
+   * Returns whether the given extensible object declares the given
+   * extension in its `extensionsRequired` array.
+   *
+   * @param extensible - The object that may declare the required extension
+   * @param extension - The extension (i.e. its name as a string)
+   * @returns Whether the object declares the extension to be required
+   */
+  static requiresExtension(extensible: Extensible, extension: string) {
+    return Extensions.contains(extensible, "extensionsRequired", extension);
+  }
+
+  /**
    * Adds the given element to the specified array if it was not
    * contained yet, creating a new array if it did not exist yet.
    *
@@ -152,5 +176,25 @@ export class Extensions {
     if (array.length === 0) {
       delete object[key];
     }
+  }
+
+  /**
+   * Returns whether the specified array property is defined and
+   * includes the given element
+   *
+   * @param object - The object containing the array
+   * @param key - The name of the array property
+   * @param element - The element
+   */
+  private static contains<T>(
+    object: { [key: string]: T[] | undefined },
+    key: string,
+    element: T
+  ): boolean {
+    const array = object[key];
+    if (!array) {
+      return false;
+    }
+    return array.includes(element);
   }
 }

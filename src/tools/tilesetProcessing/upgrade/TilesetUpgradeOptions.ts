@@ -27,6 +27,12 @@ export type TilesetUpgradeOptions = {
   // be removed and become `undefined`
   upgradeEmptyChildrenToUndefined: true;
 
+  // Whether the `asset.gltfUpAxis` declaration should
+  // be removed if present. Note that this affects the
+  // tileset JSON itself, as well as any upgrades of
+  // glTF 1.0 to 2.0 data
+  upgradeGltfUpAxis: true;
+
   // Indicates whether the `3DTILES_content_gltf` extension
   // declaration should be removed, as part of an upgrade
   // to 1.1, where glTF is supported without an extension
