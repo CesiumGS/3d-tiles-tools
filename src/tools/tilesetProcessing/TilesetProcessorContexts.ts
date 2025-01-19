@@ -99,12 +99,12 @@ export class TilesetProcessorContexts {
    * schema based on the given tileset source JSON file name.
    *
    * @param tilesetSource - The `TilesetSource` instance
-   * @param tilesetSourceInputInputName - The name of the input file
+   * @param tilesetSourceName - The name of the input file
    * of the source, passed to `TilesetSource.open`
    * @param tilesetSourceJsonFileName - The name of the file in the
    * given source that contains the main tileset JSON
    * @param tilesetTarget The `TilesetTarget` instance
-   * @param tilesetTargetOutputName - The name of the output file for
+   * @param tilesetTargetName - The name of the output file for
    * the target, passed to `TilesetTarget.begin`
    * @param tilesetTargetJsonFileName - The name that the main tileset
    * JSON file should have in the target
@@ -116,16 +116,16 @@ export class TilesetProcessorContexts {
    */
   static async createInstance(
     tilesetSource: TilesetSource,
-    tilesetSourceInputInputName: string,
+    tilesetSourceName: string,
     tilesetSourceJsonFileName: string,
     tilesetTarget: TilesetTarget,
-    tilesetTargetOutputName: string,
+    tilesetTargetName: string,
     tilesetTargetJsonFileName: string,
     overwrite: boolean
   ): Promise<TilesetProcessorContext> {
     // Open the source and the target
-    await tilesetSource.open(tilesetSourceInputInputName);
-    await tilesetTarget.begin(tilesetTargetOutputName, overwrite);
+    await tilesetSource.open(tilesetSourceName);
+    await tilesetTarget.begin(tilesetTargetName, overwrite);
 
     // Obtain the tileset object from the tileset JSON file
     const sourceTileset = await TilesetSources.parseSourceValue<Tileset>(
