@@ -23,15 +23,26 @@ export class TilesetSources {
    * Convenience method to create and open a tileset source for
    * the given name.
    *
-   * This will call `createFromName`, and immediately call `open`
-   * on the resulting source.
+   * This will call `TilesetSources.create` for the extension of
+   * the given name, and immediately call `open(name)` on the
+   * resulting source.
    *
    * @param name - The name
    * @returns The `TilesetSource`
    * @throws TilesetError If the input can not be opened
    */
   static async createAndOpen(name: string): Promise<TilesetSource> {
-    const tilesetSource = TilesetSources.createFromName(name);
+    let extension = path.extname(name).toLowerCase();
+    if (extension === ".json") {
+      extension = "";
+      name = path.dirname(name);
+    }
+    const tilesetSource = TilesetSources.create(extension);
+    if (!tilesetSource) {
+      throw new TilesetError(
+        `Could not create tileset source for name ${name} with extension "${extension}"`
+      );
+    }
     await tilesetSource.open(name);
     return tilesetSource;
   }
