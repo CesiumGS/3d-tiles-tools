@@ -31,7 +31,11 @@ export class TilesetSourceFs implements TilesetSource {
     if (this.fullInputName) {
       throw new TilesetError("Source already opened");
     }
-    this.fullInputName = fullInputName;
+    if (Paths.isDirectory(fullInputName)) {
+      this.fullInputName = fullInputName;
+    } else {
+      this.fullInputName = path.dirname(fullInputName);
+    }
   }
 
   /** {@inheritDoc TilesetSource.getKeys} */
