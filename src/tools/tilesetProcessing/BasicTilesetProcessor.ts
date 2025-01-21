@@ -69,13 +69,16 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * processing the source tileset and write all entries
    * that have not been processed yet into the target.
    *
+   * @param close - Whether calling this should try to close
+   * the source and target of the current context, defaulting
+   * to `true`.
    * @returns A promise that resolves when the operation finished
    * @throws TilesetError When there was an error while processing
    * or storing the entries.
    */
-  override async end(): Promise<void> {
+  override async end(close?: boolean): Promise<void> {
     await this.storeTargetTileset();
-    await super.end();
+    await super.end(close);
   }
 
   /**

@@ -1,6 +1,8 @@
 import path from "path";
 
+import { TilesetSource } from "../../tilesets";
 import { TilesetSources } from "../../tilesets";
+import { TilesetTarget } from "../../tilesets";
 import { TilesetTargets } from "../../tilesets";
 import { TilesetError } from "../../tilesets";
 import { Tilesets } from "../../tilesets";
@@ -17,93 +19,148 @@ const logger = Loggers.get("tilesetProcessing");
  */
 export class TilesetConverter {
   /**
-   * Convert an input tileset to an output tileset.
+   * Convert a source tileset to a target tileset.
    *
-   * The input and output are the names of tileset sources and targets.
-   *
-   * The input and output can be
+   * The source and target names can be
    * - The path to a tileset JSON file
    * - A directory that contains a `tileset.json` file
    * - A 3D Tiles package (with `.3tz` or `.3dtiles` extension)
    *
    * Package files are required to contain a `tileset.json` file for the
-   * top-level tileset. When the input was a specific tileset JSON file,
+   * top-level tileset. When the source was a specific tileset JSON file,
    * then this file will be renamed to `tileset.json` if necessary for
    * writing it into a package (and if this causes a duplicate entry, then
-   * an error will be thrown). Otherwise, it is expected that the input
+   * an error will be thrown). Otherwise, it is expected that the source
    * contains a file that matches the required file for the output.
    *
-   * @param input - The full input name
-   * @param inputTilesetJsonFileName - The name of the tileset JSON file
-   * in the input. When this is not given, then the name will either be
-   * the file name of the input (if the input was a JSON file), or default
-   * to 'tileset.json' (if the input was a directory or a tileset package)
-   * @param output - The full output name
-   * @param force - Whether existing output files may be overwritten
+   * @param tilesetSource - The tileset source
+   * @param tilesetSourceJsonFileName - The name of the tileset JSON file
+   * in the source
+   * @param tilesetTarget - The tileset target
+   * @param tilesetTargetJsonFileName - The name of the tileset JSON file
+   * in the target
    * @returns A promise that resolves when the process is finished
    * @throws TilesetError If the requirements for the tileset JSON
    * file names (stated above) are not met.
    */
   static async convert(
-    input: string,
-    inputTilesetJsonFileName: string | undefined,
-    output: string,
-    force: boolean
+    tilesetSourceName: string,
+    tilesetSourceJsonFileName: string | undefined,
+    tilesetTargetName: string,
+    overwrite: boolean
   ) {
-    if (inputTilesetJsonFileName === undefined) {
-      inputTilesetJsonFileName = Tilesets.determineTilesetJsonFileName(input);
-    }
-    const outputTilesetJsonFileName =
-      Tilesets.determineTilesetJsonFileName(output);
-
-    const inputExtension = path.extname(input).toLowerCase();
+    const inputExtension = path.extname(tilesetSourceName).toLowerCase();
     if (inputExtension === ".zip") {
+      if (tilesetSourceJsonFileName === undefined) {
+        tilesetSourceJsonFileName =
+          Tilesets.determineTilesetJsonFileName(tilesetSourceName);
+      }
       await ZipToPackage.convert(
-        input,
-        inputTilesetJsonFileName,
-        output,
-        force
+        tilesetSourceName,
+        tilesetSourceJsonFileName,
+        tilesetTargetName,
+        overwrite
       );
       return;
     }
+    if (tilesetSourceJsonFileName === undefined) {
+      tilesetSourceJsonFileName =
+        Tilesets.determineTilesetJsonFileName(tilesetSourceName);
+    }
+    const tilesetTargetJsonFileName =
+      Tilesets.determineTilesetJsonFileName(tilesetTargetName);
+    const tilesetSource = await TilesetSources.createAndOpen(tilesetSourceName);
+    const tilesetTarget = await TilesetTargets.createAndBegin(
+      tilesetTargetName,
+      overwrite
+    );
 
-    const tilesetSource = await TilesetSources.createAndOpen(input);
-    const tilesetTarget = await TilesetTargets.createAndBegin(output, force);
-    let inputTilesetJsonFileNameWasFound = false;
-    let causedDuplicate = false;
+    try {
+      await TilesetConverter.convertData(
+        tilesetSource,
+        tilesetSourceJsonFileName,
+        tilesetTarget,
+        tilesetTargetJsonFileName
+      );
+    } finally {
+      await tilesetSource.close();
+      await tilesetTarget.end();
+    }
+  }
+
+  /**
+   * Convert a source tileset to a target tileset.
+   *
+   * The source and target names can be
+   * - The path to a tileset JSON file
+   * - A directory that contains a `tileset.json` file
+   * - A 3D Tiles package (with `.3tz` or `.3dtiles` extension)
+   *
+   * Package files are required to contain a `tileset.json` file for the
+   * top-level tileset. When the source was a specific tileset JSON file,
+   * then this file will be renamed to `tileset.json` if necessary for
+   * writing it into a package (and if this causes a duplicate entry, then
+   * an error will be thrown). Otherwise, it is expected that the source
+   * contains a file that matches the required file for the output.
+   *
+   * @param tilesetSource - The tileset source
+   * @param tilesetSourceJsonFileName - The name of the tileset JSON file
+   * in the source
+   * @param tilesetTarget - The tileset target
+   * @param tilesetTargetJsonFileName - The name of the tileset JSON file
+   * in the target
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError If the requirements for the tileset JSON
+   * file names (stated above) are not met.
+   */
+  static async convertData(
+    tilesetSource: TilesetSource,
+    tilesetSourceJsonFileName: string,
+    tilesetTarget: TilesetTarget,
+    tilesetTargetJsonFileName: string
+  ): Promise<void> {
     const keys = await tilesetSource.getKeys();
+
+    // This could be much shorter, but has to handle the case
+    // that the source or target JSON file names do not match the
+    // default/recommended case of being called `tileset.json`. It
+    // has to keep track of whether the designated source name was
+    // found, and the target that it may have been renamed to, and
+    // keep track of whether this renaming caused a duplicate (e.g.
+    // when the input contained `example.json` and `tileset.json`,
+    // but `example.json` was said to be the top-level name in the
+    // source and should be stored as `tileset.json` in the target)
+    let tilesetSourceJsonFileNameWasFound = false;
+    let causedDuplicate = false;
     for await (const key of keys) {
       const content = await tilesetSource.getValue(key);
       if (content) {
-        if (key === inputTilesetJsonFileName) {
-          inputTilesetJsonFileNameWasFound = true;
-          if (inputTilesetJsonFileName !== outputTilesetJsonFileName) {
+        if (key === tilesetSourceJsonFileName) {
+          tilesetSourceJsonFileNameWasFound = true;
+          if (tilesetSourceJsonFileName !== tilesetTargetJsonFileName) {
             logger.debug(
-              `Storing ${inputTilesetJsonFileName} from ${input} ` +
-                `as ${outputTilesetJsonFileName} in ${output}`
+              `Storing ${tilesetSourceJsonFileName} from source` +
+                `as ${tilesetTargetJsonFileName} in target`
             );
           }
-          await tilesetTarget.addEntry(outputTilesetJsonFileName, content);
+          await tilesetTarget.addEntry(tilesetTargetJsonFileName, content);
         } else {
-          if (key === outputTilesetJsonFileName) {
+          if (key === tilesetTargetJsonFileName) {
             causedDuplicate = true;
           }
           await tilesetTarget.addEntry(key, content);
         }
       }
     }
-    await tilesetSource.close();
-    await tilesetTarget.end();
-
-    if (!inputTilesetJsonFileNameWasFound) {
+    if (!tilesetSourceJsonFileNameWasFound) {
       throw new TilesetError(
-        `File ${inputTilesetJsonFileName} was not found in ${input}`
+        `File ${tilesetSourceJsonFileName} was not found in source`
       );
     }
     if (causedDuplicate) {
       throw new TilesetError(
-        `The input tileset JSON file name ${inputTilesetJsonFileName} ` +
-          `becomes ${outputTilesetJsonFileName} in the output, ` +
+        `The input tileset JSON file name ${tilesetSourceJsonFileName} ` +
+          `becomes ${tilesetTargetJsonFileName} in the output, ` +
           `causing a duplicate entry`
       );
     }

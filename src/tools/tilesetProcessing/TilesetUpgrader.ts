@@ -6,6 +6,11 @@ import { ContentDataTypes } from "../../base";
 import { Tileset } from "../../structure";
 import { Schema } from "../../structure";
 
+import { Tilesets } from "../../tilesets";
+import { TilesetSource } from "../../tilesets";
+import { TilesetSources } from "../../tilesets";
+import { TilesetTarget } from "../../tilesets";
+import { TilesetTargets } from "../../tilesets";
 import { TilesetEntry } from "../../tilesets";
 
 import { TilesetUpgradeOptions } from "./upgrade/TilesetUpgradeOptions";
@@ -157,13 +162,55 @@ export class TilesetUpgrader {
     tilesetTargetName: string,
     overwrite: boolean
   ): Promise<void> {
+    const tilesetSourceJsonFileName =
+      Tilesets.determineTilesetJsonFileName(tilesetSourceName);
+    const tilesetTargetJsonFileName =
+      Tilesets.determineTilesetJsonFileName(tilesetTargetName);
+    const tilesetSource = await TilesetSources.createAndOpen(tilesetSourceName);
+    const tilesetTarget = await TilesetTargets.createAndBegin(
+      tilesetTargetName,
+      overwrite
+    );
+
+    await this.upgradeData(
+      tilesetSource,
+      tilesetSourceJsonFileName,
+      tilesetTarget,
+      tilesetTargetJsonFileName
+    );
+
+    await tilesetSource.close();
+    await tilesetTarget.end();
+  }
+
+  /**
+   * Upgrade the specified source tileset, and write it to the given
+   * target.
+   *
+   * @param tilesetSourceName - The tileset source name
+   * @param tilesetSourceJsonFileName - The name of the top-level
+   * tileset JSON file in the source
+   * @param tilesetTargetName - The tileset target name
+   * @param tilesetTargetJsonFileName - The name of the top-level
+   * tileset JSON file in the target
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError When the input could not be processed,
+   * or when the output already exists and `overwrite` was `false`.
+   */
+  async upgradeData(
+    tilesetSource: TilesetSource,
+    tilesetSourceJsonFileName: string,
+    tilesetTarget: TilesetTarget,
+    tilesetTargetJsonFileName: string
+  ): Promise<void> {
     const processExternalTilesets = this.upgradeOptions.upgradeExternalTilesets;
     const tilesetProcessor = new BasicTilesetProcessor(processExternalTilesets);
     this.tilesetProcessor = tilesetProcessor;
-    await tilesetProcessor.begin(
-      tilesetSourceName,
-      tilesetTargetName,
-      overwrite
+    await tilesetProcessor.beginData(
+      tilesetSource,
+      tilesetSourceJsonFileName,
+      tilesetTarget,
+      tilesetTargetJsonFileName
     );
 
     // Perform the upgrade for the actual tileset object
@@ -177,7 +224,7 @@ export class TilesetUpgrader {
 
     // Perform the updates for the tile contents
     await this.performContentUpgrades(tilesetProcessor);
-    await tilesetProcessor.end();
+    await tilesetProcessor.end(false);
 
     delete this.tilesetProcessor;
     delete this.currentTilesetGltfUpAxis;

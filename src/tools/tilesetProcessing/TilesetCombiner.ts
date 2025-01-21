@@ -90,17 +90,13 @@ export class TilesetCombiner {
       tilesetTargetName,
       overwrite
     );
-
-    this.tilesetSource = tilesetSource;
-    this.tilesetTarget = tilesetTarget;
-
     const tilesetSourceJsonFileName =
       Tilesets.determineTilesetJsonFileName(tilesetSourceName);
 
     const tilesetTargetJsonFileName =
       Tilesets.determineTilesetJsonFileName(tilesetTargetName);
 
-    await this.combineInternal(
+    await this.combineData(
       tilesetSource,
       tilesetSourceJsonFileName,
       tilesetTarget,
@@ -110,10 +106,44 @@ export class TilesetCombiner {
     await tilesetSource.close();
     await tilesetTarget.end();
 
+    logger.debug(`Running combine DONE`);
+  }
+
+  /**
+   * Combines ("inlines") the external tilesets that are referred to by
+   * the given source tileset, and writes the result to the given target.
+   *
+   * The caller is responsible for opening and closing the given
+   * source and target.
+   *
+   * @param tilesetSource - The tileset source
+   * @param tilesetSourceJsonFileName - The name of the top-level
+   * tileset JSON file in the source
+   * @param tilesetTarget - The tileset target
+   * @param tilesetTargetJsonFileName - The name of the top-level
+   * tileset JSON file in the target
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError When the input could not be processed,
+   * or when the output already exists and `overwrite` was `false`.
+   */
+  async combineData(
+    tilesetSource: TilesetSource,
+    tilesetSourceJsonFileName: string,
+    tilesetTarget: TilesetTarget,
+    tilesetTargetJsonFileName: string
+  ): Promise<void> {
+    this.tilesetSource = tilesetSource;
+    this.tilesetTarget = tilesetTarget;
+
+    await this.combineInternal(
+      tilesetSource,
+      tilesetSourceJsonFileName,
+      tilesetTarget,
+      tilesetTargetJsonFileName
+    );
+
     this.tilesetSource = undefined;
     this.tilesetTarget = undefined;
-
-    logger.debug(`Running combine DONE`);
   }
 
   /**

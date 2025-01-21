@@ -32,8 +32,8 @@ export class TilesetProcessorContexts {
    * @param tilesetTargetName - The tileset target name
    * @param overwrite - Whether the target should be overwritten if
    * it already exists
-   * @returns A promise that resolves when this processor has been
-   * initialized
+   * @returns A promise that resolves when this the context
+   * has been created
    * @throws TilesetError When the input could not be opened,
    * or when the output already exists and `overwrite` was `false`.
    */
@@ -58,16 +58,16 @@ export class TilesetProcessorContexts {
           tilesetTargetName
         );
 
-      const context = await TilesetProcessorContexts.createInstance(
+      // Open the source and the target
+      await tilesetSource.open(tilesetSourceName);
+      await tilesetTarget.begin(tilesetTargetName, overwrite);
+
+      return TilesetProcessorContexts.createFromData(
         tilesetSource,
-        tilesetSourceName,
         tilesetSourceJsonFileName,
         tilesetTarget,
-        tilesetTargetName,
-        tilesetTargetJsonFileName,
-        overwrite
+        tilesetTargetJsonFileName
       );
-      return context;
     } catch (error) {
       if (tilesetSource) {
         try {
@@ -88,45 +88,67 @@ export class TilesetProcessorContexts {
   }
 
   /**
+   * Creates a `TilesetProcessorContext` for the given source- and
+   * target name.
+   *
+   * This assumes that the given source has already been opened
+   * by calling `open`, and the given target has already been
+   * initialized by calling `begin`.
+   *
+   * @param tilesetSourceName - The tileset source name
+   * @param tilesetSourceJsonFileName - The name of the top-level
+   * tileset JSON file in the source
+   * @param tilesetTargetName - The tileset target name
+   * @param tilesetTargetJsonFileName - The name of the top-level
+   * tileset JSON file in the target
+   * @returns A promise that resolves when this the context
+   * has been created
+   * @throws TilesetError When the required input data could not
+   * be obtained from the given source
+   */
+  static async createFromData(
+    tilesetSource: TilesetSource,
+    tilesetSourceJsonFileName: string,
+    tilesetTarget: TilesetTarget,
+    tilesetTargetJsonFileName: string
+  ): Promise<TilesetProcessorContext> {
+    const context = await TilesetProcessorContexts.createInstance(
+      tilesetSource,
+      tilesetSourceJsonFileName,
+      tilesetTarget,
+      tilesetTargetJsonFileName
+    );
+    return context;
+  }
+
+  /**
    * A low-level method to create an instance of a tileset processor context.
    *
    * Clients will usually just call the `create` method, which creates the
    * source- and target instances and determines the tileset JSON file
    * names based on the input- and output name.
    *
-   * This method will open the given source and begin the given target
-   * with the given names, resolving the input tileset JSON and its
+   * This method will resolve the input tileset JSON and its
    * schema based on the given tileset source JSON file name.
    *
    * @param tilesetSource - The `TilesetSource` instance
-   * @param tilesetSourceName - The name of the input file
-   * of the source, passed to `TilesetSource.open`
    * @param tilesetSourceJsonFileName - The name of the file in the
    * given source that contains the main tileset JSON
    * @param tilesetTarget The `TilesetTarget` instance
-   * @param tilesetTargetName - The name of the output file for
-   * the target, passed to `TilesetTarget.begin`
    * @param tilesetTargetJsonFileName - The name that the main tileset
    * JSON file should have in the target
-   * @param overwrite - Whether existing files in the target should
-   * be overwritten
-   * @returns TilesetError If the source or target cannot be
-   * initialized, or a required input file (like the tileset JSON
+   * @returns A promise that resolves when this the context
+   * has been created
+   * @throws TilesetError If the source or target cannot be
+   * accessed, or a required input file (like the tileset JSON
    * or its schema) cannot be resolved in the source
    */
   static async createInstance(
     tilesetSource: TilesetSource,
-    tilesetSourceName: string,
     tilesetSourceJsonFileName: string,
     tilesetTarget: TilesetTarget,
-    tilesetTargetName: string,
-    tilesetTargetJsonFileName: string,
-    overwrite: boolean
+    tilesetTargetJsonFileName: string
   ): Promise<TilesetProcessorContext> {
-    // Open the source and the target
-    await tilesetSource.open(tilesetSourceName);
-    await tilesetTarget.begin(tilesetTargetName, overwrite);
-
     // Obtain the tileset object from the tileset JSON file
     const sourceTileset = await TilesetSources.parseSourceValue<Tileset>(
       tilesetSource,
