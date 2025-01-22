@@ -164,10 +164,11 @@ export interface TraversedTile {
    * Returns the URI of the subtree file for this tile, or
    * `undefined` if this is not the root of a subtree.
    *
-   * If this tile is the root of a subtree in an implicit tileset, then
-   * the returned URI will contain the actual subtree URI that was
-   * created by substituting the coordinates of this tile into the
-   * `implicitTiling.subtrees.uri` template URI.
+   * If this tile is an implicit tile that is the root of a subtree
+   * in an implicit tileset, then the returned URI will contain the
+   * actual subtree URI that was created by substituting the
+   * coordinates of this tile into the `implicitTiling.subtrees.uri`
+   * template URI.
    *
    * @returns The subtree URI, or `undefined`
    */

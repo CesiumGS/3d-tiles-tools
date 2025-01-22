@@ -269,18 +269,7 @@ export class ExplicitTraversedTile implements TraversedTile {
 
   /** {@inheritDoc TraversedTile.getSubtreeUri} */
   getSubtreeUri(): string | undefined {
-    const implicitTiling = this._tile.implicitTiling;
-    if (!implicitTiling) {
-      return undefined;
-    }
-    const rootCoordinates =
-      ImplicitTilings.createRootCoordinates(implicitTiling);
-    const subtreeUri = ImplicitTilings.substituteTemplateUri(
-      implicitTiling.subdivisionScheme,
-      implicitTiling.subtrees.uri,
-      rootCoordinates
-    );
-    return subtreeUri;
+    return undefined;
   }
 
   /**
