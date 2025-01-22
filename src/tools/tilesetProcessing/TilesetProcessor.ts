@@ -81,10 +81,20 @@ export abstract class TilesetProcessor {
    * Prepare processing the given tileset source and writing
    * the results into the given tileset target.
    *
+   * The caller is responsible for calling `open` on the given
+   * source and `begin` on the given target before calling this
+   * method.
+   *
+   * The `close` and `end` method of the given source and target
+   * will be called when calling `end(close?:boolean)` on this
+   * processor and passing in either `undefined` or `true`.
+   *
    * @param tilesetSourceName - The tileset source name
+   * @param tilesetSourceJsonFileName - The name of the top-level
+   * tileset JSON file in the source
    * @param tilesetTargetName - The tileset target name
-   * @param overwrite - Whether the target should be overwritten if
-   * it already exists
+   * @param tilesetTargetJsonFileName - The name of the top-level
+   * tileset JSON file in the target
    * @returns A promise that resolves when this processor has been
    * initialized
    * @throws TilesetError When 'begin' or 'beginData' was already
@@ -139,7 +149,8 @@ export abstract class TilesetProcessor {
 
     const tryClose = close !== false;
     if (tryClose) {
-      // Try to close the context
+      // Try to close the context, calling `close` on
+      // the source and `end` on the target.
       try {
         await TilesetProcessorContexts.close(context);
       } catch (e) {

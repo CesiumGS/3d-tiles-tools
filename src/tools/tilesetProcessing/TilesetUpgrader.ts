@@ -187,6 +187,11 @@ export class TilesetUpgrader {
    * Upgrade the specified source tileset, and write it to the given
    * target.
    *
+   * The caller is responsible for calling `open` on the given
+   * source and `begin` on the given target before calling this
+   * method, and `close` on the source and `end` on the target
+   * after calling this method.
+   *
    * @param tilesetSourceName - The tileset source name
    * @param tilesetSourceJsonFileName - The name of the top-level
    * tileset JSON file in the source

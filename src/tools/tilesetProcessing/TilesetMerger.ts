@@ -114,6 +114,11 @@ export class TilesetMerger {
    * subdirectories within the target. The names of these
    * subdirectories are unspecified.
    *
+   * The caller is responsible for calling `open` on the given
+   * sources and `begin` on the given target before calling this
+   * method, and `close` on the sources and `end` on the target
+   * after calling this method.
+   *
    * @param tilesetSources - The tileset sources
    * @param tilesetSourceJsonFileNames - The names of the main tileset
    * JSON files in the sources. When this is `undefined`, then the

@@ -113,8 +113,10 @@ export class TilesetCombiner {
    * Combines ("inlines") the external tilesets that are referred to by
    * the given source tileset, and writes the result to the given target.
    *
-   * The caller is responsible for opening and closing the given
-   * source and target.
+   * The caller is responsible for calling `open` on the given
+   * source and `begin` on the given target before calling this
+   * method, and `close` on the source and `end` on the target
+   * after calling this method.
    *
    * @param tilesetSource - The tileset source
    * @param tilesetSourceJsonFileName - The name of the top-level
