@@ -13,9 +13,10 @@ import { TilesetProcessorContext } from "./TilesetProcessorContext";
 /**
  * A class summarizing the data that a `TilesetProcessor` is operating on.
  *
- * This is initialized during the `TilesetProcessor.begin` call, if all
- * the source- and target information could be resolved, and is supposed
- * to represent a consistent, properly initialized state to work on.
+ * This is initialized during the `TilesetProcessor.begin` or `beginData`
+ * call, if all the source- and target information could be resolved,
+ * and is supposed to represent a consistent, properly initialized
+ * state to work on.
  *
  * @internal
  */
