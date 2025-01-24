@@ -306,14 +306,10 @@ export class TilesetMerger {
     for (let i = 0; i < length; ++i) {
       const tilesetSource = this.tilesetSources[i];
       const tilesetSourceJsonFileName = this.tilesetSourceJsonFileNames[i];
-      const tilesetJsonBuffer = await tilesetSource.getValue(
+      const tileset = await TilesetSources.parseSourceValue<Tileset>(
+        tilesetSource,
         tilesetSourceJsonFileName
       );
-      if (!tilesetJsonBuffer) {
-        const message = `No ${tilesetSourceJsonFileName} found in input`;
-        throw new TilesetError(message);
-      }
-      const tileset = JSON.parse(tilesetJsonBuffer.toString()) as Tileset;
       tilesets.push(tileset);
     }
 

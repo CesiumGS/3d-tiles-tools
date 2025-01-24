@@ -173,15 +173,10 @@ export class TilesetCombiner {
     tilesetTarget: TilesetTarget,
     tilesetTargetJsonFileName: string
   ): Promise<void> {
-    const tilesetJsonBuffer = await tilesetSource.getValue(
+    const tileset = await TilesetSources.parseSourceValue<Tileset>(
+      tilesetSource,
       tilesetSourceJsonFileName
     );
-    if (!tilesetJsonBuffer) {
-      const message = `No ${tilesetSourceJsonFileName} found in input`;
-      throw new TilesetError(message);
-    }
-    const tileset = JSON.parse(tilesetJsonBuffer.toString()) as Tileset;
-
     this.externalTilesetFileNames.length = 0;
     await this.combineTilesetsInternal(".", tileset);
 

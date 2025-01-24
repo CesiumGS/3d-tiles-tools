@@ -11,7 +11,7 @@ import { Tileset } from "../../structure";
 import { Schema } from "../../structure";
 
 import { TilesetSource } from "../tilesetData/TilesetSource";
-import { TilesetError } from "../tilesetData/TilesetError";
+import { TilesetSources } from "../tilesetData/TilesetSources";
 import { TilesetSourceResourceResolver } from "../tilesetData/TilesetSourceResourceResolver";
 
 import { TraversedTile } from "./TraversedTile";
@@ -103,12 +103,10 @@ export class TilesetTraversers {
     tilesetSource: TilesetSource,
     tilesetJsonFileName: string
   ) {
-    const tilesetJsonBuffer = await tilesetSource.getValue(tilesetJsonFileName);
-    if (!tilesetJsonBuffer) {
-      const message = `No ${tilesetJsonFileName} found in input`;
-      throw new TilesetError(message);
-    }
-    const tileset = JSON.parse(tilesetJsonBuffer.toString()) as Tileset;
+    const tileset = await TilesetSources.parseSourceValue<Tileset>(
+      tilesetSource,
+      tilesetJsonFileName
+    );
     return TilesetTraversers.createTraversedRootTileForTileset(
       tilesetSource,
       tileset
