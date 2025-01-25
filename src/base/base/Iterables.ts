@@ -50,6 +50,30 @@ export class Iterables {
   }
 
   /**
+   * Returns filtered view on the given iterable
+   *
+   * @param iterable - The iterable
+   * @param include - The include predicate
+   * @returns The filtered iterable
+   */
+  static filterAsync<T>(
+    iterable: AsyncIterable<T>,
+    include: (element: T) => boolean
+  ): AsyncIterable<T> {
+    const resultIterable = {
+      [Symbol.asyncIterator]: async function* (): AsyncIterator<T> {
+        for await (const element of iterable) {
+          const included = include(element);
+          if (included) {
+            yield element;
+          }
+        }
+      },
+    };
+    return resultIterable;
+  }
+
+  /**
    * Creates an iterable from the given one, applying the
    * given function to each element.
    *
