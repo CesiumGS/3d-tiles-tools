@@ -6,6 +6,20 @@
  */
 export interface ResourceResolver {
   /**
+   * Returns the URI that results from resolving the given
+   * URI against the base URI of this resource resolver.
+   *
+   * The result will be a relative URI that includes path
+   * components that reflect the paths that have been given
+   * when this resource resolver was created by calling
+   * `derive` on another resource resolver.
+   *
+   * @param uri - The URI
+   * @returns The resolved URI
+   */
+  resolveUri(uri: string): string;
+
+  /**
    * Resolve the data from the given URI.
    *
    * The given URI may be relative to the base URI for

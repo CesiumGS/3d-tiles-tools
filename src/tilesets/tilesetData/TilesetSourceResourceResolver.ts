@@ -18,6 +18,12 @@ export class TilesetSourceResourceResolver implements ResourceResolver {
     this._tilesetSource = tilesetSource;
   }
 
+  /** {@inheritDoc ResourceResolver.resolveUri} */
+  resolveUri(uri: string): string {
+    const resolved = Paths.join(this._basePath, uri);
+    return resolved;
+  }
+
   /** {@inheritDoc ResourceResolver.resolveData} */
   async resolveData(uri: string): Promise<Buffer | null> {
     return this.resolveDataInternal(uri);
@@ -43,7 +49,7 @@ export class TilesetSourceResourceResolver implements ResourceResolver {
     if (Uris.isAbsoluteUri(uri)) {
       return null;
     }
-    const localUri = Paths.join(this._basePath, uri);
+    const localUri = this.resolveUri(uri);
     const value = await this._tilesetSource.getValue(localUri);
     if (!value) {
       return null;
