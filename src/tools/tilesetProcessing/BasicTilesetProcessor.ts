@@ -157,6 +157,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * The given tile is assumed to be an explicit tile in the
    * current tileset.
    *
+   * @param tileset - The tileset
    * @param tile - The tile where to start the traversal
    * @param callback - The callback
    * @returns A promise that resolves when the process is finished
@@ -170,6 +171,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     const context = this.getContext();
     const tilesetSource = context.tilesetSource;
     const schema = context.schema;
+    const tileset = context.sourceTileset;
 
     // Create the resource resolver that will be used for
     // resolving ".subtree" files of implicit tilesets
@@ -182,7 +184,12 @@ export class BasicTilesetProcessor extends TilesetProcessor {
       depthFirst: false,
       traverseExternalTilesets: true,
     });
-    await tilesetTraverser.traverseWithSchemaAt(tile, schema, callback);
+    await tilesetTraverser.traverseWithSchemaAt(
+      tileset,
+      tile,
+      schema,
+      callback
+    );
   }
 
   /**

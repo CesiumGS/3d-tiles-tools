@@ -1,5 +1,6 @@
 import { ResourceResolver } from "../../base";
 
+import { Tileset } from "../../structure";
 import { Tile } from "../../structure";
 import { Content } from "../../structure";
 
@@ -173,4 +174,11 @@ export interface TraversedTile {
    * @returns The subtree URI, or `undefined`
    */
   getSubtreeUri(): string | undefined;
+
+  /**
+   * Returns the the tileset that this tile belongs to.
+   *
+   * @returns The tileset
+   */
+  getTileset(): Tileset;
 }

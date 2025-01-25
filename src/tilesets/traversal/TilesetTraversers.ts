@@ -35,6 +35,8 @@ export class TilesetTraversers {
    *
    * @param tilesetSource - The tileset source
    * @param tilesetJsonFileName The tileset JSON file name
+   * @param traverseExternalTilesets - Whether external tileset tiles
+   * should be included in the result
    * @param depthFirst Whether the iteration order should be depth-first
    * @returns The traversed tile iterable
    * @throws TilesetError If the given tileset source does not contain
@@ -43,6 +45,7 @@ export class TilesetTraversers {
   static async createTraversedTilesIterable(
     tilesetSource: TilesetSource,
     tilesetJsonFileName: string,
+    traverseExternalTilesets: boolean,
     depthFirst: boolean
   ): Promise<AsyncIterable<TraversedTile>> {
     const traversedRootTile = await TilesetTraversers.createTraversedRootTile(
@@ -51,6 +54,7 @@ export class TilesetTraversers {
     );
     return TilesetTraversers.createIterableFromTraversedTile(
       traversedRootTile,
+      traverseExternalTilesets,
       depthFirst
     );
   }
@@ -60,11 +64,14 @@ export class TilesetTraversers {
    * the given traversed tile.
    *
    * @param traversedRootTile - The tile to start the traversal from
+   * @param traverseExternalTilesets - Whether external tileset tiles
+   * should be included in the result
    * @param depthFirst Whether the iteration order should be depth-first
    * @returns The traversed tile iterable
    */
   static createIterableFromTraversedTile(
     traversedRootTile: TraversedTile,
+    traverseExternalTilesets: boolean,
     depthFirst: boolean
   ): AsyncIterable<TraversedTile> {
     const resultIterable = {
@@ -77,7 +84,21 @@ export class TilesetTraversers {
               : stack.shift();
             if (currentTraversedTile) {
               const children = await currentTraversedTile.getChildren();
-              stack.push(...children);
+              if (children.length === 0) {
+                if (traverseExternalTilesets) {
+                  // When there are no children, but external tilesets should
+                  // be traversed, determine the roots of external tilesets
+                  // and put them on the traversal stack
+                  const externalRoots =
+                    await TilesetTraversers.createExternalTilesetRoots(
+                      ".",
+                      currentTraversedTile
+                    );
+                  stack.push(...externalRoots);
+                }
+              } else {
+                stack.push(...children);
+              }
               return { done: false, value: currentTraversedTile };
             } else {
               return { done: true, value: undefined };
@@ -134,6 +155,7 @@ export class TilesetTraversers {
     );
     const root = tileset.root;
     const traversedTile = ExplicitTraversedTile.createRoot(
+      tileset,
       root,
       schema,
       resourceResolver
@@ -195,6 +217,7 @@ export class TilesetTraversers {
           externalResourceResolver
         );
         const externalRoot = new ExplicitTraversedTile(
+          externalTileset,
           externalTileset.root,
           traversedTile.path + `/[external:${contentUri}]/root`,
           traversedTile.level + 1,
