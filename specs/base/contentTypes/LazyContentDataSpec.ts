@@ -5,6 +5,9 @@ import { ResourceResolver } from "../../../src/base";
 
 function createTestResourceResolver(): ResourceResolver {
   return {
+    resolveUri(uri: string) {
+      return uri;
+    },
     async resolveData(uri: string): Promise<Buffer | null> {
       return null;
     },
