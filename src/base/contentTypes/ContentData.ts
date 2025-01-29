@@ -36,10 +36,10 @@ export interface ContentData {
   /**
    * Returns the actual content data that was read from the URI.
    *
-   * @returns The promise to the data, or to `null` when the
+   * @returns The promise to the data, or to `undefined` when the
    * data could not be obtained.
    */
-  getData(): Promise<Buffer | null>;
+  getData(): Promise<Buffer | undefined>;
 
   /**
    * Returns the object that was parsed from the content data,

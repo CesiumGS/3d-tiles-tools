@@ -28,13 +28,13 @@ export class FileResourceResolver implements ResourceResolver {
   async resolveDataPartial(
     uri: string,
     maxBytes: number
-  ): Promise<Buffer | null> {
+  ): Promise<Buffer | undefined> {
     if (Uris.isDataUri(uri)) {
       const data = Buffer.from(uri.split(",")[1], "base64");
       return data;
     }
     if (Uris.isAbsoluteUri(uri)) {
-      return null;
+      return undefined;
     }
     const resolved = this.resolveUri(uri);
     try {
@@ -44,22 +44,22 @@ export class FileResourceResolver implements ResourceResolver {
       fs.closeSync(fd);
       return buffer;
     } catch (error) {
-      return null;
+      return undefined;
     }
   }
 
   /** {@inheritDoc ResourceResolver.resolveData} */
-  async resolveData(uri: string): Promise<Buffer | null> {
+  async resolveData(uri: string): Promise<Buffer | undefined> {
     if (Uris.isDataUri(uri)) {
       const data = Buffer.from(uri.split(",")[1], "base64");
       return data;
     }
     if (Uris.isAbsoluteUri(uri)) {
-      return null;
+      return undefined;
     }
     const resolved = this.resolveUri(uri);
     if (!fs.existsSync(resolved)) {
-      return null;
+      return undefined;
     }
     const data = fs.readFileSync(resolved);
     // See https://github.com/nodejs/node/issues/35351

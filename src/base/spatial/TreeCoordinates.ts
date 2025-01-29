@@ -14,11 +14,11 @@ export interface TreeCoordinates {
 
   /**
    * Returns the parent coordinates of these coordinates,
-   * or `null` if this is the root.
+   * or `undefined` if this is the root.
    *
    * @returns The parent coordinates
    */
-  parent(): TreeCoordinates | null;
+  parent(): TreeCoordinates | undefined;
 
   /**
    * Returns a generator for the child coordinates of these coordinates

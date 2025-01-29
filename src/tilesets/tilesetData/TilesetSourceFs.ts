@@ -60,11 +60,12 @@ export class TilesetSourceFs implements TilesetSource {
     if (!fs.existsSync(fullFileName)) {
       return undefined;
     }
-    const data = fs.readFileSync(fullFileName);
-    if (data === null) {
+    try {
+      const data = fs.readFileSync(fullFileName);
+      return data;
+    } catch (error) {
       return undefined;
     }
-    return data;
   }
 
   /** {@inheritDoc TilesetSource.close} */

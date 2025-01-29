@@ -27,9 +27,9 @@ export interface ResourceResolver {
    *
    * @param uri - The URI
    * @returns A promise that resolves with the buffer data,
-   * or with `null` if the resource could not be resolved.
+   * or with `undefined` if the resource could not be resolved.
    */
-  resolveData(uri: string): Promise<Buffer | null>;
+  resolveData(uri: string): Promise<Buffer | undefined>;
 
   /**
    * Resolve parts of the data from the given URI.
@@ -37,7 +37,7 @@ export interface ResourceResolver {
    * The given URI may be relative to the base URI for
    * which this instance has been created.
    *
-   * If the resource cannot be resolved, then `null` is
+   * If the resource cannot be resolved, then `undefined` is
    * returned.
    *
    * Otherwise, the returned buffer contains _at least_ the
@@ -46,9 +46,12 @@ export interface ResourceResolver {
    *
    * @param uri - The URI
    * @returns A promise that resolves with the buffer data,
-   * or with `null` if the resource could not be resolved.
+   * or with `undefined` if the resource could not be resolved.
    */
-  resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
+  resolveDataPartial(
+    uri: string,
+    maxBytes: number
+  ): Promise<Buffer | undefined>;
 
   /**
    * Derive an instance from this one, with a different base
