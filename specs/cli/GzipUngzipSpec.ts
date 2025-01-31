@@ -41,7 +41,7 @@ describe("The gzip and ungzip command line operations", function () {
       overwrite,
       tilesOnly
     );
-    const difference = SpecHelpers.computePackageDifference(
+    const difference = await SpecHelpers.computePackageDifference(
       simpleTilesetGzip,
       outputSimpleTilesetGzip
     );
@@ -59,7 +59,7 @@ describe("The gzip and ungzip command line operations", function () {
       overwrite,
       tilesOnly
     );
-    const difference = SpecHelpers.computePackageDifference(
+    const difference = await SpecHelpers.computePackageDifference(
       simpleTilesetGzipTilesOnly,
       outputSimpleTilesetGzipTilesOnly
     );
@@ -76,7 +76,7 @@ describe("The gzip and ungzip command line operations", function () {
       outputSimpleTilesetFromGzip,
       overwrite
     );
-    const difference = SpecHelpers.computePackageDifference(
+    const difference = await SpecHelpers.computePackageDifference(
       simpleTileset,
       outputSimpleTilesetFromGzip
     );
@@ -93,7 +93,7 @@ describe("The gzip and ungzip command line operations", function () {
       outputSimpleTilesetFromGzipTilesOnly,
       overwrite
     );
-    const difference = SpecHelpers.computePackageDifference(
+    const difference = await SpecHelpers.computePackageDifference(
       simpleTileset,
       outputSimpleTilesetFromGzipTilesOnly
     );

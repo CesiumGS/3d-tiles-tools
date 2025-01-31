@@ -1,5 +1,7 @@
 import path from "path";
 
+import { TilesetSource } from "../../tilesets";
+import { TilesetTarget } from "../../tilesets";
 import { TilesetSources } from "../../tilesets";
 import { TilesetTargets } from "../../tilesets";
 
@@ -11,9 +13,10 @@ import { TilesetProcessorContext } from "./TilesetProcessorContext";
 /**
  * A class summarizing the data that a `TilesetProcessor` is operating on.
  *
- * This is initialized during the `TilesetProcessor.begin` call, if all
- * the source- and target information could be resolved, and is supposed
- * to represent a consistent, properly initialized state to work on.
+ * This is initialized during the `TilesetProcessor.begin` or `beginData`
+ * call, if all the source- and target information could be resolved,
+ * and is supposed to represent a consistent, properly initialized
+ * state to work on.
  *
  * @internal
  */
@@ -30,8 +33,8 @@ export class TilesetProcessorContexts {
    * @param tilesetTargetName - The tileset target name
    * @param overwrite - Whether the target should be overwritten if
    * it already exists
-   * @returns A promise that resolves when this processor has been
-   * initialized
+   * @returns A promise that resolves when this the context
+   * has been created
    * @throws TilesetError When the input could not be opened,
    * or when the output already exists and `overwrite` was `false`.
    */
@@ -40,14 +43,11 @@ export class TilesetProcessorContexts {
     tilesetTargetName: string,
     overwrite: boolean
   ): Promise<TilesetProcessorContext> {
-    let tilesetSource;
-    let tilesetTarget;
+    let tilesetSource: TilesetSource | undefined;
+    let tilesetTarget: TilesetTarget | undefined;
     try {
-      tilesetSource = TilesetSources.createAndOpen(tilesetSourceName);
-      tilesetTarget = TilesetTargets.createAndBegin(
-        tilesetTargetName,
-        overwrite
-      );
+      tilesetSource = TilesetSources.createFromName(tilesetSourceName);
+      tilesetTarget = TilesetTargets.createFromName(tilesetTargetName);
 
       const tilesetSourceJsonFileName =
         TilesetProcessorContexts.determineTilesetJsonFileName(
@@ -59,38 +59,20 @@ export class TilesetProcessorContexts {
           tilesetTargetName
         );
 
-      // Obtain the tileset object from the tileset JSON file
-      const sourceTileset = TilesetProcessing.parseSourceValue<Tileset>(
-        tilesetSource,
-        tilesetSourceJsonFileName
-      );
+      // Open the source and the target
+      await tilesetSource.open(tilesetSourceName);
+      await tilesetTarget.begin(tilesetTargetName, overwrite);
 
-      // Resolve the schema, either from the `tileset.schema`
-      // or the `tileset.schemaUri`
-      const schema = TilesetProcessing.resolveSchema(
+      return TilesetProcessorContexts.createFromData(
         tilesetSource,
-        sourceTileset
+        tilesetSourceJsonFileName,
+        tilesetTarget,
+        tilesetTargetJsonFileName
       );
-
-      // If nothing has thrown up to this point, then
-      // a `TilesetProcessorContext` with a valid
-      // state can be created:
-      const context = {
-        tilesetSource: tilesetSource,
-        tilesetSourceJsonFileName: tilesetSourceJsonFileName,
-        sourceTileset: sourceTileset,
-        schema: schema,
-        tilesetTarget: tilesetTarget,
-        tilesetTargetJsonFileName: tilesetTargetJsonFileName,
-        targetTileset: sourceTileset,
-        processedKeys: {},
-        targetKeys: {},
-      };
-      return context;
     } catch (error) {
       if (tilesetSource) {
         try {
-          tilesetSource.close();
+          await tilesetSource.close();
         } catch (e) {
           // Error already about to be re-thrown
         }
@@ -107,6 +89,98 @@ export class TilesetProcessorContexts {
   }
 
   /**
+   * Creates a `TilesetProcessorContext` for the given source- and
+   * target name.
+   *
+   * This assumes that the given source has already been opened
+   * by calling `open`, and the given target has already been
+   * initialized by calling `begin`.
+   *
+   * @param tilesetSourceName - The tileset source name
+   * @param tilesetSourceJsonFileName - The name of the top-level
+   * tileset JSON file in the source
+   * @param tilesetTargetName - The tileset target name
+   * @param tilesetTargetJsonFileName - The name of the top-level
+   * tileset JSON file in the target
+   * @returns A promise that resolves when this the context
+   * has been created
+   * @throws TilesetError When the required input data could not
+   * be obtained from the given source
+   */
+  static async createFromData(
+    tilesetSource: TilesetSource,
+    tilesetSourceJsonFileName: string,
+    tilesetTarget: TilesetTarget,
+    tilesetTargetJsonFileName: string
+  ): Promise<TilesetProcessorContext> {
+    const context = await TilesetProcessorContexts.createInstance(
+      tilesetSource,
+      tilesetSourceJsonFileName,
+      tilesetTarget,
+      tilesetTargetJsonFileName
+    );
+    return context;
+  }
+
+  /**
+   * A low-level method to create an instance of a tileset processor context.
+   *
+   * Clients will usually just call the `create` method, which creates the
+   * source- and target instances and determines the tileset JSON file
+   * names based on the input- and output name.
+   *
+   * This method will resolve the input tileset JSON and its
+   * schema based on the given tileset source JSON file name.
+   *
+   * @param tilesetSource - The `TilesetSource` instance
+   * @param tilesetSourceJsonFileName - The name of the file in the
+   * given source that contains the main tileset JSON
+   * @param tilesetTarget The `TilesetTarget` instance
+   * @param tilesetTargetJsonFileName - The name that the main tileset
+   * JSON file should have in the target
+   * @returns A promise that resolves when this the context
+   * has been created
+   * @throws TilesetError If the source or target cannot be
+   * accessed, or a required input file (like the tileset JSON
+   * or its schema) cannot be resolved in the source
+   */
+  static async createInstance(
+    tilesetSource: TilesetSource,
+    tilesetSourceJsonFileName: string,
+    tilesetTarget: TilesetTarget,
+    tilesetTargetJsonFileName: string
+  ): Promise<TilesetProcessorContext> {
+    // Obtain the tileset object from the tileset JSON file
+    const sourceTileset = await TilesetSources.parseSourceValue<Tileset>(
+      tilesetSource,
+      tilesetSourceJsonFileName
+    );
+
+    // Resolve the schema, either from the `tileset.schema`
+    // or the `tileset.schemaUri`
+    const schema = await TilesetProcessing.resolveSchema(
+      tilesetSource,
+      sourceTileset
+    );
+
+    // If nothing has thrown up to this point, then
+    // a `TilesetProcessorContext` with a valid
+    // state can be created:
+    const context = {
+      tilesetSource: tilesetSource,
+      tilesetSourceJsonFileName: tilesetSourceJsonFileName,
+      sourceTileset: sourceTileset,
+      schema: schema,
+      tilesetTarget: tilesetTarget,
+      tilesetTargetJsonFileName: tilesetTargetJsonFileName,
+      targetTileset: sourceTileset,
+      processedKeys: {},
+      targetKeys: {},
+    };
+    return context;
+  }
+
+  /**
    * Close the source and the target that are contained in the given
    * context.
    *
@@ -115,7 +189,7 @@ export class TilesetProcessorContexts {
    */
   static async close(context: TilesetProcessorContext) {
     try {
-      context.tilesetSource.close();
+      await context.tilesetSource.close();
     } catch (error) {
       try {
         await context.tilesetTarget.end();

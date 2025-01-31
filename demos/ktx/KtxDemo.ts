@@ -80,4 +80,4 @@ async function runDemo() {
   await convertImageData();
 }
 
-runDemo();
+void runDemo();

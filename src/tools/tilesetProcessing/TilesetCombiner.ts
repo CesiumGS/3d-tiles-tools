@@ -85,20 +85,57 @@ export class TilesetCombiner {
     logger.debug(`  tilesetSourceName: ${tilesetSourceName}`);
     logger.debug(`  tilesetTargetName: ${tilesetTargetName}`);
 
-    const tilesetSource = TilesetSources.createAndOpen(tilesetSourceName);
-    const tilesetTarget = TilesetTargets.createAndBegin(
+    const tilesetSource = await TilesetSources.createAndOpen(tilesetSourceName);
+    const tilesetTarget = await TilesetTargets.createAndBegin(
       tilesetTargetName,
       overwrite
     );
-
-    this.tilesetSource = tilesetSource;
-    this.tilesetTarget = tilesetTarget;
-
     const tilesetSourceJsonFileName =
       Tilesets.determineTilesetJsonFileName(tilesetSourceName);
 
     const tilesetTargetJsonFileName =
       Tilesets.determineTilesetJsonFileName(tilesetTargetName);
+
+    await this.combineData(
+      tilesetSource,
+      tilesetSourceJsonFileName,
+      tilesetTarget,
+      tilesetTargetJsonFileName
+    );
+
+    await tilesetSource.close();
+    await tilesetTarget.end();
+
+    logger.debug(`Running combine DONE`);
+  }
+
+  /**
+   * Combines ("inlines") the external tilesets that are referred to by
+   * the given source tileset, and writes the result to the given target.
+   *
+   * The caller is responsible for calling `open` on the given
+   * source and `begin` on the given target before calling this
+   * method, and `close` on the source and `end` on the target
+   * after calling this method.
+   *
+   * @param tilesetSource - The tileset source
+   * @param tilesetSourceJsonFileName - The name of the top-level
+   * tileset JSON file in the source
+   * @param tilesetTarget - The tileset target
+   * @param tilesetTargetJsonFileName - The name of the top-level
+   * tileset JSON file in the target
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError When the input could not be processed,
+   * or when the output already exists and `overwrite` was `false`.
+   */
+  async combineData(
+    tilesetSource: TilesetSource,
+    tilesetSourceJsonFileName: string,
+    tilesetTarget: TilesetTarget,
+    tilesetTargetJsonFileName: string
+  ): Promise<void> {
+    this.tilesetSource = tilesetSource;
+    this.tilesetTarget = tilesetTarget;
 
     await this.combineInternal(
       tilesetSource,
@@ -107,13 +144,8 @@ export class TilesetCombiner {
       tilesetTargetJsonFileName
     );
 
-    tilesetSource.close();
-    await tilesetTarget.end();
-
     this.tilesetSource = undefined;
     this.tilesetTarget = undefined;
-
-    logger.debug(`Running combine DONE`);
   }
 
   /**
@@ -141,21 +173,18 @@ export class TilesetCombiner {
     tilesetTarget: TilesetTarget,
     tilesetTargetJsonFileName: string
   ): Promise<void> {
-    const tilesetJsonBuffer = tilesetSource.getValue(tilesetSourceJsonFileName);
-    if (!tilesetJsonBuffer) {
-      const message = `No ${tilesetSourceJsonFileName} found in input`;
-      throw new TilesetError(message);
-    }
-    const tileset = JSON.parse(tilesetJsonBuffer.toString()) as Tileset;
-
+    const tileset = await TilesetSources.parseSourceValue<Tileset>(
+      tilesetSource,
+      tilesetSourceJsonFileName
+    );
     this.externalTilesetFileNames.length = 0;
     await this.combineTilesetsInternal(".", tileset);
 
-    this.copyResources(tilesetTargetJsonFileName);
+    await this.copyResources(tilesetTargetJsonFileName);
 
     const combinedTilesetJsonString = JSON.stringify(tileset, null, 2);
     const combinedTilesetJsonBuffer = Buffer.from(combinedTilesetJsonString);
-    tilesetTarget.addEntry(
+    await tilesetTarget.addEntry(
       tilesetTargetJsonFileName,
       combinedTilesetJsonBuffer
     );
@@ -286,7 +315,9 @@ export class TilesetCombiner {
     // an external tileset
     const contentUri = TilesetCombiner.obtainContentUri(content);
     const externalFileName = Paths.join(currentDirectory, contentUri);
-    const externalFileBuffer = this.tilesetSource.getValue(externalFileName);
+    const externalFileBuffer = await this.tilesetSource.getValue(
+      externalFileName
+    );
     if (!externalFileBuffer) {
       throw new TilesetError(`No data found for ${externalFileName}`);
     }
@@ -358,7 +389,9 @@ export class TilesetCombiner {
       // an external tileset
       const contentUri = TilesetCombiner.obtainContentUri(content);
       const externalFileName = Paths.join(currentDirectory, contentUri);
-      const externalFileBuffer = this.tilesetSource.getValue(externalFileName);
+      const externalFileBuffer = await this.tilesetSource.getValue(
+        externalFileName
+      );
       if (!externalFileBuffer) {
         throw new TilesetError(`No data found for ${externalFileName}`);
       }
@@ -456,12 +489,14 @@ export class TilesetCombiner {
    * @param tilesetTargetJsonFileName - The name of the target file
    * that will contain the combined tileset JSON
    */
-  private copyResources(tilesetTargetJsonFileName: string): void {
+  private async copyResources(
+    tilesetTargetJsonFileName: string
+  ): Promise<void> {
     if (!this.tilesetSource || !this.tilesetTarget) {
       throw new DeveloperError("The source and target must be defined");
     }
-    const entries = TilesetSources.getEntries(this.tilesetSource);
-    for (const entry of entries) {
+    const entries = await TilesetSources.getEntries(this.tilesetSource);
+    for await (const entry of entries) {
       const key = entry.key;
       if (key === tilesetTargetJsonFileName) {
         continue;
@@ -469,7 +504,7 @@ export class TilesetCombiner {
       if (this.externalTilesetFileNames.includes(key)) {
         continue;
       }
-      this.tilesetTarget.addEntry(key, entry.value);
+      await this.tilesetTarget.addEntry(key, entry.value);
     }
   }
 }

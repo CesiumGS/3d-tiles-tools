@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 
+import { Paths } from "../../base";
 import { TilesetTarget } from "./TilesetTarget";
 import { TilesetError } from "./TilesetError";
 
@@ -31,19 +32,24 @@ export class TilesetTargetFs implements TilesetTarget {
   }
 
   /** {@inheritDoc TilesetTarget.begin} */
-  begin(fullOutputName: string, overwrite: boolean) {
+  async begin(fullOutputName: string, overwrite: boolean) {
     if (this.fullOutputName) {
       throw new TilesetError("Target already opened");
     }
-    this.fullOutputName = fullOutputName;
+    const extension = path.extname(fullOutputName);
+    if (extension === "") {
+      this.fullOutputName = fullOutputName;
+    } else {
+      this.fullOutputName = path.dirname(fullOutputName);
+    }
     this.overwrite = overwrite;
-    if (!fs.existsSync(fullOutputName)) {
-      fs.mkdirSync(fullOutputName, { recursive: true });
+    if (!fs.existsSync(this.fullOutputName)) {
+      fs.mkdirSync(this.fullOutputName, { recursive: true });
     }
   }
 
   /** {@inheritDoc TilesetTarget.addEntry} */
-  addEntry(key: string, content: Buffer) {
+  async addEntry(key: string, content: Buffer) {
     if (!this.fullOutputName) {
       throw new TilesetError("Target is not opened. Call 'begin' first.");
     }
@@ -53,8 +59,7 @@ export class TilesetTargetFs implements TilesetTarget {
         throw new TilesetError("File already exists: " + fullOutputFileName);
       }
     }
-    // TODO Need to unlink if file exists?
-    fs.mkdirSync(path.dirname(fullOutputFileName), { recursive: true });
+    Paths.ensureDirectoryExists(path.dirname(fullOutputFileName));
     fs.writeFileSync(fullOutputFileName, content);
   }
 

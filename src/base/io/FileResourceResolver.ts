@@ -4,6 +4,7 @@ import path from "path";
 import { Uris } from "../base/Uris";
 
 import { ResourceResolver } from "./ResourceResolver";
+import { Paths } from "../base/Paths";
 
 /**
  * Implementation of a `ResourceResolver` based on a file system.
@@ -17,9 +18,9 @@ export class FileResourceResolver implements ResourceResolver {
     this._basePath = basePath;
   }
 
-  private resolveUri(uri: string): string {
-    let resolved = path.resolve(this._basePath, decodeURIComponent(uri));
-    resolved = resolved.replace(/\\/g, "/");
+  /** {@inheritDoc ResourceResolver.resolveUri} */
+  resolveUri(uri: string): string {
+    const resolved = Paths.join(this._basePath, decodeURIComponent(uri));
     return resolved;
   }
 

@@ -6,7 +6,6 @@ import { TilesetTarget3dtiles } from "../packages/TilesetTarget3dtiles";
 import { TilesetTarget } from "./TilesetTarget";
 import { TilesetError } from "./TilesetError";
 import { TilesetTargetFs } from "./TilesetTargetFs";
-import { TilesetEntry } from "./TilesetEntry";
 
 import { Loggers } from "../../base";
 const logger = Loggers.get("tilesetData");
@@ -21,18 +20,19 @@ export class TilesetTargets {
    * Create a tileset target for the given name, and prepare
    * it to accept entries.
    *
-   * The given name may have the extension `.3tz` or `.3dtiles`,
-   * or no extension to indicate a directory.
-   *
-   * If the given name as the extension `.json`, then a target
-   * for the directory that contains the given file is created.
+   * This will call `TilesetTargets.create` with the extension
+   * of the given name, and immediately call `begin(name)` on
+   * the resulting target.
    *
    * @param name - The name
    * @param overwrite - Whether existing output files should be overwritten
    * @returns The `TilesetTarget`
    * @throws TilesetError If the output can not be opened
    */
-  static createAndBegin(name: string, overwrite: boolean): TilesetTarget {
+  static async createAndBegin(
+    name: string,
+    overwrite: boolean
+  ): Promise<TilesetTarget> {
     let extension = path.extname(name).toLowerCase();
     if (extension === ".json") {
       extension = "";
@@ -44,7 +44,35 @@ export class TilesetTargets {
         `Could not create tileset target for name ${name} with extension "${extension}"`
       );
     }
-    tilesetTarget.begin(name, overwrite);
+    await tilesetTarget.begin(name, overwrite);
+    return tilesetTarget;
+  }
+
+  /**
+   * Create a tileset target for the given name.
+   *
+   * The given name may have the extension `.3tz` or `.3dtiles`,
+   * or no extension to indicate a directory.
+   *
+   * If the given name as the extension `.json`, then a target
+   * for the directory that contains the given file is created.
+   *
+   * @param name - The name
+   * @returns The `TilesetTarget`
+   * @throws TilesetError If the output can not be opened
+   */
+  static createFromName(name: string): TilesetTarget {
+    let extension = path.extname(name).toLowerCase();
+    if (extension === ".json") {
+      extension = "";
+      name = path.dirname(name);
+    }
+    const tilesetTarget = TilesetTargets.create(extension);
+    if (!tilesetTarget) {
+      throw new TilesetError(
+        `Could not create tileset target for name ${name} with extension "${extension}"`
+      );
+    }
     return tilesetTarget;
   }
 
@@ -69,20 +97,5 @@ export class TilesetTargets {
     }
     logger.error("Unknown target type: " + extension);
     return undefined;
-  }
-
-  /**
-   * Put all the given entries into the given tileset target.
-   *
-   * @param tilesetTarget - The `TilesetTarget`
-   * @param entries - The iterator over the entries
-   */
-  static putEntries(
-    tilesetTarget: TilesetTarget,
-    entries: Iterable<TilesetEntry>
-  ) {
-    for (const entry of entries) {
-      tilesetTarget.addEntry(entry.key, entry.value);
-    }
   }
 }

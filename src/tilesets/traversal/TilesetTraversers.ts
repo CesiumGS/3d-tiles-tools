@@ -10,6 +10,8 @@ import { Paths } from "../../base";
 import { Tileset } from "../../structure";
 import { Schema } from "../../structure";
 
+import { TilesetSource } from "../tilesetData/TilesetSource";
+import { TilesetSources } from "../tilesetData/TilesetSources";
 import { TilesetSourceResourceResolver } from "../tilesetData/TilesetSourceResourceResolver";
 
 import { TraversedTile } from "./TraversedTile";
@@ -28,6 +30,140 @@ const logger = Loggers.get("traversal");
  */
 export class TilesetTraversers {
   /**
+   * Creates an iterable over the traversed tile instances for the specified
+   * tileset from the given tileset source.
+   *
+   * @param tilesetSource - The tileset source
+   * @param tilesetJsonFileName The tileset JSON file name
+   * @param traverseExternalTilesets - Whether external tileset tiles
+   * should be included in the result
+   * @param depthFirst Whether the iteration order should be depth-first
+   * @returns The traversed tile iterable
+   * @throws TilesetError If the given tileset source does not contain
+   * a tileset JSON with the given name.
+   */
+  static async createTraversedTilesIterable(
+    tilesetSource: TilesetSource,
+    tilesetJsonFileName: string,
+    traverseExternalTilesets: boolean,
+    depthFirst: boolean
+  ): Promise<AsyncIterable<TraversedTile>> {
+    const traversedRootTile = await TilesetTraversers.createTraversedRootTile(
+      tilesetSource,
+      tilesetJsonFileName
+    );
+    return TilesetTraversers.createIterableFromTraversedTile(
+      traversedRootTile,
+      traverseExternalTilesets,
+      depthFirst
+    );
+  }
+
+  /**
+   * Creates an iterable over the traversed tile instances that start at
+   * the given traversed tile.
+   *
+   * @param traversedRootTile - The tile to start the traversal from
+   * @param traverseExternalTilesets - Whether external tileset tiles
+   * should be included in the result
+   * @param depthFirst Whether the iteration order should be depth-first
+   * @returns The traversed tile iterable
+   */
+  static createIterableFromTraversedTile(
+    traversedRootTile: TraversedTile,
+    traverseExternalTilesets: boolean,
+    depthFirst: boolean
+  ): AsyncIterable<TraversedTile> {
+    const resultIterable = {
+      [Symbol.asyncIterator]: (): AsyncIterator<TraversedTile> => {
+        const stack = [traversedRootTile];
+        return {
+          async next(): Promise<IteratorResult<TraversedTile>> {
+            const currentTraversedTile = depthFirst
+              ? stack.pop()
+              : stack.shift();
+            if (currentTraversedTile) {
+              const children = await currentTraversedTile.getChildren();
+              if (children.length === 0) {
+                if (traverseExternalTilesets) {
+                  // When there are no children, but external tilesets should
+                  // be traversed, determine the roots of external tilesets
+                  // and put them on the traversal stack
+                  const externalRoots =
+                    await TilesetTraversers.createExternalTilesetRoots(
+                      ".",
+                      currentTraversedTile
+                    );
+                  stack.push(...externalRoots);
+                }
+              } else {
+                stack.push(...children);
+              }
+              return { done: false, value: currentTraversedTile };
+            } else {
+              return { done: true, value: undefined };
+            }
+          },
+        };
+      },
+    };
+    return resultIterable;
+  }
+
+  /**
+   * Create a traversed tile for the root of the specified tileset from the
+   * given tileset source.
+   *
+   * @param tilesetSource - The tileset source
+   * @param tilesetJsonFileName The tileset JSON file name
+   * @returns The traversed tile
+   * @throws TilesetError If the given tileset source does not contain
+   * a tileset JSON with the given name.
+   */
+  static async createTraversedRootTile(
+    tilesetSource: TilesetSource,
+    tilesetJsonFileName: string
+  ) {
+    const tileset = await TilesetSources.parseSourceValue<Tileset>(
+      tilesetSource,
+      tilesetJsonFileName
+    );
+    return TilesetTraversers.createTraversedRootTileForTileset(
+      tilesetSource,
+      tileset
+    );
+  }
+  /**
+   * Creates a traversed tile for the root tile of the given tileset from
+   * the given tileset source.
+   *
+   * @param tilesetSource - The tileset source
+   * @param tileset - The tileset from the tileset source
+   * @returns The traversed tile
+   */
+  static async createTraversedRootTileForTileset(
+    tilesetSource: TilesetSource,
+    tileset: Tileset
+  ): Promise<TraversedTile> {
+    const resourceResolver = new TilesetSourceResourceResolver(
+      ".",
+      tilesetSource
+    );
+    const schema = await TilesetTraversers.resolveSchema(
+      tileset,
+      resourceResolver
+    );
+    const root = tileset.root;
+    const traversedTile = ExplicitTraversedTile.createRoot(
+      tileset,
+      root,
+      schema,
+      resourceResolver
+    );
+    return traversedTile;
+  }
+
+  /**
    * Create the nodes that are the roots of external tilesets
    * that are referred to by the given traversed tile.
    *
@@ -40,7 +176,7 @@ export class TilesetTraversers {
    * from the absolute URI.
    * @param traversedTile - The `TraversedTile`
    * @returns The external tileset roots
-   * @throws DataError If one of the externa tilesets or
+   * @throws DataError If one of the external tilesets or
    * its associated files could not be resolved.
    */
   static async createExternalTilesetRoots(
@@ -81,6 +217,7 @@ export class TilesetTraversers {
           externalResourceResolver
         );
         const externalRoot = new ExplicitTraversedTile(
+          externalTileset,
           externalTileset.root,
           traversedTile.path + `/[external:${contentUri}]/root`,
           traversedTile.level + 1,
@@ -153,22 +290,28 @@ export class TilesetTraversers {
       const tilesetJsonFileName = "tileset.json";
       // XXX TODO There is no matching 'close' call for this!
       try {
-        externalTilesetSource.open(absoluteUri);
+        await externalTilesetSource.open(absoluteUri);
       } catch (e) {
         logger.warn(
           `Could not open external tileset from ${absoluteUri} - ignoring`
         );
         return undefined;
       }
-      let externalTileset;
-      const tilesetJsonData =
-        externalTilesetSource.getValue(tilesetJsonFileName);
+      let externalTileset: Tileset | undefined;
+      const tilesetJsonData = await externalTilesetSource.getValue(
+        tilesetJsonFileName
+      );
       if (!tilesetJsonData) {
         throw new DataError(`Could not resolve ${tilesetJsonFileName}`);
       }
       try {
         externalTileset = JSON.parse(tilesetJsonData.toString("utf-8"));
       } catch (e) {
+        throw new DataError(
+          `Could not parse tileset from ${tilesetJsonFileName}`
+        );
+      }
+      if (!externalTileset) {
         throw new DataError(
           `Could not parse tileset from ${tilesetJsonFileName}`
         );

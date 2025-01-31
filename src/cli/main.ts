@@ -579,4 +579,4 @@ async function runChecked() {
   }
 }
 
-runChecked();
+void runChecked();

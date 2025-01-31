@@ -69,13 +69,16 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * processing the source tileset and write all entries
    * that have not been processed yet into the target.
    *
+   * @param close - Whether calling this should try to close
+   * the source and target of the current context, defaulting
+   * to `true`.
    * @returns A promise that resolves when the operation finished
    * @throws TilesetError When there was an error while processing
    * or storing the entries.
    */
-  override async end(): Promise<void> {
+  override async end(close?: boolean): Promise<void> {
     await this.storeTargetTileset();
-    await super.end();
+    await super.end(close);
   }
 
   /**
@@ -123,8 +126,8 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     const context = this.getContext();
     const tilesetSource = context.tilesetSource;
     const tilesetSourceJsonFileName = context.tilesetSourceJsonFileName;
-    const sourceKeys = tilesetSource.getKeys();
-    for (const sourceKey of sourceKeys) {
+    const sourceKeys = await tilesetSource.getKeys();
+    for await (const sourceKey of sourceKeys) {
       if (sourceKey !== tilesetSourceJsonFileName) {
         await this.processEntry(sourceKey, entryProcessor);
       }
@@ -154,6 +157,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
    * The given tile is assumed to be an explicit tile in the
    * current tileset.
    *
+   * @param tileset - The tileset
    * @param tile - The tile where to start the traversal
    * @param callback - The callback
    * @returns A promise that resolves when the process is finished
@@ -167,6 +171,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
     const context = this.getContext();
     const tilesetSource = context.tilesetSource;
     const schema = context.schema;
+    const tileset = context.sourceTileset;
 
     // Create the resource resolver that will be used for
     // resolving ".subtree" files of implicit tilesets
@@ -179,7 +184,12 @@ export class BasicTilesetProcessor extends TilesetProcessor {
       depthFirst: false,
       traverseExternalTilesets: true,
     });
-    await tilesetTraverser.traverseWithSchemaAt(tile, schema, callback);
+    await tilesetTraverser.traverseWithSchemaAt(
+      tileset,
+      tile,
+      schema,
+      callback
+    );
   }
 
   /**

@@ -107,5 +107,5 @@ async function runReadingExample() {
   console.log(s);
 }
 
-runCreationExample();
-runReadingExample();
+void runCreationExample();
+void runReadingExample();

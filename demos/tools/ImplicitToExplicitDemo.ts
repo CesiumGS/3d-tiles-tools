@@ -116,4 +116,4 @@ async function runDemo() {
   await runConversionDemo(tilesetSourceName, tilesetTargetName);
 }
 
-runDemo();
+void runDemo();
