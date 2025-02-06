@@ -58,11 +58,15 @@ export class GltfUpgrade {
 
       // Upgrade the GLB buffer to glTF 2.0 if necessary.
       glb = await GltfUtilities.upgradeGlb(glb, undefined);
+    }
 
-      // Convert the CESIUM_RTC extension into a root node
-      // translation if necessary.
-      glb = await GltfUtilities.replaceCesiumRtcExtension(glb, gltfUpAxis);
+    // Convert the CESIUM_RTC extension into a root node
+    // translation if necessary. Note that this is also
+    // done for cases where this (glTF 1.0) extension
+    // is contained in a glTF 2.0 asset.
+    glb = await GltfUtilities.replaceCesiumRtcExtension(glb, gltfUpAxis);
 
+    if (gltfVersion < 2.0) {
       // Remove the WEB3D_quantized_attributes extension by deqantizing
       // the respective accessors if necessary.
       // Note: Most of the work for replacing the WEB3D_quantized_attributes
