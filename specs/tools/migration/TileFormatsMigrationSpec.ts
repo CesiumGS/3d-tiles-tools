@@ -85,7 +85,7 @@ async function computeJsonStrings(
 
 describe("TileFormatsMigration", function () {
   afterEach(function () {
-    //SpecHelpers.forceDeleteDirectory(outputDir);
+    SpecHelpers.forceDeleteDirectory(targetDir);
   });
   beforeEach(function () {
     StructuralMetadataMerger.setMergedSchemaIdSuffix("SPEC_SCHEMA_ID_SUFFIX");
