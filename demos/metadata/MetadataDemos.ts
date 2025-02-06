@@ -126,7 +126,7 @@ function createValueString(value: any) {
  * Prints all properties of the `TilesetWithFullMetadata` sample
  * data, as they are obtained via a `MetadataEntityModel`.
  */
-async function testTilesetWithFullMetadata() {
+function testTilesetWithFullMetadata() {
   // Note: This is making some assumptions about
   // the input, and only intended for the basic
   // demo of the `MetadataEntityModels` class

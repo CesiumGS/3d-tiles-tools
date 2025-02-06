@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES2021",
+    "baseUrl": "./",
+    "strict": true,
+    "lib": ["es2021"],
+
+    "outDir": "./build",
+
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "strictNullChecks": true,
+    "noImplicitOverride": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noImplicitAny": false,
+    "sourceMap": true,
+  },
+  "include": ["**/*"],
+  "exclude": ["node_modules"]
+}
