@@ -167,6 +167,7 @@
   ],
   "buffers": [
     {
+      "name": "buffer",
       "byteLength": 3450
     }
   ],

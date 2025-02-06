@@ -1,0 +1,29 @@
+{
+  "asset": {
+    "version": "1.1"
+  },
+  "geometricError": 1024,
+  "root": {
+    "boundingVolume": {
+      "box": [
+        0.5,
+        0.00625,
+        0.5,
+        0.5,
+        0,
+        0,
+        0.00625,
+        0,
+        0,
+        0,
+        0,
+        0.5
+      ]
+    },
+    "geometricError": 32,
+    "refine": "ADD",
+    "content": {
+      "uri": "b3dmWithGltf1WithWeb3dQuantizedAttributes.glb"
+    }
+  }
+}
