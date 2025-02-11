@@ -225,6 +225,69 @@ export class GltfUtilities {
   }
 
   /**
+   * Creates a glTF 2.0 binary (GLB) buffer from the given JSON and
+   * binary chunk data.
+   *
+   * This is the reverse of `extractDataFromGlb2`.
+   *
+   * This is a low-level function for turning JSON- and binary chunk
+   * data into a GLB buffer. The caller is responsible for making sure
+   * that the given JSON matches the given BIN data (for example, that
+   * the given JSON does not involve a buffer byte offset that does
+   * not fit the given buffer data)
+   *
+   * @param jsonData - The JSON data
+   * @param binData - The binary chunk data
+   * @returns The GLB data
+   */
+  static createGlb2FromData(jsonData: Buffer, binData: Buffer) {
+    // Ensure 4-byte-alignment for the jsonData
+    let jsonDataPadded = jsonData;
+    if (jsonData.length % 4 != 0) {
+      const paddingLength = 4 - (jsonData.length % 4);
+      const padding = Buffer.from(Array(paddingLength).fill(32));
+      jsonDataPadded = Buffer.concat([jsonDataPadded, padding]);
+    }
+
+    // Ensure 4-byte-alignment for the binData
+    let binDataPadded = binData;
+    if (binData.length % 4 != 0) {
+      const paddingLength = 4 - (binData.length % 4);
+      const padding = Buffer.from(Array(paddingLength));
+      binDataPadded = Buffer.concat([binDataPadded, padding]);
+    }
+
+    // Create the JSON chunk
+    const CHUNK_TYPE_JSON = 0x4e4f534a; // ASCII string "JSON"
+    const jsonChunkHeader = Buffer.alloc(8);
+    jsonChunkHeader.writeInt32LE(jsonDataPadded.length, 0);
+    jsonChunkHeader.writeInt32LE(CHUNK_TYPE_JSON, 4);
+    const jsonChunkData = Buffer.concat([jsonChunkHeader, jsonDataPadded]);
+
+    // Create the BIN chunk
+    const CHUNK_TYPE_BIN = 0x004e4942; // ASCII string "BIN"
+    const binChunkHeader = Buffer.alloc(8);
+    binChunkHeader.writeInt32LE(binDataPadded.length, 0);
+    binChunkHeader.writeInt32LE(CHUNK_TYPE_BIN, 4);
+    const binChunkData = Buffer.concat([binChunkHeader, binDataPadded]);
+
+    // Assemble the GLB data
+    const MAGIC_BINARY_GLTF_HEADER = 0x46546c67; // ASCII string "glTF"
+    const BINARY_GLTF_VERSION = 2;
+    // 12 bytes for header
+    // length of JSON + 8 bytes for JSON chunk header
+    // length of BIN  + 9 bytes for BIN  chunk header
+    const length = 12 + jsonDataPadded.length + 8 + binDataPadded.length + 8;
+    const header = Buffer.alloc(12);
+    header.writeInt32LE(MAGIC_BINARY_GLTF_HEADER, 0);
+    header.writeInt32LE(BINARY_GLTF_VERSION, 4);
+    header.writeInt32LE(length, 8);
+
+    const glbData = Buffer.concat([header, jsonChunkData, binChunkData]);
+    return glbData;
+  }
+
+  /**
    * Given an input buffer containing a binary glTF asset, optimize it
    * using gltf-pipeline with the provided options.
    *
@@ -259,6 +322,12 @@ export class GltfUtilities {
    * @param glbBuffer - The buffer containing the binary glTF.
    * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
    * @returns A promise that resolves to the resulting binary glTF.
+   *
+   * @deprecated This uses `gltf-pipeline` to replace the CESIUM_RTC
+   * extension, is only applicable to GLB data, and may affect the
+   * structure of the GLB in a way that is hard to predict. Use
+   * the `replaceCesiumRtcExtensionInGltf` to perform this operation
+   * directly on a glTF JSON object.
    */
   static async replaceCesiumRtcExtension(
     glbBuffer: Buffer,
@@ -266,7 +335,7 @@ export class GltfUtilities {
   ): Promise<Buffer> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const customStage = (gltf: any, options: any) => {
-      GltfUtilities.replaceCesiumRtcExtensionInternal(gltf, gltfUpAxis);
+      GltfUtilities.replaceCesiumRtcExtensionInGltf(gltf, gltfUpAxis);
       return gltf;
     };
     const options = {
@@ -291,7 +360,7 @@ export class GltfUtilities {
    * @param gltf - The glTF object
    * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
    */
-  private static replaceCesiumRtcExtensionInternal(
+  static replaceCesiumRtcExtensionInGltf(
     gltf: any,
     gltfUpAxis?: "X" | "Y" | "Z"
   ) {

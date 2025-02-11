@@ -30,8 +30,10 @@ export class GltfUpgrade {
    * The preprocessing steps that may be applied to the buffer are:
    *
    * - glTF 1.0 data will be upgraded to glTF 2.0 with gltf-pipeline
-   * - The CESIUM_RTC extension from glTF 1.0 will be converted into
-   *   a translation of a (newly inserted) root node of the document
+   *
+   * - The CESIUM_RTC extension will be converted into a translation
+   *   of a (newly inserted) root node of the document. Note that
+   *   this is done for both glTF 1.0 and glTF 2.0.
    *
    * The postprocessing steps that may be applied to the document are:
    * - Decode oct-encoded normals into the standard representation
@@ -60,14 +62,28 @@ export class GltfUpgrade {
       glb = await GltfUtilities.upgradeGlb(glb, undefined);
     }
 
-    // Convert the CESIUM_RTC extension into a root node
-    // translation if necessary. Note that this is also
-    // done for cases where this (glTF 1.0) extension
-    // is contained in a glTF 2.0 asset.
-    glb = await GltfUtilities.replaceCesiumRtcExtension(glb, gltfUpAxis);
+    // Examine the glTF JSON to see whether it contains the CESIUM_RTC
+    // extension. This extension is converted into a root node
+    // translation if necessary. Note that this is also done for cases
+    // where this (glTF 1.0) extension is contained in a glTF 2.0 asset.
+    const gltfData = GltfUtilities.extractDataFromGlb(glb);
+    const gltfJson = JSON.parse(gltfData.jsonData.toString("utf8"));
+    const extensionsUsed = gltfJson.extensionsUsed || [];
+    if (extensionsUsed.includes("CESIUM_RTC")) {
+      if (gltfVersion < 2.0) {
+        logger.info("Found CESIUM_RTC - replacing with root node translation");
+      } else {
+        logger.info(
+          "Found CESIUM_RTC in glTF 2.0 - replacing with root node translation"
+        );
+      }
+      GltfUtilities.replaceCesiumRtcExtensionInGltf(gltfJson, gltfUpAxis);
+      const gltfJsonBuffer = Buffer.from(JSON.stringify(gltfJson, null, 2));
+      glb = GltfUtilities.createGlb2FromData(gltfJsonBuffer, gltfData.binData);
+    }
 
     if (gltfVersion < 2.0) {
-      // Remove the WEB3D_quantized_attributes extension by deqantizing
+      // Remove the WEB3D_quantized_attributes extension by dequantizing
       // the respective accessors if necessary.
       // Note: Most of the work for replacing the WEB3D_quantized_attributes
       // extension is done based on a glTF-Transform document. But in order
