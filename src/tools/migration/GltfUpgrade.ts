@@ -65,7 +65,7 @@ export class GltfUpgrade {
     // Remove the CESIUM_RTC extension if it was used. This is
     // also applied when the input already was glTF 2.0 but
     // still used this (glTF 1.0) extension.
-    glb = GltfUtilities.replaceCesiumRtcExtensionInGltf2Glb(glb);
+    glb = GltfUtilities.replaceCesiumRtcExtensionInGltf2Glb(glb, gltfUpAxis);
 
     if (gltfVersion < 2.0) {
       // Remove the WEB3D_quantized_attributes extension by dequantizing

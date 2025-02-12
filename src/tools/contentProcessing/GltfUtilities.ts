@@ -364,31 +364,76 @@ export class GltfUtilities {
    * The `CESIUM_RTC` extension object and its used/required
    * usage declarations will be removed.
    *
-   * @param gltf - The glTF object
+   * @param glb - The GLB data
    * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
+   * @returns The buffer with the updated glTF data, or the
+   * given input buffer if the glTF did not use CESIUM_RTC
    */
   static replaceCesiumRtcExtensionInGltf2Glb(
     glb: Buffer,
-    gltfUpAxis?: "X" | "Y" | "Z" | undefined
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
   ): Buffer {
     // Examine the glTF JSON to see whether it contains the CESIUM_RTC
-    // extension. This extension is converted into a root node
-    // translation if necessary. Note that this is also done for cases
-    // where this (glTF 1.0) extension is contained in a glTF 2.0 asset.
+    // extension.
     const gltfData = GltfUtilities.extractDataFromGlb(glb);
     const gltfJson = JSON.parse(gltfData.jsonData.toString("utf8"));
     const extensionsUsed = gltfJson.extensionsUsed || [];
-    if (extensionsUsed.includes("CESIUM_RTC")) {
-      logger.info("Found CESIUM_RTC - replacing with root node translation");
-      GltfUtilities.replaceCesiumRtcExtensionInGltf(gltfJson, gltfUpAxis);
-      const gltfJsonBuffer = Buffer.from(JSON.stringify(gltfJson, null, 2));
-      return GltfUtilities.createGlb2FromData(gltfJsonBuffer, gltfData.binData);
+    if (!extensionsUsed.includes("CESIUM_RTC")) {
+      return glb;
     }
-    return glb;
+
+    // When te extension is found, it is converted into a root node
+    // translation.
+    logger.info(
+      "Found CESIUM_RTC in GLB - replacing with root node translation"
+    );
+    GltfUtilities.replaceCesiumRtcExtensionInGltf(gltfJson, gltfUpAxis);
+    const gltfJsonBuffer = Buffer.from(JSON.stringify(gltfJson, null, 2));
+    return GltfUtilities.createGlb2FromData(gltfJsonBuffer, gltfData.binData);
   }
 
   /**
-   * Replaces the `CESIUM_RTC` extension in the given glTF object.
+   * Replaces the `CESIUM_RTC` extension in the given glTF 2.0 JSON data.
+   *
+   * If the given glTF does NOT use the `CESIUM_RTC` extension, then
+   * the given buffer will be returned unmodified.
+   *
+   * Otherwise, this will insert a new parent node above each root node
+   * of a scene. These new parent nodes will have a `translation`
+   * that is derived taken from the `CESIUM_RTC` `center`,
+   * possibly adjusted to take the up-axis of the glTF into account.
+   *
+   * The `CESIUM_RTC` extension object and its used/required
+   * usage declarations will be removed.
+   *
+   * @param gltfJsonBuffer - The glTF JSON buffer
+   * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
+   * @returns The buffer with the updated glTF JSON data, or the
+   * given input buffer if the glTF did not use CESIUM_RTC
+   */
+  static replaceCesiumRtcExtensionInGltf2Json(
+    gltfJsonBuffer: Buffer,
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
+  ): Buffer {
+    // Examine the glTF JSON to see whether it contains the CESIUM_RTC
+    // extension.
+    const gltfJson = JSON.parse(gltfJsonBuffer.toString("utf8"));
+    const extensionsUsed = gltfJson.extensionsUsed || [];
+    if (!extensionsUsed.includes("CESIUM_RTC")) {
+      return gltfJsonBuffer;
+    }
+
+    // When te extension is found, it is converted into a root node
+    // translation.
+    logger.info(
+      "Found CESIUM_RTC in glTF - replacing with root node translation"
+    );
+    GltfUtilities.replaceCesiumRtcExtensionInGltf(gltfJson, gltfUpAxis);
+    return Buffer.from(JSON.stringify(gltfJson, null, 2));
+  }
+
+  /**
+   * Replaces the `CESIUM_RTC` extension in the given glTF 2.0 JSON object.
    *
    * If the given glTF does NOT use the `CESIUM_RTC` extension, then
    * nothing will be done.
@@ -401,7 +446,7 @@ export class GltfUtilities {
    * The `CESIUM_RTC` extension object and its used/required
    * usage declarations will be removed.
    *
-   * @param gltf - The glTF object
+   * @param gltf - The glTF 2.0 JSON object
    * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
    */
   static replaceCesiumRtcExtensionInGltf(
