@@ -8,6 +8,9 @@ import { Extensions } from "../../tilesets";
 import { GltfPipelineLegacy } from "./GltfPipelineLegacy";
 import { GltfWeb3dQuantizedAttributes } from "./GltfWeb3dQuantizedAttributes";
 
+import { Loggers } from "../../base";
+const logger = Loggers.get("contentProcessing");
+
 /**
  * Internal utility methods related to glTF/GLB data.
  *
@@ -326,12 +329,13 @@ export class GltfUtilities {
    * @deprecated This uses `gltf-pipeline` to replace the CESIUM_RTC
    * extension, is only applicable to GLB data, and may affect the
    * structure of the GLB in a way that is hard to predict. Use
-   * the `replaceCesiumRtcExtensionInGltf` to perform this operation
-   * directly on a glTF JSON object.
+   * the `replaceCesiumRtcExtensionInGltf2Glb` function or the
+   * `replaceCesiumRtcExtensionInGltf` to perform this operation
+   * only when necessary, and without other side effects
    */
   static async replaceCesiumRtcExtension(
     glbBuffer: Buffer,
-    gltfUpAxis?: "X" | "Y" | "Z"
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
   ): Promise<Buffer> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const customStage = (gltf: any, options: any) => {
@@ -347,10 +351,50 @@ export class GltfUtilities {
   }
 
   /**
+   * Replaces the `CESIUM_RTC` extension in the given glTF 2.0 GLB data.
+   *
+   * If the given glTF does NOT use the `CESIUM_RTC` extension, then
+   * the given buffer will be returned unmodified.
+   *
+   * Otherwise, this will insert a new parent node above each root node
+   * of a scene. These new parent nodes will have a `translation`
+   * that is derived taken from the `CESIUM_RTC` `center`,
+   * possibly adjusted to take the up-axis of the glTF into account.
+   *
+   * The `CESIUM_RTC` extension object and its used/required
+   * usage declarations will be removed.
+   *
+   * @param gltf - The glTF object
+   * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
+   */
+  static replaceCesiumRtcExtensionInGltf2Glb(
+    glb: Buffer,
+    gltfUpAxis?: "X" | "Y" | "Z" | undefined
+  ): Buffer {
+    // Examine the glTF JSON to see whether it contains the CESIUM_RTC
+    // extension. This extension is converted into a root node
+    // translation if necessary. Note that this is also done for cases
+    // where this (glTF 1.0) extension is contained in a glTF 2.0 asset.
+    const gltfData = GltfUtilities.extractDataFromGlb(glb);
+    const gltfJson = JSON.parse(gltfData.jsonData.toString("utf8"));
+    const extensionsUsed = gltfJson.extensionsUsed || [];
+    if (extensionsUsed.includes("CESIUM_RTC")) {
+      logger.info("Found CESIUM_RTC - replacing with root node translation");
+      GltfUtilities.replaceCesiumRtcExtensionInGltf(gltfJson, gltfUpAxis);
+      const gltfJsonBuffer = Buffer.from(JSON.stringify(gltfJson, null, 2));
+      return GltfUtilities.createGlb2FromData(gltfJsonBuffer, gltfData.binData);
+    }
+    return glb;
+  }
+
+  /**
    * Replaces the `CESIUM_RTC` extension in the given glTF object.
    *
-   * This will insert a new parent node above each root node of
-   * a scene. These new parent nodes will have a `translation`
+   * If the given glTF does NOT use the `CESIUM_RTC` extension, then
+   * nothing will be done.
+   *
+   * Otherwise, this will insert a new parent node above each root node
+   * of a scene. These new parent nodes will have a `translation`
    * that is derived taken from the `CESIUM_RTC` `center`,
    * possibly adjusted to take the up-axis of the glTF into account.
    *
@@ -362,7 +406,7 @@ export class GltfUtilities {
    */
   static replaceCesiumRtcExtensionInGltf(
     gltf: any,
-    gltfUpAxis?: "X" | "Y" | "Z"
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
   ) {
     if (!gltf.extensions) {
       return;

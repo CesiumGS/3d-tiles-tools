@@ -24,13 +24,15 @@ export class TileFormatsMigrationCmpt {
    * external resources, like GLB data if the CMPT contains I3DM that use
    * `header.gltfFormat=0` (meaning that the payload is not GLB data,
    * but only a GLB URI).
+   * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
    * @returns The GLB buffer
    * @throws TileFormatError If the CMPT contained I3DM with an external
    * GLB URI * that could not resolved by the given resolver
    */
   static async convertCmptToGlb(
     cmptBuffer: Buffer,
-    externalResourceResolver: (uri: string) => Promise<Buffer | undefined>
+    externalResourceResolver: (uri: string) => Promise<Buffer | undefined>,
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
   ): Promise<Buffer> {
     const compositeTileData = TileFormats.readCompositeTileData(cmptBuffer);
     const innerTileBuffers = compositeTileData.innerTileBuffers;
@@ -50,21 +52,24 @@ export class TileFormatsMigrationCmpt {
       } else if (innerTileType === ContentDataTypes.CONTENT_TYPE_B3DM) {
         logger.trace("Converting inner B3DM tile to GLB...");
         const innerTileGlb = await TileFormatsMigration.convertB3dmToGlb(
-          innerTileBuffer
+          innerTileBuffer,
+          gltfUpAxis
         );
         innerTileGlbs.push(innerTileGlb);
       } else if (innerTileType === ContentDataTypes.CONTENT_TYPE_I3DM) {
         logger.trace("Converting inner I3DM tile to GLB...");
         const innerTileGlb = await TileFormatsMigration.convertI3dmToGlb(
           innerTileBuffer,
-          externalResourceResolver
+          externalResourceResolver,
+          gltfUpAxis
         );
         innerTileGlbs.push(innerTileGlb);
       } else if (innerTileType === ContentDataTypes.CONTENT_TYPE_CMPT) {
         logger.trace("Converting inner CMPT tile to GLB...");
         const innerTileGlb = await TileFormatsMigration.convertCmptToGlb(
           innerTileBuffer,
-          externalResourceResolver
+          externalResourceResolver,
+          gltfUpAxis
         );
         innerTileGlbs.push(innerTileGlb);
       } else {

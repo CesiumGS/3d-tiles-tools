@@ -46,7 +46,7 @@ export class TileFormatsMigration {
    */
   static async convertB3dmToGlb(
     b3dmBuffer: Buffer,
-    gltfUpAxis?: "X" | "Y" | "Z"
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
   ): Promise<Buffer> {
     return await TileFormatsMigrationB3dm.convertB3dmToGlb(
       b3dmBuffer,
@@ -68,7 +68,7 @@ export class TileFormatsMigration {
   static async convertI3dmToGlb(
     i3dmBuffer: Buffer,
     externalResourceResolver: (uri: string) => Promise<Buffer | undefined>,
-    gltfUpAxis?: "X" | "Y" | "Z"
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
   ): Promise<Buffer> {
     return await TileFormatsMigrationI3dm.convertI3dmToGlb(
       i3dmBuffer,
@@ -85,15 +85,18 @@ export class TileFormatsMigration {
    * external resources, like GLB data if the CMPT contains I3DM that use
    * `header.gltfFormat=0` (meaning that the payload is not GLB data,
    * but only a GLB URI).
+   * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
    * @returns The GLB buffer
    */
   static async convertCmptToGlb(
     cmptBuffer: Buffer,
-    externalResourceResolver: (uri: string) => Promise<Buffer | undefined>
+    externalResourceResolver: (uri: string) => Promise<Buffer | undefined>,
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
   ): Promise<Buffer> {
     return await TileFormatsMigrationCmpt.convertCmptToGlb(
       cmptBuffer,
-      externalResourceResolver
+      externalResourceResolver,
+      gltfUpAxis
     );
   }
 

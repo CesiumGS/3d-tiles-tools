@@ -64,8 +64,10 @@ export class ToolsMain {
 
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
+    const gltfUpAxis = "Y";
     const outputBuffer = await TileFormatsMigration.convertB3dmToGlb(
-      inputBuffer
+      inputBuffer,
+      gltfUpAxis
     );
     fs.writeFileSync(output, outputBuffer);
 
@@ -98,9 +100,11 @@ export class ToolsMain {
 
     // Prepare the resolver for external GLBs in I3DM
     const externalGlbResolver = ToolsMain.createResolver(input);
+    const gltfUpAxis = "Y";
     const outputBuffer = await TileFormatsMigration.convertI3dmToGlb(
       inputBuffer,
-      externalGlbResolver
+      externalGlbResolver,
+      gltfUpAxis
     );
     fs.writeFileSync(output, outputBuffer);
 

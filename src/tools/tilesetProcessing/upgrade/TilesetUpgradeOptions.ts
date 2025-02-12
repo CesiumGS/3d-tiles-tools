@@ -9,10 +9,12 @@
  * @internal
  */
 export type TilesetUpgradeOptions = {
-  // Options for the general upgrade process
+  // Whether the upgrade should be applied recursively
+  // on external tilesets
   upgradeExternalTilesets: boolean;
 
-  // Options for upgrading the `Tileset` object
+  // The version number that should be inserted into the `asset`
+  // of the upgraded tileset JSON (usually "1.0" or "1.1")
   upgradedAssetVersionNumber: string;
 
   // Whether the 'refine' value should be upgraded
@@ -38,8 +40,10 @@ export type TilesetUpgradeOptions = {
   // to 1.1, where glTF is supported without an extension
   upgradeContentGltfExtensionDeclarations: boolean;
 
-  // Options upgrading glTF from 1.0 to 2.0 in B3DM or I3DM tile content
+  // Whether glTF 1.0 should be upgraded to glTF 2.0 in B3DM
   upgradeB3dmGltf1ToGltf2: boolean;
+
+  // Whether glTF 1.0 should be upgraded to glTF 2.0 in I3DM
   upgradeI3dmGltf1ToGltf2: boolean;
 
   // Whether attempts should be made to convert PNTS files to GLB
@@ -56,4 +60,13 @@ export type TilesetUpgradeOptions = {
 
   // Whether attempts should be made to convert CMPT files to GLB
   upgradeCmptToGlb: boolean;
+
+  // Whether the CESIUM_RTC extension in glTF 1.0 or glTF 2.0 (!)
+  // assets should be replaced by a translation of the root node.
+  // Note that this only refers to tile content that is directly
+  // referred to as `.gltf`/`.glb` files in 3D Tiles 1.1. When
+  // the `upgradeB3dmToGlb` or `upgradeI3dmToGlm` flags are
+  // `true`, then the conversion from B3DM/I3DM to GLB will
+  // automatically include the CESIUM_RTC handling.
+  upgradeCesiumRtcToRootTranslation: boolean;
 };

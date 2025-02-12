@@ -52,7 +52,7 @@ export class GltfUpgrade {
    */
   static async obtainDocument(
     glb: Buffer,
-    gltfUpAxis?: "X" | "Y" | "Z"
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
   ): Promise<Document> {
     const gltfVersion = GltfUtilities.getGltfVersion(glb);
     if (gltfVersion < 2.0) {
@@ -62,25 +62,10 @@ export class GltfUpgrade {
       glb = await GltfUtilities.upgradeGlb(glb, undefined);
     }
 
-    // Examine the glTF JSON to see whether it contains the CESIUM_RTC
-    // extension. This extension is converted into a root node
-    // translation if necessary. Note that this is also done for cases
-    // where this (glTF 1.0) extension is contained in a glTF 2.0 asset.
-    const gltfData = GltfUtilities.extractDataFromGlb(glb);
-    const gltfJson = JSON.parse(gltfData.jsonData.toString("utf8"));
-    const extensionsUsed = gltfJson.extensionsUsed || [];
-    if (extensionsUsed.includes("CESIUM_RTC")) {
-      if (gltfVersion < 2.0) {
-        logger.info("Found CESIUM_RTC - replacing with root node translation");
-      } else {
-        logger.info(
-          "Found CESIUM_RTC in glTF 2.0 - replacing with root node translation"
-        );
-      }
-      GltfUtilities.replaceCesiumRtcExtensionInGltf(gltfJson, gltfUpAxis);
-      const gltfJsonBuffer = Buffer.from(JSON.stringify(gltfJson, null, 2));
-      glb = GltfUtilities.createGlb2FromData(gltfJsonBuffer, gltfData.binData);
-    }
+    // Remove the CESIUM_RTC extension if it was used. This is
+    // also applied when the input already was glTF 2.0 but
+    // still used this (glTF 1.0) extension.
+    glb = GltfUtilities.replaceCesiumRtcExtensionInGltf2Glb(glb);
 
     if (gltfVersion < 2.0) {
       // Remove the WEB3D_quantized_attributes extension by dequantizing

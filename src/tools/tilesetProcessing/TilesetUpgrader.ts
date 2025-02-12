@@ -97,6 +97,8 @@ export class TilesetUpgrader {
         upgradeB3dmToGlb: false,
         upgradeI3dmToGlb: false,
         upgradeCmptToGlb: false,
+
+        upgradeCesiumRtcToRootTranslation: true,
       };
       return options;
     }
@@ -120,6 +122,8 @@ export class TilesetUpgrader {
         upgradeB3dmToGlb: true,
         upgradeI3dmToGlb: true,
         upgradeCmptToGlb: true,
+
+        upgradeCesiumRtcToRootTranslation: true,
       };
       return options;
     }
@@ -327,14 +331,8 @@ export class TilesetUpgrader {
     try {
       return await this.processEntryUnchecked(sourceEntry, type);
     } catch (error) {
-      const sourceKey = sourceEntry.key;
-      logger.error(`Failed to upgrade ${sourceKey}: ${error}`);
-      const targetKey = this.processContentUri(sourceKey);
-      const targetEntry = {
-        key: targetKey,
-        value: sourceEntry.value,
-      };
-      return targetEntry;
+      logger.error(`Failed to upgrade ${sourceEntry.key}: ${error}`);
+      return sourceEntry;
     }
   };
 
@@ -419,7 +417,8 @@ export class TilesetUpgrader {
       logger.debug(`  Upgrading GLB in ${sourceKey}`);
       targetValue = await ContentUpgrades.upgradeB3dmGltf1ToGltf2(
         sourceValue,
-        this.gltfUpgradeOptions
+        this.gltfUpgradeOptions,
+        this.currentTilesetGltfUpAxis
       );
     } else {
       logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
@@ -475,7 +474,8 @@ export class TilesetUpgrader {
       logger.debug(`  Upgrading GLB in ${sourceKey}`);
       targetValue = await ContentUpgrades.upgradeI3dmGltf1ToGltf2(
         sourceValue,
-        this.gltfUpgradeOptions
+        this.gltfUpgradeOptions,
+        this.currentTilesetGltfUpAxis
       );
     } else {
       logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
@@ -525,7 +525,8 @@ export class TilesetUpgrader {
       };
       targetValue = await TileFormatsMigration.convertCmptToGlb(
         sourceValue,
-        externalResourceResolver
+        externalResourceResolver,
+        this.currentTilesetGltfUpAxis
       );
     } else {
       logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
