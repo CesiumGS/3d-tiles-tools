@@ -557,7 +557,7 @@ export class TilesetUpgrader {
     const sourceValue = sourceEntry.value;
     const targetKey = sourceKey;
     let targetValue = sourceValue;
-    if (this.upgradeOptions.upgradeCmptToGlb) {
+    if (this.upgradeOptions.upgradeCesiumRtcToRootTranslation) {
       logger.debug(`  Upgrading glTF for ${sourceKey}`);
       targetValue = GltfUtilities.replaceCesiumRtcExtensionInGltf2Json(
         sourceValue,
@@ -587,7 +587,7 @@ export class TilesetUpgrader {
     const sourceValue = sourceEntry.value;
     const targetKey = sourceKey;
     let targetValue = sourceValue;
-    if (this.upgradeOptions.upgradeCmptToGlb) {
+    if (this.upgradeOptions.upgradeCesiumRtcToRootTranslation) {
       logger.debug(`  Upgrading GLB for ${sourceKey}`);
       targetValue = GltfUtilities.replaceCesiumRtcExtensionInGltf2Glb(
         sourceValue,

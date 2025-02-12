@@ -129,6 +129,52 @@ describe("TilesetUpgrader General", function () {
     expect(difference).toBeUndefined();
   });
 
+  it("properly upgrades tilesetWithGltf2GlbWithCesiumRtc", async function () {
+    const testDirectoryName = "tilesetWithGltf2GlbWithCesiumRtc";
+    const input = sourceDir + testDirectoryName;
+    const output = targetDir + testDirectoryName;
+    const golden = goldenDir + testDirectoryName;
+
+    const overwrite = true;
+    const targetVersion = "1.1";
+    await TilesetOperations.upgrade(
+      input,
+      output,
+      overwrite,
+      targetVersion,
+      undefined
+    );
+
+    const difference = await SpecHelpers.computePackageDifference(
+      output,
+      golden
+    );
+    expect(difference).toBeUndefined();
+  });
+
+  it("properly upgrades tilesetWithGltf2WithCesiumRtc", async function () {
+    const testDirectoryName = "tilesetWithGltf2WithCesiumRtc";
+    const input = sourceDir + testDirectoryName;
+    const output = targetDir + testDirectoryName;
+    const golden = goldenDir + testDirectoryName;
+
+    const overwrite = true;
+    const targetVersion = "1.1";
+    await TilesetOperations.upgrade(
+      input,
+      output,
+      overwrite,
+      targetVersion,
+      undefined
+    );
+
+    const difference = await SpecHelpers.computePackageDifference(
+      output,
+      golden
+    );
+    expect(difference).toBeUndefined();
+  });
+
   it("properly upgrades tilesetWithI3dmWithGltf1", async function () {
     const testDirectoryName = "tilesetWithI3dmWithGltf1";
     const input = sourceDir + testDirectoryName;

@@ -68,6 +68,8 @@ const sampleOptions = [
   createSampleOption("tilesetWithB3dmWithGltf2WithCesiumRtc", true),
   createSampleOption("tilesetWithContentUrls", false),
   createSampleOption("tilesetWithExternalTilesetWithUrls", false),
+  createSampleOption("tilesetWithGltf2GlbWithCesiumRtc", false),
+  createSampleOption("tilesetWithGltf2WithCesiumRtc", false),
   createSampleOption("tilesetWithI3dmWithGltf1", true),
 ];
 Sandcastle.addToolbarMenu(sampleOptions);
