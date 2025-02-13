@@ -37,7 +37,7 @@ export class ArchiveFunctions3tz {
     fd: number,
     stat: { size: number }
   ) {
-    const bytesToRead = 320;
+    const bytesToRead = Math.min(320, stat.size);
     const buffer = Buffer.alloc(bytesToRead);
     const offset = stat.size - bytesToRead;
     const length = bytesToRead;
