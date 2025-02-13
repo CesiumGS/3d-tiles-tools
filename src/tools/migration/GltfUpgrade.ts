@@ -30,8 +30,10 @@ export class GltfUpgrade {
    * The preprocessing steps that may be applied to the buffer are:
    *
    * - glTF 1.0 data will be upgraded to glTF 2.0 with gltf-pipeline
-   * - The CESIUM_RTC extension from glTF 1.0 will be converted into
-   *   a translation of a (newly inserted) root node of the document
+   *
+   * - The CESIUM_RTC extension will be converted into a translation
+   *   of a (newly inserted) root node of the document. Note that
+   *   this is done for both glTF 1.0 and glTF 2.0.
    *
    * The postprocessing steps that may be applied to the document are:
    * - Decode oct-encoded normals into the standard representation
@@ -50,7 +52,7 @@ export class GltfUpgrade {
    */
   static async obtainDocument(
     glb: Buffer,
-    gltfUpAxis?: "X" | "Y" | "Z"
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
   ): Promise<Document> {
     const gltfVersion = GltfUtilities.getGltfVersion(glb);
     if (gltfVersion < 2.0) {
@@ -58,12 +60,15 @@ export class GltfUpgrade {
 
       // Upgrade the GLB buffer to glTF 2.0 if necessary.
       glb = await GltfUtilities.upgradeGlb(glb, undefined);
+    }
 
-      // Convert the CESIUM_RTC extension into a root node
-      // translation if necessary.
-      glb = await GltfUtilities.replaceCesiumRtcExtension(glb, gltfUpAxis);
+    // Remove the CESIUM_RTC extension if it was used. This is
+    // also applied when the input already was glTF 2.0 but
+    // still used this (glTF 1.0) extension.
+    glb = GltfUtilities.replaceCesiumRtcExtensionInGltf2Glb(glb, gltfUpAxis);
 
-      // Remove the WEB3D_quantized_attributes extension by deqantizing
+    if (gltfVersion < 2.0) {
+      // Remove the WEB3D_quantized_attributes extension by dequantizing
       // the respective accessors if necessary.
       // Note: Most of the work for replacing the WEB3D_quantized_attributes
       // extension is done based on a glTF-Transform document. But in order

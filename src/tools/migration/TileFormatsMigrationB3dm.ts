@@ -36,7 +36,7 @@ export class TileFormatsMigrationB3dm {
    */
   static async convertB3dmToGlb(
     b3dmBuffer: Buffer,
-    gltfUpAxis?: "X" | "Y" | "Z"
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
   ): Promise<Buffer> {
     const tileData = TileFormats.readTileData(b3dmBuffer);
 

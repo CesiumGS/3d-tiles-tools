@@ -74,7 +74,11 @@ describe("GltfUtilities", function () {
     const inputGlb = glbResults.glb;
 
     // Remove the RTC extension
-    const outputGlb = await GltfUtilities.replaceCesiumRtcExtension(inputGlb);
+    const gltfUpAxis = "Y";
+    const outputGlb = await GltfUtilities.replaceCesiumRtcExtension(
+      inputGlb,
+      gltfUpAxis
+    );
 
     // Create a glTF from the resulting GLB
     const gltfResults = await GltfPipeline.glbToGltf(outputGlb, options);

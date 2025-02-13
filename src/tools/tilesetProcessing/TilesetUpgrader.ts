@@ -17,6 +17,7 @@ import { TilesetUpgradeOptions } from "./upgrade/TilesetUpgradeOptions";
 import { TilesetObjectUpgrader } from "./upgrade/TilesetObjectUpgrader";
 
 import { ContentUpgrades } from "../contentProcessing/ContentUpgrades";
+import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 
 import { BasicTilesetProcessor } from "./BasicTilesetProcessor";
 
@@ -97,6 +98,8 @@ export class TilesetUpgrader {
         upgradeB3dmToGlb: false,
         upgradeI3dmToGlb: false,
         upgradeCmptToGlb: false,
+
+        upgradeCesiumRtcToRootTranslation: true,
       };
       return options;
     }
@@ -120,6 +123,8 @@ export class TilesetUpgrader {
         upgradeB3dmToGlb: true,
         upgradeI3dmToGlb: true,
         upgradeCmptToGlb: true,
+
+        upgradeCesiumRtcToRootTranslation: true,
       };
       return options;
     }
@@ -327,14 +332,8 @@ export class TilesetUpgrader {
     try {
       return await this.processEntryUnchecked(sourceEntry, type);
     } catch (error) {
-      const sourceKey = sourceEntry.key;
-      logger.error(`Failed to upgrade ${sourceKey}: ${error}`);
-      const targetKey = this.processContentUri(sourceKey);
-      const targetEntry = {
-        key: targetKey,
-        value: sourceEntry.value,
-      };
-      return targetEntry;
+      logger.error(`Failed to upgrade ${sourceEntry.key}: ${error}`);
+      return sourceEntry;
     }
   };
 
@@ -357,6 +356,10 @@ export class TilesetUpgrader {
       return this.processEntryI3dm(sourceEntry);
     } else if (type === ContentDataTypes.CONTENT_TYPE_CMPT) {
       return this.processEntryCmpt(sourceEntry);
+    } else if (type === ContentDataTypes.CONTENT_TYPE_GLTF) {
+      return this.processEntryGltf(sourceEntry);
+    } else if (type === ContentDataTypes.CONTENT_TYPE_GLB) {
+      return this.processEntryGlb(sourceEntry);
     } else if (type == ContentDataTypes.CONTENT_TYPE_TILESET) {
       return this.processEntryTileset(sourceEntry);
     }
@@ -419,7 +422,8 @@ export class TilesetUpgrader {
       logger.debug(`  Upgrading GLB in ${sourceKey}`);
       targetValue = await ContentUpgrades.upgradeB3dmGltf1ToGltf2(
         sourceValue,
-        this.gltfUpgradeOptions
+        this.gltfUpgradeOptions,
+        this.currentTilesetGltfUpAxis
       );
     } else {
       logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
@@ -475,7 +479,8 @@ export class TilesetUpgrader {
       logger.debug(`  Upgrading GLB in ${sourceKey}`);
       targetValue = await ContentUpgrades.upgradeI3dmGltf1ToGltf2(
         sourceValue,
-        this.gltfUpgradeOptions
+        this.gltfUpgradeOptions,
+        this.currentTilesetGltfUpAxis
       );
     } else {
       logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
@@ -525,7 +530,68 @@ export class TilesetUpgrader {
       };
       targetValue = await TileFormatsMigration.convertCmptToGlb(
         sourceValue,
-        externalResourceResolver
+        externalResourceResolver,
+        this.currentTilesetGltfUpAxis
+      );
+    } else {
+      logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
+    }
+    const targetEntry = {
+      key: targetKey,
+      value: targetValue,
+    };
+    return targetEntry;
+  };
+
+  /**
+   * Process the given tileset (content) entry that contains glTF,
+   * and return the result.
+   *
+   * @param sourceEntry - The source entry
+   * @returns The processed entry
+   */
+  private processEntryGltf = async (
+    sourceEntry: TilesetEntry
+  ): Promise<TilesetEntry> => {
+    const sourceKey = sourceEntry.key;
+    const sourceValue = sourceEntry.value;
+    const targetKey = sourceKey;
+    let targetValue = sourceValue;
+    if (this.upgradeOptions.upgradeCesiumRtcToRootTranslation) {
+      logger.debug(`  Upgrading glTF for ${sourceKey}`);
+      targetValue = GltfUtilities.replaceCesiumRtcExtensionInGltf2Json(
+        sourceValue,
+        this.currentTilesetGltfUpAxis
+      );
+    } else {
+      logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
+    }
+    const targetEntry = {
+      key: targetKey,
+      value: targetValue,
+    };
+    return targetEntry;
+  };
+
+  /**
+   * Process the given tileset (content) entry that contains binary
+   * glTF (GLB), and return the result.
+   *
+   * @param sourceEntry - The source entry
+   * @returns The processed entry
+   */
+  private processEntryGlb = async (
+    sourceEntry: TilesetEntry
+  ): Promise<TilesetEntry> => {
+    const sourceKey = sourceEntry.key;
+    const sourceValue = sourceEntry.value;
+    const targetKey = sourceKey;
+    let targetValue = sourceValue;
+    if (this.upgradeOptions.upgradeCesiumRtcToRootTranslation) {
+      logger.debug(`  Upgrading GLB for ${sourceKey}`);
+      targetValue = GltfUtilities.replaceCesiumRtcExtensionInGltf2Glb(
+        sourceValue,
+        this.currentTilesetGltfUpAxis
       );
     } else {
       logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
