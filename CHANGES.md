@@ -6,6 +6,7 @@ Change Log
 - Fix the `upgrade` command to properly handle a `gltfUpAxis` that may be defined in the tileset JSON, via [#166](https://github.com/CesiumGS/3d-tiles-tools/pull/166)
 - **Breaking**: Change the `TilesetSource` and `TilesetTarget` interfaces to be completely asynchronous, via [#167](https://github.com/CesiumGS/3d-tiles-tools/pull/167)
   - Clients that used the functions from this interface will generally just have to `await` the results of calling these functions
+  - As part of this change, the `TraversedTile` now returns a subtree URI only for the implicit tileset root, and not for the explicit tile that defines the implicit tiling
 - **Breaking**: Consistently use `undefined` instead of `null` as return types, via [#169](https://github.com/CesiumGS/3d-tiles-tools/pull/169)
   - Clients will have to update their checks from `null` to `undefined` accordingly. This change does _not_ apply to glTF extension implementations that are based on glTF-Transform.
 - Handle the presence of the `CESIUM_RTC` extension in glTF 2.0 during the `upgrade`, via [#172](https://github.com/CesiumGS/3d-tiles-tools/pull/172)
