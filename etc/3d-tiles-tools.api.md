@@ -119,7 +119,7 @@ export interface B3dmFeatureTable extends FeatureTable {
 // @internal
 export class BasicTilesetProcessor extends TilesetProcessor {
     constructor(processExternalTilesets?: boolean);
-    end(): Promise<void>;
+    end(close?: boolean): Promise<void>;
     forEachExplicitTile(callback: (tile: Tile) => Promise<void>): Promise<void>;
     forEachTile(callback: TraversalCallback): Promise<void>;
     forTileset(callback: (tileset: Tileset, schema: Schema | undefined) => Promise<Tileset>): Promise<void>;
@@ -385,14 +385,14 @@ export class BufferAvailabilityInfo implements AvailabilityInfo {
 
 // @internal
 export class BufferedContentData implements ContentData {
-    constructor(uri: string, data: Buffer | null);
+    constructor(uri: string, data: Buffer | undefined);
     static create(uri: string): ContentData;
     exists(): Promise<boolean>;
     get extension(): string;
     // Warning: (ae-unresolved-inheritdoc-reference) The @inheritDoc reference could not be resolved: No member was found with name "data"
     //
     // (undocumented)
-    getData(): Promise<Buffer | null>;
+    getData(): Promise<Buffer | undefined>;
     // Warning: (ae-unresolved-inheritdoc-reference) The @inheritDoc reference could not be resolved: No member was found with name "magic"
     //
     // (undocumented)
@@ -505,7 +505,7 @@ export interface Content extends RootProperty {
 export interface ContentData {
     exists(): Promise<boolean>;
     get extension(): string;
-    getData(): Promise<Buffer | null>;
+    getData(): Promise<Buffer | undefined>;
     getMagic(): Promise<Buffer>;
     getParsedObject(): Promise<any>;
     get uri(): string;
@@ -758,10 +758,10 @@ export interface EnumValue extends RootProperty {
 
 // @internal
 export class ExplicitTraversedTile implements TraversedTile {
-    constructor(tile: Tile, path: string, level: number, parent: TraversedTile | undefined, schema: Schema | undefined, resourceResolver: ResourceResolver);
+    constructor(tileset: Tileset, tile: Tile, path: string, level: number, parent: TraversedTile | undefined, schema: Schema | undefined, resourceResolver: ResourceResolver);
     asFinalTile(): Tile;
     asRawTile(): Tile;
-    static createRoot(root: Tile, schema: Schema | undefined, resourceResolver: ResourceResolver): TraversedTile;
+    static createRoot(tileset: Tileset, root: Tile, schema: Schema | undefined, resourceResolver: ResourceResolver): TraversedTile;
     getChildren(): Promise<TraversedTile[]>;
     getFinalContents(): Content[];
     getImplicitTiling(): TileImplicitTiling | undefined;
@@ -770,6 +770,7 @@ export class ExplicitTraversedTile implements TraversedTile {
     getRawContents(): Content[];
     getResourceResolver(): ResourceResolver;
     getSubtreeUri(): string | undefined;
+    getTileset(): Tileset;
     isImplicitTilesetRoot(): boolean;
     get level(): number;
     get path(): string;
@@ -778,7 +779,7 @@ export class ExplicitTraversedTile implements TraversedTile {
 
 // @internal
 export class ExplicitTraversedTiles {
-    static createTraversedChildren(implicitTiling: TileImplicitTiling, schema: Schema | undefined, parent: ExplicitTraversedTile, resourceResolver: ResourceResolver): Promise<TraversedTile[]>;
+    static createTraversedChildren(tileset: Tileset, implicitTiling: TileImplicitTiling, schema: Schema | undefined, parent: ExplicitTraversedTile, resourceResolver: ResourceResolver): Promise<TraversedTile[]>;
 }
 
 // @internal
@@ -791,6 +792,8 @@ export class Extensions {
     static removeExtension(extended: Extended, extension: string): void;
     static removeExtensionRequired(extensible: Extensible, extension: string): void;
     static removeExtensionUsed(extensible: Extensible, extension: string): void;
+    static requiresExtension(extensible: Extensible, extension: string): boolean;
+    static usesExtension(extensible: Extensible, extension: string): boolean;
 }
 
 // @internal
@@ -937,8 +940,9 @@ export interface FeatureTableBinaryBodyReference extends BinaryBodyOffset {
 export class FileResourceResolver implements ResourceResolver {
     constructor(basePath: string);
     derive(uri: string): ResourceResolver;
-    resolveData(uri: string): Promise<Buffer | null>;
-    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
+    resolveData(uri: string): Promise<Buffer | undefined>;
+    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | undefined>;
+    resolveUri(uri: string): string;
 }
 
 // @internal
@@ -1013,7 +1017,8 @@ export class GltfUtilities {
     static extractJsonFromGlb(glbBuffer: Buffer): Buffer;
     static getGltfVersion(glbBuffer: Buffer): number;
     static optimizeGlb(glbBuffer: Buffer, options: any): Promise<Buffer>;
-    static replaceCesiumRtcExtension(glbBuffer: Buffer): Promise<Buffer>;
+    static replaceCesiumRtcExtension(glbBuffer: Buffer, gltfUpAxis?: "X" | "Y" | "Z"): Promise<Buffer>;
+    static replaceWeb3dQuantizedAttributesExtension(glbBuffer: Buffer): Promise<Buffer>;
     static upgradeGlb(glbBuffer: Buffer, options: any): Promise<Buffer>;
 }
 
@@ -1071,7 +1076,7 @@ export class ImplicitTilings {
 
 // @internal
 export class ImplicitTraversedTile implements TraversedTile {
-    constructor(implicitTiling: TileImplicitTiling, resourceResolver: ResourceResolver, root: TraversedTile, path: string, subtreeModel: SubtreeModel, globalLevel: number, globalCoordinate: TreeCoordinates, rootCoordinate: TreeCoordinates, localCoordinate: TreeCoordinates, parent: TraversedTile);
+    constructor(implicitTiling: TileImplicitTiling, resourceResolver: ResourceResolver, tileset: Tileset, root: TraversedTile, path: string, subtreeModel: SubtreeModel, globalLevel: number, globalCoordinate: TreeCoordinates, rootCoordinate: TreeCoordinates, localCoordinate: TreeCoordinates, parent: TraversedTile);
     asFinalTile(): Tile;
     asRawTile(): Tile;
     getChildren(): Promise<TraversedTile[]>;
@@ -1082,6 +1087,7 @@ export class ImplicitTraversedTile implements TraversedTile {
     getRawContents(): Content[];
     getResourceResolver(): ResourceResolver;
     getSubtreeUri(): string | undefined;
+    getTileset(): Tileset;
     isImplicitTilesetRoot(): boolean;
     get level(): number;
     get path(): string;
@@ -1187,10 +1193,16 @@ export class InstanceFeaturesUtils {
 
 // @internal
 export class Iterables {
+    static asyncToArray<T>(iterable: AsyncIterable<T>): Promise<T[]>;
+    static concatAsync<T>(delegateIterables: Iterable<AsyncIterable<T>>): AsyncIterable<T>;
     static filter<T>(iterable: Iterable<T>, include: (element: T) => boolean): Iterable<T>;
+    static filterAsync<T>(iterable: AsyncIterable<T>, include: (element: T) => boolean): AsyncIterable<T>;
     static filterWithIndex<T>(iterable: Iterable<T>, include: (element: T, index: number) => boolean): Iterable<T>;
     static flatten<T>(iterable: Iterable<T[]>): Iterable<T>;
+    static flattenAsync<T>(iterable: AsyncIterable<T[]>): AsyncIterable<T>;
+    static makeAsync<T>(delegateIterable: Iterable<T>): AsyncIterable<T>;
     static map<S, T>(iterable: Iterable<S>, mapper: (element: S) => T): Iterable<T>;
+    static mapAsync<S, T>(iterable: AsyncIterable<S>, mapper: (element: S) => Promise<T>): AsyncIterable<T>;
     static overFiles(directory: string | PathLike, recurse: boolean): Iterable<string>;
     static segmentize<T>(iterable: Iterable<T>, segmentSize: number): Iterable<T[]>;
 }
@@ -1237,7 +1249,7 @@ export class LazyContentData implements ContentData {
     constructor(uri: string, resourceResolver: ResourceResolver);
     exists(): Promise<boolean>;
     get extension(): string;
-    getData(): Promise<Buffer | null>;
+    getData(): Promise<Buffer | undefined>;
     getMagic(): Promise<Buffer>;
     getParsedObject(): Promise<any>;
     get uri(): string;
@@ -1541,7 +1553,7 @@ export class OctreeCoordinates implements TreeCoordinates {
     children(): Iterable<OctreeCoordinates>;
     descendants(maxLevelInclusive: number, depthFirst: boolean): Iterable<OctreeCoordinates>;
     get level(): number;
-    parent(): OctreeCoordinates | null;
+    parent(): OctreeCoordinates | undefined;
     toArray(): number[];
     toIndex(): number;
     toIndexInLevel(): number;
@@ -1689,7 +1701,7 @@ export class QuadtreeCoordinates implements TreeCoordinates {
     children(): Iterable<QuadtreeCoordinates>;
     descendants(maxLevelInclusive: number, depthFirst: boolean): Iterable<QuadtreeCoordinates>;
     get level(): number;
-    parent(): QuadtreeCoordinates | null;
+    parent(): QuadtreeCoordinates | undefined;
     toArray(): number[];
     toIndex(): number;
     toIndexInLevel(): number;
@@ -1732,8 +1744,9 @@ export interface ReadablePointCloud {
 // @internal
 export interface ResourceResolver {
     derive(uri: string): ResourceResolver;
-    resolveData(uri: string): Promise<Buffer | null>;
-    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
+    resolveData(uri: string): Promise<Buffer | undefined>;
+    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | undefined>;
+    resolveUri(uri: string): string;
 }
 
 // @internal
@@ -2680,10 +2693,12 @@ export class TileFormats {
 
 // @internal
 export class TileFormatsMigration {
+    static applyGltfUpAxis(document: Document, gltfUpAxis: "X" | "Y" | "Z" | undefined): void;
     static applyRtcCenter(document: Document, rtcCenter: number[]): void;
-    static convertB3dmToGlb(b3dmBuffer: Buffer): Promise<Buffer>;
+    static applyTransform(document: Document, transform: number[]): void;
+    static convertB3dmToGlb(b3dmBuffer: Buffer, gltfUpAxis?: "X" | "Y" | "Z"): Promise<Buffer>;
     static convertCmptToGlb(cmptBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>): Promise<Buffer>;
-    static convertI3dmToGlb(i3dmBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>): Promise<Buffer>;
+    static convertI3dmToGlb(i3dmBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>, gltfUpAxis?: "X" | "Y" | "Z"): Promise<Buffer>;
     static convertPntsToGlb(pntsBuffer: Buffer): Promise<Buffer>;
     // (undocumented)
     static readonly DEBUG_LOG_FILE_CONTENT = false;
@@ -2692,12 +2707,12 @@ export class TileFormatsMigration {
 
 // @internal
 export class TileFormatsMigrationB3dm {
-    static convertB3dmToGlb(b3dmBuffer: Buffer): Promise<Buffer>;
+    static convertB3dmToGlb(b3dmBuffer: Buffer, gltfUpAxis?: "X" | "Y" | "Z"): Promise<Buffer>;
 }
 
 // @internal
 export class TileFormatsMigrationI3dm {
-    static convertI3dmToGlb(i3dmBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>): Promise<Buffer>;
+    static convertI3dmToGlb(i3dmBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>, gltfUpAxis?: "X" | "Y" | "Z"): Promise<Buffer>;
 }
 
 // @internal
@@ -2742,11 +2757,13 @@ export interface Tileset extends RootProperty {
 export class TilesetCombiner {
     constructor(externalTilesetDetector: (contentData: ContentData) => Promise<boolean>);
     combine(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    combineData(tilesetSource: TilesetSource, tilesetSourceJsonFileName: string, tilesetTarget: TilesetTarget, tilesetTargetJsonFileName: string): Promise<void>;
 }
 
 // @internal
 export class TilesetConverter {
-    static convert(input: string, inputTilesetJsonFileName: string | undefined, output: string, force: boolean): Promise<void>;
+    static convert(tilesetSourceName: string, tilesetSourceJsonFileName: string | undefined, tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    static convertData(tilesetSource: TilesetSource, tilesetSourceJsonFileName: string, tilesetTarget: TilesetTarget, tilesetTargetJsonFileName: string): Promise<void>;
 }
 
 // @internal
@@ -2773,13 +2790,13 @@ export class TilesetError extends Error {
 // @internal
 export class TilesetInMemory implements TilesetSource, TilesetTarget {
     constructor();
-    addEntry(key: string, content: Buffer): void;
-    begin(fullOutputName: string, overwrite: boolean): void;
-    close(): void;
+    addEntry(key: string, content: Buffer): Promise<void>;
+    begin(fullOutputName: string, overwrite: boolean): Promise<void>;
+    close(): Promise<void>;
     end(): Promise<void>;
-    getKeys(): string[];
-    getValue(key: string): Buffer | undefined;
-    open(fullInputName: string): void;
+    getKeys(): Promise<AsyncIterable<string>>;
+    getValue(key: string): Promise<Buffer | undefined>;
+    open(fullInputName: string): Promise<void>;
 }
 
 // @internal
@@ -2792,6 +2809,7 @@ export class TilesetJsonCreator {
 export class TilesetMerger {
     constructor();
     merge(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    mergeData(tilesetSources: TilesetSource[], tilesetSourceJsonFileNames: string[] | undefined, tilesetTarget: TilesetTarget, tilesetTargetJsonFileName: string): Promise<void>;
     mergeJson(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
 }
 
@@ -2812,15 +2830,14 @@ export class TilesetOperations {
 
 // @internal
 export class TilesetProcessing {
-    static getSourceValue(tilesetSource: TilesetSource, key: string): Buffer;
-    static parseSourceValue<T>(tilesetSource: TilesetSource, key: string): T;
-    static resolveSchema(tilesetSource: TilesetSource, tileset: Tileset): Schema | undefined;
+    static resolveSchema(tilesetSource: TilesetSource, tileset: Tileset): Promise<Schema | undefined>;
 }
 
 // @internal
 export abstract class TilesetProcessor {
     begin(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<void>;
-    end(): Promise<void>;
+    beginData(tilesetSource: TilesetSource, tilesetSourceJsonFileName: string, tilesetTarget: TilesetTarget, tilesetTargetJsonFileName: string): Promise<void>;
+    end(close?: boolean): Promise<void>;
     fetchSourceEntry(key: string): Promise<TilesetEntry | undefined>;
     protected getContext(): TilesetProcessorContext;
     protected getTargetKey(sourceKey: string): string | undefined;
@@ -2829,7 +2846,7 @@ export abstract class TilesetProcessor {
     protected processAllEntriesInternal(entryProcessor: TilesetEntryProcessor): Promise<void>;
     processEntry(sourceKey: string, entryProcessor: TilesetEntryProcessor): Promise<void>;
     protected putTargetKey(sourceKey: string, targetKey: string): void;
-    storeTargetEntries(...targetEntries: TilesetEntry[]): void;
+    storeTargetEntries(...targetEntries: TilesetEntry[]): Promise<void>;
 }
 
 // @internal
@@ -2853,6 +2870,8 @@ export interface TilesetProcessorContext {
 export class TilesetProcessorContexts {
     static close(context: TilesetProcessorContext): Promise<void>;
     static create(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<TilesetProcessorContext>;
+    static createFromData(tilesetSource: TilesetSource, tilesetSourceJsonFileName: string, tilesetTarget: TilesetTarget, tilesetTargetJsonFileName: string): Promise<TilesetProcessorContext>;
+    static createInstance(tilesetSource: TilesetSource, tilesetSourceJsonFileName: string, tilesetTarget: TilesetTarget, tilesetTargetJsonFileName: string): Promise<TilesetProcessorContext>;
 }
 
 // @internal
@@ -2864,54 +2883,58 @@ export class Tilesets {
 
 // @internal
 export interface TilesetSource {
-    close(): void;
-    getKeys(): Iterable<string>;
-    getValue(key: string): Buffer | undefined;
-    open(fullInputName: string): void;
+    close(): Promise<void>;
+    getKeys(): Promise<AsyncIterable<string>>;
+    getValue(key: string): Promise<Buffer | undefined>;
+    open(fullInputName: string): Promise<void>;
 }
 
 // @internal
 export class TilesetSource3dtiles implements TilesetSource {
     constructor();
-    close(): void;
-    getKeys(): Iterable<string>;
-    getValue(key: string): Buffer | undefined;
-    open(fullInputName: string): void;
+    close(): Promise<void>;
+    getKeys(): Promise<AsyncIterable<string>>;
+    getValue(key: string): Promise<Buffer | undefined>;
+    open(fullInputName: string): Promise<void>;
 }
 
 // @internal
 export class TilesetSource3tz implements TilesetSource {
     constructor();
-    close(): void;
-    getKeys(): Iterable<string>;
-    getValue(key: string): Buffer | undefined;
+    close(): Promise<void>;
+    getKeys(): Promise<AsyncIterable<string>>;
+    getValue(key: string): Promise<Buffer | undefined>;
     // (undocumented)
     getZipIndex(): IndexEntry[] | undefined;
-    open(fullInputName: string): void;
+    open(fullInputName: string): Promise<void>;
 }
 
 // @internal
 export class TilesetSourceFs implements TilesetSource {
     constructor();
-    close(): void;
-    getKeys(): Iterable<string>;
-    getValue(key: string): Buffer | undefined;
-    open(fullInputName: string): void;
+    close(): Promise<void>;
+    getKeys(): Promise<AsyncIterable<string>>;
+    getValue(key: string): Promise<Buffer | undefined>;
+    open(fullInputName: string): Promise<void>;
 }
 
 // @internal
 export class TilesetSourceResourceResolver implements ResourceResolver {
     constructor(basePath: string, tilesetSource: TilesetSource);
     derive(uri: string): ResourceResolver;
-    resolveData(uri: string): Promise<Buffer | null>;
-    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
+    resolveData(uri: string): Promise<Buffer | undefined>;
+    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | undefined>;
+    resolveUri(uri: string): string;
 }
 
 // @internal
 export class TilesetSources {
     static create(extension: string): TilesetSource | undefined;
-    static createAndOpen(name: string): TilesetSource;
-    static getEntries(tilesetSource: TilesetSource): Iterable<TilesetEntry>;
+    static createAndOpen(name: string): Promise<TilesetSource>;
+    static createFromName(name: string): TilesetSource;
+    static getEntries(tilesetSource: TilesetSource): Promise<AsyncIterable<TilesetEntry>>;
+    static getSourceValue(tilesetSource: TilesetSource, key: string): Promise<Buffer>;
+    static parseSourceValue<T>(tilesetSource: TilesetSource, key: string): Promise<T>;
 }
 
 // @internal
@@ -2942,40 +2965,40 @@ export class TilesetStages {
 
 // @internal
 export interface TilesetTarget {
-    addEntry(key: string, content: Buffer): void;
-    begin(fullOutputName: string, overwrite: boolean): void;
+    addEntry(key: string, content: Buffer): Promise<void>;
+    begin(fullOutputName: string, overwrite: boolean): Promise<void>;
     end(): Promise<void>;
 }
 
 // @internal
 export class TilesetTarget3dtiles implements TilesetTarget {
     constructor();
-    addEntry(key: string, content: Buffer): void;
-    begin(fullOutputName: string, overwrite: boolean): void;
+    addEntry(key: string, content: Buffer): Promise<void>;
+    begin(fullOutputName: string, overwrite: boolean): Promise<void>;
     end(): Promise<void>;
 }
 
 // @internal
 export class TilesetTarget3tz implements TilesetTarget {
     constructor();
-    addEntry(key: string, content: Buffer): void;
-    begin(fullOutputName: string, overwrite: boolean): void;
+    addEntry(key: string, content: Buffer): Promise<void>;
+    begin(fullOutputName: string, overwrite: boolean): Promise<void>;
     end(): Promise<void>;
 }
 
 // @internal
 export class TilesetTargetFs implements TilesetTarget {
     constructor();
-    addEntry(key: string, content: Buffer): void;
-    begin(fullOutputName: string, overwrite: boolean): void;
+    addEntry(key: string, content: Buffer): Promise<void>;
+    begin(fullOutputName: string, overwrite: boolean): Promise<void>;
     end(): Promise<void>;
 }
 
 // @internal
 export class TilesetTargets {
     static create(extension: string): TilesetTarget | undefined;
-    static createAndBegin(name: string, overwrite: boolean): TilesetTarget;
-    static putEntries(tilesetTarget: TilesetTarget, entries: Iterable<TilesetEntry>): void;
+    static createAndBegin(name: string, overwrite: boolean): Promise<TilesetTarget>;
+    static createFromName(name: string): TilesetTarget;
 }
 
 // @internal
@@ -2983,12 +3006,16 @@ export class TilesetTraverser {
     constructor(baseUri: string, resourceResolver: ResourceResolver, options?: TraversalOptions);
     traverse(tileset: Tileset, traversalCallback: TraversalCallback): Promise<void>;
     traverseWithSchema(tileset: Tileset, schema: Schema | undefined, traversalCallback: TraversalCallback): Promise<void>;
-    traverseWithSchemaAt(tile: Tile, schema: Schema | undefined, traversalCallback: TraversalCallback): Promise<void>;
+    traverseWithSchemaAt(tileset: Tileset, tile: Tile, schema: Schema | undefined, traversalCallback: TraversalCallback): Promise<void>;
 }
 
 // @internal
 export class TilesetTraversers {
     static createExternalTilesetRoots(baseUri: string, traversedTile: TraversedTile): Promise<TraversedTile[]>;
+    static createIterableFromTraversedTile(traversedRootTile: TraversedTile, traverseExternalTilesets: boolean, depthFirst: boolean): AsyncIterable<TraversedTile>;
+    static createTraversedRootTile(tilesetSource: TilesetSource, tilesetJsonFileName: string): Promise<TraversedTile>;
+    static createTraversedRootTileForTileset(tilesetSource: TilesetSource, tileset: Tileset): Promise<TraversedTile>;
+    static createTraversedTilesIterable(tilesetSource: TilesetSource, tilesetJsonFileName: string, traverseExternalTilesets: boolean, depthFirst: boolean): Promise<AsyncIterable<TraversedTile>>;
     static resolveSchema(tileset: Tileset, resourceResolver: ResourceResolver): Promise<Schema | undefined>;
 }
 
@@ -2999,6 +3026,7 @@ export type TilesetUpgradeOptions = {
     upgradeRefineCase: boolean;
     upgradeContentUrlToUri: boolean;
     upgradeEmptyChildrenToUndefined: true;
+    upgradeGltfUpAxis: true;
     upgradeContentGltfExtensionDeclarations: boolean;
     upgradeB3dmGltf1ToGltf2: boolean;
     upgradeI3dmGltf1ToGltf2: boolean;
@@ -3012,6 +3040,7 @@ export type TilesetUpgradeOptions = {
 export class TilesetUpgrader {
     constructor(targetVersion: string, gltfUpgradeOptions: any);
     upgrade(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    upgradeData(tilesetSource: TilesetSource, tilesetSourceJsonFileName: string, tilesetTarget: TilesetTarget, tilesetTargetJsonFileName: string): Promise<void>;
     upgradeTileset(tileset: Tileset): Promise<void>;
 }
 
@@ -3095,6 +3124,7 @@ export interface TraversedTile {
     getRawContents(): Content[];
     getResourceResolver(): ResourceResolver;
     getSubtreeUri(): string | undefined;
+    getTileset(): Tileset;
     isImplicitTilesetRoot(): boolean;
     get level(): number;
     get path(): string;
@@ -3105,7 +3135,7 @@ export interface TreeCoordinates {
     children(): Iterable<TreeCoordinates>;
     descendants(maxLevelInclusive: number, depthFirst: boolean): Iterable<TreeCoordinates>;
     get level(): number;
-    parent(): TreeCoordinates | null;
+    parent(): TreeCoordinates | undefined;
     toArray(): number[];
     toIndex(): number;
     toIndexInLevel(): number;
@@ -3123,8 +3153,9 @@ export class TypeDetection {
 export class UnzippingResourceResolver implements ResourceResolver {
     constructor(delegate: ResourceResolver);
     derive(uri: string): ResourceResolver;
-    resolveData(uri: string): Promise<Buffer | null>;
-    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
+    resolveData(uri: string): Promise<Buffer | undefined>;
+    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | undefined>;
+    resolveUri(uri: string): string;
 }
 
 // @internal
@@ -3140,8 +3171,60 @@ export class VecMath {
     static computeEastNorthUpMatrix4(positionPacked: number[]): number[];
     static computeMean3D(points: Iterable<number[]>): number[];
     static computeRotationQuaternions(upVectors: number[][], rightVectors: number[][]): number[][];
-    static createYupToZupPacked4(): number[];
-    static createZupToYupPacked4(): number[];
+    static createXupToYupPacked4(): [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+    ];
+    static createYupToZupPacked4(): [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+    ];
+    static createZupToYupPacked4(): [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+    ];
     static decomposeMatrixTRS(matrix4Packed: number[]): {
         t: number[];
         r: number[];
