@@ -34,10 +34,10 @@ export class TilesetTraversers {
    * tileset from the given tileset source.
    *
    * @param tilesetSource - The tileset source
-   * @param tilesetJsonFileName The tileset JSON file name
+   * @param tilesetJsonFileName - The tileset JSON file name
    * @param traverseExternalTilesets - Whether external tileset tiles
    * should be included in the result
-   * @param depthFirst Whether the iteration order should be depth-first
+   * @param depthFirst - Whether the iteration order should be depth-first
    * @returns The traversed tile iterable
    * @throws TilesetError If the given tileset source does not contain
    * a tileset JSON with the given name.
@@ -66,7 +66,7 @@ export class TilesetTraversers {
    * @param traversedRootTile - The tile to start the traversal from
    * @param traverseExternalTilesets - Whether external tileset tiles
    * should be included in the result
-   * @param depthFirst Whether the iteration order should be depth-first
+   * @param depthFirst - Whether the iteration order should be depth-first
    * @returns The traversed tile iterable
    */
   static createIterableFromTraversedTile(
@@ -115,7 +115,7 @@ export class TilesetTraversers {
    * given tileset source.
    *
    * @param tilesetSource - The tileset source
-   * @param tilesetJsonFileName The tileset JSON file name
+   * @param tilesetJsonFileName - The tileset JSON file name
    * @returns The traversed tile
    * @throws TilesetError If the given tileset source does not contain
    * a tileset JSON with the given name.
