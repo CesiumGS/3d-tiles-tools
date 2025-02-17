@@ -55,7 +55,7 @@ export class TileFormatsMigrationI3dm {
   static async convertI3dmToGlb(
     i3dmBuffer: Buffer,
     externalResourceResolver: (uri: string) => Promise<Buffer | undefined>,
-    gltfUpAxis?: "X" | "Y" | "Z"
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
   ): Promise<Buffer> {
     const tileData = TileFormats.readTileData(i3dmBuffer);
 

@@ -333,8 +333,10 @@ export class ContentStageExecutor {
       if (type !== ContentDataTypes.CONTENT_TYPE_B3DM) {
         return sourceEntry;
       }
+      const gltfUpAxis = "Y";
       const targetValue = await TileFormatsMigration.convertB3dmToGlb(
-        sourceEntry.value
+        sourceEntry.value,
+        gltfUpAxis
       );
       const targetEntry = {
         key: uriProcessor(sourceEntry.key),
