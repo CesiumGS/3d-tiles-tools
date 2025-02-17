@@ -135,7 +135,7 @@ export class TilesetProcessorContexts {
    * @param tilesetSource - The `TilesetSource` instance
    * @param tilesetSourceJsonFileName - The name of the file in the
    * given source that contains the main tileset JSON
-   * @param tilesetTarget The `TilesetTarget` instance
+   * @param tilesetTarget - The `TilesetTarget` instance
    * @param tilesetTargetJsonFileName - The name that the main tileset
    * JSON file should have in the target
    * @returns A promise that resolves when this the context
