@@ -625,8 +625,8 @@ export class ContentStages {
 
 // @internal
 export class ContentUpgrades {
-    static upgradeB3dmGltf1ToGltf2(inputBuffer: Buffer, options: any): Promise<Buffer>;
-    static upgradeI3dmGltf1ToGltf2(inputBuffer: Buffer, options: any): Promise<Buffer>;
+    static upgradeB3dmGltf1ToGltf2(inputBuffer: Buffer, options: any, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
+    static upgradeI3dmGltf1ToGltf2(inputBuffer: Buffer, options: any, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
 }
 
 // @internal
@@ -1010,6 +1010,7 @@ export class GltfTransformTextures {
 
 // @internal
 export class GltfUtilities {
+    static createGlb2FromData(jsonData: Buffer, binData: Buffer): Buffer;
     static extractDataFromGlb(glbBuffer: Buffer): {
         jsonData: Buffer;
         binData: Buffer;
@@ -1017,7 +1018,11 @@ export class GltfUtilities {
     static extractJsonFromGlb(glbBuffer: Buffer): Buffer;
     static getGltfVersion(glbBuffer: Buffer): number;
     static optimizeGlb(glbBuffer: Buffer, options: any): Promise<Buffer>;
-    static replaceCesiumRtcExtension(glbBuffer: Buffer, gltfUpAxis?: "X" | "Y" | "Z"): Promise<Buffer>;
+    // @deprecated
+    static replaceCesiumRtcExtension(glbBuffer: Buffer, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
+    static replaceCesiumRtcExtensionInGltf(gltf: any, gltfUpAxis: "X" | "Y" | "Z" | undefined): void;
+    static replaceCesiumRtcExtensionInGltf2Glb(glb: Buffer, gltfUpAxis: "X" | "Y" | "Z" | undefined): Buffer;
+    static replaceCesiumRtcExtensionInGltf2Json(gltfJsonBuffer: Buffer, gltfUpAxis: "X" | "Y" | "Z" | undefined): Buffer;
     static replaceWeb3dQuantizedAttributesExtension(glbBuffer: Buffer): Promise<Buffer>;
     static upgradeGlb(glbBuffer: Buffer, options: any): Promise<Buffer>;
 }
@@ -2696,9 +2701,9 @@ export class TileFormatsMigration {
     static applyGltfUpAxis(document: Document, gltfUpAxis: "X" | "Y" | "Z" | undefined): void;
     static applyRtcCenter(document: Document, rtcCenter: number[]): void;
     static applyTransform(document: Document, transform: number[]): void;
-    static convertB3dmToGlb(b3dmBuffer: Buffer, gltfUpAxis?: "X" | "Y" | "Z"): Promise<Buffer>;
-    static convertCmptToGlb(cmptBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>): Promise<Buffer>;
-    static convertI3dmToGlb(i3dmBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>, gltfUpAxis?: "X" | "Y" | "Z"): Promise<Buffer>;
+    static convertB3dmToGlb(b3dmBuffer: Buffer, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
+    static convertCmptToGlb(cmptBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
+    static convertI3dmToGlb(i3dmBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
     static convertPntsToGlb(pntsBuffer: Buffer): Promise<Buffer>;
     // (undocumented)
     static readonly DEBUG_LOG_FILE_CONTENT = false;
@@ -2707,12 +2712,12 @@ export class TileFormatsMigration {
 
 // @internal
 export class TileFormatsMigrationB3dm {
-    static convertB3dmToGlb(b3dmBuffer: Buffer, gltfUpAxis?: "X" | "Y" | "Z"): Promise<Buffer>;
+    static convertB3dmToGlb(b3dmBuffer: Buffer, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
 }
 
 // @internal
 export class TileFormatsMigrationI3dm {
-    static convertI3dmToGlb(i3dmBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>, gltfUpAxis?: "X" | "Y" | "Z"): Promise<Buffer>;
+    static convertI3dmToGlb(i3dmBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
 }
 
 // @internal
@@ -3034,6 +3039,7 @@ export type TilesetUpgradeOptions = {
     upgradeB3dmToGlb: boolean;
     upgradeI3dmToGlb: boolean;
     upgradeCmptToGlb: boolean;
+    upgradeCesiumRtcToRootTranslation: boolean;
 };
 
 // @internal
