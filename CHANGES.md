@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-### 0.5.0 - 2025-??-??
+### 0.5.0 - 2025-02-17
 
 - Fix the `upgrade` command to properly handle a `gltfUpAxis` that may be defined in the tileset JSON, via [#166](https://github.com/CesiumGS/3d-tiles-tools/pull/166)
 - **Breaking**: Change the `TilesetSource` and `TilesetTarget` interfaces to be completely asynchronous, via [#167](https://github.com/CesiumGS/3d-tiles-tools/pull/167)
