@@ -170,6 +170,19 @@ describe("TileFormats", function () {
     expect(glbBuffers.length).toBe(1);
   });
 
+  it("extracts a single GLB buffer from an I3DM that refers to an external GLB with spaces as padding bytes", async function () {
+    const p =
+      SPECS_DATA_BASE_DIRECTORY +
+      "/tileFormats/instancedGltfExternalWithSpaces.i3dm";
+    const tileDataBuffer = fs.readFileSync(p);
+    const externalGlbResolver = createResolver(p);
+    const glbBuffers = await TileFormats.extractGlbBuffers(
+      tileDataBuffer,
+      externalGlbResolver
+    );
+    expect(glbBuffers.length).toBe(1);
+  });
+
   it("extracts no GLB buffers from PNTS", async function () {
     const p = SPECS_DATA_BASE_DIRECTORY + "/contentTypes/content.pnts";
     const tileDataBuffer = fs.readFileSync(p);
