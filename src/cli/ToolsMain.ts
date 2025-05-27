@@ -598,6 +598,7 @@ export class ToolsMain {
     inputName: string,
     output: string,
     cartographicPositionDegrees: number[] | undefined,
+    rotationDegrees: number[] | undefined,
     force: boolean
   ) {
     logger.debug(`Executing createTilesetJson`);
@@ -625,10 +626,24 @@ export class ToolsMain {
       contentUris
     );
 
-    if (cartographicPositionDegrees !== undefined) {
+    if (cartographicPositionDegrees !== undefined && rotationDegrees !== undefined) {
       logger.info(
         `Creating tileset at cartographic position: ` +
-          `${cartographicPositionDegrees} (in degress)`
+        `${cartographicPositionDegrees} (in degress) and rotation: ` +
+        `${rotationDegrees} (in degrees)`
+      );
+      const transform =
+        TilesetJsonCreator.computeTransformFromCartographicPositionAndRotationDegrees(
+          cartographicPositionDegrees,
+          rotationDegrees
+        );
+      tileset.root.transform = transform;
+    }
+
+    else if (cartographicPositionDegrees !== undefined) {
+      logger.info(
+        `Creating tileset at cartographic position: ` +
+        `${cartographicPositionDegrees} (in degress)`
       );
       const transform =
         TilesetJsonCreator.computeTransformFromCartographicPositionDegrees(
