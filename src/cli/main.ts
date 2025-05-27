@@ -98,16 +98,16 @@ function parseToolArgs(a: string[]) {
     .command(
       "convert",
       "Convert between tilesets and tileset package formats.\n" +
-      "The input and output can be one of the following:\n" +
-      "- The path of a tileset JSON file\n" +
-      "- The path of a directory that contains a 'tileset.json' file\n" +
-      "- The path of a '.3tz' file\n" +
-      "- The path of a '.3dtiles' file\n" +
-      "\n" +
-      "The input can also be the path of a ZIP file that contains the " +
-      "tileset data. The tileset JSON file in this ZIP is determined " +
-      "by the 'inputTilesetJsonFileName', which is 'tileset.json' by " +
-      "default.",
+        "The input and output can be one of the following:\n" +
+        "- The path of a tileset JSON file\n" +
+        "- The path of a directory that contains a 'tileset.json' file\n" +
+        "- The path of a '.3tz' file\n" +
+        "- The path of a '.3dtiles' file\n" +
+        "\n" +
+        "The input can also be the path of a ZIP file that contains the " +
+        "tileset data. The tileset JSON file in this ZIP is determined " +
+        "by the 'inputTilesetJsonFileName', which is 'tileset.json' by " +
+        "default.",
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
@@ -174,7 +174,7 @@ function parseToolArgs(a: string[]) {
     .command(
       "convertB3dmToGlb",
       "Convert a b3dm file into a glTF asset that uses glTF extensions to " +
-      "represent the batch- and feature table information",
+        "represent the batch- and feature table information",
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
@@ -183,7 +183,7 @@ function parseToolArgs(a: string[]) {
     .command(
       "convertPntsToGlb",
       "Convert a pnts file into a glTF asset that uses glTF extensions to " +
-      "represent the point properties and batch- and feature table information",
+        "represent the point properties and batch- and feature table information",
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
@@ -192,8 +192,8 @@ function parseToolArgs(a: string[]) {
     .command(
       "convertI3dmToGlb",
       "Convert an i3dm file into a glTF asset that uses glTF extensions to " +
-      "represent the batch- and feature table information. This conversion " +
-      "may be lossy if the GLB of the input i3dm contains animations.",
+        "represent the batch- and feature table information. This conversion " +
+        "may be lossy if the GLB of the input i3dm contains animations.",
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
@@ -202,7 +202,7 @@ function parseToolArgs(a: string[]) {
     .command(
       "optimizeB3dm",
       "Pass the input b3dm through gltf-pipeline. To pass options to gltf-pipeline, " +
-      "place them after --options. (--options -h for gltf-pipeline help)",
+        "place them after --options. (--options -h for gltf-pipeline help)",
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
@@ -215,7 +215,7 @@ function parseToolArgs(a: string[]) {
     .command(
       "optimizeI3dm",
       "Pass the input i3dm through gltf-pipeline. To pass options to gltf-pipeline, " +
-      "place them after --options. (--options -h for gltf-pipeline help)",
+        "place them after --options. (--options -h for gltf-pipeline help)",
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
@@ -228,8 +228,8 @@ function parseToolArgs(a: string[]) {
     .command(
       "updateAlignment",
       "Update the alignment of the batch- and feature table and the tile data" +
-      "as a whole, to meet the alignment requirements of the specification. " +
-      "This can be applied to B3DM, I3DM, PNTS, or CMPT tile data.",
+        "as a whole, to meet the alignment requirements of the specification. " +
+        "This can be applied to B3DM, I3DM, PNTS, or CMPT tile data.",
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
@@ -273,20 +273,20 @@ function parseToolArgs(a: string[]) {
     .command(
       "upgrade",
       "Upgrades legacy tilesets to comply to the 3D Tiles specification.\n\n" +
-      "By default, this will upgrade legacy tilesets to comply to 3D Tiles 1.0. " +
-      "These upgrades include:\n" +
-      "- The asset version will be set to '1.0'\n" +
-      "- Content that uses a 'url' will be upgraded to use 'uri'.\n" +
-      "- The 'refine' value will be converted to be in all-uppercase.\n" +
-      "- glTF 1.0 models in B3DM or I3DM will be upgraded to glTF 2.0.\n" +
-      "\n" +
-      "When specifying '--targetVersion 1.1', then the upgrades will include:\n" +
-      "- The asset version will be set to '1.1'\n" +
-      "- Content that uses a 'url' will be upgraded to use 'uri'.\n" +
-      "- The 'refine' value will be converted to be in all-uppercase.\n" +
-      "- The '3DTILES_content_gltf' extension declaration will be removed.\n" +
-      "- PNTS, B3DM, and I3DM content will be converted to glTF.\n" +
-      "\n",
+        "By default, this will upgrade legacy tilesets to comply to 3D Tiles 1.0. " +
+        "These upgrades include:\n" +
+        "- The asset version will be set to '1.0'\n" +
+        "- Content that uses a 'url' will be upgraded to use 'uri'.\n" +
+        "- The 'refine' value will be converted to be in all-uppercase.\n" +
+        "- glTF 1.0 models in B3DM or I3DM will be upgraded to glTF 2.0.\n" +
+        "\n" +
+        "When specifying '--targetVersion 1.1', then the upgrades will include:\n" +
+        "- The asset version will be set to '1.1'\n" +
+        "- Content that uses a 'url' will be upgraded to use 'uri'.\n" +
+        "- The 'refine' value will be converted to be in all-uppercase.\n" +
+        "- The '3DTILES_content_gltf' extension declaration will be removed.\n" +
+        "- PNTS, B3DM, and I3DM content will be converted to glTF.\n" +
+        "\n",
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
@@ -303,10 +303,10 @@ function parseToolArgs(a: string[]) {
     .command(
       "analyze",
       "Analyze the input file, and write the results to the output directory. " +
-      "This will accept B3DM, I3DM, PNTS, CMPT, and GLB files (both for glTF " +
-      "1.0 and for glTF 2.0), and write files into the output directory that " +
-      "contain the feature table, batch table, layout information, the GLB, " +
-      "and the JSON of the GLB",
+        "This will accept B3DM, I3DM, PNTS, CMPT, and GLB files (both for glTF " +
+        "1.0 and for glTF 2.0), and write files into the output directory that " +
+        "contain the feature table, batch table, layout information, the GLB, " +
+        "and the JSON of the GLB",
       { i: inputStringDefinition, o: outputStringDefinition }
     )
     .command(
@@ -325,11 +325,11 @@ function parseToolArgs(a: string[]) {
     .command(
       "createTilesetJson",
       "Creates a tileset JSON file that just refers to given tile content files. " +
-      "If the input is a single file, then this will result in a single (root) tile with " +
-      "the input file as its tile content. If the input is a directory, then all content " +
-      "files in this directory will be used as tile content, recursively. The exact set " +
-      "of file types that are considered to be 'tile content' is not specified, but it " +
-      "will include GLB, B3DM, PNTS, I3DM, and CMPT files.",
+        "If the input is a single file, then this will result in a single (root) tile with " +
+        "the input file as its tile content. If the input is a directory, then all content " +
+        "files in this directory will be used as tile content, recursively. The exact set " +
+        "of file types that are considered to be 'tile content' is not specified, but it " +
+        "will include GLB, B3DM, PNTS, I3DM, and CMPT files.",
       {
         i: inputStringDefinition,
         o: outputStringDefinition,
@@ -408,7 +408,7 @@ function validateOptionalNumberArray(
     if (value.length < minLength) {
       throw new DeveloperError(
         `Expected an array of at least length ${minLength}, ` +
-        `but received an array of length ${value.length}: ${value}`
+          `but received an array of length ${value.length}: ${value}`
       );
     }
   }
@@ -416,7 +416,7 @@ function validateOptionalNumberArray(
     if (value.length > maxLength) {
       throw new DeveloperError(
         `Expected an array of at most length ${maxLength}, ` +
-        `but received an array of length ${value.length}: ${value}`
+          `but received an array of length ${value.length}: ${value}`
       );
     }
   }
@@ -426,7 +426,7 @@ function validateOptionalNumberArray(
     if (type !== "number") {
       throw new DeveloperError(
         `Expected an array of numbers, but element at index ${i} ` +
-        `has type '${type}': ${element}`
+          `has type '${type}': ${element}`
       );
     }
   }

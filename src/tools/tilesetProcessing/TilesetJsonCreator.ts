@@ -286,7 +286,7 @@ export class TilesetJsonCreator {
     if (cartographicPositionDegrees.length < 2) {
       throw new DeveloperError(
         `Expected an array of at least length 2, but received an array ` +
-        `of length ${cartographicPositionDegrees.length}: ${cartographicPositionDegrees}`
+          `of length ${cartographicPositionDegrees.length}: ${cartographicPositionDegrees}`
       );
     }
     const lonDegrees = cartographicPositionDegrees[0];
@@ -321,12 +321,12 @@ export class TilesetJsonCreator {
    */
   static computeTransformFromCartographicPositionAndRotationDegrees(
     cartographicPositionDegrees: number[],
-    rotationDegrees: number[],
+    rotationDegrees: number[]
   ) {
     if (cartographicPositionDegrees.length < 2) {
       throw new DeveloperError(
         `Expected an array of at least length 2, but received an array ` +
-        `of length ${cartographicPositionDegrees.length}: ${cartographicPositionDegrees}`
+          `of length ${cartographicPositionDegrees.length}: ${cartographicPositionDegrees}`
       );
     }
     const lonDegrees = cartographicPositionDegrees[0];
@@ -339,11 +339,7 @@ export class TilesetJsonCreator {
     const pitchDegrees = rotationDegrees[1];
     const rollDegrees = rotationDegrees[2];
 
-    const position = Cartesian3.fromDegrees(
-      lonDegrees,
-      latDegrees,
-      height
-    );
+    const position = Cartesian3.fromDegrees(lonDegrees, latDegrees, height);
     const hpr = new HeadingPitchRoll(
       CesiumMath.toRadians(headingDegrees),
       CesiumMath.toRadians(pitchDegrees),
@@ -351,7 +347,11 @@ export class TilesetJsonCreator {
     );
     const orientation = Transforms.headingPitchRollQuaternion(position, hpr);
     const scale = new Cartesian3(1.0, 1.0, 1.0);
-    const transform = Matrix4.fromTranslationQuaternionRotationScale(position, orientation, scale);
+    const transform = Matrix4.fromTranslationQuaternionRotationScale(
+      position,
+      orientation,
+      scale
+    );
     const transformArray = Matrix4.toArray(transform);
     return transformArray;
   }
