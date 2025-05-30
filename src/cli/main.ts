@@ -340,6 +340,12 @@ function parseToolArgs(a: string[]) {
             "latitude are given in degrees, and the height is given in meters.",
           type: "array",
         },
+        rotationDegrees: {
+          description:
+            "An array of three values, which are the (heading, pitch, roll) " +
+            "of the target rotation. The heading, pitch, and roll are given in degrees.",
+          type: "array",
+        },
       }
     )
     .demandCommand(1)
@@ -560,10 +566,16 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
       2,
       3
     );
+    const rotationDegrees = validateOptionalNumberArray(
+      toolArgs.rotationDegrees,
+      3,
+      3
+    );
     await ToolsMain.createTilesetJson(
       input,
       output,
       cartographicPositionDegrees,
+      rotationDegrees,
       force
     );
   } else {
