@@ -632,7 +632,7 @@ export class ToolsMain {
     ) {
       logger.info(
         `Creating tileset at cartographic position: ` +
-          `${cartographicPositionDegrees} (in degress) and rotation: ` +
+          `${cartographicPositionDegrees} (in degrees) and rotation: ` +
           `${rotationDegrees} (in degrees)`
       );
       const transform =
@@ -644,7 +644,7 @@ export class ToolsMain {
     } else if (cartographicPositionDegrees !== undefined) {
       logger.info(
         `Creating tileset at cartographic position: ` +
-          `${cartographicPositionDegrees} (in degress)`
+          `${cartographicPositionDegrees} (in degrees)`
       );
       const transform =
         TilesetJsonCreator.computeTransformFromCartographicPositionDegrees(
