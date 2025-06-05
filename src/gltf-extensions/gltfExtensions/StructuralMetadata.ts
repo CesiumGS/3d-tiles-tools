@@ -1,4 +1,6 @@
 import { ExtensionProperty } from "@gltf-transform/core";
+import { RefMap } from "@gltf-transform/core";
+import { RefSet } from "@gltf-transform/core";
 import { Texture } from "@gltf-transform/core";
 import { TextureInfo } from "@gltf-transform/core";
 import { IProperty } from "@gltf-transform/core";
@@ -26,22 +28,22 @@ const NAME = "EXT_structural_metadata";
 interface IStructuralMetadata extends IProperty {
   schema: Schema;
   schemaUri: string | null;
-  propertyTables: PropertyTable[];
-  propertyTextures: PropertyTexture[];
-  propertyAttributes: PropertyAttribute[];
+  propertyTables: RefSet<PropertyTable>;
+  propertyTextures: RefSet<PropertyTexture>;
+  propertyAttributes: RefSet<PropertyAttribute>;
 }
 interface ISchema extends IProperty {
   id: string;
   objectName: string | null;
   description: string | null;
   version: string | null;
-  classes: { [key: string]: Class };
-  enums: { [key: string]: Enum };
+  classes: RefMap<Class>;
+  enums: RefMap<Enum>;
 }
 interface IClass extends IProperty {
   objectName: string | null;
   description: string | null;
-  properties: { [key: string]: ClassProperty };
+  properties: RefMap<ClassProperty>;
 }
 
 /* Not supported by glTF-Transform...
@@ -79,7 +81,7 @@ interface IEnum extends IProperty {
   objectName: string | null;
   description: string | null;
   valueType: EnumValueType;
-  values: EnumValue[];
+  values: RefSet<EnumValue>;
 }
 
 interface IEnumValue extends IProperty {
@@ -92,7 +94,7 @@ interface IPropertyTable extends IProperty {
   objectName: string | null;
   class: string;
   count: number;
-  properties: { [key: string]: PropertyTableProperty };
+  properties: RefMap<PropertyTableProperty>;
 }
 
 interface IPropertyTableProperty extends IProperty {
@@ -110,7 +112,7 @@ interface IPropertyTableProperty extends IProperty {
 interface IPropertyTexture extends IProperty {
   objectName: string | null;
   class: string;
-  properties: { [key: string]: PropertyTextureProperty };
+  properties: RefMap<PropertyTextureProperty>;
 }
 
 interface IPropertyTextureProperty extends IProperty {
@@ -126,7 +128,7 @@ interface IPropertyTextureProperty extends IProperty {
 interface IPropertyAttribute extends IProperty {
   objectName: string | null;
   class: string;
-  properties: { [key: string]: PropertyAttributeProperty };
+  properties: RefMap<PropertyAttributeProperty>;
 }
 
 interface IPropertyAttributeProperty extends IProperty {
@@ -139,7 +141,7 @@ interface IPropertyAttributeProperty extends IProperty {
 
 // This corresponds to the EXT_structural_metadata.schema.json
 // schema, which is structural metadata that can be applied
-// to all glTF elements, and is only constrainted to 'nodes' in
+// to all glTF elements, and is only constrained to 'nodes' in
 // the specification text for now
 interface IElementStructuralMetadata extends IProperty {
   propertyTable: PropertyTable;
@@ -149,8 +151,8 @@ interface IElementStructuralMetadata extends IProperty {
 // This corresponds to the mesh.primitive.EXT_structural_metadata.schema.json
 // schema
 interface IMeshPrimitiveStructuralMetadata extends IProperty {
-  propertyTextures: PropertyTexture[];
-  propertyAttributes: PropertyAttribute[];
+  propertyTextures: RefSet<PropertyTexture>;
+  propertyAttributes: RefSet<PropertyAttribute>;
 }
 
 //============================================================================
@@ -181,9 +183,9 @@ export class StructuralMetadata extends ExtensionProperty<IStructuralMetadata> {
     return Object.assign(super.getDefaults(), {
       schema: null,
       schemaUri: null,
-      propertyTables: [],
-      propertyTextures: [],
-      propertyAttributes: [],
+      propertyTables: new RefSet<PropertyTable>(),
+      propertyTextures: new RefSet<PropertyTexture>(),
+      propertyAttributes: new RefSet<PropertyAttribute>(),
     });
   }
 
@@ -254,8 +256,8 @@ export class Schema extends ExtensionProperty<ISchema> {
       objectName: null,
       description: null,
       version: null,
-      classes: {},
-      enums: {},
+      classes: new RefMap<Class>(),
+      enums: new RefMap<Enum>(),
     });
   }
 
@@ -335,7 +337,7 @@ export class Class extends ExtensionProperty<IClass> {
     return Object.assign(super.getDefaults(), {
       objectName: null,
       description: null,
-      properties: {},
+      properties: new RefMap<ClassProperty>(),
     });
   }
 
@@ -531,7 +533,7 @@ export class Enum extends ExtensionProperty<IEnum> {
       objectName: null,
       description: null,
       valueType: "UINT16",
-      values: [],
+      values: new RefSet<EnumValue>(),
     });
   }
 
@@ -632,7 +634,7 @@ export class PropertyTable extends ExtensionProperty<IPropertyTable> {
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
       objectName: null,
-      properties: {},
+      properties: new RefMap<PropertyTableProperty>(),
     });
   }
 
@@ -785,7 +787,7 @@ export class PropertyTexture extends ExtensionProperty<IPropertyTexture> {
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
       objectName: null,
-      properties: {},
+      properties: new RefMap<PropertyTextureProperty>(),
     });
   }
 
@@ -916,7 +918,7 @@ export class PropertyAttribute extends ExtensionProperty<IPropertyAttribute> {
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
       objectName: null,
-      properties: {},
+      properties: new RefMap<PropertyAttributeProperty>(),
     });
   }
 
@@ -1065,8 +1067,8 @@ export class MeshPrimitiveStructuralMetadata extends ExtensionProperty<IMeshPrim
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
-      propertyTextures: [],
-      propertyAttributes: [],
+      propertyTextures: new RefSet<PropertyTexture>(),
+      propertyAttributes: new RefSet<PropertyAttribute>(),
     });
   }
 

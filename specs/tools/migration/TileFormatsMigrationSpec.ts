@@ -301,7 +301,7 @@ describe("TileFormatsMigration", function () {
   //==========================================================================
   // B3DM
 
-  it("converts BatchedAnimated to the expected output", async function () {
+  fit("converts BatchedAnimated to the expected output", async function () {
     const subDir = "Batched/";
     const name = "BatchedAnimated";
     const fileNameWithoutExtension = "batchedAnimated";

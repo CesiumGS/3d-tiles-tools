@@ -1,4 +1,5 @@
 import { ExtensionProperty } from "@gltf-transform/core";
+import { RefSet } from "@gltf-transform/core";
 import { Texture } from "@gltf-transform/core";
 import { TextureInfo } from "@gltf-transform/core";
 import { IProperty } from "@gltf-transform/core";
@@ -23,14 +24,14 @@ const NAME = "EXT_mesh_features";
 // has an associated `TextureInfo`. This is used internally by glTF-Transform
 // for some deduplication magic or whatnot.
 //
-// More genenerally: The types of the properties in these interfaces
+// More generally: The types of the properties in these interfaces
 // are the model classes themself, and NOT the interface. So it is
 //     featureIds: FeatureId[];
 // and not
 //     featureIds: IFeatureId[];
 //
 // These interfaces are NOT publicly visible. They only serve as the type
-// pararameter for the `ExtensionProperty` class, which is the base
+// parameter for the `ExtensionProperty` class, which is the base
 // for the actual "model" classes that are exposed to the user.
 //
 // In these interfaces, optional properties are generally represented
@@ -44,7 +45,7 @@ const NAME = "EXT_mesh_features";
 // classes will return or accept the `...|null` type automatically.
 
 interface IMeshFeatures extends IProperty {
-  featureIds: FeatureId[];
+  featureIds: RefSet<FeatureId>;
 }
 interface IFeatureId extends IProperty {
   featureCount: number;
@@ -114,7 +115,7 @@ export class MeshFeatures extends ExtensionProperty<IMeshFeatures> {
 
   protected override getDefaults() {
     return Object.assign(super.getDefaults(), {
-      featureIds: [],
+      featureIds: new RefSet<FeatureId>(),
     });
   }
 
