@@ -957,7 +957,7 @@ export class StructuralMetadataMerger {
 
   /**
    * Returns whether the given array of glTF-Transform `Property` objects
-   * contains an objec that is equal to the given one, based on the
+   * contains an object that is equal to the given one, based on the
    * glTF-Transform `Property.equal` implementation.
    *
    * @param properties - The properties

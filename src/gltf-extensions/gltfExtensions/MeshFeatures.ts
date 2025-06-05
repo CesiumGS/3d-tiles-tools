@@ -70,7 +70,7 @@ interface IFeatureIdTexture extends IProperty {
 //
 // They offer accessor methods for the properties that are defined in
 // the model class interfaces. Depending on the type of the properties,
-// these accesor methods come in different flavors:
+// these accessor methods come in different flavors:
 //
 // - For "primitive" property types (like `number`, `boolean` and `string`),
 //   the implementations use `this.get(...)`/`this.set(...)`
