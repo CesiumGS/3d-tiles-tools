@@ -198,8 +198,8 @@
   ],
   "scene": 0,
   "extensionsUsed": [
-    "EXT_structural_metadata",
-    "EXT_mesh_features"
+    "EXT_mesh_features",
+    "EXT_structural_metadata"
   ],
   "extensions": {
     "EXT_structural_metadata": {
