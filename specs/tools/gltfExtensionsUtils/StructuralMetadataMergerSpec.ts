@@ -469,7 +469,7 @@ async function addSpecPropertyTexture(
   );
 }
 
-fdescribe("StructuralMetadataMerger", function () {
+describe("StructuralMetadataMerger", function () {
   //==========================================================================
   // Basic class merging
 
