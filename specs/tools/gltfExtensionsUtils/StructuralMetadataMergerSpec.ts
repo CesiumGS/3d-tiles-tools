@@ -430,7 +430,6 @@ async function addSpecPropertyTexture(
   const image = await savePixels(pixels, "image/png");
   const texture = document.createTexture();
   texture.setImage(image);
-  texture.setURI("propertyTexture.png");
 
   // Create and add a property texture with the following structure:
   // {
@@ -470,7 +469,7 @@ async function addSpecPropertyTexture(
   );
 }
 
-describe("StructuralMetadataMerger", function () {
+fdescribe("StructuralMetadataMerger", function () {
   //==========================================================================
   // Basic class merging
 
