@@ -65,7 +65,7 @@ export class StructuralMetadataPropertyTables {
     propertyTable.setClass(propertyTableJson.class);
     propertyTable.setCount(propertyTableJson.count);
 
-    // Create all PropertyTablePropery objects, and put
+    // Create all PropertyTableProperty objects, and put
     // them into the PropertyTable
     const binaryMetadata = binaryPropertyTable.binaryMetadata;
     const metadataClass = binaryMetadata.metadataClass;
@@ -88,7 +88,7 @@ export class StructuralMetadataPropertyTables {
    * glTF-Transform `PropertyTable` object, based on the given
    * input data.
    *
-   * @param extStructuralMetadata - The `EXTStructuralMetdadata` for
+   * @param extStructuralMetadata - The `EXTStructuralMetadata` for
    * creating the glTF-Transform model objects
    * @param binaryPropertyTable - The `BinaryPropertyTable` that
    * contains all the input data

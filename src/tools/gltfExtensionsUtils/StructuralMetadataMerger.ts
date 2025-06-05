@@ -4,6 +4,8 @@ import { Document } from "@gltf-transform/core";
 import { Property } from "@gltf-transform/core";
 import { IProperty } from "@gltf-transform/core";
 
+import { copyToDocument } from "@gltf-transform/functions";
+import { mergeDocuments } from "@gltf-transform/functions";
 import { unpartition } from "@gltf-transform/functions";
 
 import { EXTStructuralMetadata } from "../../gltf-extensions/";
@@ -14,9 +16,6 @@ import { StructuralMetadataClass as Class } from "../../gltf-extensions/";
 import { StructuralMetadataPropertyTable as PropertyTable } from "../../gltf-extensions/";
 import { StructuralMetadataPropertyTexture as PropertyTexture } from "../../gltf-extensions/";
 import { StructuralMetadataPropertyAttribute as PropertyAttribute } from "../../gltf-extensions/";
-
-import { mergeDocuments } from "./StructuralMetadataMergeUtilities";
-import { copyToDocument } from "./StructuralMetadataMergeUtilities";
 
 import { MetadataError } from "../../metadata";
 import { Loggers } from "../../base/";
@@ -958,7 +957,7 @@ export class StructuralMetadataMerger {
 
   /**
    * Returns whether the given array of glTF-Transform `Property` objects
-   * contains an objec that is equal to the given one, based on the
+   * contains an object that is equal to the given one, based on the
    * glTF-Transform `Property.equal` implementation.
    *
    * @param properties - The properties

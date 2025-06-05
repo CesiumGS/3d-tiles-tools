@@ -27,9 +27,9 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@gltf-transform/core": "^3.9.0",
-    "@gltf-transform/extensions": "^3.9.0",
-    "@gltf-transform/functions": "^3.9.0",
+    "@gltf-transform/core": "^4.1.4",
+    "@gltf-transform/extensions": "^4.1.4",
+    "@gltf-transform/functions": "^4.1.4",
     "archiver": "^5.3.1",
     "better-sqlite3": "^11.5.0",
     "cesium": "^1.103.0",
@@ -43,7 +43,7 @@
     "pino": "^8.15.0",
     "pino-pretty": "^10.2.0",
     "seedrandom": "^3.0.5",
-    "sharp": "^0.32.1",
+    "sharp": "0.33.5",
     "yargs": "^17.5.1"
   },
   "devDependencies": {
