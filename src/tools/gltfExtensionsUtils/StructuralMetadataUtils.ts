@@ -154,14 +154,16 @@ export class StructuralMetadataUtils {
     if (arrayOffsets) {
       arrayOffsetsBufferViewData = Buffer.from(arrayOffsets);
     }
-    const arrayOffsetType = propertyTableProperty.getArrayOffsetType();
+    const arrayOffsetType =
+      propertyTableProperty.getArrayOffsetType() ?? "UINT32";
 
     const stringOffsets = propertyTableProperty.getStringOffsets();
     let stringOffsetsBufferViewData: Buffer | undefined;
     if (stringOffsets) {
       stringOffsetsBufferViewData = Buffer.from(stringOffsets);
     }
-    const stringOffsetType = propertyTableProperty.getStringOffsetType();
+    const stringOffsetType =
+      propertyTableProperty.getStringOffsetType() ?? "UINT32";
 
     let enumValueType: string | undefined = undefined;
     const enumType = classProperty.getEnumType();
