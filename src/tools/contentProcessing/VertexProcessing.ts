@@ -359,7 +359,7 @@ export class VertexProcessing {
     //const io = await GltfTransform.getIO();
     //const document = await io.readBinary(glbBuffer);
     // TODO Obtaining document, INCLUDING possible upgrades - OK?
-    const document = await GltfUpgrade.obtainDocument(glbBuffer);
+    const document = await GltfUpgrade.obtainDocument(glbBuffer, "Y");
     const root = document.getRoot();
     let scene = root.getDefaultScene();
     if (!scene) {
