@@ -6,12 +6,18 @@ import { ContentDataTypes } from "../../base";
 import { Tileset } from "../../structure";
 import { Schema } from "../../structure";
 
+import { Tilesets } from "../../tilesets";
+import { TilesetSource } from "../../tilesets";
+import { TilesetSources } from "../../tilesets";
+import { TilesetTarget } from "../../tilesets";
+import { TilesetTargets } from "../../tilesets";
 import { TilesetEntry } from "../../tilesets";
 
 import { TilesetUpgradeOptions } from "./upgrade/TilesetUpgradeOptions";
 import { TilesetObjectUpgrader } from "./upgrade/TilesetObjectUpgrader";
 
 import { ContentUpgrades } from "../contentProcessing/ContentUpgrades";
+import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 
 import { BasicTilesetProcessor } from "./BasicTilesetProcessor";
 
@@ -45,6 +51,12 @@ export class TilesetUpgrader {
   private tilesetProcessor: BasicTilesetProcessor | undefined;
 
   /**
+   * The value that was stored as the `tileset.asset.gltfUpAxis`
+   * of the tileset that is currently being processed.
+   */
+  private currentTilesetGltfUpAxis: "X" | "Y" | "Z" | undefined;
+
+  /**
    * Creates a new instance
    *
    * @param targetVersion - The target version - 1.0 or 1.1
@@ -71,9 +83,11 @@ export class TilesetUpgrader {
         upgradeExternalTilesets: true,
 
         upgradedAssetVersionNumber: "1.0",
+
         upgradeRefineCase: true,
         upgradeContentUrlToUri: true,
         upgradeEmptyChildrenToUndefined: true,
+        upgradeGltfUpAxis: true,
 
         upgradeContentGltfExtensionDeclarations: false,
 
@@ -84,6 +98,8 @@ export class TilesetUpgrader {
         upgradeB3dmToGlb: false,
         upgradeI3dmToGlb: false,
         upgradeCmptToGlb: false,
+
+        upgradeCesiumRtcToRootTranslation: true,
       };
       return options;
     }
@@ -92,9 +108,11 @@ export class TilesetUpgrader {
         upgradeExternalTilesets: true,
 
         upgradedAssetVersionNumber: "1.1",
+
         upgradeRefineCase: true,
         upgradeContentUrlToUri: true,
         upgradeEmptyChildrenToUndefined: true,
+        upgradeGltfUpAxis: true,
 
         upgradeContentGltfExtensionDeclarations: true,
 
@@ -105,6 +123,8 @@ export class TilesetUpgrader {
         upgradeB3dmToGlb: true,
         upgradeI3dmToGlb: true,
         upgradeCmptToGlb: true,
+
+        upgradeCesiumRtcToRootTranslation: true,
       };
       return options;
     }
@@ -112,6 +132,22 @@ export class TilesetUpgrader {
       `Invalid target version ${version} - ` +
         `only '1.0' and '1.1' are allowed`
     );
+  }
+
+  /**
+   * Returns the value that is stored as the `tileset.asset.gltfUpAxis`
+   * in the given tileset, in uppercase, or "Y" if this value is not
+   * defined.
+   *
+   * The result should always be a string, "X", "Y", or "Z".
+   *
+   * @param tileset - The tileset
+   * @returns The up axis
+   */
+  private static getGltfUpAxis(tileset: Tileset): "X" | "Y" | "Z" {
+    const asset = tileset.asset as any;
+    const gltfUpAxis = asset?.gltfUpAxis ?? "Y";
+    return gltfUpAxis.toUpperCase();
   }
 
   /**
@@ -131,13 +167,60 @@ export class TilesetUpgrader {
     tilesetTargetName: string,
     overwrite: boolean
   ): Promise<void> {
+    const tilesetSourceJsonFileName =
+      Tilesets.determineTilesetJsonFileName(tilesetSourceName);
+    const tilesetTargetJsonFileName =
+      Tilesets.determineTilesetJsonFileName(tilesetTargetName);
+    const tilesetSource = await TilesetSources.createAndOpen(tilesetSourceName);
+    const tilesetTarget = await TilesetTargets.createAndBegin(
+      tilesetTargetName,
+      overwrite
+    );
+
+    await this.upgradeData(
+      tilesetSource,
+      tilesetSourceJsonFileName,
+      tilesetTarget,
+      tilesetTargetJsonFileName
+    );
+
+    await tilesetSource.close();
+    await tilesetTarget.end();
+  }
+
+  /**
+   * Upgrade the specified source tileset, and write it to the given
+   * target.
+   *
+   * The caller is responsible for calling `open` on the given
+   * source and `begin` on the given target before calling this
+   * method, and `close` on the source and `end` on the target
+   * after calling this method.
+   *
+   * @param tilesetSourceName - The tileset source name
+   * @param tilesetSourceJsonFileName - The name of the top-level
+   * tileset JSON file in the source
+   * @param tilesetTargetName - The tileset target name
+   * @param tilesetTargetJsonFileName - The name of the top-level
+   * tileset JSON file in the target
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError When the input could not be processed,
+   * or when the output already exists and `overwrite` was `false`.
+   */
+  async upgradeData(
+    tilesetSource: TilesetSource,
+    tilesetSourceJsonFileName: string,
+    tilesetTarget: TilesetTarget,
+    tilesetTargetJsonFileName: string
+  ): Promise<void> {
     const processExternalTilesets = this.upgradeOptions.upgradeExternalTilesets;
     const tilesetProcessor = new BasicTilesetProcessor(processExternalTilesets);
     this.tilesetProcessor = tilesetProcessor;
-    await tilesetProcessor.begin(
-      tilesetSourceName,
-      tilesetTargetName,
-      overwrite
+    await tilesetProcessor.beginData(
+      tilesetSource,
+      tilesetSourceJsonFileName,
+      tilesetTarget,
+      tilesetTargetJsonFileName
     );
 
     // Perform the upgrade for the actual tileset object
@@ -151,8 +234,10 @@ export class TilesetUpgrader {
 
     // Perform the updates for the tile contents
     await this.performContentUpgrades(tilesetProcessor);
-    await tilesetProcessor.end();
+    await tilesetProcessor.end(false);
+
     delete this.tilesetProcessor;
+    delete this.currentTilesetGltfUpAxis;
   }
 
   /**
@@ -161,6 +246,7 @@ export class TilesetUpgrader {
    * @param tileset - The `Tileset` object
    */
   async upgradeTileset(tileset: Tileset) {
+    this.currentTilesetGltfUpAxis = TilesetUpgrader.getGltfUpAxis(tileset);
     const tilesetObjectUpgrader = new TilesetObjectUpgrader(
       this.upgradeOptions
     );
@@ -246,14 +332,8 @@ export class TilesetUpgrader {
     try {
       return await this.processEntryUnchecked(sourceEntry, type);
     } catch (error) {
-      const sourceKey = sourceEntry.key;
-      logger.error(`Failed to upgrade ${sourceKey}: ${error}`);
-      const targetKey = this.processContentUri(sourceKey);
-      const targetEntry = {
-        key: targetKey,
-        value: sourceEntry.value,
-      };
-      return targetEntry;
+      logger.error(`Failed to upgrade ${sourceEntry.key}: ${error}`);
+      return sourceEntry;
     }
   };
 
@@ -276,6 +356,10 @@ export class TilesetUpgrader {
       return this.processEntryI3dm(sourceEntry);
     } else if (type === ContentDataTypes.CONTENT_TYPE_CMPT) {
       return this.processEntryCmpt(sourceEntry);
+    } else if (type === ContentDataTypes.CONTENT_TYPE_GLTF) {
+      return this.processEntryGltf(sourceEntry);
+    } else if (type === ContentDataTypes.CONTENT_TYPE_GLB) {
+      return this.processEntryGlb(sourceEntry);
     } else if (type == ContentDataTypes.CONTENT_TYPE_TILESET) {
       return this.processEntryTileset(sourceEntry);
     }
@@ -330,12 +414,16 @@ export class TilesetUpgrader {
       logger.debug(`  Upgrading B3DM to GLB for ${sourceKey}`);
 
       targetKey = this.processContentUri(sourceKey);
-      targetValue = await TileFormatsMigration.convertB3dmToGlb(sourceValue);
+      targetValue = await TileFormatsMigration.convertB3dmToGlb(
+        sourceValue,
+        this.currentTilesetGltfUpAxis
+      );
     } else if (this.upgradeOptions.upgradeB3dmGltf1ToGltf2) {
       logger.debug(`  Upgrading GLB in ${sourceKey}`);
       targetValue = await ContentUpgrades.upgradeB3dmGltf1ToGltf2(
         sourceValue,
-        this.gltfUpgradeOptions
+        this.gltfUpgradeOptions,
+        this.currentTilesetGltfUpAxis
       );
     } else {
       logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
@@ -384,13 +472,15 @@ export class TilesetUpgrader {
       };
       targetValue = await TileFormatsMigration.convertI3dmToGlb(
         sourceValue,
-        externalGlbResolver
+        externalGlbResolver,
+        this.currentTilesetGltfUpAxis
       );
     } else if (this.upgradeOptions.upgradeI3dmGltf1ToGltf2) {
       logger.debug(`  Upgrading GLB in ${sourceKey}`);
       targetValue = await ContentUpgrades.upgradeI3dmGltf1ToGltf2(
         sourceValue,
-        this.gltfUpgradeOptions
+        this.gltfUpgradeOptions,
+        this.currentTilesetGltfUpAxis
       );
     } else {
       logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
@@ -440,7 +530,68 @@ export class TilesetUpgrader {
       };
       targetValue = await TileFormatsMigration.convertCmptToGlb(
         sourceValue,
-        externalResourceResolver
+        externalResourceResolver,
+        this.currentTilesetGltfUpAxis
+      );
+    } else {
+      logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
+    }
+    const targetEntry = {
+      key: targetKey,
+      value: targetValue,
+    };
+    return targetEntry;
+  };
+
+  /**
+   * Process the given tileset (content) entry that contains glTF,
+   * and return the result.
+   *
+   * @param sourceEntry - The source entry
+   * @returns The processed entry
+   */
+  private processEntryGltf = async (
+    sourceEntry: TilesetEntry
+  ): Promise<TilesetEntry> => {
+    const sourceKey = sourceEntry.key;
+    const sourceValue = sourceEntry.value;
+    const targetKey = sourceKey;
+    let targetValue = sourceValue;
+    if (this.upgradeOptions.upgradeCesiumRtcToRootTranslation) {
+      logger.debug(`  Upgrading glTF for ${sourceKey}`);
+      targetValue = GltfUtilities.replaceCesiumRtcExtensionInGltf2Json(
+        sourceValue,
+        this.currentTilesetGltfUpAxis
+      );
+    } else {
+      logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);
+    }
+    const targetEntry = {
+      key: targetKey,
+      value: targetValue,
+    };
+    return targetEntry;
+  };
+
+  /**
+   * Process the given tileset (content) entry that contains binary
+   * glTF (GLB), and return the result.
+   *
+   * @param sourceEntry - The source entry
+   * @returns The processed entry
+   */
+  private processEntryGlb = async (
+    sourceEntry: TilesetEntry
+  ): Promise<TilesetEntry> => {
+    const sourceKey = sourceEntry.key;
+    const sourceValue = sourceEntry.value;
+    const targetKey = sourceKey;
+    let targetValue = sourceValue;
+    if (this.upgradeOptions.upgradeCesiumRtcToRootTranslation) {
+      logger.debug(`  Upgrading GLB for ${sourceKey}`);
+      targetValue = GltfUtilities.replaceCesiumRtcExtensionInGltf2Glb(
+        sourceValue,
+        this.currentTilesetGltfUpAxis
       );
     } else {
       logger.debug(`  Not upgrading ${sourceKey} (disabled via option)`);

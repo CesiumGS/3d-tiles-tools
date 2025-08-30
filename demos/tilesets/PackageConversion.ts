@@ -77,19 +77,22 @@ async function tilesetPackageConversion(options: any) {
       overwrite
     );
   } else {
-    const tilesetSource = TilesetSources.createAndOpen(input);
-    const tilesetTarget = TilesetTargets.createAndBegin(output, overwrite);
+    const tilesetSource = await TilesetSources.createAndOpen(input);
+    const tilesetTarget = await TilesetTargets.createAndBegin(
+      output,
+      overwrite
+    );
 
-    const keys = tilesetSource.getKeys();
-    for (const key of keys) {
-      const content = tilesetSource.getValue(key);
+    const keys = await tilesetSource.getKeys();
+    for await (const key of keys) {
+      const content = await tilesetSource.getValue(key);
       // TODO Compression or decompression could happen here...
       if (content) {
-        tilesetTarget.addEntry(key, content);
+        await tilesetTarget.addEntry(key, content);
       }
     }
 
-    tilesetSource.close();
+    await tilesetSource.close();
     await tilesetTarget.end();
   }
 }
@@ -103,7 +106,7 @@ async function run() {
   if (options === undefined) {
     return;
   }
-  tilesetPackageConversion(options);
+  await tilesetPackageConversion(options);
 }
 
-run();
+void run();

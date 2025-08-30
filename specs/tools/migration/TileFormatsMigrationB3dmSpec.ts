@@ -110,8 +110,10 @@ describe("TileFormatsMigrationB3dm", function () {
     expect(inputPrimitives[3].attributes).toEqual({ BATCHID: 1 });
 
     const b3dmBuffer = await createB3dmBuffer(inputDocument);
+    const gltfUpAxis = "Y";
     const outputGlb = await TileFormatsMigrationB3dm.convertB3dmToGlb(
-      b3dmBuffer
+      b3dmBuffer,
+      gltfUpAxis
     );
     const outputDocument = await io.readBinary(outputGlb);
 

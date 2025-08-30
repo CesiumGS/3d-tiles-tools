@@ -7,6 +7,8 @@ import { prune } from "@gltf-transform/functions";
 import { GltfUtilities } from "../contentProcessing/GltfUtilities";
 import { GltfTransform } from "../contentProcessing/GltfTransform";
 
+import { TileFormatsMigration } from "./TileFormatsMigration";
+
 import { Loggers } from "../../base";
 const logger = Loggers.get("migration");
 
@@ -28,27 +30,55 @@ export class GltfUpgrade {
    * The preprocessing steps that may be applied to the buffer are:
    *
    * - glTF 1.0 data will be upgraded to glTF 2.0 with gltf-pipeline
-   * - The CESIUM_RTC extension from glTF 1.0 will be converted into
-   *   a translation of a (newly inserted) root node of the document
+   *
+   * - The CESIUM_RTC extension will be converted into a translation
+   *   of a (newly inserted) root node of the document. Note that
+   *   this is done for both glTF 1.0 and glTF 2.0.
    *
    * The postprocessing steps that may be applied to the document are:
    * - Decode oct-encoded normals into the standard representation
    *   (for details, see `octDecode2DNormals`)
    * - Decode compressed 3D texture coordinates into 2D
    *   (for details, see `decode3DTexCoords`)
+   * - Apply the up-axis conversion: When the given gltfUpAxis is not
+   *   ("Y" or undefined), then a new root node will be inserted into
+   *   the resulting document, compensating for the specified up-axis
+   *   convention, and ensuring the Y-axis convention that is specified
+   *   for glTF 2.0.
    *
    * @param glb The GLB buffer
+   * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
    * @returns A promise to the glTF-Transform `Document`
    */
-  static async obtainDocument(glb: Buffer): Promise<Document> {
-    // Upgrade the GLB buffer to glTF 2.0 if necessary,
-    // and convert the CESIUM_RTC extension into a root
-    // node translation if necessary
+  static async obtainDocument(
+    glb: Buffer,
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
+  ): Promise<Document> {
     const gltfVersion = GltfUtilities.getGltfVersion(glb);
     if (gltfVersion < 2.0) {
       logger.info("Found glTF 1.0 - upgrading to glTF 2.0 with gltf-pipeline");
+
+      // Upgrade the GLB buffer to glTF 2.0 if necessary.
       glb = await GltfUtilities.upgradeGlb(glb, undefined);
-      glb = await GltfUtilities.replaceCesiumRtcExtension(glb);
+    }
+
+    // Remove the CESIUM_RTC extension if it was used. This is
+    // also applied when the input already was glTF 2.0 but
+    // still used this (glTF 1.0) extension.
+    glb = GltfUtilities.replaceCesiumRtcExtensionInGltf2Glb(glb, gltfUpAxis);
+
+    if (gltfVersion < 2.0) {
+      // Remove the WEB3D_quantized_attributes extension by dequantizing
+      // the respective accessors if necessary.
+      // Note: Most of the work for replacing the WEB3D_quantized_attributes
+      // extension is done based on a glTF-Transform document. But in order
+      // to replace the extension, information about the extension has to
+      // be extracted from the original glTF. And the extension has to be
+      // removed from the 'extensionsRequired' array before trying to
+      // create a glTF-Transform document from it. So this is a dedicated
+      // step (even though it also may have to create a glTF-Transform
+      // document internally)
+      glb = await GltfUtilities.replaceWeb3dQuantizedAttributesExtension(glb);
     }
 
     // Read the GLB data from the payload of the tile
@@ -67,6 +97,10 @@ export class GltfUpgrade {
       document.setLogger(new Logger(Logger.Verbosity.WARN));
       await document.transform(prune());
     }
+
+    // Apply the up-axis conversion to the resulting document
+    TileFormatsMigration.applyGltfUpAxis(document, gltfUpAxis);
+
     return document;
   }
 

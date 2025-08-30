@@ -26,7 +26,7 @@ export class TilesetObjectUpgrader {
   /**
    * Creates a new instance
    *
-   * @param upgradeOptions - The `UpgradeOptions`
+   * @param upgradeOptions - The `TilesetUpgradeOptions`
    */
   constructor(upgradeOptions: TilesetUpgradeOptions) {
     this.upgradeOptions = upgradeOptions;
@@ -60,6 +60,13 @@ export class TilesetObjectUpgrader {
     if (this.upgradeOptions.upgradeContentGltfExtensionDeclarations) {
       logger.debug(`Upgrading extension declarations`);
       Extensions.removeExtensionUsed(tileset, "3DTILES_content_gltf");
+    }
+    if (this.upgradeOptions.upgradeGltfUpAxis) {
+      logger.debug(`Upgrading glTFUpAxis declaration`);
+      const asset = tileset.asset as any;
+      if (asset.gltfUpAxis !== undefined) {
+        delete asset.gltfUpAxis;
+      }
     }
   }
 

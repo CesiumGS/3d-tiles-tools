@@ -64,8 +64,10 @@ export class ToolsMain {
 
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
+    const gltfUpAxis = "Y";
     const outputBuffer = await TileFormatsMigration.convertB3dmToGlb(
-      inputBuffer
+      inputBuffer,
+      gltfUpAxis
     );
     fs.writeFileSync(output, outputBuffer);
 
@@ -98,9 +100,11 @@ export class ToolsMain {
 
     // Prepare the resolver for external GLBs in I3DM
     const externalGlbResolver = ToolsMain.createResolver(input);
+    const gltfUpAxis = "Y";
     const outputBuffer = await TileFormatsMigration.convertI3dmToGlb(
       inputBuffer,
-      externalGlbResolver
+      externalGlbResolver,
+      gltfUpAxis
     );
     fs.writeFileSync(output, outputBuffer);
 
@@ -594,6 +598,7 @@ export class ToolsMain {
     inputName: string,
     output: string,
     cartographicPositionDegrees: number[] | undefined,
+    rotationDegrees: number[] | undefined,
     force: boolean
   ) {
     logger.debug(`Executing createTilesetJson`);
@@ -621,10 +626,25 @@ export class ToolsMain {
       contentUris
     );
 
-    if (cartographicPositionDegrees !== undefined) {
+    if (
+      cartographicPositionDegrees !== undefined &&
+      rotationDegrees !== undefined
+    ) {
       logger.info(
         `Creating tileset at cartographic position: ` +
-          `${cartographicPositionDegrees} (in degress)`
+          `${cartographicPositionDegrees} (in degrees) and rotation: ` +
+          `${rotationDegrees} (in degrees)`
+      );
+      const transform =
+        TilesetJsonCreator.computeTransformFromCartographicPositionAndRotationDegrees(
+          cartographicPositionDegrees,
+          rotationDegrees
+        );
+      tileset.root.transform = transform;
+    } else if (cartographicPositionDegrees !== undefined) {
+      logger.info(
+        `Creating tileset at cartographic position: ` +
+          `${cartographicPositionDegrees} (in degrees)`
       );
       const transform =
         TilesetJsonCreator.computeTransformFromCartographicPositionDegrees(

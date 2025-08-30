@@ -1,6 +1,7 @@
 
 package-lock.json
 .eslintcache
+/.vscode
 /.nyc_output
 /coverage
 /node_modules

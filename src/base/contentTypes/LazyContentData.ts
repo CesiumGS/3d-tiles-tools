@@ -50,10 +50,10 @@ export class LazyContentData implements ContentData {
   private _magic: Buffer | undefined;
 
   /**
-   * The content data, or `null` if the data could not
+   * The content data, or `undefined` if the data could not
    * be resolved.
    */
-  private _data: Buffer | null;
+  private _data: Buffer | undefined;
 
   /**
    * Whether the `_data` was already requested
@@ -87,7 +87,7 @@ export class LazyContentData implements ContentData {
     this._resourceResolver = resourceResolver;
     this._extension = path.extname(uri).toLowerCase();
     this._magic = undefined;
-    this._data = null;
+    this._data = undefined;
     this._dataWasRequested = false;
     this._parsedObject = undefined;
     this._parsedObjectWasRequested = false;
@@ -112,7 +112,7 @@ export class LazyContentData implements ContentData {
       this._uri,
       1
     );
-    this._exists = partialData !== null;
+    this._exists = partialData !== undefined;
     return this._exists;
   }
 
@@ -137,13 +137,13 @@ export class LazyContentData implements ContentData {
   }
 
   /** {@inheritDoc ContentData.getData} */
-  async getData(): Promise<Buffer | null> {
+  async getData(): Promise<Buffer | undefined> {
     if (this._dataWasRequested) {
       return this._data;
     }
     this._data = await this._resourceResolver.resolveData(this._uri);
     this._dataWasRequested = true;
-    this._exists = this._data !== null;
+    this._exists = this._data !== undefined;
     return this._data;
   }
 

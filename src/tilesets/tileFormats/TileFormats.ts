@@ -629,7 +629,7 @@ export class TileFormats {
    * Returns the GLB data that is stored as tile payload
    * of the given tile.
    *
-   * This will exclude any padding bytes that may beve been
+   * This will exclude any padding bytes that may have been
    * inserted to satisfy the alignment requirements.
    *
    * This is applicable to B3DM and I3DM tile data. If the data
@@ -659,7 +659,7 @@ export class TileFormats {
     if (tileData.header.gltfFormat === 1) {
       return TileFormats.stripGlbPaddingBytes(tileData.payload);
     }
-    const glbUri = tileData.payload.toString().replace(/\0/g, "");
+    const glbUri = tileData.payload.toString().replace(/\0/g, "").trim();
     return externalGlbResolver(glbUri);
   }
 

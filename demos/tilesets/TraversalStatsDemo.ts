@@ -257,4 +257,4 @@ async function runDemo() {
   await tilesetTraversalDemo(tilesetFileName);
 }
 
-runDemo();
+void runDemo();

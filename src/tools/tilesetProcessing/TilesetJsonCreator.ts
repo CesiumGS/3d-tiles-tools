@@ -1,7 +1,10 @@
 import fs from "fs";
 import path from "path";
 
+import { Cartesian3 } from "cesium";
 import { Cartographic } from "cesium";
+import { HeadingPitchRoll } from "cesium";
+import { Math as CesiumMath } from "cesium";
 import { Matrix4 } from "cesium";
 import { Transforms } from "cesium";
 
@@ -301,5 +304,55 @@ export class TilesetJsonCreator {
     const enuMatrix = Transforms.eastNorthUpToFixedFrame(cartesian);
     const transform = Matrix4.toArray(enuMatrix);
     return transform;
+  }
+
+  /**
+   * Computes the transform for a tile to place it at the given cartographic
+   * position and rotation.
+   *
+   * The given position is either (longitudeDegrees, latitudeDegrees)
+   * or (longitudeDegrees, latitudeDegrees, heightMeters). The rotation is
+   * (headingDegrees, pitchDegrees, rollDegrees).
+   *
+   * @param cartographicPositionDegrees - The cartographic position
+   * @param rotationDegrees - The rotation in degrees
+   * @returns The transform
+   * @throws DeveloperError If the given array has a length smaller than 2
+   */
+  static computeTransformFromCartographicPositionAndRotationDegrees(
+    cartographicPositionDegrees: number[],
+    rotationDegrees: number[]
+  ) {
+    if (cartographicPositionDegrees.length < 2) {
+      throw new DeveloperError(
+        `Expected an array of at least length 2, but received an array ` +
+          `of length ${cartographicPositionDegrees.length}: ${cartographicPositionDegrees}`
+      );
+    }
+    const lonDegrees = cartographicPositionDegrees[0];
+    const latDegrees = cartographicPositionDegrees[1];
+    const height =
+      cartographicPositionDegrees.length >= 3
+        ? cartographicPositionDegrees[2]
+        : 0.0;
+    const headingDegrees = rotationDegrees[0];
+    const pitchDegrees = rotationDegrees[1];
+    const rollDegrees = rotationDegrees[2];
+
+    const position = Cartesian3.fromDegrees(lonDegrees, latDegrees, height);
+    const hpr = new HeadingPitchRoll(
+      CesiumMath.toRadians(headingDegrees),
+      CesiumMath.toRadians(pitchDegrees),
+      CesiumMath.toRadians(rollDegrees)
+    );
+    const orientation = Transforms.headingPitchRollQuaternion(position, hpr);
+    const scale = new Cartesian3(1.0, 1.0, 1.0);
+    const transform = Matrix4.fromTranslationQuaternionRotationScale(
+      position,
+      orientation,
+      scale
+    );
+    const transformArray = Matrix4.toArray(transform);
+    return transformArray;
   }
 }

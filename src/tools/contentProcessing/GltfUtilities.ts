@@ -6,6 +6,10 @@ import { TileFormatError } from "../../tilesets";
 import { Extensions } from "../../tilesets";
 
 import { GltfPipelineLegacy } from "./GltfPipelineLegacy";
+import { GltfWeb3dQuantizedAttributes } from "./GltfWeb3dQuantizedAttributes";
+
+import { Loggers } from "../../base";
+const logger = Loggers.get("contentProcessing");
 
 /**
  * Internal utility methods related to glTF/GLB data.
@@ -224,6 +228,69 @@ export class GltfUtilities {
   }
 
   /**
+   * Creates a glTF 2.0 binary (GLB) buffer from the given JSON and
+   * binary chunk data.
+   *
+   * This is the reverse of `extractDataFromGlb2`.
+   *
+   * This is a low-level function for turning JSON- and binary chunk
+   * data into a GLB buffer. The caller is responsible for making sure
+   * that the given JSON matches the given BIN data (for example, that
+   * the given JSON does not involve a buffer byte offset that does
+   * not fit the given buffer data)
+   *
+   * @param jsonData - The JSON data
+   * @param binData - The binary chunk data
+   * @returns The GLB data
+   */
+  static createGlb2FromData(jsonData: Buffer, binData: Buffer) {
+    // Ensure 4-byte-alignment for the jsonData
+    let jsonDataPadded = jsonData;
+    if (jsonData.length % 4 != 0) {
+      const paddingLength = 4 - (jsonData.length % 4);
+      const padding = Buffer.from(Array(paddingLength).fill(32));
+      jsonDataPadded = Buffer.concat([jsonDataPadded, padding]);
+    }
+
+    // Ensure 4-byte-alignment for the binData
+    let binDataPadded = binData;
+    if (binData.length % 4 != 0) {
+      const paddingLength = 4 - (binData.length % 4);
+      const padding = Buffer.from(Array(paddingLength));
+      binDataPadded = Buffer.concat([binDataPadded, padding]);
+    }
+
+    // Create the JSON chunk
+    const CHUNK_TYPE_JSON = 0x4e4f534a; // ASCII string "JSON"
+    const jsonChunkHeader = Buffer.alloc(8);
+    jsonChunkHeader.writeInt32LE(jsonDataPadded.length, 0);
+    jsonChunkHeader.writeInt32LE(CHUNK_TYPE_JSON, 4);
+    const jsonChunkData = Buffer.concat([jsonChunkHeader, jsonDataPadded]);
+
+    // Create the BIN chunk
+    const CHUNK_TYPE_BIN = 0x004e4942; // ASCII string "BIN"
+    const binChunkHeader = Buffer.alloc(8);
+    binChunkHeader.writeInt32LE(binDataPadded.length, 0);
+    binChunkHeader.writeInt32LE(CHUNK_TYPE_BIN, 4);
+    const binChunkData = Buffer.concat([binChunkHeader, binDataPadded]);
+
+    // Assemble the GLB data
+    const MAGIC_BINARY_GLTF_HEADER = 0x46546c67; // ASCII string "glTF"
+    const BINARY_GLTF_VERSION = 2;
+    // 12 bytes for header
+    // length of JSON + 8 bytes for JSON chunk header
+    // length of BIN  + 9 bytes for BIN  chunk header
+    const length = 12 + jsonDataPadded.length + 8 + binDataPadded.length + 8;
+    const header = Buffer.alloc(12);
+    header.writeInt32LE(MAGIC_BINARY_GLTF_HEADER, 0);
+    header.writeInt32LE(BINARY_GLTF_VERSION, 4);
+    header.writeInt32LE(length, 8);
+
+    const glbData = Buffer.concat([header, jsonChunkData, binChunkData]);
+    return glbData;
+  }
+
+  /**
    * Given an input buffer containing a binary glTF asset, optimize it
    * using gltf-pipeline with the provided options.
    *
@@ -256,12 +323,23 @@ export class GltfUtilities {
    * their translation.
    *
    * @param glbBuffer - The buffer containing the binary glTF.
+   * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
    * @returns A promise that resolves to the resulting binary glTF.
+   *
+   * @deprecated This uses `gltf-pipeline` to replace the CESIUM_RTC
+   * extension, is only applicable to GLB data, and may affect the
+   * structure of the GLB in a way that is hard to predict. Use
+   * the `replaceCesiumRtcExtensionInGltf2Glb` function or the
+   * `replaceCesiumRtcExtensionInGltf` to perform this operation
+   * only when necessary, and without other side effects
    */
-  static async replaceCesiumRtcExtension(glbBuffer: Buffer): Promise<Buffer> {
+  static async replaceCesiumRtcExtension(
+    glbBuffer: Buffer,
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
+  ): Promise<Buffer> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const customStage = (gltf: any, options: any) => {
-      GltfUtilities.replaceCesiumRtcExtensionInternal(gltf);
+      GltfUtilities.replaceCesiumRtcExtensionInGltf(gltf, gltfUpAxis);
       return gltf;
     };
     const options = {
@@ -273,18 +351,108 @@ export class GltfUtilities {
   }
 
   /**
-   * Replaces the `CESIUM_RTC` extension in the given glTF object.
+   * Replaces the `CESIUM_RTC` extension in the given glTF 2.0 GLB data.
    *
-   * This will insert a new parent node above each root node of
-   * a scene. These new parent nodes will have a `translation`
-   * that is directly taken from the `CESIUM_RTC` `center`.
+   * If the given glTF does NOT use the `CESIUM_RTC` extension, then
+   * the given buffer will be returned unmodified.
+   *
+   * Otherwise, this will insert a new parent node above each root node
+   * of a scene. These new parent nodes will have a `translation`
+   * that is derived taken from the `CESIUM_RTC` `center`,
+   * possibly adjusted to take the up-axis of the glTF into account.
    *
    * The `CESIUM_RTC` extension object and its used/required
    * usage declarations will be removed.
    *
-   * @param gltf - The glTF object
+   * @param glb - The GLB data
+   * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
+   * @returns The buffer with the updated glTF data, or the
+   * given input buffer if the glTF did not use CESIUM_RTC
    */
-  private static replaceCesiumRtcExtensionInternal(gltf: any) {
+  static replaceCesiumRtcExtensionInGltf2Glb(
+    glb: Buffer,
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
+  ): Buffer {
+    // Examine the glTF JSON to see whether it contains the CESIUM_RTC
+    // extension.
+    const gltfData = GltfUtilities.extractDataFromGlb(glb);
+    const gltfJson = JSON.parse(gltfData.jsonData.toString("utf8"));
+    const extensionsUsed = gltfJson.extensionsUsed || [];
+    if (!extensionsUsed.includes("CESIUM_RTC")) {
+      return glb;
+    }
+
+    // When te extension is found, it is converted into a root node
+    // translation.
+    logger.info(
+      "Found CESIUM_RTC in GLB - replacing with root node translation"
+    );
+    GltfUtilities.replaceCesiumRtcExtensionInGltf(gltfJson, gltfUpAxis);
+    const gltfJsonBuffer = Buffer.from(JSON.stringify(gltfJson, null, 2));
+    return GltfUtilities.createGlb2FromData(gltfJsonBuffer, gltfData.binData);
+  }
+
+  /**
+   * Replaces the `CESIUM_RTC` extension in the given glTF 2.0 JSON data.
+   *
+   * If the given glTF does NOT use the `CESIUM_RTC` extension, then
+   * the given buffer will be returned unmodified.
+   *
+   * Otherwise, this will insert a new parent node above each root node
+   * of a scene. These new parent nodes will have a `translation`
+   * that is derived taken from the `CESIUM_RTC` `center`,
+   * possibly adjusted to take the up-axis of the glTF into account.
+   *
+   * The `CESIUM_RTC` extension object and its used/required
+   * usage declarations will be removed.
+   *
+   * @param gltfJsonBuffer - The glTF JSON buffer
+   * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
+   * @returns The buffer with the updated glTF JSON data, or the
+   * given input buffer if the glTF did not use CESIUM_RTC
+   */
+  static replaceCesiumRtcExtensionInGltf2Json(
+    gltfJsonBuffer: Buffer,
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
+  ): Buffer {
+    // Examine the glTF JSON to see whether it contains the CESIUM_RTC
+    // extension.
+    const gltfJson = JSON.parse(gltfJsonBuffer.toString("utf8"));
+    const extensionsUsed = gltfJson.extensionsUsed || [];
+    if (!extensionsUsed.includes("CESIUM_RTC")) {
+      return gltfJsonBuffer;
+    }
+
+    // When te extension is found, it is converted into a root node
+    // translation.
+    logger.info(
+      "Found CESIUM_RTC in glTF - replacing with root node translation"
+    );
+    GltfUtilities.replaceCesiumRtcExtensionInGltf(gltfJson, gltfUpAxis);
+    return Buffer.from(JSON.stringify(gltfJson, null, 2));
+  }
+
+  /**
+   * Replaces the `CESIUM_RTC` extension in the given glTF 2.0 JSON object.
+   *
+   * If the given glTF does NOT use the `CESIUM_RTC` extension, then
+   * nothing will be done.
+   *
+   * Otherwise, this will insert a new parent node above each root node
+   * of a scene. These new parent nodes will have a `translation`
+   * that is derived taken from the `CESIUM_RTC` `center`,
+   * possibly adjusted to take the up-axis of the glTF into account.
+   *
+   * The `CESIUM_RTC` extension object and its used/required
+   * usage declarations will be removed.
+   *
+   * @param gltf - The glTF 2.0 JSON object
+   * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
+   */
+  static replaceCesiumRtcExtensionInGltf(
+    gltf: any,
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
+  ) {
     if (!gltf.extensions) {
       return;
     }
@@ -292,12 +460,27 @@ export class GltfUtilities {
     if (!rtcExtension) {
       return;
     }
-    // Compute the translation, taking the y-up-vs-z-up transform into account
-    const rtcTranslation = [
-      rtcExtension.center[0],
-      rtcExtension.center[2],
-      -rtcExtension.center[1],
-    ];
+    // Compute the translation, taking the up-axis transform into account
+    let rtcTranslation: number[];
+    if (gltfUpAxis === "X") {
+      rtcTranslation = [
+        rtcExtension.center[1],
+        -rtcExtension.center[2],
+        -rtcExtension.center[0],
+      ];
+    } else if (gltfUpAxis === "Y" || gltfUpAxis === undefined) {
+      rtcTranslation = [
+        rtcExtension.center[0],
+        rtcExtension.center[2],
+        -rtcExtension.center[1],
+      ];
+    } else {
+      rtcTranslation = [
+        rtcExtension.center[0],
+        rtcExtension.center[1],
+        rtcExtension.center[2],
+      ];
+    }
     const scenes = gltf.scenes;
     if (!scenes) {
       return;
@@ -319,5 +502,65 @@ export class GltfUtilities {
     }
     Extensions.removeExtensionUsed(gltf, "CESIUM_RTC");
     Extensions.removeExtension(gltf, "CESIUM_RTC");
+  }
+
+  /**
+   * Given an input buffer containing a binary glTF 2.0 asset, remove
+   * its use of the `WEB3D_quantized_attributes` extension.
+   *
+   * See `GltfWeb3dQuantizedAttributes` for further notes about
+   * the context where this is used.
+   *
+   * @param glbBuffer - The buffer containing the binary glTF.
+   * @returns A promise that resolves to the resulting binary glTF.
+   */
+  static async replaceWeb3dQuantizedAttributesExtension(
+    glbBuffer: Buffer
+  ): Promise<Buffer> {
+    // Process the GLB data with a custom gltf-pipeline stage that removes
+    // the WEB3D_quantized_attributes from the extensionsUsed/Required
+    // arrays, and collects the 'decodeMatrix' arrays from the extension
+    // objects in the accessors.
+    const extensionName = "WEB3D_quantized_attributes";
+    let usedExtension = false;
+    const decodeMatrices: (number[] | undefined)[] = [];
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const customStage = (gltf: any, options: any) => {
+      usedExtension = Extensions.usesExtension(gltf, extensionName);
+      if (usedExtension) {
+        Extensions.removeExtensionUsed(gltf, extensionName);
+
+        // Collect the 'decodeMatrix' arrays, one for each accessor
+        // (or 'undefined' if the accessor did not use the extension)
+        const accessors = gltf.accessors || [];
+        for (let i = 0; i < accessors.length; i++) {
+          const accessor = accessors[i];
+          const extensions = accessor.extensions || {};
+          const extension = extensions[extensionName] || {};
+          const decodeMatrix = extension.decodeMatrix;
+          decodeMatrices.push(decodeMatrix);
+        }
+      }
+      return gltf;
+    };
+    const options = {
+      customStages: [customStage],
+      keepUnusedElements: true,
+    };
+    const result = await GltfPipeline.processGlb(glbBuffer, options);
+    const preprocessedGlb = result.glb;
+
+    // If the glTF did not use the extension, then just return the result
+    if (!usedExtension) {
+      return preprocessedGlb;
+    }
+
+    // Otherwise, post-process the glTF to dequantize the accessors
+    // using the decode matrices that have been found for them.
+    return GltfWeb3dQuantizedAttributes.replaceWeb3dQuantizedAttributesExtension(
+      preprocessedGlb,
+      decodeMatrices
+    );
   }
 }

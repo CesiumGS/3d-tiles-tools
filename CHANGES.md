@@ -1,13 +1,31 @@
 Change Log
 ==========
 
+### 0.5.0 - 2025-02-17
+
+- Fix the `upgrade` command to properly handle a `gltfUpAxis` that may be defined in the tileset JSON, via [#166](https://github.com/CesiumGS/3d-tiles-tools/pull/166)
+- **Breaking**: Change the `TilesetSource` and `TilesetTarget` interfaces to be completely asynchronous, via [#167](https://github.com/CesiumGS/3d-tiles-tools/pull/167)
+  - Clients that used the functions from this interface will generally just have to `await` the results of calling these functions
+  - As part of this change, the `TraversedTile` now returns a subtree URI only for the implicit tileset root, and not for the explicit tile that defines the implicit tiling
+- **Breaking**: Consistently use `undefined` instead of `null` as return types, via [#169](https://github.com/CesiumGS/3d-tiles-tools/pull/169)
+  - Clients will have to update their checks from `null` to `undefined` accordingly. This change does _not_ apply to glTF extension implementations that are based on glTF-Transform.
+- Handle the presence of the `CESIUM_RTC` extension in glTF 2.0 during the `upgrade`, via [#172](https://github.com/CesiumGS/3d-tiles-tools/pull/172)
+- Fix several smaller bugs for reading 3TZ files, e.g. ones that used 'extras' in the ZIP file headers, via [#173](https://github.com/CesiumGS/3d-tiles-tools/pull/173)
+
+### 0.4.4 - 2024-12-03
+
+- Updated the `better-sqlite3` dependency from 8.0.1 to 11.5.0 to support NodeJS 22
+- Updated the NodeJS version requirement to >=18 for compatibility with latest CesiumJS version
+- Fixed a bug where applying the `merge` or `mergeJson` command to multiple implicit tilesets created an invalid result, via [#161](https://github.com/CesiumGS/3d-tiles-tools/pull/161)
+- Fixed a bug where resolving binary glTF data failed for glTF that used the `EXT_meshopt_compression` glTF extension with fallback buffers, via [#160](https://github.com/CesiumGS/3d-tiles-tools/pull/160)
+
 ### 0.4.3 - 2024-09-14
 
 - Fixed the handling of legacy B3DM files that contain glTF 1.0 data with texture coordinates that are stored as "quantized" 3D coordinates, via [#148](https://github.com/CesiumGS/3d-tiles-tools/pull/148)
 - Fixed the `upgrade` command for `targetVersion 1.1` for the case that the input data contains very old B3DM files that do not define a `BATCHID` attribute, via [#147](https://github.com/CesiumGS/3d-tiles-tools/pull/147).
 - Added a `mergeJson` command to create a tileset JSON that refers to other tilesets as external tilesets, without copying the input tilesets to the output directory, via [#140](https://github.com/CesiumGS/3d-tiles-tools/pull/140) and [#143](https://github.com/CesiumGS/3d-tiles-tools/pull/143).
 - Fixed a bug where the `combine` command did not properly update the content URIs when an external tileset in a subdirectory referred to another external tileset in the same subdirectory, via [#139](https://github.com/CesiumGS/3d-tiles-tools/pull/139)
-- Added an `updateAlignment` command that can process a B3DM, I3DM, PNGS, or CMPT file, to ensure that the alignment requirements for the batch- and feature table and the tile data as a whole are met, via [#136](https://github.com/CesiumGS/3d-tiles-tools/pull/136)
+- Added an `updateAlignment` command that can process a B3DM, I3DM, PNTS, or CMPT file, to ensure that the alignment requirements for the batch- and feature table and the tile data as a whole are met, via [#136](https://github.com/CesiumGS/3d-tiles-tools/pull/136)
 
 ### 0.4.2 - 2024-05-15
 

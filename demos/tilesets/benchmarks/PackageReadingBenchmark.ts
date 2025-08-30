@@ -2,6 +2,7 @@ import fs from "fs";
 import util from "util";
 import { performance } from "perf_hooks";
 
+import { Iterables } from "3d-tiles-tools";
 import { TilesetSource } from "3d-tiles-tools";
 import { TilesetSource3tz } from "3d-tiles-tools";
 import { TilesetSource3dtiles } from "3d-tiles-tools";
@@ -18,15 +19,15 @@ import { Arrays } from "./Arrays";
  * @param configString A string describing the configuration
  * of the benchmark, only used for logging
  */
-function readTilesetSource(
+async function readTilesetSource(
   tilesetSource: TilesetSource,
   fullInputFileName: string,
   configString: string
 ) {
   let beforeMs = 0;
-  tilesetSource.open(fullInputFileName);
+  await tilesetSource.open(fullInputFileName);
 
-  const keys = [...tilesetSource.getKeys()];
+  const keys = await Iterables.asyncToArray(await tilesetSource.getKeys());
 
   let totalBytes = 0;
   const passes = 5;
@@ -37,14 +38,14 @@ function readTilesetSource(
       totalBytes = 0;
     }
     for (const key of keys) {
-      const content = tilesetSource.getValue(key);
+      const content = await tilesetSource.getValue(key);
       if (content) {
         totalBytes += content.length;
       }
     }
     Arrays.shuffle(keys, "0");
   }
-  tilesetSource.close();
+  await tilesetSource.close();
   const afterMs = performance.now();
   const durationMs = afterMs - beforeMs;
   const message = util.format(
@@ -72,14 +73,14 @@ async function run() {
     const inputFilePrefix = inputDirectory + configString;
 
     const tilesetSource3tz = new TilesetSource3tz();
-    readTilesetSource(
+    await readTilesetSource(
       tilesetSource3tz,
       inputFilePrefix + ".3tz",
       "3TZ     " + configString
     );
 
     const tilesetSource3dtiles = new TilesetSource3dtiles();
-    readTilesetSource(
+    await readTilesetSource(
       tilesetSource3dtiles,
       inputFilePrefix + ".3dtiles",
       "3DTILES " + configString
@@ -89,4 +90,4 @@ async function run() {
   console.log("Running test DONE");
 }
 
-run();
+void run();

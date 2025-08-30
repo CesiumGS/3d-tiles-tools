@@ -101,13 +101,15 @@ describe("BasicTilesetProcessor on implicit input", function () {
     await tilesetProcessor.end();
 
     // Collect all content URIs from the output tileset
-    const outputTilesetSource = TilesetSources.createAndOpen(implicitOutput);
-    const outputTileset = SpecHelpers.parseTileset(outputTilesetSource);
+    const outputTilesetSource = await TilesetSources.createAndOpen(
+      implicitOutput
+    );
+    const outputTileset = await SpecHelpers.parseTileset(outputTilesetSource);
     const actualContentUris = await SpecHelpers.collectContentUris(
       outputTileset,
       outputTilesetSource
     );
-    outputTilesetSource.close();
+    await outputTilesetSource.close();
 
     // Ensure that all content URIs have been updated
     for (const contentUri of actualContentUris) {

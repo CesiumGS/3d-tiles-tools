@@ -2,6 +2,7 @@ import { defined } from "../../base";
 import { ResourceResolver } from "../../base";
 import { TreeCoordinates } from "../../base";
 
+import { Tileset } from "../../structure";
 import { Tile } from "../../structure";
 import { Content } from "../../structure";
 import { TileImplicitTiling } from "../../structure";
@@ -35,6 +36,11 @@ export class ImplicitTraversedTile implements TraversedTile {
    * subtree files.
    */
   private readonly _resourceResolver: ResourceResolver;
+
+  /**
+   * The tileset that this tile belongs to
+   */
+  private readonly _tileset: Tileset;
 
   /**
    * The tile that corresponds to the root tile from the
@@ -86,6 +92,7 @@ export class ImplicitTraversedTile implements TraversedTile {
   constructor(
     implicitTiling: TileImplicitTiling,
     resourceResolver: ResourceResolver,
+    tileset: Tileset,
     root: TraversedTile,
     path: string,
     subtreeModel: SubtreeModel,
@@ -97,6 +104,7 @@ export class ImplicitTraversedTile implements TraversedTile {
   ) {
     this._implicitTiling = implicitTiling;
     this._resourceResolver = resourceResolver;
+    this._tileset = tileset;
     this._root = root;
     this._path = path;
     this._subtreeModel = subtreeModel;
@@ -259,6 +267,7 @@ export class ImplicitTraversedTile implements TraversedTile {
         const traversedChild = new ImplicitTraversedTile(
           this._implicitTiling,
           this._resourceResolver,
+          this._tileset,
           this._root,
           childPath,
           childSubtreeModel,
@@ -310,6 +319,7 @@ export class ImplicitTraversedTile implements TraversedTile {
         const traversedChild = new ImplicitTraversedTile(
           this._implicitTiling,
           this._resourceResolver,
+          this._tileset,
           this._root,
           childPath,
           this._subtreeModel,
@@ -402,6 +412,11 @@ export class ImplicitTraversedTile implements TraversedTile {
       return subtreeUri;
     }
     return undefined;
+  }
+
+  /** {@inheritDoc TraversedTile.getTileset} */
+  getTileset(): Tileset {
+    return this._tileset;
   }
 
   /**
