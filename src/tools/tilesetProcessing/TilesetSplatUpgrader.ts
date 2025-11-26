@@ -187,7 +187,9 @@ export class TilesetSplatUpgrader {
     return sourceEntry;
   }
 
-  private async processEntryGlb(sourceEntry: TilesetEntry): Promise<TilesetEntry> {
+  private async processEntryGlb(
+    sourceEntry: TilesetEntry
+  ): Promise<TilesetEntry> {
     const sourceKey = sourceEntry.key;
     const sourceValue = sourceEntry.value;
     const targetKey = sourceKey;
@@ -201,13 +203,17 @@ export class TilesetSplatUpgrader {
     };
   }
 
-  private async processEntryGltf(sourceEntry: TilesetEntry): Promise<TilesetEntry> {
+  private async processEntryGltf(
+    sourceEntry: TilesetEntry
+  ): Promise<TilesetEntry> {
     const sourceKey = sourceEntry.key;
     const sourceValue = sourceEntry.value;
     const targetKey = sourceKey;
     logger.debug(`  Upgrading glTF for ${sourceKey}`);
     const targetValue =
-      GltfUtilities.replaceLegacyGaussianSplattingExtensionGltf2Json(sourceValue);
+      GltfUtilities.replaceLegacyGaussianSplattingExtensionGltf2Json(
+        sourceValue
+      );
 
     return {
       key: targetKey,
