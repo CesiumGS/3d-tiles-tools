@@ -552,6 +552,8 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
       targetVersion,
       parsedOptionArgs
     );
+  } else if (command === "upgradeLegacySplats") {
+    await ToolsMain.upgradeSplats(input, output, force);
   } else if (command === "merge") {
     await ToolsMain.merge(inputs, output, force);
   } else if (command === "mergeJson") {

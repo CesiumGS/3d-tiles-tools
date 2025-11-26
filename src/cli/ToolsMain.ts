@@ -557,6 +557,18 @@ export class ToolsMain {
     logger.debug(`Executing upgrade DONE`);
   }
 
+  static async upgradeSplats(input: string, output: string, force: boolean) {
+    logger.debug(`Executing upgrade to 3D Gaussian splatting tileset`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
+    ToolsMain.ensureCanWrite(output, force);
+    await TilesetOperations.upgradeSplats(input, output, force);
+
+    logger.debug(`Executing upgrade to 3D Gaussian splatting tileset DONE`);
+  }
+
   static async merge(inputs: string[], output: string, force: boolean) {
     logger.debug(`Executing merge`);
     logger.debug(`  inputs: ${inputs}`);
