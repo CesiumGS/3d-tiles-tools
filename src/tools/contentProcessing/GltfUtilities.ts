@@ -11,32 +11,72 @@ import { GltfWeb3dQuantizedAttributes } from "./GltfWeb3dQuantizedAttributes";
 import { Loggers } from "../../base";
 const logger = Loggers.get("contentProcessing");
 
+/**
+ * Type representing a KHR_spz_gaussian_splats_compression extension object in the glTF JSON.
+ */
 type GltfKhrSpzGaussianSplatsCompression = {
+  /**
+   * The index of the buffer view containing the relevant data.
+   */
   bufferView?: number;
 };
 
+/**
+ * Type representing a KHR_gaussian_splatting extension object in the glTF JSON.
+ */
 type GltfKhrGaussianSplattingExtension = {
+  /**
+   * The extensions for this object.
+   */
   extensions?: { [key: string]: GltfKhrGaussianSplattingCompressionSpz2 };
 };
 
+/**
+ * Type representing a KHR_gaussian_splatting_compression_spz_2 extension object in the glTF JSON.
+ */
 type GltfKhrGaussianSplattingCompressionSpz2 = {
+  /**
+   * The index of the buffer view containing the relevant data.
+   */
   bufferView?: number;
 };
 
+/**
+ * Type representing a glTF Attribute within the glTF JSON.
+ */
 type GltfAttribute = { [key: string]: number };
 
+/**
+ * Type representing a Primitive object within the glTF JSON.
+ */
 type GltfPrimitive = {
+  /**
+   * The attributes for this primitive.
+   */
   attributes?: GltfAttribute;
+
+  /**
+   * The extensions for this object.
+   */
   extensions?: {
     [key: string]: GltfKhrSpzGaussianSplatsCompression &
       GltfKhrGaussianSplattingExtension;
   };
 };
 
+/**
+ * Type representing a Mesh object within the glTF JSON.
+ */
 type GltfMesh = {
+  /**
+   * The primitives for this mesh.
+   */
   primitives?: GltfPrimitive[];
 };
 
+/**
+ * Type representing a glTF JSON structure.
+ */
 export type GltfJson = {
   extensionsUsed?: string[];
   extensionsRequired?: string[];
