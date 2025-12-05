@@ -18,6 +18,10 @@ const OLD_SPLAT_EXTENSION = "KHR_spz_gaussian_splats_compression";
 const NEW_SPLAT_EXTENSION = "KHR_gaussian_splatting";
 const NEW_SPZ_EXTENSION = "KHR_gaussian_splatting_compression_spz_2";
 
+/**
+ * A class for "upgrading" a 3DGS tileset from the legacy version to the
+ * RC version.
+ */
 export class TilesetSplatUpgrader {
   /**
    * The tileset processor that will perform the actual upgrade
@@ -162,6 +166,14 @@ export class TilesetSplatUpgrader {
     return uri;
   }
 
+  /**
+   * Process the given 3DGS tileset (content) entry, and return the result.
+   *
+   * @param sourceEntry - The source entry
+   * @param type - The `ContentDataType` of the source entry
+   * @returns The processed entry
+   * @private
+   */
   private async processEntry(
     sourceEntry: TilesetEntry,
     type: string | undefined
@@ -174,6 +186,14 @@ export class TilesetSplatUpgrader {
     }
   }
 
+  /**
+   * Process the given 3DGS tileset (content) entry, and return the result.
+   *
+   * @param sourceEntry - The source entry
+   * @param type - The `ContentDataType` of the source entry
+   * @returns The processed entry
+   * @private
+   */
   private async processEntryUnchecked(
     sourceEntry: TilesetEntry,
     type: string | undefined
@@ -187,6 +207,13 @@ export class TilesetSplatUpgrader {
     return sourceEntry;
   }
 
+  /**
+   * Process the given 3DGS tileset (content) entry that contains binary glTF (GLB), and return the result.
+   *
+   * @param sourceEntry - The source entry
+   * @returns The processed entry
+   * @private
+   */
   private async processEntryGlb(
     sourceEntry: TilesetEntry
   ): Promise<TilesetEntry> {
@@ -203,6 +230,13 @@ export class TilesetSplatUpgrader {
     };
   }
 
+  /**
+   * Process the given 3DGS tileset (content) entry that contains glTF, and return the result.
+   *
+   * @param sourceEntry - The source entry
+   * @returns The processed entry
+   * @private
+   */
   private async processEntryGltf(
     sourceEntry: TilesetEntry
   ): Promise<TilesetEntry> {
