@@ -174,17 +174,17 @@ export class TilesetSplatUpgrader {
    * @returns The processed entry
    * @private
    */
-  private async processEntry(
+  private processEntry = async (
     sourceEntry: TilesetEntry,
     type: string | undefined
-  ): Promise<TilesetEntry> {
+  ): Promise<TilesetEntry> => {
     try {
       return await this.processEntryUnchecked(sourceEntry, type);
     } catch (error) {
       logger.error(`Failed to upgrade ${sourceEntry.key}: ${error}`);
       return sourceEntry;
     }
-  }
+  };
 
   /**
    * Process the given 3DGS tileset (content) entry, and return the result.
