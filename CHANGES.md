@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+### 0.5.2 - 2026-03-15
+
+- Generalized the functionalities that are related to bounding volumes. This includes the introduction of a `VertexProcessing` class that can be used for processing all vertices of tile content to either compute a bounding volume, or to check whether the vertices are contained in a bounding volume, using the newly introduced `BoundingVolumesContainment` class. This is an internal change, only supposed to be used by the 3D Tiles Validator, to perform bounding volume containment validation. See [#189](https://github.com/CesiumGS/3d-tiles-tools/pull/189)
+- Fixed a compilation issue that was caused by a change of the type definitions in CesiumJS, via [#197](https://github.com/CesiumGS/3d-tiles-tools/pull/197)
+
 ### 0.5.1 - 2025-10-17
 
 - Fixed a bug where I3DM files that referred to external glTF files using a URI that was padded with spaces could not be read properly, via [#178](https://github.com/CesiumGS/3d-tiles-tools/pull/178)
