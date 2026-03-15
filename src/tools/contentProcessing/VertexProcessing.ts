@@ -382,8 +382,8 @@ export class VertexProcessing {
    * transform of the respective node, and pass that transformed
    * position to the given consumer.
    *
-   * @param root The root scene or note of the glTF
-   * @param consumer The consumer that will receive the points as 3-element arrays
+   * @param root - The root scene or note of the glTF
+   * @param consumer - The consumer that will receive the points as 3-element arrays
    */
   private static fromGltfNode(
     root: Node | Scene,
