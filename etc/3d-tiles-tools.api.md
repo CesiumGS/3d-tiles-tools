@@ -2806,6 +2806,7 @@ export class TilesetInMemory implements TilesetSource, TilesetTarget {
 
 // @internal
 export class TilesetJsonCreator {
+    static computeTransformFromCartographicPositionAndRotationDegrees(cartographicPositionDegrees: number[], rotationDegrees: number[]): number[];
     static computeTransformFromCartographicPositionDegrees(cartographicPositionDegrees: number[]): number[];
     static createTilesetFromContents(baseDir: string, contentUris: string[]): Promise<Tileset>;
 }

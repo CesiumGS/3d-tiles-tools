@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+### 0.5.1 - 2025-10-17
+
+- Fixed a bug where I3DM files that referred to external glTF files using a URI that was padded with spaces could not be read properly, via [#178](https://github.com/CesiumGS/3d-tiles-tools/pull/178)
+- Added a parameter `--rotationDegrees` for the `createTilesetJson` functionality that allows defining the heading, pitch, and roll rotation for the root transform of the tileset, via [#180](https://github.com/CesiumGS/3d-tiles-tools/pull/180)
+- Fixed a bug in an internal class for creating string representations of metadata that could lead to a `null` access when the offset types for strings and arrays had not been defined, via [#187](https://github.com/CesiumGS/3d-tiles-tools/pull/187)
+
 ### 0.5.0 - 2025-02-17
 
 - Fix the `upgrade` command to properly handle a `gltfUpAxis` that may be defined in the tileset JSON, via [#166](https://github.com/CesiumGS/3d-tiles-tools/pull/166)
