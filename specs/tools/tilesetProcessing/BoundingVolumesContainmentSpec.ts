@@ -133,7 +133,8 @@ describe("BoundingVolumesContainment", function () {
 
     const cartesianIn = new Cartesian3(0.9, 0.9, 0.9);
     Matrix4.multiplyByPoint(transform, cartesianIn, cartesianIn);
-    const pointIn = Cartesian3.pack(cartesianIn, Array<number>(3), 0);
+    const pointIn = Array<number>(3);
+    Cartesian3.pack(cartesianIn, pointIn, 0);
     const actualIn = BoundingVolumesContainment.boxContains(
       box,
       pointIn,
@@ -144,7 +145,8 @@ describe("BoundingVolumesContainment", function () {
 
     const cartesianOn = new Cartesian3(1.0, 1.0, 1.0);
     Matrix4.multiplyByPoint(transform, cartesianOn, cartesianOn);
-    const pointOn = Cartesian3.pack(cartesianOn, Array<number>(3), 0);
+    const pointOn = Array<number>(3);
+    Cartesian3.pack(cartesianOn, pointOn, 0);
     const actualOn = BoundingVolumesContainment.boxContains(
       box,
       pointOn,
@@ -155,7 +157,8 @@ describe("BoundingVolumesContainment", function () {
 
     const cartesianOut = new Cartesian3(1.0, 1.0, 1.01);
     Matrix4.multiplyByPoint(transform, cartesianOut, cartesianOut);
-    const pointOut = Cartesian3.pack(cartesianOut, Array<number>(3), 0);
+    const pointOut = Array<number>(3);
+    Cartesian3.pack(cartesianOut, pointOut, 0);
     const actualOut = BoundingVolumesContainment.boxContains(
       box,
       pointOut,
@@ -216,7 +219,8 @@ describe("BoundingVolumesContainment", function () {
     ];
 
     const cartesianIn = Cartesian3.fromDegrees(25, 20, 55);
-    const pointIn = Cartesian3.pack(cartesianIn, Array<number>(3), 0);
+    const pointIn = Array<number>(3);
+    Cartesian3.pack(cartesianIn, pointIn, 0);
     const actualIn = BoundingVolumesContainment.regionContains(
       region,
       pointIn,
@@ -226,7 +230,8 @@ describe("BoundingVolumesContainment", function () {
     expect(actualIn).toBe(expectedIn);
 
     const cartesianOn = Cartesian3.fromDegrees(20, 30, 50);
-    const pointOn = Cartesian3.pack(cartesianOn, Array<number>(3), 0);
+    const pointOn = Array<number>(3);
+    Cartesian3.pack(cartesianOn, pointOn, 0);
     const actualOn = BoundingVolumesContainment.regionContains(
       region,
       pointOn,
@@ -236,7 +241,8 @@ describe("BoundingVolumesContainment", function () {
     expect(actualOn).toBe(expectedOn);
 
     const cartesianOut = Cartesian3.fromDegrees(19, 20, 55);
-    const pointOut = Cartesian3.pack(cartesianOut, Array<number>(3), 0);
+    const pointOut = Array<number>(3);
+    Cartesian3.pack(cartesianOut, pointOut, 0);
     const actualOut = BoundingVolumesContainment.regionContains(
       region,
       pointOut,
