@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+### 0.5.3 - 2026-03-15
+
+- Added export declarations for the new classes that have been introduced in 0.5.2
+
 ### 0.5.2 - 2026-03-15
 
 - Generalized the functionalities that are related to bounding volumes. This includes the introduction of a `VertexProcessing` class that can be used for processing all vertices of tile content to either compute a bounding volume, or to check whether the vertices are contained in a bounding volume, using the newly introduced `BoundingVolumesContainment` class. This is an internal change, only supposed to be used by the 3D Tiles Validator, to perform bounding volume containment validation. See [#189](https://github.com/CesiumGS/3d-tiles-tools/pull/189)

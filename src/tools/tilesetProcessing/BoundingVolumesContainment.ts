@@ -11,6 +11,8 @@ const logger = Loggers.get("tilesetProcessing");
 
 /**
  * A class offering methods for containment checks of bounding volumes
+ *
+ * @internal
  */
 export class BoundingVolumesContainment {
   // Scratch variable for all containment methods
@@ -35,6 +37,8 @@ export class BoundingVolumesContainment {
    * @param point - The point, as a 3-element array
    * @param epsilon - The absolute epsilon
    * @returns Whether the box contains the point
+   *
+   * @internal
    */
   static contains(
     boundingVolume: BoundingVolume,

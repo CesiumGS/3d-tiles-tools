@@ -7,6 +7,7 @@ export * from "./contentProcessing/GltfPipelineLegacy";
 export * from "./contentProcessing/GltfTransform";
 export * from "./contentProcessing/GltfTransformTextures";
 export * from "./contentProcessing/GltfUtilities";
+export * from "./contentProcessing/VertexProcessing";
 
 export * from "./draco/AttributeInfo";
 export * from "./draco/ComponentDataType";
@@ -48,6 +49,7 @@ export * from "./migration/TypeDetection";
 
 export * from "./tilesetProcessing/BasicTilesetProcessor";
 export * from "./tilesetProcessing/BoundingVolumes";
+export * from "./tilesetProcessing/BoundingVolumesContainment";
 export * from "./tilesetProcessing/TileContentProcessing";
 export * from "./tilesetProcessing/TileContentProcessor";
 export * from "./tilesetProcessing/TileContentProcessors";

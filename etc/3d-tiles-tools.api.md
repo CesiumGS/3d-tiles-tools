@@ -377,6 +377,15 @@ export interface BoundingVolumeS2 extends RootProperty {
 }
 
 // @internal
+export class BoundingVolumesContainment {
+    static boxContains(box: number[], point: number[], epsilon: number): boolean;
+    static contains(boundingVolume: BoundingVolume, point: number[], epsilon: number): boolean;
+    static longitudeRangeContainsInclusive(westRad: number, eastRad: number, pointRad: number, epsilon: number): boolean;
+    static regionContains(region: number[], point: number[], epsilon: number): boolean;
+    static sphereContains(sphere: number[], point: number[], epsilon: number): boolean;
+}
+
+// @internal
 export class BufferAvailabilityInfo implements AvailabilityInfo {
     constructor(buffer: Buffer, length: number);
     isAvailable(index: number): boolean;
@@ -3240,6 +3249,11 @@ export class VecMath {
     static matrix4ToQuaternion(matrix4Packed: number[]): number[];
     static multiplyAll4(matrices4Packed: number[][]): number[];
     static subtract(a: number[], b: number[], result?: number[]): number[];
+}
+
+// @internal
+export class VertexProcessing {
+    static fromContent(contentUri: string, data: Buffer, externalGlbResolver: (glbUri: string) => Promise<Buffer | undefined>, processInstancePoints: boolean, consumer: (p: number[]) => void): Promise<void>;
 }
 
 // @internal (undocumented)
