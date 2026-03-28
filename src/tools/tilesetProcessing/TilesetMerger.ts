@@ -4,16 +4,14 @@ import { Paths } from "../../base";
 import { DeveloperError } from "../../base";
 
 import { Tileset } from "../../structure";
-import { Tile } from "../../structure";
 
 import { TilesetSource } from "../../tilesets";
 import { TilesetTarget } from "../../tilesets";
-import { TilesetError } from "../../tilesets";
 import { TilesetSources } from "../../tilesets";
 import { TilesetTargets } from "../../tilesets";
 import { Tilesets } from "../../tilesets";
 
-import { BoundingVolumes } from "./BoundingVolumes";
+import { TilesetMergers } from "./TilesetMergers";
 
 /**
  * A class for merging multiple tilesets, to create a tileset that refers
@@ -103,75 +101,6 @@ export class TilesetMerger {
   }
 
   /**
-   * Merges the tilesets from the given sources into one tileset
-   * that refers to the sources as external ones, and writes the
-   * result into the given target.
-   *
-   * If the given source file names are `undefined`, then this
-   * will assume that all source names are `tileset.json`.
-   *
-   * This will write the data from the given sources into
-   * subdirectories within the target. The names of these
-   * subdirectories are unspecified.
-   *
-   * The caller is responsible for calling `open` on the given
-   * sources and `begin` on the given target before calling this
-   * method, and `close` on the sources and `end` on the target
-   * after calling this method.
-   *
-   * @param tilesetSources - The tileset sources
-   * @param tilesetSourceJsonFileNames - The names of the main tileset
-   * JSON files in the sources. When this is `undefined`, then the
-   * name `tileset.json` will be assumed for all of them.
-   * @param tilesetTarget - The tileset target
-   * @param tilesetTargetJsonFileName  - The name that the main
-   * tileset JSON should have in the target
-   * @returns A promise that resolves when the process is finished
-   * @throws TilesetError When the given source file names are defined
-   * and their number does not match the number of sources.
-   * @throws TilesetError When the input could not be processed
-   */
-  async mergeData(
-    tilesetSources: TilesetSource[],
-    tilesetSourceJsonFileNames: string[] | undefined,
-    tilesetTarget: TilesetTarget,
-    tilesetTargetJsonFileName: string
-  ): Promise<void> {
-    if (tilesetSourceJsonFileNames === undefined) {
-      tilesetSourceJsonFileNames = Array(tilesetSources.length).fill(
-        "tileset.json"
-      );
-    }
-    if (tilesetSourceJsonFileNames.length !== tilesetSources.length) {
-      const message =
-        `Received ${tilesetSources.length} sources ` +
-        `but ${tilesetSourceJsonFileNames.length} source JSON file names`;
-      throw new TilesetError(message);
-    }
-
-    this.tilesetSources = tilesetSources;
-    this.tilesetSourceJsonFileNames = tilesetSourceJsonFileNames;
-    this.externalTilesetDirectories = [];
-    for (let i = 0; i < tilesetSources.length; i++) {
-      this.externalTilesetDirectories.push(`external_${i}`);
-    }
-    this.tilesetTarget = tilesetTarget;
-    this.tilesetTargetJsonFileName = tilesetTargetJsonFileName;
-
-    // Perform the actual merge, creating the merged tileset JSON
-    // in the target
-    await this.mergeInternal();
-
-    // Copy the resources from the sources to the target
-    await this.copyResources();
-
-    this.tilesetSources.length = 0;
-    this.externalTilesetDirectories.length = 0;
-    this.tilesetTarget = undefined;
-    this.tilesetTargetJsonFileName = undefined;
-  }
-
-  /**
    * Merges the tileset from the specified sources into one tileset
    * that refers to the sources as external ones, and writes the
    * result into the given target without copying resources to
@@ -251,7 +180,7 @@ export class TilesetMerger {
         const externalTilesetDirectoryBaseName = path.basename(
           externalTilesetDirectory
         );
-        const uniqueExternalTilesetDirectory = TilesetMerger.createUnique(
+        const uniqueExternalTilesetDirectory = TilesetMergers.createUnique(
           externalTilesetDirectoryBaseName,
           this.externalTilesetDirectories
         );
@@ -282,6 +211,7 @@ export class TilesetMerger {
     await this.tilesetTarget.end();
 
     this.tilesetSources.length = 0;
+    this.tilesetSourceJsonFileNames.length = 0;
     this.externalTilesetDirectories.length = 0;
     this.tilesetTarget = undefined;
     this.tilesetTargetJsonFileName = undefined;
@@ -314,9 +244,9 @@ export class TilesetMerger {
     }
 
     // Derive the information for the merged tileset
-    const geometricError = TilesetMerger.getMergedGeometricError(tilesets);
-    const box = TilesetMerger.getMergedBox(tilesets);
-    const children = TilesetMerger.getChildren(
+    const geometricError = TilesetMergers.getMergedGeometricError(tilesets);
+    const box = TilesetMergers.getMergedBox(tilesets);
+    const children = TilesetMergers.getChildren(
       tilesets,
       this.externalTilesetDirectories,
       this.tilesetSourceJsonFileNames
@@ -370,105 +300,5 @@ export class TilesetMerger {
         }
       }
     }
-  }
-
-  /**
-   * Creates a string that does not exist yet.
-   *
-   * If the given prefix is not yet contained in the given list,
-   * then it is returned. Otherwise, it is made "unique" in an
-   * unspecified way, and then returned.
-   *
-   * This does NOT add the new string to the given list!
-   *
-   * @param prefix - The prefix
-   * @param existing - The existing strings
-   * @returns The unique string
-   */
-  private static createUnique(prefix: string, existing: string[]): string {
-    let result = prefix;
-    let counter = 0;
-    for (;;) {
-      if (!existing.includes(result)) {
-        return result;
-      }
-      result = `${prefix}-${counter}`;
-      counter++;
-    }
-  }
-
-  //========================================================================
-  // The following functions are ported from the `merge-tilesets` branch
-  // at https://github.com/CesiumGS/3d-tiles-tools/blob/d7e76e59022fc5e5aa4b848730ec9f8f4dea6d4e/tools/lib/mergeTilesets.js
-  // with slight modification of 'getChildren' for disambiguation
-  // and updates to compute bounding boxes instead of bounding spheres,
-  // and a fix for https://github.com/CesiumGS/3d-tiles-tools/issues/157
-
-  private static getChildren(
-    tilesets: Tileset[],
-    externalTilesetDirectories: string[],
-    tilesetJsonFileNames: string[]
-  ) {
-    const length = tilesets.length;
-    const children = Array<Tile>(length);
-    for (let i = 0; i < length; ++i) {
-      const tilesetJsonFileName = tilesetJsonFileNames[i];
-      const externalTilesetDirectory = externalTilesetDirectories[i];
-      const tilesetUrl = Paths.join(
-        externalTilesetDirectory,
-        tilesetJsonFileName
-      );
-
-      children[i] = tilesets[i].root;
-      children[i].content = {
-        uri: tilesetUrl,
-      };
-      children[i].boundingVolume = {
-        box: TilesetMerger.getBoundingBox(tilesets[i]),
-      };
-      delete children[i].children;
-      delete children[i].transform;
-      delete children[i].implicitTiling;
-    }
-    return children;
-  }
-
-  private static getMergedGeometricError(tilesets: Tileset[]): number {
-    let geometricError = 0.0;
-    const length = tilesets.length;
-    for (let i = 0; i < length; ++i) {
-      geometricError = Math.max(geometricError, tilesets[i].geometricError);
-    }
-    return geometricError;
-  }
-
-  private static getBoundingBox(tileset: Tileset): number[] {
-    const root = tileset.root;
-    const boundingVolume = root.boundingVolume;
-    const boundingVolumeBox =
-      BoundingVolumes.computeBoundingVolumeBoxFromBoundingVolume(
-        boundingVolume
-      );
-    if (boundingVolumeBox === undefined) {
-      throw new TilesetError("No bounding volume found in root tile");
-    }
-    if (root.transform === undefined) {
-      return boundingVolumeBox;
-    }
-    return BoundingVolumes.transformBoundingVolumeBox(
-      boundingVolumeBox,
-      root.transform
-    );
-  }
-
-  private static getMergedBox(tilesets: Tileset[]): number[] {
-    const length = tilesets.length;
-    const boundingBoxes = Array<number[]>(length);
-    for (let i = 0; i < length; ++i) {
-      boundingBoxes[i] = TilesetMerger.getBoundingBox(tilesets[i]);
-    }
-    const boundingBox =
-      BoundingVolumes.computeUnionBoundingVolumeBox(boundingBoxes);
-    return boundingBox;
   }
 }
