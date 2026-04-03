@@ -63,6 +63,8 @@ export * from "./tilesetProcessing/TilesetDataProcessor";
 export * from "./tilesetProcessing/TilesetEntryProcessor";
 export * from "./tilesetProcessing/TilesetJsonCreator";
 export * from "./tilesetProcessing/TilesetMerger";
+export * from "./tilesetProcessing/TilesetMerger3tz";
+export * from "./tilesetProcessing/TilesetMergers";
 export * from "./tilesetProcessing/TilesetOperations";
 export * from "./tilesetProcessing/TilesetProcessing";
 export * from "./tilesetProcessing/TilesetProcessor";
