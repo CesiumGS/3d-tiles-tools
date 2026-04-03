@@ -9,7 +9,7 @@ import { SpecHelpers } from "../../SpecHelpers";
 const SPECS_DATA_BASE_DIRECTORY = SpecHelpers.getSpecsDataBaseDirectory();
 const overwrite = true;
 
-fdescribe("TilesetMerger3tz", function () {
+describe("TilesetMerger3tz", function () {
   afterEach(function () {
     SpecHelpers.forceDeleteDirectory(
       Paths.join(SPECS_DATA_BASE_DIRECTORY, "output/mergeTilesets")
