@@ -1,20 +1,20 @@
 ```
 tileset.json refers to
-  tileA.glb
+  tileA.b3dm
   externalA.json
   sub0/externalB.json
   
 externalA.json refers to
-  tileB.glb
+  tileB.b3dm
   sub1/externalC.json
   
 sub0/externalB.json refers to
-  tileC.glb
-  sub01/tileD.glb
+  tileC.b3dm
+  sub01/tileD.b3dm
 
 sub1/externalC.json refers to
-  tileE.glb
-  sub10/tileF.glb
+  tileE.b3dm
+  sub10/tileF.b3dm
 ```  
   
   
