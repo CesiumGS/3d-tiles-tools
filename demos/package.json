@@ -1,0 +1,17 @@
+{
+  "name": "3d-tiles-tools-demos",
+  "private": true,
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "description": "3D Tiles tools demos",
+  "type": "commonjs",
+  "dependencies": {
+    "3d-tiles-tools": "file:../build/src",
+    "minimist": "^1.2.7",
+    "seedrandom": "^3.0.5"
+  },
+  "devDependencies": {
+    "@types/seedrandom": "^3.0.8",
+    "typescript": "^4.8.3"
+  }
+}

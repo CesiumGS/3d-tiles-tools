@@ -4,10 +4,6 @@
 !specs/**/
 !**/*.js
 !**/*.ts
-!**/*.json
 specs/data/
-tsconfig.json
-.prettierrc.json
-ThirdParty.json
-ThirdParty.extra.json
-src/ktx/external/basis_encoder.js
+build/
+src/ktx/ktx/external/basis_encoder.js

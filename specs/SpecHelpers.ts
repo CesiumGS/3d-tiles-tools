@@ -1,26 +1,126 @@
 import fs from "fs";
 
-import { Iterables } from "../src/base/Iterables";
-import { Buffers } from "../src/base/Buffers";
-import { Paths } from "../src/base/Paths";
-import { DeveloperError } from "../src/base/DeveloperError";
+import { defaultValue } from "../src/base";
+import { Iterables } from "../src/base";
+import { Buffers } from "../src/base";
+import { Paths } from "../src/base";
+import { DeveloperError } from "../src/base";
 
-import { Tile } from "../src/structure/Tile";
-import { Tileset } from "../src/structure/Tileset";
+import { Tile } from "../src/structure";
+import { Tileset } from "../src/structure";
 
-import { Tiles } from "../src/tilesets/Tiles";
-
-import { TilesetSourceResourceResolver } from "../src/io/TilesetSourceResourceResolver";
-
-import { TilesetTraverser } from "../src/traversal/TilesetTraverser";
-
-import { TilesetSource } from "../src/tilesetData/TilesetSource";
-import { TilesetSources } from "../src/tilesetData/TilesetSources";
+import { Tiles } from "../src/tilesets";
+import { TilesetTraverser } from "../src/tilesets";
+import { TilesetSource } from "../src/tilesets";
+import { TilesetSources } from "../src/tilesets";
+import { TilesetSourceResourceResolver } from "../src/tilesets";
 
 /**
  * Utility methods for the specs
  */
 export class SpecHelpers {
+  /**
+   * Returns the directory that was defined as the
+   * `SPECS_DATA_BASE_DIRECTORY` environment variable
+   * in the jasmine helpers (or `./specs/data` by
+   * default)
+   *
+   * @returns The specs data base directory
+   */
+  static getSpecsDataBaseDirectory() {
+    const directory = process.env.SPECS_DATA_BASE_DIRECTORY;
+    if (directory === undefined) {
+      return "./specs/data";
+    }
+    return directory;
+  }
+
+  /**
+   * Reads a JSON file, parses it, and returns the result.
+   * If the file cannot be read or parsed, then an error
+   * message will be printed and `undefined` is returned.
+   *
+   * @param filePath - The path to the file
+   * @returns The result or `undefined`
+   */
+  static readJsonUnchecked(filePath: string): any {
+    try {
+      const data = fs.readFileSync(filePath);
+      try {
+        const jsonString = data.toString();
+        const result = JSON.parse(jsonString);
+        return result;
+      } catch (error) {
+        console.error("Could parse JSON", error);
+        return undefined;
+      }
+    } catch (error) {
+      const resolved = Paths.resolve(filePath);
+      console.error(
+        `Could read JSON from ${filePath} resolved to ${resolved}`,
+        error
+      );
+      return undefined;
+    }
+  }
+
+  /**
+   * Returns whether two numbers are equal, up to a certain epsilon
+   *
+   * @param left - The first value
+   * @param right - The second value
+   * @param relativeEpsilon - The maximum inclusive delta for the relative tolerance test.
+   * @param absoluteEpsilon - The maximum inclusive delta for the absolute tolerance test.
+   * @returns Whether the values are equal within the epsilon
+   */
+  static equalsEpsilon(
+    left: number,
+    right: number,
+    relativeEpsilon: number,
+    absoluteEpsilon?: number
+  ) {
+    relativeEpsilon = defaultValue(relativeEpsilon, 0.0);
+    absoluteEpsilon = defaultValue(absoluteEpsilon, relativeEpsilon);
+    const absDiff = Math.abs(left - right);
+    return (
+      absDiff <= absoluteEpsilon ||
+      absDiff <= relativeEpsilon * Math.max(Math.abs(left), Math.abs(right))
+    );
+  }
+
+  /**
+   * A function for checking values for equality, taking into account the
+   * possibility that the values are (potentially multi- dimensional)
+   * arrays, and recursively comparing the elements in this case.
+   * If the eventual elements are numbers, they are compared for
+   * equality up to the given relative epsilon.
+   *
+   * This is ONLY used in the specs, to compare metadata values.
+   *
+   * @param a - The first element
+   * @param b - The second element
+   * @param epsilon - A relative epsilon
+   * @returns Whether the objects are equal
+   */
+  static genericEquals(a: any, b: any, epsilon: number): boolean {
+    if (Array.isArray(a) && Array.isArray(b)) {
+      if (a.length !== b.length) {
+        return false;
+      }
+
+      for (let i = 0; i < a.length; ++i) {
+        if (!SpecHelpers.genericEquals(a[i], b[i], epsilon)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    if (typeof a === "number") {
+      return SpecHelpers.equalsEpsilon(a, Number(b), epsilon);
+    }
+    return a === b;
+  }
+
   /**
    * Returns the given byte length, padded if necessary to
    * be a multiple of 8
@@ -138,8 +238,8 @@ export class SpecHelpers {
    * @returns The tileset
    * @throws DeveloperError if the tileset could not be read
    */
-  static parseTileset(tilesetSource: TilesetSource) {
-    const tilesetJsonBuffer = tilesetSource.getValue("tileset.json");
+  static async parseTileset(tilesetSource: TilesetSource): Promise<Tileset> {
+    const tilesetJsonBuffer = await tilesetSource.getValue("tileset.json");
     if (!tilesetJsonBuffer) {
       throw new DeveloperError("No tileset.json found in input");
     }
@@ -162,20 +262,20 @@ export class SpecHelpers {
    * @returns A string describing the difference, or `undefined`
    * if there is no difference.
    */
-  static computePackageDifference(
+  static async computePackageDifference(
     nameA: string,
     nameB: string
-  ): string | undefined {
-    const tilesetSourceA = TilesetSources.createAndOpen(nameA);
-    const tilesetSourceB = TilesetSources.createAndOpen(nameB);
-    const result = SpecHelpers.computePackageDifferenceInternal(
+  ): Promise<string | undefined> {
+    const tilesetSourceA = await TilesetSources.createAndOpen(nameA);
+    const tilesetSourceB = await TilesetSources.createAndOpen(nameB);
+    const result = await SpecHelpers.computePackageDifferenceInternal(
       nameA,
       tilesetSourceA,
       nameB,
       tilesetSourceB
     );
-    tilesetSourceA.close();
-    tilesetSourceB.close();
+    await tilesetSourceA.close();
+    await tilesetSourceB.close();
     return result;
   }
 
@@ -197,14 +297,16 @@ export class SpecHelpers {
    * @returns A string describing the difference, or `undefined`
    * if there is no difference.
    */
-  static computePackageDifferenceInternal(
+  static async computePackageDifferenceInternal(
     nameA: string,
     tilesetSourceA: TilesetSource,
     nameB: string,
     tilesetSourceB: TilesetSource
-  ): string | undefined {
-    const keysA = [...tilesetSourceA.getKeys()].sort();
-    const keysB = [...tilesetSourceB.getKeys()].sort();
+  ): Promise<string | undefined> {
+    const keysA = await Iterables.asyncToArray(await tilesetSourceA.getKeys());
+    const keysB = await Iterables.asyncToArray(await tilesetSourceB.getKeys());
+    keysA.sort();
+    keysB.sort();
 
     if (keysA.length != keysB.length) {
       return `There are ${keysA.length} keys in ${nameA} and ${keysB.length} keys in ${nameB}`;
@@ -215,8 +317,8 @@ export class SpecHelpers {
       }
     }
     for (let i = 0; i < keysA.length; i++) {
-      const valueA = tilesetSourceA.getValue(keysA[i]);
-      const valueB = tilesetSourceB.getValue(keysB[i]);
+      const valueA = await tilesetSourceA.getValue(keysA[i]);
+      const valueB = await tilesetSourceB.getValue(keysB[i]);
       const entryDifference = SpecHelpers.computeEntryDifference(
         keysA[i],
         nameA,

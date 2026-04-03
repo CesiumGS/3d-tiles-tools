@@ -26,7 +26,7 @@ async function recreateTileset() {
   currentTileset.style = new Cesium.Cesium3DTileStyle({
     pointSize: "10"
   });
-  
+
   // Special handling for tilesets that are "at the origin":
   // Move them to a certain position on the globe
   let distance = 500;
@@ -43,7 +43,7 @@ async function recreateTileset() {
     currentTileset.modelMatrix = modelMatrix;
     distance = 10;
   }
-  
+
   if (doZoom) {
     const offset = new Cesium.HeadingPitchRange(
       Cesium.Math.toRadians(-22.5),
@@ -156,7 +156,7 @@ function createOptions() {
     createOption("InstancedAxes/InstancedAxesSimple"),
     createOption("InstancedAxes/InstancedAxesRotated"),
     createOption("InstancedAxes/InstancedAxesScaled"),
-    
+
     createOption("Instanced/InstancedAnimated"),
     createOption("Instanced/InstancedGltfExternal"),
     createOption("Instanced/InstancedOct32POrientation"),
@@ -216,7 +216,12 @@ function createOptions() {
     createOption("Batched/BatchedWithTransformBox"),
     createOption("Batched/BatchedWithTransformRegion"),
     createOption("Batched/BatchedWithTransformSphere"),
-    createOption("Batched/BatchedWithVertexColors")
+    createOption("Batched/BatchedWithVertexColors"),
+
+    createOption("Composite/Composite"),
+    createOption("Composite/CompositeOfComposite"),
+    createOption("Composite/CompositeOfInstanced")
+
   ];
   return options;
 }

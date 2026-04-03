@@ -1,26 +1,23 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2021",
-    "outDir": "build",
+    "module": "CommonJS",
+    "target": "ES2021",
+    "baseUrl": "./",
     "strict": true,
+    "lib": ["es2021"],
+
+    "outDir": "./build",
+
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
     "resolveJsonModule": true,
     "strictNullChecks": true,
     "noImplicitOverride": true,
     "declaration": true,
     "declarationMap": true,
-    "allowJs": true,
-    "lib": [
-      "es2021"
-    ],
-    "paths": {
-      "*": [ "./src/*.d.ts"]
-    },
+    "noImplicitAny": false,
+    "sourceMap": true,
   },
-  "include": ["src" ],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*", "specs/**/*"],
+  "exclude": ["node_modules", "specs/data"]
 }

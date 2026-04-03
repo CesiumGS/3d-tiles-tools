@@ -1,13 +1,20 @@
 
 package-lock.json
 .eslintcache
+/.vscode
 /.nyc_output
 /coverage
 /node_modules
+/demos/node_modules
+/packages/cli/node_modules
 /build
 /dist
 /data
+/temp
 /output
 /specs/data/output
 /specs/data/migration/output_gltf
 /specs/data/migration/output
+/packages/**/build
+*.tsbuildinfo
+3d-tiles-tools-*.tgz

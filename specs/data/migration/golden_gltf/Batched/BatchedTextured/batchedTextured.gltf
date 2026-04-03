@@ -44,23 +44,16 @@
     },
     {
       "type": "SCALAR",
-      "componentType": 5126,
-      "count": 240,
-      "bufferView": 2,
-      "byteOffset": 0
-    },
-    {
-      "type": "SCALAR",
       "componentType": 5123,
       "count": 360,
-      "bufferView": 3,
+      "bufferView": 2,
       "byteOffset": 0
     }
   ],
   "bufferViews": [
     {
       "buffer": 0,
-      "byteOffset": 10320,
+      "byteOffset": 9360,
       "byteLength": 15490
     },
     {
@@ -73,32 +66,27 @@
     {
       "buffer": 0,
       "byteOffset": 8640,
-      "byteLength": 960
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 9600,
       "byteLength": 720,
       "target": 34963
     },
     {
       "buffer": 0,
-      "byteOffset": 25816,
+      "byteOffset": 24856,
       "byteLength": 10
     },
     {
       "buffer": 0,
-      "byteOffset": 25826,
+      "byteOffset": 24866,
       "byteLength": 40
     },
     {
       "buffer": 0,
-      "byteOffset": 25866,
+      "byteOffset": 24906,
       "byteLength": 40
     },
     {
       "buffer": 0,
-      "byteOffset": 25906,
+      "byteOffset": 24946,
       "byteLength": 40
     }
   ],
@@ -126,7 +114,7 @@
   "buffers": [
     {
       "name": "buffer",
-      "byteLength": 25946
+      "byteLength": 24986
     }
   ],
   "materials": [
@@ -151,7 +139,7 @@
           },
           "mode": 4,
           "material": 0,
-          "indices": 5,
+          "indices": 4,
           "extensions": {
             "EXT_mesh_features": {
               "featureIds": [
@@ -248,16 +236,16 @@
           "count": 10,
           "properties": {
             "id": {
-              "values": 4
+              "values": 3
             },
             "Longitude": {
-              "values": 5
+              "values": 4
             },
             "Latitude": {
-              "values": 6
+              "values": 5
             },
             "Height": {
-              "values": 7
+              "values": 6
             }
           }
         }

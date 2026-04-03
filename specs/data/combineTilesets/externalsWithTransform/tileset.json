@@ -1,0 +1,58 @@
+{
+  "asset" : {
+    "version" : "1.1"
+  },
+  "geometricError" : 4.0,
+  "root" : {
+    "boundingVolume" : {
+      "box" : [ 
+        2.0, 1.5, 3.0,
+        2.0, 0, 0,
+        0, -2.5, 0,
+        0, 0, 3.0 
+      ]
+    },
+    "geometricError" : 2.0,
+    "children": [
+      {
+        "boundingVolume" : {
+          "box" : [ 
+            3.5, -0.5, 0.5,
+            0.5, 0, 0,
+            0, -0.5, 0,
+            0, 0, 0.5 ]
+        },
+        "geometricError" : 1.0,
+        "content": {
+          "uri": "externalR.json"
+        }
+      },  
+      {
+        "boundingVolume" : {
+          "box" : [ 
+            0.5, 3.5, 0.5,
+            0.5, 0, 0,
+            0, -0.5, 0,
+            0, 0, 0.5 ]
+        },
+        "geometricError" : 1.0,
+        "content": {
+          "uri": "externalG.json"
+        }
+      },  
+      {
+        "boundingVolume" : {
+          "box" : [ 
+            0.5, -0.5, 5.5,
+            0.5, 0, 0,
+            0, -0.5, 0,
+            0, 0, 0.5 ]
+        },
+        "geometricError" : 1.0,
+        "content": {
+          "uri": "externalB.json"
+        }
+      }      
+    ]
+  }
+}

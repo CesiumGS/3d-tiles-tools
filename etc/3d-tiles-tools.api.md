@@ -119,7 +119,7 @@ export interface B3dmFeatureTable extends FeatureTable {
 // @internal
 export class BasicTilesetProcessor extends TilesetProcessor {
     constructor(processExternalTilesets?: boolean);
-    end(): Promise<void>;
+    end(close?: boolean): Promise<void>;
     forEachExplicitTile(callback: (tile: Tile) => Promise<void>): Promise<void>;
     forEachTile(callback: TraversalCallback): Promise<void>;
     forTileset(callback: (tileset: Tileset, schema: Schema | undefined) => Promise<Tileset>): Promise<void>;
@@ -347,12 +347,6 @@ export class BooleanPropertyModel implements PropertyModel {
     getPropertyValue(index: number): boolean;
 }
 
-// @internal (undocumented)
-export type BoundingBox3D = {
-    min: Point3D;
-    max: Point3D;
-};
-
 // @internal
 export interface BoundingVolume extends RootProperty {
     box?: number[];
@@ -362,19 +356,14 @@ export interface BoundingVolume extends RootProperty {
 
 // @internal
 export class BoundingVolumes {
-    static computeBoundingBoxCorners(boundingBox: BoundingBox3D): Point3D[];
-    static computeBoundingBoxUnion(bb0: BoundingBox3D, bb1: BoundingBox3D): BoundingBox3D;
-    static createBoundingBoxForBoundingVolumeBox(boundingVolumeBox: number[]): BoundingBox3D;
-    static createBoundingVolumeBoxFromBoundingBox(boundingBox: BoundingBox3D): number[];
-    static createBoundingVolumeBoxFromGltfBoundingBox(boundingBox: BoundingBox3D): number[];
-    static createUnitCubeBoundingBox(): BoundingBox3D;
+    static computeBoundingVolumeBoxCorners(boundingVolumeBox: number[]): number[][];
+    static computeBoundingVolumeBoxFromBoundingVolume(boundingVolume: BoundingVolume): number[] | undefined;
+    static computeUnionBoundingVolumeBox(boundingVolumeBoxes: Iterable<number[]>): number[];
+    static createBoundingVolumeBoxFromMinMax(min: number[], max: number[]): number[];
+    static createBoundingVolumeBoxFromPoints(points: number[][]): number[];
     static createUnitCubeBoundingVolumeBox(): number[];
-    static max(p0: Point3D, p1: Point3D, result?: Point3D): Point3D;
-    static min(p0: Point3D, p1: Point3D, result?: Point3D): Point3D;
-    static translateBoundingBox(boundingBox: BoundingBox3D, translation: Point3D): {
-        min: Point3D;
-        max: Point3D;
-    };
+    static transformBoundingVolumeBox(boundingVolumeBox: number[], transform: number[]): number[];
+    static translateBoundingVolumeBox(boundingVolumeBox: number[], translation: number[]): number[];
 }
 
 // @internal
@@ -388,6 +377,15 @@ export interface BoundingVolumeS2 extends RootProperty {
 }
 
 // @internal
+export class BoundingVolumesContainment {
+    static boxContains(box: number[], point: number[], epsilon: number): boolean;
+    static contains(boundingVolume: BoundingVolume, point: number[], epsilon: number): boolean;
+    static longitudeRangeContainsInclusive(westRad: number, eastRad: number, pointRad: number, epsilon: number): boolean;
+    static regionContains(region: number[], point: number[], epsilon: number): boolean;
+    static sphereContains(sphere: number[], point: number[], epsilon: number): boolean;
+}
+
+// @internal
 export class BufferAvailabilityInfo implements AvailabilityInfo {
     constructor(buffer: Buffer, length: number);
     isAvailable(index: number): boolean;
@@ -396,14 +394,14 @@ export class BufferAvailabilityInfo implements AvailabilityInfo {
 
 // @internal
 export class BufferedContentData implements ContentData {
-    constructor(uri: string, data: Buffer | null);
+    constructor(uri: string, data: Buffer | undefined);
     static create(uri: string): ContentData;
     exists(): Promise<boolean>;
     get extension(): string;
     // Warning: (ae-unresolved-inheritdoc-reference) The @inheritDoc reference could not be resolved: No member was found with name "data"
     //
     // (undocumented)
-    getData(): Promise<Buffer | null>;
+    getData(): Promise<Buffer | undefined>;
     // Warning: (ae-unresolved-inheritdoc-reference) The @inheritDoc reference could not be resolved: No member was found with name "magic"
     //
     // (undocumented)
@@ -470,12 +468,6 @@ export interface ClassProperty extends RootProperty {
 }
 
 // @internal
-export type ClassPropertyComponentType = "INT8" | "UINT8" | "INT16" | "UINT16" | "INT32" | "UINT32" | "INT64" | "UINT64" | "FLOAT32" | "FLOAT64";
-
-// @internal
-export type ClassPropertyType = "SCALAR" | "VEC2" | "VEC3" | "VEC4" | "MAT2" | "MAT3" | "MAT4" | "STRING" | "BOOLEAN" | "ENUM";
-
-// @internal
 export class Colors {
     static standardRGB565ToNormalizedLinearRGBA(input: number): number[];
     static standardRGBAToNormalizedLinearRGBA(input: number[]): number[];
@@ -522,7 +514,7 @@ export interface Content extends RootProperty {
 export interface ContentData {
     exists(): Promise<boolean>;
     get extension(): string;
-    getData(): Promise<Buffer | null>;
+    getData(): Promise<Buffer | undefined>;
     getMagic(): Promise<Buffer>;
     getParsedObject(): Promise<any>;
     get uri(): string;
@@ -591,12 +583,13 @@ export class ContentError extends Error {
 // @internal
 export class ContentOps {
     static b3dmToGlbBuffer(inputBuffer: Buffer): Buffer;
-    static cmptToGlbBuffers(inputBuffer: Buffer): Buffer[];
+    static cmptToGlbBuffers(inputBuffer: Buffer, externalGlbResolver: (glbUri: string) => Promise<Buffer | undefined>): Promise<Buffer[]>;
     static glbToB3dmBuffer(inputBuffer: Buffer): Buffer;
     static glbToI3dmBuffer(inputBuffer: Buffer): Buffer;
     static i3dmToGlbBuffer(inputBuffer: Buffer): Buffer;
     static optimizeB3dmBuffer(inputBuffer: Buffer, options: any): Promise<Buffer>;
     static optimizeI3dmBuffer(inputBuffer: Buffer, options: any): Promise<Buffer>;
+    static updateAlignment(inputBuffer: Buffer): Buffer;
 }
 
 // @internal
@@ -605,9 +598,44 @@ export class Contents {
 }
 
 // @internal
+export interface ContentStage extends Stage {
+    options?: any;
+}
+
+// @internal
+export class ContentStageExecutor {
+    static executeContentStage(contentStage: ContentStage, tilesetProcessor: BasicTilesetProcessor): Promise<void>;
+}
+
+// @internal
+export class ContentStages {
+    static readonly CONTENT_STAGE_B3DM_TO_GLB = "b3dmToGlb";
+    static readonly CONTENT_STAGE_CONVERT_B3DM_TO_GLB = "convertB3dmToGlb";
+    static readonly CONTENT_STAGE_CONVERT_PNTS_TO_GLB = "convertPntsToGlb";
+    static readonly CONTENT_STAGE_GLB_TO_B3DM = "glbToB3dm";
+    static readonly CONTENT_STAGE_GLB_TO_I3DM = "glbToI3dm";
+    static readonly CONTENT_STAGE_I3DM_TO_GLB = "i3dmToGlb";
+    static readonly CONTENT_STAGE_OPTIMIZE_B3DM = "optimizeB3dm";
+    static readonly CONTENT_STAGE_OPTIMIZE_GLB = "optimizeGlb";
+    static readonly CONTENT_STAGE_OPTIMIZE_I3DM = "optimizeI3dm";
+    static readonly CONTENT_STAGE_SEPARATE_GLTF = "separateGltf";
+    static createB3dmToGlb(): ContentStage;
+    static createContentStage(contentStageJson: any): ContentStage;
+    static createConvertB3dmToGlb(): ContentStage;
+    static createConvertPntsToGlb(): ContentStage;
+    static createGlbToB3dm(): ContentStage;
+    static createGlbToI3dm(): ContentStage;
+    static createI3dmToGlb(): ContentStage;
+    static createOptimizeB3dm(options: any): ContentStage;
+    static createOptimizeGlb(options: any): ContentStage;
+    static createOptimizeI3dm(options: any): ContentStage;
+    static createSeparateGltf(): ContentStage;
+}
+
+// @internal
 export class ContentUpgrades {
-    static upgradeB3dmGltf1ToGltf2(inputBuffer: Buffer, options: any): Promise<Buffer>;
-    static upgradeI3dmGltf1ToGltf2(inputBuffer: Buffer, options: any): Promise<Buffer>;
+    static upgradeB3dmGltf1ToGltf2(inputBuffer: Buffer, options: any, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
+    static upgradeI3dmGltf1ToGltf2(inputBuffer: Buffer, options: any, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
 }
 
 // @internal
@@ -715,7 +743,7 @@ export class ElementStructuralMetadata extends ExtensionProperty<IElementStructu
     // (undocumented)
     protected getDefaults(): Nullable<IElementStructuralMetadata>;
     // (undocumented)
-    getIndex(): number;
+    getIndex(): number | null;
     // (undocumented)
     getPropertyTable(): StructuralMetadataPropertyTable | null;
     // (undocumented)
@@ -725,7 +753,7 @@ export class ElementStructuralMetadata extends ExtensionProperty<IElementStructu
     // (undocumented)
     propertyType: "ElementStructuralMetadata";
     // (undocumented)
-    setIndex(index: number): this;
+    setIndex(index: number | null): this;
     // (undocumented)
     setPropertyTable(propertyTable: StructuralMetadataPropertyTable | null): this;
 }
@@ -738,14 +766,11 @@ export interface EnumValue extends RootProperty {
 }
 
 // @internal
-export type EnumValueType = "INT8" | "UINT8" | "INT16" | "UINT16" | "INT32" | "UINT32" | "INT64" | "UINT64";
-
-// @internal
 export class ExplicitTraversedTile implements TraversedTile {
-    constructor(tile: Tile, path: string, level: number, parent: TraversedTile | undefined, schema: Schema | undefined, resourceResolver: ResourceResolver);
+    constructor(tileset: Tileset, tile: Tile, path: string, level: number, parent: TraversedTile | undefined, schema: Schema | undefined, resourceResolver: ResourceResolver);
     asFinalTile(): Tile;
     asRawTile(): Tile;
-    static createRoot(root: Tile, schema: Schema | undefined, resourceResolver: ResourceResolver): TraversedTile;
+    static createRoot(tileset: Tileset, root: Tile, schema: Schema | undefined, resourceResolver: ResourceResolver): TraversedTile;
     getChildren(): Promise<TraversedTile[]>;
     getFinalContents(): Content[];
     getImplicitTiling(): TileImplicitTiling | undefined;
@@ -754,6 +779,7 @@ export class ExplicitTraversedTile implements TraversedTile {
     getRawContents(): Content[];
     getResourceResolver(): ResourceResolver;
     getSubtreeUri(): string | undefined;
+    getTileset(): Tileset;
     isImplicitTilesetRoot(): boolean;
     get level(): number;
     get path(): string;
@@ -762,7 +788,7 @@ export class ExplicitTraversedTile implements TraversedTile {
 
 // @internal
 export class ExplicitTraversedTiles {
-    static createTraversedChildren(implicitTiling: TileImplicitTiling, schema: Schema | undefined, parent: ExplicitTraversedTile, resourceResolver: ResourceResolver): Promise<TraversedTile[]>;
+    static createTraversedChildren(tileset: Tileset, implicitTiling: TileImplicitTiling, schema: Schema | undefined, parent: ExplicitTraversedTile, resourceResolver: ResourceResolver): Promise<TraversedTile[]>;
 }
 
 // @internal
@@ -775,6 +801,8 @@ export class Extensions {
     static removeExtension(extended: Extended, extension: string): void;
     static removeExtensionRequired(extensible: Extensible, extension: string): void;
     static removeExtensionUsed(extensible: Extensible, extension: string): void;
+    static requiresExtension(extensible: Extensible, extension: string): boolean;
+    static usesExtension(extensible: Extensible, extension: string): boolean;
 }
 
 // @internal
@@ -921,8 +949,9 @@ export interface FeatureTableBinaryBodyReference extends BinaryBodyOffset {
 export class FileResourceResolver implements ResourceResolver {
     constructor(basePath: string);
     derive(uri: string): ResourceResolver;
-    resolveData(uri: string): Promise<Buffer | null>;
-    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
+    resolveData(uri: string): Promise<Buffer | undefined>;
+    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | undefined>;
+    resolveUri(uri: string): string;
 }
 
 // @internal
@@ -967,6 +996,7 @@ export class GltfPipelineLegacy {
 // @internal
 export class GltfTransform {
     static getIO(): Promise<NodeIO>;
+    static merge(inputGlbBuffers: Buffer[], schemaUriResolver: (schemaUri: string) => Promise<any>): Promise<Document>;
     static process(inputGlb: Buffer, ...transforms: Transform[]): Promise<Buffer>;
 }
 
@@ -989,6 +1019,7 @@ export class GltfTransformTextures {
 
 // @internal
 export class GltfUtilities {
+    static createGlb2FromData(jsonData: Buffer, binData: Buffer): Buffer;
     static extractDataFromGlb(glbBuffer: Buffer): {
         jsonData: Buffer;
         binData: Buffer;
@@ -996,7 +1027,12 @@ export class GltfUtilities {
     static extractJsonFromGlb(glbBuffer: Buffer): Buffer;
     static getGltfVersion(glbBuffer: Buffer): number;
     static optimizeGlb(glbBuffer: Buffer, options: any): Promise<Buffer>;
-    static replaceCesiumRtcExtension(glbBuffer: Buffer): Promise<any>;
+    // @deprecated
+    static replaceCesiumRtcExtension(glbBuffer: Buffer, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
+    static replaceCesiumRtcExtensionInGltf(gltf: any, gltfUpAxis: "X" | "Y" | "Z" | undefined): void;
+    static replaceCesiumRtcExtensionInGltf2Glb(glb: Buffer, gltfUpAxis: "X" | "Y" | "Z" | undefined): Buffer;
+    static replaceCesiumRtcExtensionInGltf2Json(gltfJsonBuffer: Buffer, gltfUpAxis: "X" | "Y" | "Z" | undefined): Buffer;
+    static replaceWeb3dQuantizedAttributesExtension(glbBuffer: Buffer): Promise<Buffer>;
     static upgradeGlb(glbBuffer: Buffer, options: any): Promise<Buffer>;
 }
 
@@ -1054,7 +1090,7 @@ export class ImplicitTilings {
 
 // @internal
 export class ImplicitTraversedTile implements TraversedTile {
-    constructor(implicitTiling: TileImplicitTiling, resourceResolver: ResourceResolver, root: TraversedTile, path: string, subtreeModel: SubtreeModel, globalLevel: number, globalCoordinate: TreeCoordinates, rootCoordinate: TreeCoordinates, localCoordinate: TreeCoordinates, parent: TraversedTile);
+    constructor(implicitTiling: TileImplicitTiling, resourceResolver: ResourceResolver, tileset: Tileset, root: TraversedTile, path: string, subtreeModel: SubtreeModel, globalLevel: number, globalCoordinate: TreeCoordinates, rootCoordinate: TreeCoordinates, localCoordinate: TreeCoordinates, parent: TraversedTile);
     asFinalTile(): Tile;
     asRawTile(): Tile;
     getChildren(): Promise<TraversedTile[]>;
@@ -1065,6 +1101,7 @@ export class ImplicitTraversedTile implements TraversedTile {
     getRawContents(): Content[];
     getResourceResolver(): ResourceResolver;
     getSubtreeUri(): string | undefined;
+    getTileset(): Tileset;
     isImplicitTilesetRoot(): boolean;
     get level(): number;
     get path(): string;
@@ -1129,15 +1166,20 @@ export class InstanceFeaturesFeatureId extends ExtensionProperty<IFeatureId> {
     // Warning: (ae-forgotten-export) The symbol "FeatureIdAttribute" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    getAttribute(): FeatureIdAttribute;
+    getAttribute(): FeatureIdAttribute | null;
     // (undocumented)
-    protected getDefaults(): Nullable<IFeatureId>;
+    protected getDefaults(): Nullable<IFeatureId> & {
+        nullFeatureId: null;
+        label: null;
+        attribute: null;
+        propertyTable: null;
+    };
     // (undocumented)
     getFeatureCount(): number;
     // (undocumented)
-    getLabel(): string;
+    getLabel(): string | null;
     // (undocumented)
-    getNullFeatureId(): number;
+    getNullFeatureId(): number | null;
     // (undocumented)
     getPropertyTable(): StructuralMetadataPropertyTable | null;
     // (undocumented)
@@ -1147,13 +1189,13 @@ export class InstanceFeaturesFeatureId extends ExtensionProperty<IFeatureId> {
     // (undocumented)
     propertyType: "FeatureId";
     // (undocumented)
-    setAttribute(attribute: FeatureIdAttribute): this;
+    setAttribute(attribute: FeatureIdAttribute | null): this;
     // (undocumented)
     setFeatureCount(featureCount: number): this;
     // (undocumented)
-    setLabel(label: string): this;
+    setLabel(label: string | null): this;
     // (undocumented)
-    setNullFeatureId(nullFeatureId: number): this;
+    setNullFeatureId(nullFeatureId: number | null): this;
     // (undocumented)
     setPropertyTable(propertyTable: StructuralMetadataPropertyTable | null): this;
 }
@@ -1165,10 +1207,16 @@ export class InstanceFeaturesUtils {
 
 // @internal
 export class Iterables {
+    static asyncToArray<T>(iterable: AsyncIterable<T>): Promise<T[]>;
+    static concatAsync<T>(delegateIterables: Iterable<AsyncIterable<T>>): AsyncIterable<T>;
     static filter<T>(iterable: Iterable<T>, include: (element: T) => boolean): Iterable<T>;
+    static filterAsync<T>(iterable: AsyncIterable<T>, include: (element: T) => boolean): AsyncIterable<T>;
     static filterWithIndex<T>(iterable: Iterable<T>, include: (element: T, index: number) => boolean): Iterable<T>;
     static flatten<T>(iterable: Iterable<T[]>): Iterable<T>;
+    static flattenAsync<T>(iterable: AsyncIterable<T[]>): AsyncIterable<T>;
+    static makeAsync<T>(delegateIterable: Iterable<T>): AsyncIterable<T>;
     static map<S, T>(iterable: Iterable<S>, mapper: (element: S) => T): Iterable<T>;
+    static mapAsync<S, T>(iterable: AsyncIterable<S>, mapper: (element: S) => Promise<T>): AsyncIterable<T>;
     static overFiles(directory: string | PathLike, recurse: boolean): Iterable<string>;
     static segmentize<T>(iterable: Iterable<T>, segmentSize: number): Iterable<T[]>;
 }
@@ -1207,6 +1255,7 @@ export type KtxUastcOptions = Partial<{
 export class KtxUtility {
     static convertImageData(inputImageData: Buffer, options: KtxOptions | undefined): Promise<Buffer>;
     static convertImageFile(inputFileName: string, outputFileName: string, options: KtxOptions | undefined): Promise<void>;
+    static setLogCallback(logCallback: ((value: any) => void) | undefined): void;
 }
 
 // @internal
@@ -1214,7 +1263,7 @@ export class LazyContentData implements ContentData {
     constructor(uri: string, resourceResolver: ResourceResolver);
     exists(): Promise<boolean>;
     get extension(): string;
-    getData(): Promise<Buffer | null>;
+    getData(): Promise<Buffer | undefined>;
     getMagic(): Promise<Buffer>;
     getParsedObject(): Promise<any>;
     get uri(): string;
@@ -1264,15 +1313,21 @@ export class MeshFeaturesFeatureId extends ExtensionProperty<IFeatureId_2> {
     // Warning: (ae-forgotten-export) The symbol "FeatureIdAttribute_2" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    getAttribute(): FeatureIdAttribute_2;
+    getAttribute(): FeatureIdAttribute_2 | null;
     // (undocumented)
-    protected getDefaults(): Nullable<IFeatureId_2>;
+    protected getDefaults(): Nullable<IFeatureId_2> & {
+        nullFeatureId: null;
+        label: null;
+        attribute: null;
+        texture: null;
+        propertyTable: null;
+    };
     // (undocumented)
     getFeatureCount(): number;
     // (undocumented)
-    getLabel(): string;
+    getLabel(): string | null;
     // (undocumented)
-    getNullFeatureId(): number;
+    getNullFeatureId(): number | null;
     // (undocumented)
     getPropertyTable(): StructuralMetadataPropertyTable | null;
     // (undocumented)
@@ -1284,13 +1339,13 @@ export class MeshFeaturesFeatureId extends ExtensionProperty<IFeatureId_2> {
     // (undocumented)
     propertyType: "FeatureId";
     // (undocumented)
-    setAttribute(attribute: FeatureIdAttribute_2): this;
+    setAttribute(attribute: FeatureIdAttribute_2 | null): this;
     // (undocumented)
     setFeatureCount(featureCount: number): this;
     // (undocumented)
-    setLabel(label: string): this;
+    setLabel(label: string | null): this;
     // (undocumented)
-    setNullFeatureId(nullFeatureId: number): this;
+    setNullFeatureId(nullFeatureId: number | null): this;
     // (undocumented)
     setPropertyTable(propertyTable: StructuralMetadataPropertyTable | null): this;
     // (undocumented)
@@ -1512,7 +1567,7 @@ export class OctreeCoordinates implements TreeCoordinates {
     children(): Iterable<OctreeCoordinates>;
     descendants(maxLevelInclusive: number, depthFirst: boolean): Iterable<OctreeCoordinates>;
     get level(): number;
-    parent(): OctreeCoordinates | null;
+    parent(): OctreeCoordinates | undefined;
     toArray(): number[];
     toIndex(): number;
     toIndexInLevel(): number;
@@ -1545,6 +1600,31 @@ export class Paths {
 }
 
 // @internal
+export interface Pipeline {
+    input: string;
+    output: string;
+    tilesetStages: TilesetStage[];
+}
+
+// @internal
+export class PipelineError extends Error {
+    constructor(message: string);
+    // (undocumented)
+    toString: () => string;
+}
+
+// @internal
+export class PipelineExecutor {
+    static executePipeline(pipeline: Pipeline, overwrite: boolean): Promise<void>;
+    static setTempBaseDirectory(directory: string | undefined): void;
+}
+
+// @internal
+export class Pipelines {
+    static createPipeline(pipelineJson: any): Pipeline;
+}
+
+// @internal
 export interface PntsFeatureTable extends FeatureTable {
     BATCH_ID?: FeatureTableBinaryBodyReference;
     BATCH_LENGTH?: number;
@@ -1569,9 +1649,6 @@ export class PntsPointClouds {
     static hasQuantizedPositions(featureTable: PntsFeatureTable): boolean;
     static mayRequireAlpha(featureTable: PntsFeatureTable): boolean;
 }
-
-// @internal (undocumented)
-export type Point3D = [number, number, number];
 
 // @internal
 export interface Properties extends RootProperty {
@@ -1638,7 +1715,7 @@ export class QuadtreeCoordinates implements TreeCoordinates {
     children(): Iterable<QuadtreeCoordinates>;
     descendants(maxLevelInclusive: number, depthFirst: boolean): Iterable<QuadtreeCoordinates>;
     get level(): number;
-    parent(): QuadtreeCoordinates | null;
+    parent(): QuadtreeCoordinates | undefined;
     toArray(): number[];
     toIndex(): number;
     toIndexInLevel(): number;
@@ -1681,8 +1758,9 @@ export interface ReadablePointCloud {
 // @internal
 export interface ResourceResolver {
     derive(uri: string): ResourceResolver;
-    resolveData(uri: string): Promise<Buffer | null>;
-    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
+    resolveData(uri: string): Promise<Buffer | undefined>;
+    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | undefined>;
+    resolveUri(uri: string): string;
 }
 
 // @internal
@@ -1716,6 +1794,12 @@ export interface Schema extends RootProperty {
     id: string;
     name?: string;
     version?: string;
+}
+
+// @internal
+export interface Stage {
+    description?: string;
+    name: string;
 }
 
 // @internal
@@ -1788,6 +1872,8 @@ export class StructuralMetadata extends ExtensionProperty<IStructuralMetadata> {
     extensionName: typeof NAME;
     // (undocumented)
     protected getDefaults(): Nullable<IStructuralMetadata> & {
+        schema: null;
+        schemaUri: null;
         propertyTables: never[];
         propertyTextures: never[];
         propertyAttributes: never[];
@@ -1795,7 +1881,7 @@ export class StructuralMetadata extends ExtensionProperty<IStructuralMetadata> {
     // (undocumented)
     getSchema(): StructuralMetadataSchema | null;
     // (undocumented)
-    getSchemaUri(): string;
+    getSchemaUri(): string | null;
     // (undocumented)
     protected init(): void;
     // (undocumented)
@@ -1817,7 +1903,7 @@ export class StructuralMetadata extends ExtensionProperty<IStructuralMetadata> {
     // (undocumented)
     setSchema(schema: StructuralMetadataSchema | null): this;
     // (undocumented)
-    setSchemaUri(name: string): this;
+    setSchemaUri(schemaUri: string | null): this;
 }
 
 // Warning: (ae-forgotten-export) The symbol "IClass" needs to be exported by the entry point index.d.ts
@@ -1830,12 +1916,14 @@ export class StructuralMetadataClass extends ExtensionProperty<IClass> {
     extensionName: typeof NAME;
     // (undocumented)
     protected getDefaults(): Nullable<IClass> & {
+        objectName: null;
+        description: null;
         properties: {};
     };
     // (undocumented)
-    getDescription(): string;
+    getDescription(): string | null;
     // (undocumented)
-    getObjectName(): string;
+    getObjectName(): string | null;
     // (undocumented)
     getProperty(key: string): StructuralMetadataClassProperty | null;
     // (undocumented)
@@ -1849,9 +1937,9 @@ export class StructuralMetadataClass extends ExtensionProperty<IClass> {
     // (undocumented)
     propertyType: "Class";
     // (undocumented)
-    setDescription(description: string): this;
+    setDescription(description: string | null): this;
     // (undocumented)
-    setObjectName(name: string): this;
+    setObjectName(name: string | null): this;
     // (undocumented)
     setProperty(key: string, value: StructuralMetadataClassProperty | null): this;
 }
@@ -1866,22 +1954,35 @@ export class StructuralMetadataClassProperty extends ExtensionProperty<IClassPro
     extensionName: typeof NAME;
     // (undocumented)
     getArray(): boolean;
+    // Warning: (ae-forgotten-export) The symbol "ClassPropertyComponentType" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
-    getComponentType(): ClassPropertyComponentType;
+    getComponentType(): ClassPropertyComponentType | null;
     // (undocumented)
-    getCount(): number;
+    getCount(): number | null;
     // (undocumented)
     getDefault(): any;
     // (undocumented)
     protected getDefaults(): Nullable<IClassProperty> & {
-        array: boolean;
-        normalized: boolean;
-        required: boolean;
+        objectName: null;
+        description: null;
+        componentType: null;
+        enumType: null;
+        array: null;
+        count: null;
+        normalized: null;
+        offset: null;
+        scale: null;
+        max: null;
+        min: null;
+        required: null;
+        noData: null;
+        default: null;
     };
     // (undocumented)
-    getDescription(): string;
+    getDescription(): string | null;
     // (undocumented)
-    getEnumType(): string;
+    getEnumType(): string | null;
     // (undocumented)
     getMax(): any;
     // (undocumented)
@@ -1891,13 +1992,15 @@ export class StructuralMetadataClassProperty extends ExtensionProperty<IClassPro
     // (undocumented)
     getNormalized(): boolean;
     // (undocumented)
-    getObjectName(): string;
+    getObjectName(): string | null;
     // (undocumented)
     getOffset(): any;
     // (undocumented)
     getRequired(): boolean;
     // (undocumented)
     getScale(): any;
+    // Warning: (ae-forgotten-export) The symbol "ClassPropertyType" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     getType(): ClassPropertyType;
     // (undocumented)
@@ -1909,15 +2012,15 @@ export class StructuralMetadataClassProperty extends ExtensionProperty<IClassPro
     // (undocumented)
     setArray(array: boolean): this;
     // (undocumented)
-    setComponentType(componentType: ClassPropertyComponentType): this;
+    setComponentType(componentType: ClassPropertyComponentType | null): this;
     // (undocumented)
-    setCount(count: number): this;
+    setCount(count: number | null): this;
     // (undocumented)
     setDefault(defaultValue: any): this;
     // (undocumented)
-    setDescription(description: string): this;
+    setDescription(description: string | null): this;
     // (undocumented)
-    setEnumType(enumType: string): this;
+    setEnumType(enumType: string | null): this;
     // (undocumented)
     setMax(max: any): this;
     // (undocumented)
@@ -1927,7 +2030,7 @@ export class StructuralMetadataClassProperty extends ExtensionProperty<IClassPro
     // (undocumented)
     setNormalized(normalized: boolean): this;
     // (undocumented)
-    setObjectName(name: string): this;
+    setObjectName(name: string | null): this;
     // (undocumented)
     setOffset(offset: any): this;
     // (undocumented)
@@ -1950,13 +2053,17 @@ export class StructuralMetadataEnum extends ExtensionProperty<IEnum> {
     extensionName: typeof NAME;
     // (undocumented)
     protected getDefaults(): Nullable<IEnum> & {
+        objectName: null;
+        description: null;
         valueType: string;
         values: never[];
     };
     // (undocumented)
-    getDescription(): string;
+    getDescription(): string | null;
     // (undocumented)
-    getObjectName(): string;
+    getObjectName(): string | null;
+    // Warning: (ae-forgotten-export) The symbol "EnumValueType" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     getValueType(): EnumValueType;
     // (undocumented)
@@ -1970,9 +2077,9 @@ export class StructuralMetadataEnum extends ExtensionProperty<IEnum> {
     // (undocumented)
     removeEnumValue(enumValue: StructuralMetadataEnumValue): this;
     // (undocumented)
-    setDescription(description: string): this;
+    setDescription(description: string | null): this;
     // (undocumented)
-    setObjectName(name: string): this;
+    setObjectName(name: string | null): this;
     // (undocumented)
     setValueType(valueType: EnumValueType): this;
 }
@@ -1986,9 +2093,11 @@ export class StructuralMetadataEnumValue extends ExtensionProperty<IEnumValue> {
     // (undocumented)
     extensionName: typeof NAME;
     // (undocumented)
-    protected getDefaults(): Nullable<IEnumValue>;
+    protected getDefaults(): Nullable<IEnumValue> & {
+        description: null;
+    };
     // (undocumented)
-    getDescription(): string;
+    getDescription(): string | null;
     // (undocumented)
     getObjectName(): string;
     // (undocumented)
@@ -2000,11 +2109,17 @@ export class StructuralMetadataEnumValue extends ExtensionProperty<IEnumValue> {
     // (undocumented)
     propertyType: "EnumValue";
     // (undocumented)
-    setDescription(description: string): this;
+    setDescription(description: string | null): this;
     // (undocumented)
     setObjectName(name: string): this;
     // (undocumented)
     setValue(value: number): this;
+}
+
+// @internal
+export class StructuralMetadataMerger {
+    static mergeDocumentsWithStructuralMetadata(targetDocument: Document, sourceDocument: Document, schemaUriResolver: (schemaUri: string) => Promise<any>): Promise<void>;
+    static setMergedSchemaIdSuffix(mergedSchemaIdSuffix: string | undefined): void;
 }
 
 // Warning: (ae-forgotten-export) The symbol "IPropertyAttribute" needs to be exported by the entry point index.d.ts
@@ -2019,10 +2134,11 @@ export class StructuralMetadataPropertyAttribute extends ExtensionProperty<IProp
     getClass(): string;
     // (undocumented)
     protected getDefaults(): Nullable<IPropertyAttribute> & {
+        objectName: null;
         properties: {};
     };
     // (undocumented)
-    getObjectName(): string;
+    getObjectName(): string | null;
     // (undocumented)
     getProperty(key: string): StructuralMetadataPropertyAttributeProperty | null;
     // (undocumented)
@@ -2038,7 +2154,7 @@ export class StructuralMetadataPropertyAttribute extends ExtensionProperty<IProp
     // (undocumented)
     setClass(_class: string): this;
     // (undocumented)
-    setObjectName(name: string): this;
+    setObjectName(name: string | null): this;
     // (undocumented)
     setProperty(key: string, value: StructuralMetadataPropertyAttributeProperty | null): this;
 }
@@ -2054,7 +2170,12 @@ export class StructuralMetadataPropertyAttributeProperty extends ExtensionProper
     // (undocumented)
     getAttribute(): string;
     // (undocumented)
-    protected getDefaults(): Nullable<IPropertyAttributeProperty>;
+    protected getDefaults(): Nullable<IPropertyAttributeProperty> & {
+        offset: null;
+        scale: null;
+        max: null;
+        min: null;
+    };
     // (undocumented)
     getMax(): any;
     // (undocumented)
@@ -2095,10 +2216,11 @@ export class StructuralMetadataPropertyTable extends ExtensionProperty<IProperty
     getCount(): number;
     // (undocumented)
     protected getDefaults(): Nullable<IPropertyTable> & {
+        objectName: null;
         properties: {};
     };
     // (undocumented)
-    getObjectName(): string;
+    getObjectName(): string | null;
     // (undocumented)
     getProperty(key: string): StructuralMetadataPropertyTableProperty | null;
     // (undocumented)
@@ -2116,7 +2238,7 @@ export class StructuralMetadataPropertyTable extends ExtensionProperty<IProperty
     // (undocumented)
     setCount(count: number): this;
     // (undocumented)
-    setObjectName(name: string): this;
+    setObjectName(name: string | null): this;
     // (undocumented)
     setProperty(key: string, value: StructuralMetadataPropertyTableProperty | null): this;
 }
@@ -2135,8 +2257,14 @@ export class StructuralMetadataPropertyTableProperty extends ExtensionProperty<I
     getArrayOffsetType(): PropertyTablePropertyOffsetType;
     // (undocumented)
     protected getDefaults(): Nullable<IPropertyTableProperty> & {
-        arrayOffsetType: string;
-        stringOffsetType: string;
+        arrayOffsets: null;
+        stringOffsets: null;
+        arrayOffsetType: null;
+        stringOffsetType: null;
+        offset: null;
+        scale: null;
+        max: null;
+        min: null;
     };
     // (undocumented)
     getMax(): any;
@@ -2195,10 +2323,11 @@ export class StructuralMetadataPropertyTexture extends ExtensionProperty<IProper
     getClass(): string;
     // (undocumented)
     protected getDefaults(): Nullable<IPropertyTexture> & {
+        objectName: null;
         properties: {};
     };
     // (undocumented)
-    getObjectName(): string;
+    getObjectName(): string | null;
     // (undocumented)
     getProperty(key: string): StructuralMetadataPropertyTextureProperty | null;
     // (undocumented)
@@ -2214,7 +2343,7 @@ export class StructuralMetadataPropertyTexture extends ExtensionProperty<IProper
     // (undocumented)
     setClass(_class: string): this;
     // (undocumented)
-    setObjectName(name: string): this;
+    setObjectName(name: string | null): this;
     // (undocumented)
     setProperty(key: string, value: StructuralMetadataPropertyTextureProperty | null): this;
 }
@@ -2234,6 +2363,10 @@ export class StructuralMetadataPropertyTextureProperty extends ExtensionProperty
         channels: number[];
         texture: null;
         textureInfo: TextureInfo;
+        offset: null;
+        scale: null;
+        max: null;
+        min: null;
     };
     // (undocumented)
     getMax(): any;
@@ -2279,19 +2412,22 @@ export class StructuralMetadataSchema extends ExtensionProperty<ISchema> {
     getClass(key: string): StructuralMetadataClass | null;
     // (undocumented)
     protected getDefaults(): Nullable<ISchema> & {
+        objectName: null;
+        description: null;
+        version: null;
         classes: {};
         enums: {};
     };
     // (undocumented)
-    getDescription(): string;
+    getDescription(): string | null;
     // (undocumented)
     getEnum(key: string): StructuralMetadataEnum | null;
     // (undocumented)
     getId(): string;
     // (undocumented)
-    getObjectName(): string;
+    getObjectName(): string | null;
     // (undocumented)
-    getVersion(): string;
+    getVersion(): string | null;
     // (undocumented)
     protected init(): void;
     // (undocumented)
@@ -2309,15 +2445,15 @@ export class StructuralMetadataSchema extends ExtensionProperty<ISchema> {
     // (undocumented)
     setClass(key: string, value: StructuralMetadataClass | null): this;
     // (undocumented)
-    setDescription(description: string): this;
+    setDescription(description: string | null): this;
     // (undocumented)
     setEnum(key: string, value: StructuralMetadataEnum | null): this;
     // (undocumented)
     setId(name: string): this;
     // (undocumented)
-    setObjectName(name: string): this;
+    setObjectName(name: string | null): this;
     // (undocumented)
-    setVersion(version: string): this;
+    setVersion(version: string | null): this;
 }
 
 // @internal
@@ -2544,7 +2680,8 @@ export class TileFormats {
     static createDefaultI3dmTileDataFromGlb(glbData: Buffer): TileData;
     static createI3dmTileDataFromGlb(glbData: Buffer, featureTableJson: I3dmFeatureTable | undefined, featureTableBinary: Buffer | undefined, batchTableJson: BatchTable | undefined, batchTableBinary: Buffer | undefined): TileData;
     static createTileDataBuffer(tileData: TileData): Buffer;
-    static extractGlbBuffers(tileDataBuffer: Buffer): Buffer[];
+    static extractGlbBuffers(tileDataBuffer: Buffer, externalGlbResolver: (glbUri: string) => Promise<Buffer | undefined>): Promise<Buffer[]>;
+    static extractGlbPayload(tileData: TileData): Buffer;
     static extractTileData(buffer: Buffer, tileDataLayout: TileDataLayout): {
         header: {
             magic: string;
@@ -2562,15 +2699,20 @@ export class TileFormats {
         payload: Buffer;
     };
     static isComposite(buffer: Buffer): boolean;
+    static obtainGlbPayload(tileData: TileData, externalGlbResolver: (glbUri: string) => Promise<Buffer | undefined>): Promise<Buffer | undefined>;
     static readCompositeTileData(buffer: Buffer): CompositeTileData;
     static readTileData(buffer: Buffer): TileData;
+    static splitCmpt(tileDataBuffer: Buffer, recursive: boolean): Promise<Buffer[]>;
 }
 
 // @internal
 export class TileFormatsMigration {
+    static applyGltfUpAxis(document: Document, gltfUpAxis: "X" | "Y" | "Z" | undefined): void;
     static applyRtcCenter(document: Document, rtcCenter: number[]): void;
-    static convertB3dmToGlb(b3dmBuffer: Buffer): Promise<Buffer>;
-    static convertI3dmToGlb(i3dmBuffer: Buffer, externalGlbResolver: (uri: string) => Promise<Buffer | undefined>): Promise<Buffer>;
+    static applyTransform(document: Document, transform: number[]): void;
+    static convertB3dmToGlb(b3dmBuffer: Buffer, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
+    static convertCmptToGlb(cmptBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
+    static convertI3dmToGlb(i3dmBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
     static convertPntsToGlb(pntsBuffer: Buffer): Promise<Buffer>;
     // (undocumented)
     static readonly DEBUG_LOG_FILE_CONTENT = false;
@@ -2579,12 +2721,12 @@ export class TileFormatsMigration {
 
 // @internal
 export class TileFormatsMigrationB3dm {
-    static convertB3dmToGlb(b3dmBuffer: Buffer): Promise<Buffer>;
+    static convertB3dmToGlb(b3dmBuffer: Buffer, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
 }
 
 // @internal
 export class TileFormatsMigrationI3dm {
-    static convertI3dmToGlb(i3dmBuffer: Buffer, externalGlbResolver: (uri: string) => Promise<Buffer | undefined>): Promise<Buffer>;
+    static convertI3dmToGlb(i3dmBuffer: Buffer, externalResourceResolver: (uri: string) => Promise<Buffer | undefined>, gltfUpAxis: "X" | "Y" | "Z" | undefined): Promise<Buffer>;
 }
 
 // @internal
@@ -2629,11 +2771,13 @@ export interface Tileset extends RootProperty {
 export class TilesetCombiner {
     constructor(externalTilesetDetector: (contentData: ContentData) => Promise<boolean>);
     combine(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    combineData(tilesetSource: TilesetSource, tilesetSourceJsonFileName: string, tilesetTarget: TilesetTarget, tilesetTargetJsonFileName: string): Promise<void>;
 }
 
 // @internal
 export class TilesetConverter {
-    static convert(input: string, inputTilesetJsonFileName: string | undefined, output: string, force: boolean): Promise<void>;
+    static convert(tilesetSourceName: string, tilesetSourceJsonFileName: string | undefined, tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    static convertData(tilesetSource: TilesetSource, tilesetSourceJsonFileName: string, tilesetTarget: TilesetTarget, tilesetTargetJsonFileName: string): Promise<void>;
 }
 
 // @internal
@@ -2660,17 +2804,19 @@ export class TilesetError extends Error {
 // @internal
 export class TilesetInMemory implements TilesetSource, TilesetTarget {
     constructor();
-    addEntry(key: string, content: Buffer): void;
-    begin(fullOutputName: string, overwrite: boolean): void;
-    close(): void;
+    addEntry(key: string, content: Buffer): Promise<void>;
+    begin(fullOutputName: string, overwrite: boolean): Promise<void>;
+    close(): Promise<void>;
     end(): Promise<void>;
-    getKeys(): string[];
-    getValue(key: string): Buffer | undefined;
-    open(fullInputName: string): void;
+    getKeys(): Promise<AsyncIterable<string>>;
+    getValue(key: string): Promise<Buffer | undefined>;
+    open(fullInputName: string): Promise<void>;
 }
 
 // @internal
 export class TilesetJsonCreator {
+    static computeTransformFromCartographicPositionAndRotationDegrees(cartographicPositionDegrees: number[], rotationDegrees: number[]): number[];
+    static computeTransformFromCartographicPositionDegrees(cartographicPositionDegrees: number[]): number[];
     static createTilesetFromContents(baseDir: string, contentUris: string[]): Promise<Tileset>;
 }
 
@@ -2678,6 +2824,8 @@ export class TilesetJsonCreator {
 export class TilesetMerger {
     constructor();
     merge(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    mergeData(tilesetSources: TilesetSource[], tilesetSourceJsonFileNames: string[] | undefined, tilesetTarget: TilesetTarget, tilesetTargetJsonFileName: string): Promise<void>;
+    mergeJson(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
 }
 
 // @internal
@@ -2687,16 +2835,24 @@ export class TilesetObjectUpgrader {
 }
 
 // @internal
+export class TilesetOperations {
+    static combine(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    static merge(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    static mergeJson(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    static upgrade(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean, targetVersion: string, gltfUpgradeOptions: any): Promise<void>;
+    static upgradeTileset(tileset: Tileset, targetVersion: string): Promise<void>;
+}
+
+// @internal
 export class TilesetProcessing {
-    static getSourceValue(tilesetSource: TilesetSource, key: string): Buffer;
-    static parseSourceValue<T>(tilesetSource: TilesetSource, key: string): T;
-    static resolveSchema(tilesetSource: TilesetSource, tileset: Tileset): Schema | undefined;
+    static resolveSchema(tilesetSource: TilesetSource, tileset: Tileset): Promise<Schema | undefined>;
 }
 
 // @internal
 export abstract class TilesetProcessor {
     begin(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<void>;
-    end(): Promise<void>;
+    beginData(tilesetSource: TilesetSource, tilesetSourceJsonFileName: string, tilesetTarget: TilesetTarget, tilesetTargetJsonFileName: string): Promise<void>;
+    end(close?: boolean): Promise<void>;
     fetchSourceEntry(key: string): Promise<TilesetEntry | undefined>;
     protected getContext(): TilesetProcessorContext;
     protected getTargetKey(sourceKey: string): string | undefined;
@@ -2705,7 +2861,7 @@ export abstract class TilesetProcessor {
     protected processAllEntriesInternal(entryProcessor: TilesetEntryProcessor): Promise<void>;
     processEntry(sourceKey: string, entryProcessor: TilesetEntryProcessor): Promise<void>;
     protected putTargetKey(sourceKey: string, targetKey: string): void;
-    storeTargetEntries(...targetEntries: TilesetEntry[]): void;
+    storeTargetEntries(...targetEntries: TilesetEntry[]): Promise<void>;
 }
 
 // @internal
@@ -2729,106 +2885,135 @@ export interface TilesetProcessorContext {
 export class TilesetProcessorContexts {
     static close(context: TilesetProcessorContext): Promise<void>;
     static create(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<TilesetProcessorContext>;
+    static createFromData(tilesetSource: TilesetSource, tilesetSourceJsonFileName: string, tilesetTarget: TilesetTarget, tilesetTargetJsonFileName: string): Promise<TilesetProcessorContext>;
+    static createInstance(tilesetSource: TilesetSource, tilesetSourceJsonFileName: string, tilesetTarget: TilesetTarget, tilesetTargetJsonFileName: string): Promise<TilesetProcessorContext>;
 }
 
 // @internal
 export class Tilesets {
     static areEqualPackages(tilesetPackageName0: string, tilesetPackageName1: string): boolean;
-    static combine(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    static determineTilesetDirectoryName(tilesetName: string): string;
     static determineTilesetJsonFileName(tilesetDataName: string): string;
-    static merge(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
-    static upgrade(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean, targetVersion: string, gltfUpgradeOptions: any): Promise<void>;
-    static upgradeTileset(tileset: Tileset, targetVersion: string): Promise<void>;
 }
 
 // @internal
 export interface TilesetSource {
-    close(): void;
-    getKeys(): Iterable<string>;
-    getValue(key: string): Buffer | undefined;
-    open(fullInputName: string): void;
+    close(): Promise<void>;
+    getKeys(): Promise<AsyncIterable<string>>;
+    getValue(key: string): Promise<Buffer | undefined>;
+    open(fullInputName: string): Promise<void>;
 }
 
 // @internal
 export class TilesetSource3dtiles implements TilesetSource {
     constructor();
-    close(): void;
-    getKeys(): Iterable<string>;
-    getValue(key: string): Buffer | undefined;
-    open(fullInputName: string): void;
+    close(): Promise<void>;
+    getKeys(): Promise<AsyncIterable<string>>;
+    getValue(key: string): Promise<Buffer | undefined>;
+    open(fullInputName: string): Promise<void>;
 }
 
 // @internal
 export class TilesetSource3tz implements TilesetSource {
     constructor();
-    close(): void;
-    getKeys(): Iterable<string>;
-    getValue(key: string): Buffer | undefined;
+    close(): Promise<void>;
+    getKeys(): Promise<AsyncIterable<string>>;
+    getValue(key: string): Promise<Buffer | undefined>;
     // (undocumented)
     getZipIndex(): IndexEntry[] | undefined;
-    open(fullInputName: string): void;
+    open(fullInputName: string): Promise<void>;
 }
 
 // @internal
 export class TilesetSourceFs implements TilesetSource {
     constructor();
-    close(): void;
-    getKeys(): Iterable<string>;
-    getValue(key: string): Buffer | undefined;
-    open(fullInputName: string): void;
+    close(): Promise<void>;
+    getKeys(): Promise<AsyncIterable<string>>;
+    getValue(key: string): Promise<Buffer | undefined>;
+    open(fullInputName: string): Promise<void>;
 }
 
 // @internal
 export class TilesetSourceResourceResolver implements ResourceResolver {
     constructor(basePath: string, tilesetSource: TilesetSource);
     derive(uri: string): ResourceResolver;
-    resolveData(uri: string): Promise<Buffer | null>;
-    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
+    resolveData(uri: string): Promise<Buffer | undefined>;
+    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | undefined>;
+    resolveUri(uri: string): string;
 }
 
 // @internal
 export class TilesetSources {
     static create(extension: string): TilesetSource | undefined;
-    static createAndOpen(name: string): TilesetSource;
-    static getEntries(tilesetSource: TilesetSource): Iterable<TilesetEntry>;
+    static createAndOpen(name: string): Promise<TilesetSource>;
+    static createFromName(name: string): TilesetSource;
+    static getEntries(tilesetSource: TilesetSource): Promise<AsyncIterable<TilesetEntry>>;
+    static getSourceValue(tilesetSource: TilesetSource, key: string): Promise<Buffer>;
+    static parseSourceValue<T>(tilesetSource: TilesetSource, key: string): Promise<T>;
+}
+
+// @internal
+export interface TilesetStage extends Stage {
+    contentStages?: ContentStage[];
+    excludedContentTypes?: string[];
+    includedContentTypes?: string[];
+}
+
+// @internal
+export class TilesetStageExecutor {
+    static executeTilesetStage(tilesetStage: TilesetStage, currentInput: string, currentOutput: string, overwrite: boolean): Promise<void>;
+}
+
+// @internal
+export class TilesetStages {
+    static create(name: string, description: string, contentStages: ContentStage[]): TilesetStage;
+    static createCombine(): TilesetStage;
+    static createGzip(includedContentTypes: string[] | undefined): TilesetStage;
+    static createTilesetStage(tilesetStageJson: any): TilesetStage;
+    static createUngzip(): ContentStage;
+    static createUpgrade(): TilesetStage;
+    static readonly TILESET_STAGE_COMBINE = "combine";
+    static readonly TILESET_STAGE_GZIP = "gzip";
+    static readonly TILESET_STAGE_UNGZIP = "ungzip";
+    static readonly TILESET_STAGE_UPGRADE = "upgrade";
 }
 
 // @internal
 export interface TilesetTarget {
-    addEntry(key: string, content: Buffer): void;
-    begin(fullOutputName: string, overwrite: boolean): void;
+    addEntry(key: string, content: Buffer): Promise<void>;
+    begin(fullOutputName: string, overwrite: boolean): Promise<void>;
     end(): Promise<void>;
 }
 
 // @internal
 export class TilesetTarget3dtiles implements TilesetTarget {
     constructor();
-    addEntry(key: string, content: Buffer): void;
-    begin(fullOutputName: string, overwrite: boolean): void;
+    addEntry(key: string, content: Buffer): Promise<void>;
+    begin(fullOutputName: string, overwrite: boolean): Promise<void>;
     end(): Promise<void>;
 }
 
 // @internal
 export class TilesetTarget3tz implements TilesetTarget {
     constructor();
-    addEntry(key: string, content: Buffer): void;
-    begin(fullOutputName: string, overwrite: boolean): void;
+    addEntry(key: string, content: Buffer): Promise<void>;
+    begin(fullOutputName: string, overwrite: boolean): Promise<void>;
     end(): Promise<void>;
 }
 
 // @internal
 export class TilesetTargetFs implements TilesetTarget {
     constructor();
-    addEntry(key: string, content: Buffer): void;
-    begin(fullOutputName: string, overwrite: boolean): void;
+    addEntry(key: string, content: Buffer): Promise<void>;
+    begin(fullOutputName: string, overwrite: boolean): Promise<void>;
     end(): Promise<void>;
 }
 
 // @internal
 export class TilesetTargets {
     static create(extension: string): TilesetTarget | undefined;
-    static createAndBegin(name: string, overwrite: boolean): TilesetTarget;
-    static putEntries(tilesetTarget: TilesetTarget, entries: Iterable<TilesetEntry>): void;
+    static createAndBegin(name: string, overwrite: boolean): Promise<TilesetTarget>;
+    static createFromName(name: string): TilesetTarget;
 }
 
 // @internal
@@ -2836,12 +3021,16 @@ export class TilesetTraverser {
     constructor(baseUri: string, resourceResolver: ResourceResolver, options?: TraversalOptions);
     traverse(tileset: Tileset, traversalCallback: TraversalCallback): Promise<void>;
     traverseWithSchema(tileset: Tileset, schema: Schema | undefined, traversalCallback: TraversalCallback): Promise<void>;
-    traverseWithSchemaAt(tile: Tile, schema: Schema | undefined, traversalCallback: TraversalCallback): Promise<void>;
+    traverseWithSchemaAt(tileset: Tileset, tile: Tile, schema: Schema | undefined, traversalCallback: TraversalCallback): Promise<void>;
 }
 
 // @internal
 export class TilesetTraversers {
     static createExternalTilesetRoots(baseUri: string, traversedTile: TraversedTile): Promise<TraversedTile[]>;
+    static createIterableFromTraversedTile(traversedRootTile: TraversedTile, traverseExternalTilesets: boolean, depthFirst: boolean): AsyncIterable<TraversedTile>;
+    static createTraversedRootTile(tilesetSource: TilesetSource, tilesetJsonFileName: string): Promise<TraversedTile>;
+    static createTraversedRootTileForTileset(tilesetSource: TilesetSource, tileset: Tileset): Promise<TraversedTile>;
+    static createTraversedTilesIterable(tilesetSource: TilesetSource, tilesetJsonFileName: string, traverseExternalTilesets: boolean, depthFirst: boolean): Promise<AsyncIterable<TraversedTile>>;
     static resolveSchema(tileset: Tileset, resourceResolver: ResourceResolver): Promise<Schema | undefined>;
 }
 
@@ -2852,24 +3041,28 @@ export type TilesetUpgradeOptions = {
     upgradeRefineCase: boolean;
     upgradeContentUrlToUri: boolean;
     upgradeEmptyChildrenToUndefined: true;
+    upgradeGltfUpAxis: true;
     upgradeContentGltfExtensionDeclarations: boolean;
     upgradeB3dmGltf1ToGltf2: boolean;
     upgradeI3dmGltf1ToGltf2: boolean;
     upgradePntsToGlb: boolean;
     upgradeB3dmToGlb: boolean;
     upgradeI3dmToGlb: boolean;
+    upgradeCmptToGlb: boolean;
+    upgradeCesiumRtcToRootTranslation: boolean;
 };
 
 // @internal
 export class TilesetUpgrader {
     constructor(targetVersion: string, gltfUpgradeOptions: any);
     upgrade(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    upgradeData(tilesetSource: TilesetSource, tilesetSourceJsonFileName: string, tilesetTarget: TilesetTarget, tilesetTargetJsonFileName: string): Promise<void>;
     upgradeTileset(tileset: Tileset): Promise<void>;
 }
 
 // @internal
 export class TileTableData {
-    static convertLegacyComponentTypeToComponentType(legacyComponentType: string): "UINT16" | "INT8" | "UINT8" | "INT16" | "INT32" | "UINT32" | "FLOAT32" | "FLOAT64";
+    static convertLegacyComponentTypeToComponentType(legacyComponentType: string): "INT8" | "UINT8" | "INT16" | "UINT16" | "INT32" | "UINT32" | "FLOAT32" | "FLOAT64";
     static convertLegacyTypeToType(legacyType: string): "SCALAR" | "VEC2" | "VEC3" | "VEC4";
     static createBatchIdsFromBinary(binary: Buffer, byteOffset: number, legacyComponentType: string, numPoints: number): Iterable<number>;
     static createNumericArrayIterable(legacyType: string, legacyComponentType: string, binary: Buffer, byteOffset: number, numElements: number): Iterable<number[]>;
@@ -2912,7 +3105,7 @@ export class TileTableDataPnts {
 
 // @internal
 export class TileTableDataToMeshFeatures {
-    static convertBatchIdToMeshFeatures(document: Document, primitive: Primitive): MeshFeaturesFeatureId;
+    static convertBatchIdToMeshFeatures(document: Document, primitive: Primitive, batchIdToFeatureIdAccessor: Map<Accessor, Accessor>): MeshFeaturesFeatureId | undefined;
 }
 
 // @internal
@@ -2947,6 +3140,7 @@ export interface TraversedTile {
     getRawContents(): Content[];
     getResourceResolver(): ResourceResolver;
     getSubtreeUri(): string | undefined;
+    getTileset(): Tileset;
     isImplicitTilesetRoot(): boolean;
     get level(): number;
     get path(): string;
@@ -2957,7 +3151,7 @@ export interface TreeCoordinates {
     children(): Iterable<TreeCoordinates>;
     descendants(maxLevelInclusive: number, depthFirst: boolean): Iterable<TreeCoordinates>;
     get level(): number;
-    parent(): TreeCoordinates | null;
+    parent(): TreeCoordinates | undefined;
     toArray(): number[];
     toIndex(): number;
     toIndexInLevel(): number;
@@ -2975,8 +3169,9 @@ export class TypeDetection {
 export class UnzippingResourceResolver implements ResourceResolver {
     constructor(delegate: ResourceResolver);
     derive(uri: string): ResourceResolver;
-    resolveData(uri: string): Promise<Buffer | null>;
-    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | null>;
+    resolveData(uri: string): Promise<Buffer | undefined>;
+    resolveDataPartial(uri: string, maxBytes: number): Promise<Buffer | undefined>;
+    resolveUri(uri: string): string;
 }
 
 // @internal
@@ -2992,8 +3187,60 @@ export class VecMath {
     static computeEastNorthUpMatrix4(positionPacked: number[]): number[];
     static computeMean3D(points: Iterable<number[]>): number[];
     static computeRotationQuaternions(upVectors: number[][], rightVectors: number[][]): number[][];
-    static createYupToZupPacked4(): number[];
-    static createZupToYupPacked4(): number[];
+    static createXupToYupPacked4(): [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+    ];
+    static createYupToZupPacked4(): [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+    ];
+    static createZupToYupPacked4(): [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+    ];
     static decomposeMatrixTRS(matrix4Packed: number[]): {
         t: number[];
         r: number[];
@@ -3002,6 +3249,11 @@ export class VecMath {
     static matrix4ToQuaternion(matrix4Packed: number[]): number[];
     static multiplyAll4(matrices4Packed: number[][]): number[];
     static subtract(a: number[], b: number[], result?: number[]): number[];
+}
+
+// @internal
+export class VertexProcessing {
+    static fromContent(contentUri: string, data: Buffer, externalGlbResolver: (glbUri: string) => Promise<Buffer | undefined>, processInstancePoints: boolean, consumer: (p: number[]) => void): Promise<void>;
 }
 
 // @internal (undocumented)
