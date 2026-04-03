@@ -581,6 +581,18 @@ export class ToolsMain {
     logger.debug(`Executing merge DONE`);
   }
 
+  static async mergeJson3tz(inputs: string[], output: string, force: boolean) {
+    logger.debug(`Executing mergeJson3tz`);
+    logger.debug(`  inputs: ${inputs}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
+    ToolsMain.ensureCanWrite(output, force);
+    await TilesetOperations.mergeJson3tz(inputs, output, force);
+
+    logger.debug(`Executing merge DONE`);
+  }
+
   static async pipeline(input: string, force: boolean) {
     logger.debug(`Executing pipeline`);
     logger.debug(`  input: ${input}`);

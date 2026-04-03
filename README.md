@@ -85,6 +85,18 @@ Example:
 npx 3d-tiles-tools mergeJson -i ./example/TilesetA/tileset.json -i ./example/TilesetB/tileset.json -o ./example/mergedTileset.json
 ```
 
+#### mergeJson3tz
+
+Merge any number of tilesets that are packaged as 3TZ files into a single tileset JSON.
+
+This will not copy or repackage the input files. It will only create a tileset JSON that uses the `MAXAR_content_3tz` extension to refer to the input files using relative paths. If any of the inputs is a directory name, then all `.3tz` files from this directory will be considered as input files, recursively.
+
+Example:
+```
+npx 3d-tiles-tools mergeJson3tz -i ./example/tilesetA.3tz -i ./example/tilesetB.3tz -o ./example/tileset.json
+```
+
+
 #### upgrade
 
 Upgrade a tileset to the latest 3D Tiles version.
