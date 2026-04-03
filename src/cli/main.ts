@@ -271,6 +271,17 @@ function parseToolArgs(a: string[]) {
       }
     )
     .command(
+      "mergeJson3tz",
+      "Merge any number of tilesets that are packaged as 3TZ files into a single tileset that " +
+        "uses the 'MAXAR_content_3tz' extension to refer to the input files using relative paths. " +
+        "If any of the inputs is a directory name, then all '.3tz' files from this directory will " +
+        "be considered as input files, recursively.",
+      {
+        i: inputArrayDefinition,
+        o: outputStringDefinition,
+      }
+    )
+    .command(
       "upgrade",
       "Upgrades legacy tilesets to comply to the 3D Tiles specification.\n\n" +
         "By default, this will upgrade legacy tilesets to comply to 3D Tiles 1.0. " +
@@ -556,6 +567,8 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
     await ToolsMain.merge(inputs, output, force);
   } else if (command === "mergeJson") {
     await ToolsMain.mergeJson(inputs, output, force);
+  } else if (command === "mergeJson3tz") {
+    await ToolsMain.mergeJson3tz(inputs, output, force);
   } else if (command === "pipeline") {
     await ToolsMain.pipeline(input, force);
   } else if (command === "analyze") {
