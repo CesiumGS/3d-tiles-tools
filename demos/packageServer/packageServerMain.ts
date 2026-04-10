@@ -1,15 +1,12 @@
 import path from "path";
 import minimist from "minimist";
 
-import { Paths } from "../../src/base/Paths";
-import { defined } from "../../src/base/defined";
-import { defaultValue } from "../../src/base/defaultValue";
+import { Paths } from "3d-tiles-tools";
 
 import { PackageServer } from "./PackageServer";
-
-import { Loggers } from "../../src/logging/Loggers";
 import { PackageServerOptions } from "./PackageServerOptions";
 
+import { Loggers } from "3d-tiles-tools";
 const logger = Loggers.get("packageServer");
 
 /**
@@ -35,20 +32,16 @@ function printHelp() {
  * @returns The options
  */
 function parseOptions(args: any) {
-  if (defined(args.h) || defined(args.help)) {
+  if (args.h || args.help) {
     printHelp();
     return undefined;
   }
 
-  const hostName = defaultValue(
-    defaultValue(args.n, args.hostName),
-    "127.0.0.1"
-  );
-  const port = defaultValue(defaultValue(args.p, args.port), "8003");
-  let sourceName = "";
-  sourceName = defaultValue(args.s, args.sourceName);
+  const hostName = (args.n ?? args.hostName) ?? "127.0.0.1"
+  const port = (args.p ?? args.port) ?? "8003";
+  const sourceName = args.s ?? args.sourceName;
 
-  if (!defined(sourceName)) {
+  if (!sourceName) {
     logger.warn("No source name was given");
     printHelp();
     return undefined;
@@ -68,7 +61,7 @@ function parseOptions(args: any) {
 async function run() {
   const parsedArguments = minimist(process.argv.slice(2));
   const options = parseOptions(parsedArguments);
-  if (!defined(options)) {
+  if (!options) {
     return;
   }
 
@@ -84,7 +77,7 @@ async function run() {
     port: options.port,
     sourceName: options.sourceName,
   };
-  packageServer.start(serverOptions);
+  await packageServer.start(serverOptions);
 }
 
-run();
+void run();

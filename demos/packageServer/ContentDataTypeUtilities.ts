@@ -1,4 +1,4 @@
-import { ContentDataTypes } from "../../src/contentTypes/ContentDataTypes";
+import { ContentDataTypes } from "3d-tiles-tools";
 
 /**
  * Utility methods for determining default file extensions and MIME
