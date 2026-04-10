@@ -37,8 +37,8 @@ function parseOptions(args: any) {
     return undefined;
   }
 
-  const hostName = (args.n ?? args.hostName) ?? "127.0.0.1"
-  const port = (args.p ?? args.port) ?? "8003";
+  const hostName = args.n ?? args.hostName ?? "127.0.0.1";
+  const port = args.p ?? args.port ?? "8003";
   const sourceName = args.s ?? args.sourceName;
 
   if (!sourceName) {
