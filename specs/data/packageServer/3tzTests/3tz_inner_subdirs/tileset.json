@@ -1,0 +1,126 @@
+{
+  "asset": {
+    "version": "1.1"
+  },
+  "extensionsUsed": [
+    "MAXAR_content_3tz"
+  ],
+  "extensionsRequired": [
+    "MAXAR_content_3tz"
+  ],
+  "geometricError": 1048576,
+  "root": {
+    "boundingVolume": {
+      "box": [
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "refine": "ADD",
+    "geometricError": 1048576,
+    "children": [
+      {
+        "boundingVolume": {
+          "box": [
+            0.5,
+            0.5,
+            0,
+            0.5,
+            0,
+            0,
+            0,
+            0.5,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "geometricError": 1024,
+        "refine": "REPLACE",
+        "content": {
+          "uri": "subdir/tilesetWithSubdirA.3tz"
+        }
+      },
+      {
+        "boundingVolume": {
+          "box": [
+            1.5,
+            0.5,
+            0,
+            0.5,
+            0,
+            0,
+            0,
+            0.5,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "geometricError": 1024,
+        "refine": "REPLACE",
+        "content": {
+          "uri": "subdir/tilesetWithSubdirB.3tz/subdir/content.glb"
+        }
+      },
+      {
+        "boundingVolume": {
+          "box": [
+            0.5,
+            1.5,
+            0,
+            0.5,
+            0,
+            0,
+            0,
+            0.5,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "geometricError": 1024,
+        "refine": "REPLACE",
+        "content": {
+          "uri": "subdir/tilesetWithSubdirC.3tz/tileset.json"
+        }
+      },
+      {
+        "boundingVolume": {
+          "box": [
+            1.5,
+            1.5,
+            0,
+            0.5,
+            0,
+            0,
+            0,
+            0.5,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "geometricError": 1024,
+        "refine": "REPLACE",
+        "content": {
+          "uri": "subdir/tilesetWithSubdirD.3tz/subdir/content.glb"
+        }
+      }
+    ]
+  }
+}
