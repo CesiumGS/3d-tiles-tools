@@ -1,10 +1,10 @@
-import { ContentDataTypes } from "3d-tiles-tools";
+import { ContentDataTypes } from "../../base";
 
 /**
  * Utility methods for determining default file extensions and MIME
  * types for a `ContentDataType`.
  *
- * These are only used in the package server demo. The functionality
+ * These are only used in the package server. The functionality
  * could later become part of the `contentTypes` package, maybe as
  * part of the `ContentDataTypeRegistry`.
  *

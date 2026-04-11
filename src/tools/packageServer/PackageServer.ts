@@ -1,25 +1,41 @@
 import path from "path";
 import http, { Server } from "http";
 
-import { Buffers } from "3d-tiles-tools";
-import { BufferedContentData } from "3d-tiles-tools";
-import { Extensions } from "3d-tiles-tools";
-import { Tile } from "3d-tiles-tools";
-import { Tileset } from "3d-tiles-tools";
+import { ContentDataTypes } from "../../base";
+import { ContentDataTypeRegistry } from "../../base";
+import { BufferedContentData } from "../../base";
+import { Buffers } from "../../base";
 
-import { TilesetSource } from "3d-tiles-tools";
-import { TilesetSources } from "3d-tiles-tools";
+import { TilesetSource } from "../../tilesets";
+import { TilesetSources } from "../../tilesets";
+import { Extensions } from "../../tilesets";
 
-import { ContentDataTypes } from "3d-tiles-tools";
-import { ContentDataTypeRegistry } from "3d-tiles-tools";
+import { Tileset } from "../../structure";
+import { Tile } from "../../structure";
 
 import { PackageServerOptions } from "./PackageServerOptions";
 import { PackagePath } from "./PackagePath";
 import { ContentDataTypeUtilities } from "./ContentDataTypeUtilities";
 
-import { Loggers } from "3d-tiles-tools";
+import { Loggers } from "../../base";
 const logger = Loggers.get("packageServer");
 
+/**
+ * Implementation of an HTTP server that can serve tilesets.
+ *
+ * This server is handling tilesets that care contained in packages
+ * (like 3TZ files), as well as tilesets that refer to resources
+ * that are contained in 3TZ files using the `MAXAR_content_3tz`
+ * extension.
+ *
+ * The handling of these tilesets aims at serving them transparently
+ * for the client. This includes modifications of the served
+ * tileset JSON, to remove the `MAXAR_content_3tz` extension usage
+ * declaration, and to update content URIs that refer to 3TZ files,
+ * so that they refer to the respective tileset JSON files instead.
+ *
+ * @internal
+ */
 export class PackageServer {
   /**
    * The base directory from which the server is serving.
@@ -51,6 +67,11 @@ export class PackageServer {
   private readonly server: Server;
 
   /**
+   * A log level for logging more detailed information
+   */
+  private readonly logDetailLevel = "debug";
+
+  /**
    * Creates a new instance
    *
    * @param baseDirectory - The base directory
@@ -67,7 +88,7 @@ export class PackageServer {
    * @param options The options
    */
   async start(options: PackageServerOptions) {
-    const hostName = options.hostName;
+    const host = options.host;
     const port = options.port;
     const sourceName = options.sourceName;
 
@@ -78,8 +99,8 @@ export class PackageServer {
     }
     this.tilesetSources.set("", tilesetSource);
     await new Promise<void>((resolve) => {
-      this.server.listen(port, hostName, () => {
-        logger.info(`Server running at http://${hostName}:${port}/`);
+      this.server.listen(port, host, () => {
+        logger.info(`Server running at http://${host}:${port}/`);
         resolve();
       });
     });
@@ -156,6 +177,21 @@ export class PackageServer {
   }
 
   /**
+   * Print the given output to the logger, using the 'logDetailLevel',
+   * because why should a logger offer the option to pass in the
+   * desired log level, right?
+   *
+   * @param output The output
+   */
+  private logDetail(output: any) {
+    if (logger[this.logDetailLevel] === undefined) {
+      logger.error(`Invalid log level: ${this.logDetailLevel}`);
+    } else {
+      logger[this.logDetailLevel](output);
+    }
+  }
+
+  /**
    * Handle the response for the given URL pathname.
    *
    * This will try to look up the data that is identified with the
@@ -172,7 +208,7 @@ export class PackageServer {
     res: http.ServerResponse<http.IncomingMessage>,
     urlPathname: string
   ): Promise<void> {
-    logger.info(`Handle response for URL pathname ${urlPathname}`);
+    this.logDetail(`Handle response for URL pathname ${urlPathname}`);
 
     const packagePath = new PackagePath(urlPathname);
     logger.debug(`PackagePath for '${urlPathname}':`);
@@ -201,7 +237,7 @@ export class PackageServer {
       const tilesetObject = await contentData.getParsedObject();
       const tileset = tilesetObject as Tileset;
       if (Extensions.usesExtension(tileset, "MAXAR_content_3tz")) {
-        logger.info(`Post-processing tileset obtained for '${urlPathname}'`);
+        this.logDetail(`Post-processing tileset obtained for '${urlPathname}'`);
         const fromPackage = packagePath.containerPath !== "";
         PackageServer.postProcessTilesetFor3tz(fromPackage, tileset);
         content = Buffer.from(JSON.stringify(tileset, null, 2));
@@ -221,7 +257,7 @@ export class PackageServer {
     }
 
     // Send out the actual response
-    logger.info(`Handle response for URL pathname ${urlPathname} succeeded`);
+    this.logDetail(`Handle response for URL pathname ${urlPathname} succeeded`);
     logger.debug(`  mimeType: ${mimeType}`);
     logger.debug(`  content.length: ${content.length}`);
 
@@ -302,7 +338,7 @@ export class PackageServer {
     const components = uri.split(/\//);
     const lastIndex = components.length - 1;
     const lastComponent = components[lastIndex];
-    if (lastComponent.match(/.+\.3tz/i)) {
+    if (lastComponent.toLowerCase().endsWith(".3tz")) {
       components.push("tileset.json");
     }
     const result = components.join("/");
@@ -333,7 +369,7 @@ export class PackageServer {
 
     const content = await tilesetSource.getValue(relativePath);
     if (content) {
-      logger.info(
+      this.logDetail(
         `Resolving content data for '${relativePath}' in ` +
           `tileset source '${tilesetSourceKey}' succeeded`
       );
@@ -375,7 +411,7 @@ export class PackageServer {
           tilesetSourceName
         );
         this.tilesetSources.set(tilesetSourceKey, tilesetSource);
-        logger.info(
+        this.logDetail(
           `Resolving tileset source for '${tilesetSourceKey}': ` +
             `Tileset source was created and opened`
         );

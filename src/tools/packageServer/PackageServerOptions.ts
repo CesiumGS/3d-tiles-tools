@@ -1,11 +1,13 @@
 /**
  * Options for starting the package server
+ *
+ * @internal
  */
 export type PackageServerOptions = {
   /**
    * The host name
    */
-  hostName: string;
+  host: string;
 
   /**
    * The port

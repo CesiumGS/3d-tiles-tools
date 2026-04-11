@@ -3,6 +3,8 @@
  *
  * This implements the path resolution mechanism for 3TZ files, according to
  * https://github.com/Maxar-Public/3d-tiles/tree/wff1.7.0/extensions/MAXAR_content_3tz/1.0.0#path-resolver-algorithm
+ *
+ * @internal
  */
 export class PackagePath {
   /**

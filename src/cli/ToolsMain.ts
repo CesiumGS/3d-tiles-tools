@@ -6,6 +6,7 @@ import { DeveloperError } from "../base";
 import { Buffers } from "../base";
 import { Iterables } from "../base";
 import { ContentDataTypes } from "../base";
+import { ContentDataTypeRegistry } from "../base";
 
 import { TileFormats } from "../tilesets";
 import { TileDataLayouts } from "../tilesets";
@@ -13,16 +14,15 @@ import { TileFormatError } from "../tilesets";
 
 import { ContentOps } from "../tools";
 import { GltfUtilities } from "../tools";
-
 import { PipelineExecutor } from "../tools";
 import { Pipelines } from "../tools";
-
 import { TilesetOperations } from "../tools";
 import { TileFormatsMigration } from "../tools";
 import { TilesetConverter } from "../tools";
 import { TilesetJsonCreator } from "../tools";
 
-import { ContentDataTypeRegistry } from "../base";
+import { PackageServer } from "../tools/packageServer/PackageServer";
+import { PackageServerOptions } from "../tools/packageServer/PackageServerOptions";
 
 import { Loggers } from "../base";
 const logger = Loggers.get("CLI");
@@ -671,6 +671,25 @@ export class ToolsMain {
     fs.writeFileSync(output, Buffer.from(tilesetJsonString));
 
     logger.debug(`Executing createTilesetJson DONE`);
+  }
+
+  static async serve(sourceName: string, host: string, port: number) {
+    logger.debug(`Executing serve`);
+    logger.debug(`  sourceName: ${sourceName}`);
+    logger.debug(`  host: ${host}`);
+    logger.debug(`  port: ${port}`);
+
+    let baseDirectory = sourceName;
+    if (!Paths.isDirectory(sourceName)) {
+      baseDirectory = path.dirname(sourceName);
+    }
+    const packageServer = new PackageServer(baseDirectory);
+    const packageServerOptions: PackageServerOptions = {
+      host: host,
+      port: port,
+      sourceName: sourceName,
+    };
+    await packageServer.start(packageServerOptions);
   }
 
   /**

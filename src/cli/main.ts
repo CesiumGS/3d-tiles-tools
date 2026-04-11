@@ -321,6 +321,23 @@ function parseToolArgs(a: string[]) {
       { i: inputStringDefinition, o: outputStringDefinition }
     )
     .command(
+      "serve",
+      "Creates a server that serves a directory that may contain tileset packages.",
+      {
+        i: inputStringDefinition,
+        host: {
+          default: "localhost",
+          description: "The host name for the server",
+          type: "string",
+        },
+        port: {
+          default: "8003",
+          description: "The port number for the server",
+          type: "number",
+        },
+      }
+    )
+    .command(
       "tilesetToDatabase",
       "Create a sqlite database for a tileset. (Deprecated - use 'convert' instead)",
       {
@@ -573,6 +590,10 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
     await ToolsMain.pipeline(input, force);
   } else if (command === "analyze") {
     ToolsMain.analyze(input, output, force);
+  } else if (command === "serve") {
+    const host = toolArgs.host ?? "localhost";
+    const port = toolArgs.port ?? 8003;
+    await ToolsMain.serve(input, host, port);
   } else if (command === "createTilesetJson") {
     const cartographicPositionDegrees = validateOptionalNumberArray(
       toolArgs.cartographicPositionDegrees,

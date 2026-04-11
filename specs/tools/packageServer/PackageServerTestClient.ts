@@ -1,12 +1,13 @@
-import { Tileset } from "3d-tiles-tools";
-import { Tile } from "3d-tiles-tools";
-import { Content } from "3d-tiles-tools";
-import { Buffers } from "3d-tiles-tools";
+import { PackageServer } from "../../../src/tools";
+import { PackagePath } from "../../../src/tools";
 
-import { PackageServer } from "./PackageServer";
-import { PackagePath } from "./PackagePath";
+import { Buffers } from "../../../src/base";
 
-import { Loggers } from "3d-tiles-tools";
+import { Tileset } from "../../../src/structure";
+import { Tile } from "../../../src/structure";
+import { Content } from "../../../src/structure";
+
+import { Loggers } from "../../../src/base";
 const logger = Loggers.get("packageServerTest");
 
 /**
@@ -84,12 +85,12 @@ export class PackageServerTestClient {
 
     const pathname = new URL(uri, baseUrl.href).pathname;
     const packagePath = new PackagePath(pathname);
-    logger.info(`Client resolving content data for package path:`);
-    logger.info(`  containerPath: '${packagePath.containerPath}'`);
-    logger.info(`  innerFilePath: '${packagePath.innerFilePath}'`);
+    logger.debug(`Client resolving content data for package path:`);
+    logger.debug(`  containerPath: '${packagePath.containerPath}'`);
+    logger.debug(`  innerFilePath: '${packagePath.innerFilePath}'`);
     const content = await packageServer.resolveContent(packagePath);
     if (content) {
-      logger.info("Resolving URI " + uri + " DONE");
+      logger.debug("Resolving URI " + uri + " DONE");
       this.resolvedPathnames.add(pathname);
 
       if (Buffers.isProbablyJson(content)) {
