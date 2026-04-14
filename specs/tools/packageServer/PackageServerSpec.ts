@@ -28,7 +28,9 @@ async function computeUnresolved(sourceName: string): Promise<string[]> {
   if (!Paths.isDirectory(sourceName)) {
     baseDirectory = path.dirname(sourceName);
   }
-  const packageServer = new PackageServer(baseDirectory);
+  const cors = true;
+  const developmentMode = false;
+  const packageServer = new PackageServer(baseDirectory, cors, developmentMode);
   const packageServerOptions: PackageServerOptions = {
     host: "127.0.0.1",
     port: 8003,
@@ -48,7 +50,7 @@ async function computeUnresolved(sourceName: string): Promise<string[]> {
   return [...unresolvedPathnames];
 }
 
-describe("PackageServer", function () {
+fdescribe("PackageServer", function () {
   //==========================================================================
   // PNTS
 
@@ -60,6 +62,12 @@ describe("PackageServer", function () {
 
   it("resolves all data from 3tz_chained/tileset.json", async function () {
     const sourceName = BASE_DIR + "3tz_chained/tileset.json";
+    const unresolved = await computeUnresolved(sourceName);
+    expect(unresolved).toEqual([]);
+  });
+
+  it("resolves all data from 3tz_chained_uppercase/tileset.json", async function () {
+    const sourceName = BASE_DIR + "3tz_chained_uppercase/tileset.json";
     const unresolved = await computeUnresolved(sourceName);
     expect(unresolved).toEqual([]);
   });
@@ -84,6 +92,12 @@ describe("PackageServer", function () {
 
   it("resolves all data from 3tz_direct/tileset.json", async function () {
     const sourceName = BASE_DIR + "3tz_direct/tileset.json";
+    const unresolved = await computeUnresolved(sourceName);
+    expect(unresolved).toEqual([]);
+  });
+
+  it("resolves all data from 3tz_flat/tileset.3tz", async function () {
+    const sourceName = BASE_DIR + "3tz_flat/tileset.3tz";
     const unresolved = await computeUnresolved(sourceName);
     expect(unresolved).toEqual([]);
   });

@@ -49,10 +49,13 @@ function createSampleOption(name) {
 const sampleOptions = [
   createSampleOption("3tz_basic/tileset.json"),
   createSampleOption("3tz_chained/tileset.json"),
+  createSampleOption("3tz_chained_uppercase/tileset.json"),
   createSampleOption("3tz_chained_deep/tileset.json"),
   createSampleOption("3tz_chained_subdirs/tileset.json"),
   createSampleOption("3tz_chained_subdirs_direct/tileset.json"),
   createSampleOption("3tz_direct/tileset.json"),
+  createSampleOption("3tz_flat/tileset.3tz"),
+  createSampleOption("3tz_flat/tileset.3tz/tileset.json"),
   createSampleOption("3tz_inner_subdirs/tileset.json"),
 ];
 Sandcastle.addToolbarMenu(sampleOptions);

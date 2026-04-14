@@ -3,9 +3,11 @@
 - `3tz_basic`: A basic tileset JSON file that refers to 3TZ files as external tilesets
 - `3tz_direct`: A tileset JSON file that refers to GLB files that are contained in 3TZ files
 - `3tz_chained`: A tileset JSON that refers to two 3TZ files as external tilesets, which each refer to two other 3TZ files as external tilesets
+- `3tz_chained_uppercase`: The same as `3tz_chained`, but with uppercase `.3TZ` file extensions
 - `3tz_chained_subdirs`: A tileset JSON that refers to two 3TZ files in subdirectories as external tilesets, which each refer to two 3TZ files from the root directory as external tilesets
 - `3tz_chained_subdirs_direct`: A tileset JSON that refers to two 3TZ files in subdirectories as external tilesets, which refer to GLB files that are contained in 3TZ files in the root directory
 - `3tz_chained_deep`: A tileset that tests cross-referencing (details below)
+- `3tz_flat`: A tileset that is directly and completely stored in a 3TZ file
 - `3tz_inner_subdirs`: A tileset that refers to 3TZ files that are stored in subdirectories, and GLB files that are stored in subdirectories in 3TZ files that are stored in subdirectories
 
 
