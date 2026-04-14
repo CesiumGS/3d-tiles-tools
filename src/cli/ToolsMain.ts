@@ -673,17 +673,29 @@ export class ToolsMain {
     logger.debug(`Executing createTilesetJson DONE`);
   }
 
-  static async serve(sourceName: string, host: string, port: number) {
+  static async serve(
+    sourceName: string,
+    host: string,
+    port: number,
+    cors: boolean,
+    developmentMode: boolean
+  ) {
     logger.debug(`Executing serve`);
     logger.debug(`  sourceName: ${sourceName}`);
     logger.debug(`  host: ${host}`);
     logger.debug(`  port: ${port}`);
+    logger.debug(`  cors: ${cors}`);
+    logger.debug(`  developmentMode: ${developmentMode}`);
 
     let baseDirectory = sourceName;
     if (!Paths.isDirectory(sourceName)) {
       baseDirectory = path.dirname(sourceName);
     }
-    const packageServer = new PackageServer(baseDirectory);
+    const packageServer = new PackageServer(
+      baseDirectory,
+      cors,
+      developmentMode
+    );
     const packageServerOptions: PackageServerOptions = {
       host: host,
       port: port,

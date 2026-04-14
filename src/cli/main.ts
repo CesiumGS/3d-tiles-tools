@@ -331,9 +331,19 @@ function parseToolArgs(a: string[]) {
           type: "string",
         },
         port: {
-          default: "8003",
+          default: 8003,
           description: "The port number for the server",
           type: "number",
+        },
+        cors: {
+          default: false,
+          description: "Whether CORS should be enabled",
+          type: "boolean",
+        },
+        developmentMode: {
+          default: false,
+          description: "Disables caching and enables additional log output",
+          type: "boolean",
         },
       }
     )
@@ -593,7 +603,9 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   } else if (command === "serve") {
     const host = toolArgs.host ?? "localhost";
     const port = toolArgs.port ?? 8003;
-    await ToolsMain.serve(input, host, port);
+    const cors = toolArgs.cors ?? false;
+    const developmentMode = toolArgs.developmentMode ?? false;
+    await ToolsMain.serve(input, host, port, cors, developmentMode);
   } else if (command === "createTilesetJson") {
     const cartographicPositionDegrees = validateOptionalNumberArray(
       toolArgs.cartographicPositionDegrees,

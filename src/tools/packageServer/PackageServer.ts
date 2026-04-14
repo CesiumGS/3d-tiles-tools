@@ -67,17 +67,42 @@ export class PackageServer {
   private readonly server: Server;
 
   /**
+   * Whether "Access-Control-Allow-Origin" should be set
+   */
+  private readonly cors: boolean;
+
+  /**
+   * Development mode, which disables caching and prints
+   * additional logging information
+   */
+  private readonly developmentMode: boolean;
+
+  /**
    * A log level for logging more detailed information
    */
-  private readonly logDetailLevel = "debug";
+  private logInfoLevel: string;
+
+  /**
+   * A log level for logging even more detailed information
+   */
+  private readonly logDebugLevel = "debug";
 
   /**
    * Creates a new instance
    *
    * @param baseDirectory - The base directory
+   * @param cors - Whether CORS should be enabled
+   * @param developmentMode - Disable caching and print additional logging
    */
-  constructor(baseDirectory: string) {
+  constructor(baseDirectory: string, cors: boolean, developmentMode: boolean) {
     this.baseDirectory = baseDirectory;
+    this.cors = cors;
+    this.developmentMode = developmentMode;
+    if (developmentMode) {
+      this.logInfoLevel = "info";
+    } else {
+      this.logInfoLevel = "debug";
+    }
     this.tilesetSources = new Map<string, TilesetSource | undefined>();
     this.server = http.createServer((req, res) => this.handleRequest(req, res));
   }
@@ -130,21 +155,6 @@ export class PackageServer {
   }
 
   /**
-   * Set overly permissive CORS header options for local tests
-   *
-   * @param res - The server response
-   */
-  private static setCorsHeader(res: http.ServerResponse<http.IncomingMessage>) {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Request-Method", "*");
-    res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET");
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept"
-    );
-  }
-
-  /**
    * The request handler for the node http server
    *
    * @param req The request
@@ -161,7 +171,16 @@ export class PackageServer {
       res.end();
       return;
     }
-    PackageServer.setCorsHeader(res);
+
+    if (this.cors) {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+    }
+
+    if (this.developmentMode) {
+      res.setHeader("Cache-Control", "no-store");
+    } else {
+      res.setHeader("Cache-Control", "public, max-age=86400");
+    }
 
     // Trivial handling of OPTIONS requests
     if (req.method === "OPTIONS") {
@@ -177,17 +196,30 @@ export class PackageServer {
   }
 
   /**
-   * Print the given output to the logger, using the 'logDetailLevel',
+   * Print the given output to the logger, using the 'logInfoLevel',
    * because why should a logger offer the option to pass in the
    * desired log level, right?
    *
    * @param output The output
    */
-  private logDetail(output: any) {
-    if (logger[this.logDetailLevel] === undefined) {
-      logger.error(`Invalid log level: ${this.logDetailLevel}`);
+  private logInfo(output: any) {
+    if (logger[this.logInfoLevel] === undefined) {
+      logger.error(`Invalid log level: ${this.logInfoLevel}`);
     } else {
-      logger[this.logDetailLevel](output);
+      logger[this.logInfoLevel](output);
+    }
+  }
+
+  /**
+   * Print the given output to the logger, using the 'logDebugLevel'
+   *
+   * @param output The output
+   */
+  private logDebug(output: any) {
+    if (logger[this.logDebugLevel] === undefined) {
+      logger.error(`Invalid log level: ${this.logDebugLevel}`);
+    } else {
+      logger[this.logDebugLevel](output);
     }
   }
 
@@ -208,17 +240,17 @@ export class PackageServer {
     res: http.ServerResponse<http.IncomingMessage>,
     urlPathname: string
   ): Promise<void> {
-    this.logDetail(`Handle response for URL pathname ${urlPathname}`);
+    this.logInfo(`Handle response for URL pathname '${urlPathname}'`);
 
     const packagePath = new PackagePath(urlPathname);
-    logger.debug(`PackagePath for '${urlPathname}':`);
-    logger.debug(`  containerPath: '${packagePath.containerPath}'`);
-    logger.debug(`  innerFilePath: '${packagePath.innerFilePath}'`);
+    this.logDebug(`PackagePath for '${urlPathname}':`);
+    this.logDebug(`  containerPath: '${packagePath.containerPath}'`);
+    this.logDebug(`  innerFilePath: '${packagePath.innerFilePath}'`);
 
     // Try to resolve the content data
     let content = await this.resolveContent(packagePath);
     if (!content) {
-      logger.warn(`Return 404 for URL pathname ${urlPathname}`);
+      logger.warn(`Return 404 for URL pathname '${urlPathname}'`);
       res.statusCode = 404;
       res.end();
       return;
@@ -234,14 +266,33 @@ export class PackageServer {
       contentData
     );
     if (contentDataType === ContentDataTypes.CONTENT_TYPE_TILESET) {
+      this.logInfo(`Post-processing tileset obtained for '${urlPathname}'`);
+
       const tilesetObject = await contentData.getParsedObject();
       const tileset = tilesetObject as Tileset;
       if (Extensions.usesExtension(tileset, "MAXAR_content_3tz")) {
-        this.logDetail(`Post-processing tileset obtained for '${urlPathname}'`);
-        const fromPackage = packagePath.containerPath !== "";
-        PackageServer.postProcessTilesetFor3tz(fromPackage, tileset);
-        content = Buffer.from(JSON.stringify(tileset, null, 2));
+        logger.warn(`Removing MAXAR_content_3tz extension usage declaration`);
+        Extensions.removeExtensionUsed(tileset, "MAXAR_content_3tz");
       }
+
+      // When the top-level request was to "example.3tz", then this
+      // will implicitly refer to "example.3tz/tileset.json"
+      // (in contrast to the case where the top-level request
+      // explicitly went to "example.3tz/tileset.json")
+      // So only when the top-level request was to a 3TZ file,
+      // the name of the 3TZ file has to be added as a prefix to
+      // the URLs, turing "content.glb" into "example.3tz/content.glb"
+      let packagePrefix = "";
+      if (
+        urlPathname.toLowerCase().endsWith(".3tz") &&
+        packagePath.containerPath !== ""
+      ) {
+        const components = packagePath.containerPath.split(/\//);
+        packagePrefix = components[components.length - 1] + "/";
+      }
+
+      PackageServer.postProcessTilesetFor3tz(packagePrefix, tileset);
+      content = Buffer.from(JSON.stringify(tileset, null, 2));
     }
 
     // Prepare the headers for the response
@@ -257,9 +308,9 @@ export class PackageServer {
     }
 
     // Send out the actual response
-    this.logDetail(`Handle response for URL pathname ${urlPathname} succeeded`);
-    logger.debug(`  mimeType: ${mimeType}`);
-    logger.debug(`  content.length: ${content.length}`);
+    this.logInfo(`Handle response for URL pathname '${urlPathname}' succeeded`);
+    this.logDebug(`  mimeType: ${mimeType}`);
+    this.logDebug(`  content.length: ${content.length}`);
 
     res.writeHead(200, headers);
     res.end(content);
@@ -272,17 +323,14 @@ export class PackageServer {
    *
    * See postProcessTileFor3tz for details.
    *
-   * @param fromPackage Whether the content was read from a package
+   * @param packagePrefix The prefix for the URLs
    * @param tileset - The tileset
    */
   private static postProcessTilesetFor3tz(
-    fromPackage: boolean,
+    packagePrefix: string,
     tileset: Tileset
   ) {
-    logger.warn(`Removing MAXAR_content_3tz extension usage declaration`);
-    Extensions.removeExtensionUsed(tileset, "MAXAR_content_3tz");
-
-    PackageServer.postProcessTileFor3tz(fromPackage, tileset.root);
+    PackageServer.postProcessTileFor3tz(packagePrefix, tileset.root);
   }
 
   /**
@@ -292,26 +340,26 @@ export class PackageServer {
    * This will update all 'content.uri' strings as necessary to handle
    * 3TZ files. See expandContent3tzUri for details.
    *
-   * @param fromPackage Whether the content was read from a package
+   * @param packagePrefix The prefix for the URLs
    * @param tile - The tile
    */
-  private static postProcessTileFor3tz(fromPackage: boolean, tile: Tile) {
+  private static postProcessTileFor3tz(packagePrefix: string, tile: Tile) {
     if (tile.content) {
       tile.content.uri = PackageServer.expandContent3tzUri(
-        fromPackage,
+        packagePrefix,
         tile.content.uri
       );
     } else if (tile.contents) {
       for (const content of tile.contents) {
         content.uri = PackageServer.expandContent3tzUri(
-          fromPackage,
+          packagePrefix,
           content.uri
         );
       }
     }
     if (tile.children) {
       for (const child of tile.children) {
-        PackageServer.postProcessTileFor3tz(fromPackage, child);
+        PackageServer.postProcessTileFor3tz(packagePrefix, child);
       }
     }
   }
@@ -320,31 +368,23 @@ export class PackageServer {
    * Expand the given URI, if it refers to a 3TZ file or an entry
    * of a 3TZ file.
    *
-   * If the URI refers to a 3TZ file as an external tileset, then this will
-   * return the full URI to that tileset, e.g. 'example.3tz/tileset.json'.
+   * If the URI will be prefixed with the given string, unless it
+   * refers to a 3TZ file or an entry of a 3TZ file.
    *
-   * If the given "fromPackage" flag is 'true', then the content is
-   * considered to be read from a package, meaning that the URIs have
-   * to be prefixed with a parent directory reference "../".
-   *
-   * @param fromPackage Whether the content was read from a package
+   * @param packagePrefix The prefix for the URLs
    * @param uri - The content URI
    * @returns The updated content URI
    */
   private static expandContent3tzUri(
-    fromPackage: boolean,
+    packagePrefix: string,
     uri: string
   ): string {
-    const components = uri.split(/\//);
-    const lastIndex = components.length - 1;
-    const lastComponent = components[lastIndex];
-    if (lastComponent.toLowerCase().endsWith(".3tz")) {
-      components.push("tileset.json");
-    }
-    const result = components.join("/");
-    const finalResult = (fromPackage ? "../" : "") + result;
-    logger.debug(`Expand content URI '${uri}' to '${finalResult}'`);
-    return finalResult;
+    const uriLowercase = uri.toLowerCase();
+    const is3tz =
+      uriLowercase.endsWith(".3tz") || uriLowercase.includes(".3tz/");
+    const finalUri = (is3tz ? "" : packagePrefix) + uri;
+    //logger.info(`Expand content URI '${uri}' to '${finalUri}', is 3TZ? ` + is3tz);
+    return finalUri;
   }
 
   /**
@@ -354,9 +394,9 @@ export class PackageServer {
    * @returns - The content data
    */
   async resolveContent(packagePath: PackagePath): Promise<Buffer | undefined> {
-    logger.debug(`Resolving content data for package path:`);
-    logger.debug(`  containerPath: '${packagePath.containerPath}'`);
-    logger.debug(`  innerFilePath: '${packagePath.innerFilePath}'`);
+    this.logDebug(`Resolving content data for package path:`);
+    this.logDebug(`  containerPath: '${packagePath.containerPath}'`);
+    this.logDebug(`  innerFilePath: '${packagePath.innerFilePath}'`);
 
     const tilesetSourceKey = packagePath.containerPath;
     const relativePath = packagePath.innerFilePath;
@@ -369,7 +409,7 @@ export class PackageServer {
 
     const content = await tilesetSource.getValue(relativePath);
     if (content) {
-      this.logDetail(
+      this.logInfo(
         `Resolving content data for '${relativePath}' in ` +
           `tileset source '${tilesetSourceKey}' succeeded`
       );
@@ -399,7 +439,7 @@ export class PackageServer {
   private async resolveTilesetSource(
     tilesetSourceKey: string
   ): Promise<TilesetSource | undefined> {
-    logger.debug(`Resolving tileset source for '${tilesetSourceKey}'`);
+    this.logDebug(`Resolving tileset source for '${tilesetSourceKey}'`);
 
     if (!this.tilesetSources.has(tilesetSourceKey)) {
       const tilesetSourceName = path.resolve(
@@ -411,7 +451,7 @@ export class PackageServer {
           tilesetSourceName
         );
         this.tilesetSources.set(tilesetSourceKey, tilesetSource);
-        this.logDetail(
+        this.logInfo(
           `Resolving tileset source for '${tilesetSourceKey}': ` +
             `Tileset source was created and opened`
         );
@@ -425,7 +465,7 @@ export class PackageServer {
       }
     }
     const tilesetSource = this.tilesetSources.get(tilesetSourceKey);
-    logger.debug(
+    this.logDebug(
       `Resolving tileset source for '${tilesetSourceKey}' ` +
         (tilesetSource ? "succeeded" : "failed")
     );
