@@ -50,7 +50,7 @@ async function computeUnresolved(sourceName: string): Promise<string[]> {
   return [...unresolvedPathnames];
 }
 
-fdescribe("PackageServer", function () {
+describe("PackageServer", function () {
   //==========================================================================
   // PNTS
 
