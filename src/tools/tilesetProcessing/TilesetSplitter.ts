@@ -69,7 +69,7 @@ interface SplittingCondition {
 /**
  * A class that can split a tileset into one that refers to multiple
  * external tilesets.
- * 
+ *
  * @internal
  */
 export class TilesetSplitter {
