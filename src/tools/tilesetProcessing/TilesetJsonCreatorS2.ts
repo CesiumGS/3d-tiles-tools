@@ -27,7 +27,7 @@ export class TilesetJsonCreatorS2 {
    * A conservative global maximum height in meters for all
    * bounding volumes
    */
-  private static readonly GLOBAL_MAX_HEIGHT = -9000;
+  private static readonly GLOBAL_MAX_HEIGHT = 9000;
 
   /**
    * A bounding volume (region) that covers the whole globe
