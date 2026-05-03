@@ -62,6 +62,7 @@ export * from "./tilesetProcessing/TilesetConverter";
 export * from "./tilesetProcessing/TilesetDataProcessor";
 export * from "./tilesetProcessing/TilesetEntryProcessor";
 export * from "./tilesetProcessing/TilesetJsonCreator";
+export * from "./tilesetProcessing/TilesetJsonCreatorS2";
 export * from "./tilesetProcessing/TilesetMerger";
 export * from "./tilesetProcessing/TilesetMerger3tz";
 export * from "./tilesetProcessing/TilesetMergers";
@@ -70,6 +71,7 @@ export * from "./tilesetProcessing/TilesetProcessing";
 export * from "./tilesetProcessing/TilesetProcessor";
 export * from "./tilesetProcessing/TilesetProcessorContext";
 export * from "./tilesetProcessing/TilesetProcessorContexts";
+export * from "./tilesetProcessing/TilesetSplitter";
 export * from "./tilesetProcessing/TilesetUpgrader";
 
 export * from "./tilesetProcessing/upgrade/TilesetObjectUpgrader";

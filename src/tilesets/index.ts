@@ -65,3 +65,7 @@ export * from "./traversal/TilesetTraverser";
 export * from "./traversal/TilesetTraversers";
 export * from "./traversal/TraversalCallback";
 export * from "./traversal/TraversedTile";
+
+export * from "./traversal/cesium/BoundingVolumeDerivation";
+export * from "./traversal/cesium/HilbertOrder";
+export * from "./traversal/cesium/S2Cell";

@@ -359,6 +359,37 @@ function parseToolArgs(a: string[]) {
         },
       }
     )
+    .command(
+      "createTilesetJsonS2",
+      "Creates one or more tileset JSON files that refer to content that is identified " +
+        "with S2 cell tokens. ",
+      {
+        o: outputStringDefinition,
+        maximumLevelInclusive: {
+          description:
+            "The maximum S2 level, inclusive, for which the tilesets should be created",
+          type: "number",
+          demandOption: true,
+        },
+        contentTemplateUri: {
+          description:
+            "A string that will be used to define the content URIs for the leaf tiles " +
+            "of of the resulting tileset. This URI can contain a template '{cellIdToken}' " +
+            "that will be replaced with the actual S2 cell ID token",
+          type: "string",
+          demandOption: true,
+        },
+        globalSplittingLevels: {
+          description:
+            "An array of numbers that indicate at which global levels the tileset " +
+            "should be split into multiple external tilesets. If this is not given, " +
+            "then a single tileset JSON file will be created. Otherwise, the main " +
+            "tileset JSON file will refer to external tilesets (with unspecified names) " +
+            "that start at the respective global levels",
+          type: "array",
+        },
+      }
+    )
     .demandCommand(1)
     .strict();
 
@@ -503,7 +534,7 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
   logger.trace(`  optionArgs: ${optionArgs}`);
   logger.trace(`  parsedOptionArgs: ${JSON.stringify(parsedOptionArgs)}`);
 
-  const input = inputs[inputs.length - 1];
+  const input = inputs?.length > 0 ? inputs[inputs.length - 1] : "";
 
   if (command === "b3dmToGlb") {
     await ToolsMain.b3dmToGlb(input, output, force);
@@ -589,6 +620,17 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
       output,
       cartographicPositionDegrees,
       rotationDegrees,
+      force
+    );
+  } else if (command === "createTilesetJsonS2") {
+    const maximumLevelInclusive = toolArgs.maximumLevelInclusive;
+    const contentTemplateUri = toolArgs.contentTemplateUri;
+    const globalSplittingLevels = toolArgs.globalSplittingLevels;
+    await ToolsMain.createTilesetJsonS2(
+      output,
+      maximumLevelInclusive,
+      contentTemplateUri,
+      globalSplittingLevels,
       force
     );
   } else {

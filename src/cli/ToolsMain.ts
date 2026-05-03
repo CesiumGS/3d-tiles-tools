@@ -6,23 +6,24 @@ import { DeveloperError } from "../base";
 import { Buffers } from "../base";
 import { Iterables } from "../base";
 import { ContentDataTypes } from "../base";
+import { ContentDataTypeRegistry } from "../base";
 
 import { TileFormats } from "../tilesets";
 import { TileDataLayouts } from "../tilesets";
 import { TileFormatError } from "../tilesets";
 
 import { ContentOps } from "../tools";
+import { TilesetJsonCreatorS2 } from "../tools";
+import { TilesetSplitter } from "../tools";
 import { GltfUtilities } from "../tools";
-
 import { PipelineExecutor } from "../tools";
 import { Pipelines } from "../tools";
-
 import { TilesetOperations } from "../tools";
 import { TileFormatsMigration } from "../tools";
 import { TilesetConverter } from "../tools";
 import { TilesetJsonCreator } from "../tools";
 
-import { ContentDataTypeRegistry } from "../base";
+import { Tileset } from "../structure";
 
 import { Loggers } from "../base";
 const logger = Loggers.get("CLI");
@@ -671,6 +672,83 @@ export class ToolsMain {
     fs.writeFileSync(output, Buffer.from(tilesetJsonString));
 
     logger.debug(`Executing createTilesetJson DONE`);
+  }
+
+  static async createTilesetJsonS2(
+    output: string,
+    maximumLevelInclusive: number,
+    contentTemplateUri: string,
+    globalSplittingLevels: number[] | undefined,
+    force: boolean
+  ) {
+    logger.debug(`Executing createTilesetJsonS2`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
+    ToolsMain.ensureCanWrite(output, force);
+
+    logger.info(
+      `Creating tileset JSON for maximum S2 level ${maximumLevelInclusive}`
+    );
+    const creator = new TilesetJsonCreatorS2();
+    creator.setMaxLevelInclusive(maximumLevelInclusive);
+    creator.setContentTemplateUri(contentTemplateUri);
+    const tileset = creator.createTileset();
+    logger.info(
+      `Creating tileset JSON for maximum S2 level ${maximumLevelInclusive} DONE`
+    );
+
+    let externalTilesets: Map<string, Tileset> = new Map<string, Tileset>();
+    if (globalSplittingLevels) {
+      logger.info(
+        `Splitting tileset at global levels ${globalSplittingLevels}`
+      );
+      const tilesetSplitter = new TilesetSplitter();
+      tilesetSplitter.setGlobalSplittingLevels(globalSplittingLevels);
+      externalTilesets = tilesetSplitter.splitTileset(tileset);
+      logger.info(
+        `Splitting tileset at global levels ${globalSplittingLevels} DONE`
+      );
+    }
+
+    let outputFileName = output;
+    let outputDirectory: string;
+    if (Paths.isDirectory(output)) {
+      outputDirectory = output;
+    } else {
+      outputDirectory = path.dirname(output);
+      outputFileName = path.resolve(outputDirectory, "tileset.json");
+    }
+
+    Paths.ensureDirectoryExists(outputDirectory);
+
+    const tilesetJsonString = JSON.stringify(tileset, null, 2);
+    fs.writeFileSync(outputFileName, Buffer.from(tilesetJsonString));
+
+    logger.info(`Writing tileset to ${outputFileName}`);
+    fs.writeFileSync(
+      outputFileName,
+      Buffer.from(JSON.stringify(tileset, null, 2))
+    );
+    logger.info(`Writing tileset to ${outputFileName} DONE`);
+
+    if (externalTilesets.size !== 0) {
+      logger.info(
+        `Writing ${externalTilesets.size} external tilesets to ${outputDirectory}`
+      );
+      for (const entry of externalTilesets.entries()) {
+        const name = entry[0];
+        const value = entry[1];
+        fs.writeFileSync(
+          path.resolve(outputDirectory, name),
+          Buffer.from(JSON.stringify(value, null, 2))
+        );
+      }
+      logger.info(
+        `Writing ${externalTilesets.size} external tilesets to ${outputDirectory} DONE`
+      );
+    }
+    logger.debug(`Executing createTilesetJsonS2 DONE`);
   }
 
   /**
