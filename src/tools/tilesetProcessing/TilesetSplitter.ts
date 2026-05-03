@@ -154,6 +154,9 @@ export class TilesetSplitter {
    * This will convert tiles of the given tileset into external tilesets,
    * based on the splitting condition of this instance.
    *
+   * The result will be a mapping from (unspecified) JSON file names
+   * to the respective tileset objects.
+   *
    * @param tileset - The tileset
    * @returns The result
    */

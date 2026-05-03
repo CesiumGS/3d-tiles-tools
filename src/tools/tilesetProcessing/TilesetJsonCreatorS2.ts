@@ -18,42 +18,6 @@ const logger = Loggers.get("tilesetProcessing");
  */
 export class TilesetJsonCreatorS2 {
   /**
-   * A conservative global minimum height in meters for all
-   * bounding volumes
-   */
-  private static readonly GLOBAL_MIN_HEIGHT = -12000;
-
-  /**
-   * A conservative global maximum height in meters for all
-   * bounding volumes
-   */
-  private static readonly GLOBAL_MAX_HEIGHT = 9000;
-
-  /**
-   * A bounding volume (region) that covers the whole globe
-   */
-  private static readonly GLOBAL_BOUNDING_VOLUME: BoundingVolume = {
-    region: [
-      -3.141592653589793,
-      -1.5707963267948966,
-      3.141592653589793,
-      1.5707963267948966,
-      TilesetJsonCreatorS2.GLOBAL_MIN_HEIGHT,
-      TilesetJsonCreatorS2.GLOBAL_MAX_HEIGHT,
-    ],
-  };
-
-  /**
-   * The geometricError that should be used for the tileset
-   */
-  private readonly tilesetGeometricError: number;
-
-  /**
-   * The geometric error that should be used for the root tile
-   */
-  private readonly rootGeometricError: number;
-
-  /**
    * Whether S2 bounding volumes should be used for the tiles.
    *
    * When this is `true`, then the bounding volumes of the tiles
@@ -65,6 +29,26 @@ export class TilesetJsonCreatorS2 {
    * not be required.
    */
   private readonly useS2BoundingVolumes: boolean;
+
+  /**
+   * The minimum height in meters for all bounding volumes
+   */
+  private globalMinHeightMeters: number;
+
+  /**
+   * The maximum height in meters for all bounding volumes
+   */
+  private globalMaxHeightMeters: number;
+
+  /**
+   * The geometricError that should be used for the tileset
+   */
+  private tilesetGeometricError: number;
+
+  /**
+   * The geometric error that should be used for the root tile
+   */
+  private rootGeometricError: number;
 
   /**
    * The maximum S2 level (inclusive) for which tiles should
@@ -84,16 +68,72 @@ export class TilesetJsonCreatorS2 {
    * Creates a new instance with unspecified default values
    */
   constructor() {
+    this.useS2BoundingVolumes = true;
+    this.globalMaxHeightMeters = 9000;
+    this.globalMinHeightMeters = -12000;
     this.tilesetGeometricError = 1048576;
     this.rootGeometricError = 524288;
-    this.useS2BoundingVolumes = true;
     this.maxLevelInclusive = 7;
     this.contentTemplateUri = "content-{cellIdToken}";
   }
 
   /**
-   * Set the maximum S2 level (inclusive) for which tiles should be generated.
+   * Set the minimum and maximum height in meters that should be used for
+   * all bounding volumes.
    *
+   * @param globalMinHeightMeters - The global minimum height in meters
+   * @param globalMaxHeightMeters - The global maximum height in meters
+   * @throws DeveloperError If the minimum height is larger than the
+   * maximum height
+   */
+  setGlobalHeightMeters(
+    globalMinHeightMeters: number,
+    globalMaxHeightMeters: number
+  ) {
+    if (globalMinHeightMeters > globalMaxHeightMeters) {
+      throw new DeveloperError(
+        `The globalMinHeightMeters may not be larger than the ` +
+          `globalMaxHeightMeters, but the globalMinHeightMeters ` +
+          `is ${globalMinHeightMeters} and the ` +
+          `globalMaxHeightMeters is ${globalMaxHeightMeters}`
+      );
+    }
+    this.globalMinHeightMeters = globalMinHeightMeters;
+    this.globalMaxHeightMeters = globalMaxHeightMeters;
+  }
+
+  /**
+   * Set the geometric error that should be used for the tileset and
+   * the root tile.
+   *
+   * The geometric error of each inner tile will be half of the geometric
+   * error of its parent.
+   *
+   * @param tilesetGeometricError - The tileset geometric error
+   * @param rootGeometricError - The geometric error of the root tile
+   */
+  setGeometricErrors(
+    tilesetGeometricError: number,
+    rootGeometricError: number
+  ) {
+    if (tilesetGeometricError < 0) {
+      throw new DeveloperError(
+        `The tilesetGeometricError may not be negative, ` +
+          `but is ${tilesetGeometricError}`
+      );
+    }
+    if (rootGeometricError < 0) {
+      throw new DeveloperError(
+        `The rootGeometricError may not be negative, ` +
+          `but is ${rootGeometricError}`
+      );
+    }
+    this.tilesetGeometricError = tilesetGeometricError;
+    this.rootGeometricError = rootGeometricError;
+  }
+
+  /**
+   * Set the maximum S2 level (inclusive) for which tiles should be generated.
    *
    * @param maxLevelInclusive - The maximum level, inclusive
    * @throws DeveloperError If the given value is negative
@@ -150,6 +190,25 @@ export class TilesetJsonCreatorS2 {
   }
 
   /**
+   * Create a bounding volume (region) that covers the whole globe
+   *
+   * @returns The bounding volume
+   */
+  private createGlobalBoundingVolume(): BoundingVolume {
+    const boundingVolume = {
+      region: [
+        -3.141592653589793,
+        -1.5707963267948966,
+        3.141592653589793,
+        1.5707963267948966,
+        this.globalMinHeightMeters,
+        this.globalMaxHeightMeters,
+      ],
+    };
+    return boundingVolume;
+  }
+
+  /**
    * Creates the root tile of the tileset (and all its children,
    * created via `buildHierarchy`.
    *
@@ -161,8 +220,7 @@ export class TilesetJsonCreatorS2 {
    */
   private createRoot(): Tile {
     const rootGeometricError = this.rootGeometricError;
-    const rootBoundingVolumeRegion =
-      TilesetJsonCreatorS2.GLOBAL_BOUNDING_VOLUME;
+    const rootBoundingVolumeRegion = this.createGlobalBoundingVolume();
 
     const children: Tile[] = [];
     const root: Tile = {
@@ -282,9 +340,9 @@ export class TilesetJsonCreatorS2 {
    */
   private createBoundingVolume(cellId: bigint): BoundingVolume {
     if (this.useS2BoundingVolumes) {
-      return TilesetJsonCreatorS2.createBoundingVolumeS2(cellId);
+      return this.createBoundingVolumeS2(cellId);
     }
-    return TilesetJsonCreatorS2.createBoundingVolumeRegion(cellId);
+    return this.createBoundingVolumeRegion(cellId);
   }
 
   /**
@@ -294,13 +352,13 @@ export class TilesetJsonCreatorS2 {
    * @param cellId - The S2 cell ID
    * @returns The bounding volume
    */
-  private static createBoundingVolumeS2(cellId: bigint): BoundingVolume {
+  private createBoundingVolumeS2(cellId: bigint): BoundingVolume {
     const boundingVolume: any = {
       extensions: {
         "3DTILES_bounding_volume_S2": {
           token: S2Cell.getTokenFromId(cellId),
-          minimumHeight: TilesetJsonCreatorS2.GLOBAL_MIN_HEIGHT,
-          maximumHeight: TilesetJsonCreatorS2.GLOBAL_MAX_HEIGHT,
+          minimumHeight: this.globalMinHeightMeters,
+          maximumHeight: this.globalMaxHeightMeters,
         },
       },
     };
@@ -314,15 +372,15 @@ export class TilesetJsonCreatorS2 {
    * @param cellId - The S2 cell ID
    * @returns he bounding volume
    */
-  private static createBoundingVolumeRegion(cellId: bigint): BoundingVolume {
+  private createBoundingVolumeRegion(cellId: bigint): BoundingVolume {
     const cell = s2.Cell.fromCellID(cellId);
     const rect = cell.rectBound();
     const w = rect.lng.lo;
     const s = rect.lat.lo;
     const e = rect.lng.hi;
     const n = rect.lat.hi;
-    const minHeight = TilesetJsonCreatorS2.GLOBAL_MIN_HEIGHT;
-    const maxHeight = TilesetJsonCreatorS2.GLOBAL_MAX_HEIGHT;
+    const minHeight = this.globalMinHeightMeters;
+    const maxHeight = this.globalMaxHeightMeters;
     const region = [w, s, e, n, minHeight, maxHeight];
     const boundingVolume: BoundingVolume = {
       region: region,
