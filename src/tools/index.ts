@@ -81,3 +81,8 @@ export * from "./gltfExtensionsUtils/StringBuilder";
 export * from "./gltfExtensionsUtils/StructuralMetadataPropertyTables";
 export * from "./gltfExtensionsUtils/StructuralMetadataUtils";
 export * from "./gltfExtensionsUtils/StructuralMetadataMerger";
+
+export * from "./packageServer/PackageServer";
+export * from "./packageServer/PackageServerOptions";
+export * from "./packageServer/PackagePath";
+export * from "./packageServer/ContentDataTypeUtilities";
