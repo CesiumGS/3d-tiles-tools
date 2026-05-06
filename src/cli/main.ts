@@ -308,6 +308,16 @@ function parseToolArgs(a: string[]) {
         },
       }
     )
+    .command(
+      "upgradeSplats",
+      "Upgrade a tileset that uses the legacy KHR_spz_gaussian_splats_compression " +
+        "glTF extension to use the new KHR_gaussian_splatting_compression_spz_2 " +
+        "extension.",
+      {
+        i: inputStringDefinition,
+        o: outputStringDefinition,
+      }
+    )
     .command("pipeline", "Execute a pipeline that is provided as a JSON file", {
       i: inputStringDefinition,
     })
@@ -590,6 +600,8 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
       targetVersion,
       parsedOptionArgs
     );
+  } else if (command === "upgradeSplats") {
+    await ToolsMain.upgradeSplats(input, output, force);
   } else if (command === "merge") {
     await ToolsMain.merge(inputs, output, force);
   } else if (command === "mergeJson") {
