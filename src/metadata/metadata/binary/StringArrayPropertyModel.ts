@@ -18,17 +18,17 @@ export class StringArrayPropertyModel implements PropertyModel {
 
   private readonly valuesBuffer: Buffer;
   private readonly arrayOffsetsBuffer: Buffer | undefined;
-  private readonly arrayOffsetType: string;
+  private readonly arrayOffsetType: string | undefined;
   private readonly stringOffsetsBuffer: Buffer;
-  private readonly stringOffsetType: string;
+  private readonly stringOffsetType: string | undefined;
   private readonly count: number | undefined;
 
   constructor(
     valuesBuffer: Buffer,
     arrayOffsetsBuffer: Buffer | undefined,
-    arrayOffsetType: string,
+    arrayOffsetType: string | undefined,
     stringOffsetsBuffer: Buffer,
-    stringOffsetType: string,
+    stringOffsetType: string | undefined,
     count: number | undefined
   ) {
     this.valuesBuffer = valuesBuffer;
@@ -48,10 +48,11 @@ export class StringArrayPropertyModel implements PropertyModel {
     const stringOffsetType = this.stringOffsetType;
     const count = this.count;
 
+    const localArrayOffsetType = arrayOffsetType ?? "UINT32";
     const arraySlice = BinaryPropertyModels.computeSlice(
       index,
       arrayOffsetsBuffer,
-      arrayOffsetType,
+      localArrayOffsetType,
       count
     );
     const arrayOffset = arraySlice.offset;
@@ -61,10 +62,11 @@ export class StringArrayPropertyModel implements PropertyModel {
     for (let i = 0; i < arrayLength; i++) {
       const n = arrayOffset + i;
 
+      const localStringOffsetType = stringOffsetType ?? "UINT32";
       const stringSlice = BinaryPropertyModels.computeSlice(
         n,
         stringOffsetsBuffer,
-        stringOffsetType,
+        localStringOffsetType,
         undefined
       );
       const stringOffset = stringSlice.offset;

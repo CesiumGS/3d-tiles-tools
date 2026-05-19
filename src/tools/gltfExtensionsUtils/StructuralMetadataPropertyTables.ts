@@ -1,9 +1,9 @@
+import { EXTStructuralMetadata } from "@gltf-transform/extensions";
+import { PropertyTable } from "@gltf-transform/extensions";
+import { PropertyTablePropertyOffsetType } from "@gltf-transform/extensions";
+
 import { MetadataError } from "../../metadata";
 import { BinaryPropertyTable } from "../../metadata";
-
-import { EXTStructuralMetadata } from "../../gltf-extensions";
-import { PropertyTablePropertyOffsetType } from "../../gltf-extensions";
-import { StructuralMetadataPropertyTable as PropertyTable } from "../../gltf-extensions";
 
 /**
  * Methods for creating `PropertyTable` objects for the glTF-Transform
@@ -60,7 +60,7 @@ export class StructuralMetadataPropertyTables {
     const propertyTable = extStructuralMetadata.createPropertyTable();
     const propertyTableJson = binaryPropertyTable.propertyTable;
     if (propertyTableJson.name !== undefined) {
-      propertyTable.setObjectName(propertyTableJson.name);
+      propertyTable.setName(propertyTableJson.name);
     }
     propertyTable.setClass(propertyTableJson.class);
     propertyTable.setCount(propertyTableJson.count);
@@ -139,8 +139,7 @@ export class StructuralMetadataPropertyTables {
     if (arrayOffsetsBufferViewIndex !== undefined) {
       arrayOffsetsBufferViewData = bufferViewsData[arrayOffsetsBufferViewIndex];
     }
-    const arrayOffsetType =
-      propertyTablePropertyJson.arrayOffsetType ?? "UINT32";
+    const arrayOffsetType = propertyTablePropertyJson.arrayOffsetType;
 
     // Obtain the `stringOffsets` buffer view data
     const stringOffsetsBufferViewIndex =
@@ -150,8 +149,7 @@ export class StructuralMetadataPropertyTables {
       stringOffsetsBufferViewData =
         bufferViewsData[stringOffsetsBufferViewIndex];
     }
-    const stringOffsetType =
-      propertyTablePropertyJson.stringOffsetType ?? "UINT32";
+    const stringOffsetType = propertyTablePropertyJson.stringOffsetType;
 
     // Create the glTF-Transform PropertyTableProperty object,
     // and fill it with the basic information from the raw JSON

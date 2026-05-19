@@ -27,9 +27,9 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@gltf-transform/core": "^4.1.4",
-    "@gltf-transform/extensions": "^4.1.4",
-    "@gltf-transform/functions": "^4.1.4",
+    "@gltf-transform/core": "^4.4.0-alpha.1",
+    "@gltf-transform/extensions": "^4.4.0-alpha.1",
+    "@gltf-transform/functions": "^4.4.0-alpha.1",
     "archiver": "^5.3.1",
     "better-sqlite3": "^11.5.0",
     "cesium": "^1.103.0",

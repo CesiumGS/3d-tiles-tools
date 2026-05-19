@@ -2,7 +2,7 @@ import { ExtensionProperty } from "@gltf-transform/core";
 import { RefSet } from "@gltf-transform/core";
 import { IProperty } from "@gltf-transform/core";
 import { PropertyType } from "@gltf-transform/core";
-import { PropertyTable } from "./StructuralMetadata";
+import { PropertyTable } from "@gltf-transform/extensions";
 
 const NAME = "EXT_mesh_features";
 

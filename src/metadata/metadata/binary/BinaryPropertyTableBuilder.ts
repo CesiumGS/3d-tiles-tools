@@ -63,16 +63,20 @@ export class BinaryPropertyTableBuilder {
   private readonly propertyTableName: string;
 
   /**
-   * The data type with which array offsets will be stored
-   * (this is the default and not modifiable for now)
+   * The data type with which array offsets will be stored.
+   *
+   * For now, this will default to 'undefined', which means
+   * that the default (UINT32) will be used.
    */
-  private readonly arrayOffsetType = "UINT32";
+  private readonly arrayOffsetType = undefined;
 
   /**
-   * The data type with which string offsets will be stored
-   * (this is the default and not modifiable for now)
+   * The data type with which string offsets will be stored.
+   *
+   * For now, this will default to 'undefined', which means
+   * that the default (UINT32) will be used.
    */
-  private readonly stringOffsetType = "UINT32";
+  private readonly stringOffsetType = undefined;
 
   /**
    * The count (number of rows) of the property table.
@@ -279,7 +283,7 @@ export class BinaryPropertyTableBuilder {
   }
 
   /**
-   * Returns the `ClassProperty` for the given propery name from
+   * Returns the `ClassProperty` for the given property name from
    * the `MetadataClass` that the table is built for
    *
    * @param propertyName - The property names

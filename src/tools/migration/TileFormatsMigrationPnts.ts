@@ -5,8 +5,6 @@ import { TileFormats } from "../../tilesets";
 import { TileTableData } from "../../tilesets";
 import { BatchTables } from "../../tilesets";
 
-import { MeshFeatures } from "../../gltf-extensions";
-
 import { PropertyModel } from "../../metadata";
 import { DefaultPropertyModel } from "../../metadata";
 
@@ -24,6 +22,7 @@ import { InstanceFeaturesUtils } from "../gltfExtensionsUtils/InstanceFeaturesUt
 import { StructuralMetadataUtils } from "../gltfExtensionsUtils/StructuralMetadataUtils";
 
 import { Loggers } from "../../base";
+import { Features } from "@gltf-transform/extensions";
 const logger = Loggers.get("migration");
 
 /**
@@ -101,9 +100,9 @@ export class TileFormatsMigrationPnts {
         );
       if (propertyTable) {
         const meshFeatures =
-          primitive.getExtension<MeshFeatures>("EXT_mesh_features");
+          primitive.getExtension<Features>("EXT_mesh_features");
         if (meshFeatures) {
-          const featureIds = meshFeatures.listFeatureIds();
+          const featureIds = meshFeatures.listFeatureIDs();
           for (const featureId of featureIds) {
             featureId.setPropertyTable(propertyTable);
           }

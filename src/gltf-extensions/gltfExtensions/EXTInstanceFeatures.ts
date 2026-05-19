@@ -6,7 +6,7 @@ import { ReaderContext } from "@gltf-transform/core";
 import { WriterContext } from "@gltf-transform/core";
 import { FeatureId } from "./InstanceFeatures";
 import { InstanceFeatures } from "./InstanceFeatures";
-import { StructuralMetadata } from "./StructuralMetadata";
+import { StructuralMetadata } from "@gltf-transform/extensions";
 
 const NAME = "EXT_instance_features";
 

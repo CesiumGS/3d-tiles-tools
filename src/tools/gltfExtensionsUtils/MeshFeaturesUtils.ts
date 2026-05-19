@@ -2,10 +2,8 @@ import { Document } from "@gltf-transform/core";
 import { Mesh } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 
-import { MeshFeaturesFeatureId as FeatureId } from "../../gltf-extensions";
-import { MeshFeatures } from "../../gltf-extensions";
-
 import { StringBuilder } from "./StringBuilder";
+import { FeatureID, Features } from "@gltf-transform/extensions";
 
 /**
  * Utilities related to the glTF `EXT_mesh_features` extension.
@@ -55,7 +53,7 @@ export class MeshFeaturesUtils {
 
       sb.increaseIndent();
       const meshFeatures =
-        primitive.getExtension<MeshFeatures>("EXT_mesh_features");
+        primitive.getExtension<Features>("EXT_mesh_features");
       MeshFeaturesUtils.createMeshFeaturesString(sb, meshFeatures);
       sb.decreaseIndent();
 
@@ -65,7 +63,7 @@ export class MeshFeaturesUtils {
 
   private static createMeshFeaturesString(
     sb: StringBuilder,
-    meshFeatures: MeshFeatures | null
+    meshFeatures: Features | null
   ) {
     if (!meshFeatures) {
       sb.addLine("EXT_mesh_features: (none)");
@@ -74,7 +72,7 @@ export class MeshFeaturesUtils {
     sb.addLine("EXT_mesh_features:");
     sb.increaseIndent();
     sb.addLine("featureIds:");
-    const featureIds = meshFeatures.listFeatureIds();
+    const featureIds = meshFeatures.listFeatureIDs();
     for (let f = 0; f < featureIds.length; f++) {
       sb.increaseIndent();
       sb.addLine("Feature ID ", f, " of ", featureIds.length);
@@ -89,7 +87,7 @@ export class MeshFeaturesUtils {
 
   private static createFeatureIdString(
     sb: StringBuilder,
-    featureId: FeatureId
+    featureId: FeatureID
   ) {
     sb.addLine("featureCount: ", featureId.getFeatureCount());
     sb.addLine("attribute: ", featureId.getAttribute());

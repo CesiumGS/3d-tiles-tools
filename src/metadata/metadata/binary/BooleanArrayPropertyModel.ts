@@ -10,13 +10,13 @@ import { NumericBuffers } from "./NumericBuffers";
 export class BooleanArrayPropertyModel implements PropertyModel {
   private readonly valuesBuffer: Buffer;
   private readonly arrayOffsetsBuffer: Buffer | undefined;
-  private readonly arrayOffsetType: string;
+  private readonly arrayOffsetType: string | undefined;
   private readonly count: number | undefined;
 
   constructor(
     valuesBuffer: Buffer,
     arrayOffsetsBuffer: Buffer | undefined,
-    arrayOffsetType: string,
+    arrayOffsetType: string | undefined,
     count: number | undefined
   ) {
     this.valuesBuffer = valuesBuffer;
@@ -32,10 +32,11 @@ export class BooleanArrayPropertyModel implements PropertyModel {
     const arrayOffsetType = this.arrayOffsetType;
     const count = this.count;
 
+    const localArrayOffsetType = arrayOffsetType ?? "UINT32";
     const arraySlice = BinaryPropertyModels.computeSlice(
       index,
       arrayOffsetsBuffer,
-      arrayOffsetType,
+      localArrayOffsetType,
       count
     );
     const arrayOffset = arraySlice.offset;

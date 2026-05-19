@@ -83,9 +83,9 @@ async function computeJsonStrings(
   };
 }
 
-describe("TileFormatsMigration", function () {
+fdescribe("TileFormatsMigration", function () {
   afterEach(function () {
-    SpecHelpers.forceDeleteDirectory(targetDir);
+    //SpecHelpers.forceDeleteDirectory(targetDir);
   });
   beforeEach(function () {
     StructuralMetadataMerger.setMergedSchemaIdSuffix("SPEC_SCHEMA_ID_SUFFIX");

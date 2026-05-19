@@ -2,10 +2,10 @@ import { Document } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 import { Accessor } from "@gltf-transform/core";
 
-import { TileFormatError } from "../../tilesets";
+import { EXTMeshFeatures } from "@gltf-transform/extensions";
+import { FeatureID } from "@gltf-transform/extensions";
 
-import { EXTMeshFeatures } from "../../gltf-extensions";
-import { MeshFeaturesFeatureId as FeatureId } from "../../gltf-extensions";
+import { TileFormatError } from "../../tilesets";
 
 import { Loggers } from "../../base";
 const logger = Loggers.get("migration");
@@ -46,7 +46,7 @@ export class TileTableDataToMeshFeatures {
     document: Document,
     primitive: Primitive,
     batchIdToFeatureIdAccessor: Map<Accessor, Accessor>
-  ): FeatureId | undefined {
+  ): FeatureID | undefined {
     let batchIdAttribute = primitive.getAttribute("_BATCHID");
     if (!batchIdAttribute) {
       batchIdAttribute = primitive.getAttribute("BATCHID");
@@ -95,12 +95,12 @@ export class TileTableDataToMeshFeatures {
     // Creates the mesh features extension object that
     // refers to the _FEATURE_ID_0 attribute
     const extMeshFeatures = document.createExtension(EXTMeshFeatures);
-    const meshFeatures = extMeshFeatures.createMeshFeatures();
-    const featureId = extMeshFeatures.createFeatureId();
+    const meshFeatures = extMeshFeatures.createFeatures();
+    const featureId = extMeshFeatures.createFeatureID();
     featureId.setAttribute(0);
     const featureCount = new Set(batchIdsArray).size;
     featureId.setFeatureCount(featureCount);
-    meshFeatures.addFeatureId(featureId);
+    meshFeatures.addFeatureID(featureId);
 
     primitive.setExtension("EXT_mesh_features", meshFeatures);
 
