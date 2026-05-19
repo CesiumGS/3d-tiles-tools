@@ -3,11 +3,6 @@ import { Primitive } from "@gltf-transform/core";
 
 import { BatchTable } from "../../structure";
 
-import { EXTStructuralMetadata } from "../../gltf-extensions";
-import { MeshPrimitiveStructuralMetadata } from "../../gltf-extensions";
-import { StructuralMetadataPropertyTable as PropertyTable } from "../../gltf-extensions";
-import { StructuralMetadata } from "../../gltf-extensions";
-
 import { PropertyTableModels } from "../../metadata";
 import { PropertyModels } from "../../metadata";
 import { PropertyModel } from "../../metadata";
@@ -15,6 +10,12 @@ import { BinaryPropertyTableModel } from "../../metadata";
 import { BinaryPropertyTableBuilder } from "../../metadata";
 
 import { StructuralMetadataPropertyTables } from "../gltfExtensionsUtils/StructuralMetadataPropertyTables";
+import { StructuralMetadataSchemas } from "../gltfExtensionsUtils/StructuralMetadataSchemas";
+
+import { EXTStructuralMetadata } from "@gltf-transform/extensions";
+import { StructuralMetadata } from "@gltf-transform/extensions";
+import { MeshPrimitiveStructuralMetadata } from "@gltf-transform/extensions";
+import { PropertyTable } from "@gltf-transform/extensions";
 
 import { BatchTableSchemas } from "./BatchTableSchemas";
 import { BatchTablePropertyTableModels } from "./BatchTablePropertyTableModels";
@@ -91,7 +92,8 @@ export class TileTableDataToStructuralMetadata {
     // and assign it to the document root
     const structuralMetadata = extStructuralMetadata.createStructuralMetadata();
 
-    const schema = extStructuralMetadata.createSchemaFrom(
+    const schema = StructuralMetadataSchemas.createSchemaFrom(
+      extStructuralMetadata,
       metadataSchema as any
     );
     structuralMetadata.setSchema(schema);
@@ -221,7 +223,8 @@ export class TileTableDataToStructuralMetadata {
     // contains the schema and assign it to the document root
     const structuralMetadata = extStructuralMetadata.createStructuralMetadata();
 
-    const schema = extStructuralMetadata.createSchemaFrom(
+    const schema = StructuralMetadataSchemas.createSchemaFrom(
+      extStructuralMetadata,
       metadataSchema as any
     );
     structuralMetadata.setSchema(schema);
@@ -295,14 +298,14 @@ export class TileTableDataToStructuralMetadata {
       logger.trace("Creating structural metadata property table from:\n" + s);
     }
 
-    const structualMetadataPropertyTable =
+    const structuralMetadataPropertyTable =
       StructuralMetadataPropertyTables.create(
         extStructuralMetadata,
         binaryPropertyTable
       );
 
-    structuralMetadata.addPropertyTable(structualMetadataPropertyTable);
-    return structualMetadataPropertyTable;
+    structuralMetadata.addPropertyTable(structuralMetadataPropertyTable);
+    return structuralMetadataPropertyTable;
   }
 
   /**

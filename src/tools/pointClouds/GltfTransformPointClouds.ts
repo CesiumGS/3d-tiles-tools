@@ -7,9 +7,8 @@ import { Buffer as GltfBuffer } from "@gltf-transform/core";
 import { quantize } from "@gltf-transform/functions";
 import { QuantizeOptions } from "@gltf-transform/functions";
 
+import { EXTMeshFeatures } from "@gltf-transform/extensions";
 import { KHRMeshQuantization } from "@gltf-transform/extensions";
-
-import { EXTMeshFeatures } from "../../gltf-extensions";
 
 import { Iterables } from "../../base";
 
