@@ -32,7 +32,7 @@ export class BufferedContentData implements ContentData {
    * @returns The ContentData
    */
   static create(uri: string): ContentData {
-    let data: Buffer | null = null;
+    let data: Buffer | undefined = undefined;
     try {
       data = fs.readFileSync(uri);
     } catch (error) {
@@ -61,10 +61,10 @@ export class BufferedContentData implements ContentData {
   private readonly _magic: Buffer;
 
   /**
-   * The content data, or `null` if the data could not
+   * The content data, or `undefined` if the data could not
    * be resolved.
    */
-  private readonly _data: Buffer | null;
+  private readonly _data: Buffer | undefined;
 
   /**
    * The object that was parsed from the content, assuming
@@ -86,7 +86,7 @@ export class BufferedContentData implements ContentData {
    * @param uri - The URI of the content data
    * @param data - The actual content data buffer
    */
-  constructor(uri: string, data: Buffer | null) {
+  constructor(uri: string, data: Buffer | undefined) {
     this._uri = uri;
     this._extension = path.extname(uri).toLowerCase();
     if (data) {
@@ -112,7 +112,7 @@ export class BufferedContentData implements ContentData {
 
   /** {@inheritDoc ContentData.exists} */
   async exists(): Promise<boolean> {
-    return this._data !== null;
+    return this._data !== undefined;
   }
 
   /** {@inheritDoc ContentData.magic} */
@@ -121,7 +121,7 @@ export class BufferedContentData implements ContentData {
   }
 
   /** {@inheritDoc ContentData.data} */
-  async getData(): Promise<Buffer | null> {
+  async getData(): Promise<Buffer | undefined> {
     return this._data;
   }
 

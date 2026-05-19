@@ -12,7 +12,7 @@ export class TileContentProcessors {
    * This creates a `TileContentProcessor` that applies the given
    * processors, in the given order, to the input data.
    *
-   * This asssumes that none of the given processors changes the
+   * This assumes that none of the given processors changes the
    * _type_ of the input data (even though it _may_ change the
    * type, if subsequent processors are agnostic of that...)
    *

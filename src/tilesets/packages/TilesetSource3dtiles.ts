@@ -29,7 +29,7 @@ export class TilesetSource3dtiles implements TilesetSource {
   }
 
   /** {@inheritDoc TilesetSource.open} */
-  open(fullInputName: string): void {
+  async open(fullInputName: string): Promise<void> {
     if (this.db) {
       throw new TilesetError("Database already opened");
     }
@@ -50,13 +50,13 @@ export class TilesetSource3dtiles implements TilesetSource {
     };
     const message = TableStructureValidator.validate(this.db, tableStructure);
     if (message) {
-      this.close();
+      await this.close();
       throw new TilesetError(message);
     }
   }
 
   /** {@inheritDoc TilesetSource.getKeys} */
-  getKeys(): Iterable<string> {
+  async getKeys(): Promise<AsyncIterable<string>> {
     if (!this.db) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
@@ -66,11 +66,11 @@ export class TilesetSource3dtiles implements TilesetSource {
         return selection.iterate();
       },
     };
-    return Iterables.map(iterable, (row: any) => row.key);
+    return Iterables.makeAsync(Iterables.map(iterable, (row: any) => row.key));
   }
 
   /** {@inheritDoc TilesetSource.getValue} */
-  getValue(key: string): Buffer | undefined {
+  async getValue(key: string): Promise<Buffer | undefined> {
     if (!this.db) {
       throw new Error("Source is not opened. Call 'open' first.");
     }
@@ -83,7 +83,7 @@ export class TilesetSource3dtiles implements TilesetSource {
   }
 
   /** {@inheritDoc TilesetSource.close} */
-  close() {
+  async close(): Promise<void> {
     if (!this.db) {
       throw new Error("Source is not opened. Call 'open' first.");
     }

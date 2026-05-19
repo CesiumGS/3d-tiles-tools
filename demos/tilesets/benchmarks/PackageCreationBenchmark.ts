@@ -26,15 +26,15 @@ async function fillTilesetTarget(
   configString: string
 ) {
   const beforeMs = performance.now();
-  tilesetTarget.begin(fullOutputFileName, true);
-  tilesetTarget.addEntry(
+  await tilesetTarget.begin(fullOutputFileName, true);
+  await tilesetTarget.addEntry(
     "tileset.json",
     BenchmarkUtils.createDummyTilesetJsonBuffer()
   );
   for (const entry of entries) {
     const key = entry.key;
     const content = entry.value;
-    tilesetTarget.addEntry(key, content);
+    await tilesetTarget.addEntry(key, content);
   }
   await tilesetTarget.end();
   const afterMs = performance.now();
@@ -81,4 +81,4 @@ async function run() {
   console.log("Running test DONE");
 }
 
-run();
+void run();

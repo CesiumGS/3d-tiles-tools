@@ -44,4 +44,4 @@ async function example() {
   await PipelineExecutor.executePipeline(pipeline, overwrite);
 }
 
-example();
+void example();

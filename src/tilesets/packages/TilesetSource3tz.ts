@@ -1,7 +1,7 @@
 import fs from "fs";
 import zlib from "zlib";
 
-import { defined } from "../../base";
+import { defined, Iterables } from "../../base";
 
 import { TilesetSource } from "../tilesetData/TilesetSource";
 import { TilesetError } from "../tilesetData/TilesetError";
@@ -43,7 +43,7 @@ export class TilesetSource3tz implements TilesetSource {
   }
 
   /** {@inheritDoc TilesetSource.open} */
-  open(fullInputName: string) {
+  async open(fullInputName: string) {
     if (defined(this.fd)) {
       throw new TilesetError("Source already opened");
     }
@@ -53,11 +53,13 @@ export class TilesetSource3tz implements TilesetSource {
   }
 
   /** {@inheritDoc TilesetSource.getKeys} */
-  getKeys(): Iterable<string> {
+  async getKeys(): Promise<AsyncIterable<string>> {
     if (!defined(this.fd) || !this.zipIndex) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
-    return TilesetSource3tz.createKeysIterable(this.fd, this.zipIndex);
+    return Iterables.makeAsync(
+      TilesetSource3tz.createKeysIterable(this.fd, this.zipIndex)
+    );
   }
 
   private static createKeysIterable(
@@ -78,7 +80,7 @@ export class TilesetSource3tz implements TilesetSource {
   }
 
   /** {@inheritDoc TilesetSource.getValue} */
-  getValue(key: string): Buffer | undefined {
+  async getValue(key: string): Promise<Buffer | undefined> {
     if (!defined(this.fd) || !this.zipIndex) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }
@@ -95,7 +97,7 @@ export class TilesetSource3tz implements TilesetSource {
   }
 
   /** {@inheritDoc TilesetSource.close} */
-  close() {
+  async close() {
     if (!defined(this.fd) || !this.zipIndex) {
       throw new TilesetError("Source is not opened. Call 'open' first.");
     }

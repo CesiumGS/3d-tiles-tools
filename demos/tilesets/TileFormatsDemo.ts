@@ -42,7 +42,7 @@ async function b3dmOrI3dmToGlb(inputFileName: string, outputFileName: string) {
   fs.writeFileSync(outputFileName, upgradedOutputBuffer);
 }
 
-function testTileFormatsDemotConversions() {
+async function testTileFormatsDemotConversions() {
   Paths.ensureDirectoryExists(SPECS_DATA_BASE_DIRECTORY + "/output");
 
   glbToB3dm(
@@ -55,15 +55,15 @@ function testTileFormatsDemotConversions() {
     SPECS_DATA_BASE_DIRECTORY + "/output/CesiumTexturedBox.i3dm"
   );
 
-  b3dmOrI3dmToGlb(
+  await b3dmOrI3dmToGlb(
     SPECS_DATA_BASE_DIRECTORY + "/batchedWithBatchTableBinary.b3dm",
     SPECS_DATA_BASE_DIRECTORY + "/output/batchedWithBatchTableBinary.glb"
   );
 
-  b3dmOrI3dmToGlb(
+  await b3dmOrI3dmToGlb(
     SPECS_DATA_BASE_DIRECTORY + "/instancedWithBatchTableBinary.i3dm",
     SPECS_DATA_BASE_DIRECTORY + "/output/instancedWithBatchTableBinary.glb"
   );
 }
 
-testTileFormatsDemotConversions();
+void testTileFormatsDemotConversions();

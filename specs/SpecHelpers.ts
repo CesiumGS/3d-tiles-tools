@@ -238,8 +238,8 @@ export class SpecHelpers {
    * @returns The tileset
    * @throws DeveloperError if the tileset could not be read
    */
-  static parseTileset(tilesetSource: TilesetSource) {
-    const tilesetJsonBuffer = tilesetSource.getValue("tileset.json");
+  static async parseTileset(tilesetSource: TilesetSource): Promise<Tileset> {
+    const tilesetJsonBuffer = await tilesetSource.getValue("tileset.json");
     if (!tilesetJsonBuffer) {
       throw new DeveloperError("No tileset.json found in input");
     }
@@ -262,20 +262,20 @@ export class SpecHelpers {
    * @returns A string describing the difference, or `undefined`
    * if there is no difference.
    */
-  static computePackageDifference(
+  static async computePackageDifference(
     nameA: string,
     nameB: string
-  ): string | undefined {
-    const tilesetSourceA = TilesetSources.createAndOpen(nameA);
-    const tilesetSourceB = TilesetSources.createAndOpen(nameB);
-    const result = SpecHelpers.computePackageDifferenceInternal(
+  ): Promise<string | undefined> {
+    const tilesetSourceA = await TilesetSources.createAndOpen(nameA);
+    const tilesetSourceB = await TilesetSources.createAndOpen(nameB);
+    const result = await SpecHelpers.computePackageDifferenceInternal(
       nameA,
       tilesetSourceA,
       nameB,
       tilesetSourceB
     );
-    tilesetSourceA.close();
-    tilesetSourceB.close();
+    await tilesetSourceA.close();
+    await tilesetSourceB.close();
     return result;
   }
 
@@ -297,14 +297,16 @@ export class SpecHelpers {
    * @returns A string describing the difference, or `undefined`
    * if there is no difference.
    */
-  static computePackageDifferenceInternal(
+  static async computePackageDifferenceInternal(
     nameA: string,
     tilesetSourceA: TilesetSource,
     nameB: string,
     tilesetSourceB: TilesetSource
-  ): string | undefined {
-    const keysA = [...tilesetSourceA.getKeys()].sort();
-    const keysB = [...tilesetSourceB.getKeys()].sort();
+  ): Promise<string | undefined> {
+    const keysA = await Iterables.asyncToArray(await tilesetSourceA.getKeys());
+    const keysB = await Iterables.asyncToArray(await tilesetSourceB.getKeys());
+    keysA.sort();
+    keysB.sort();
 
     if (keysA.length != keysB.length) {
       return `There are ${keysA.length} keys in ${nameA} and ${keysB.length} keys in ${nameB}`;
@@ -315,8 +317,8 @@ export class SpecHelpers {
       }
     }
     for (let i = 0; i < keysA.length; i++) {
-      const valueA = tilesetSourceA.getValue(keysA[i]);
-      const valueB = tilesetSourceB.getValue(keysB[i]);
+      const valueA = await tilesetSourceA.getValue(keysA[i]);
+      const valueB = await tilesetSourceB.getValue(keysB[i]);
       const entryDifference = SpecHelpers.computeEntryDifference(
         keysA[i],
         nameA,

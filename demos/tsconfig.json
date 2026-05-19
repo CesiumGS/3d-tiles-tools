@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES2021",
+    
+    //-----------------------------------------------------------------------
+    // TODO This was suddenly necessary. Clean this up.
+    "ignoreDeprecations": "6.0",
+    "types": [
+      "node",
+      "@types/jasmine"
+    ],
+    //-----------------------------------------------------------------------
+
+    "baseUrl": "./",
+
+    "strict": true,
+    "lib": ["es2021"],
+
+    "outDir": "./build",
+
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "strictNullChecks": true,
+    "noImplicitOverride": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noImplicitAny": false,
+    "sourceMap": true,
+  },
+  "include": ["**/*"],
+  "exclude": ["node_modules"]
+}

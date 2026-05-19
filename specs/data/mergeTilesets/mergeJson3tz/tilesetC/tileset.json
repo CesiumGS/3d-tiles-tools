@@ -1,0 +1,20 @@
+{
+  "asset" : {
+    "extras" : {
+      "generator" : "J3DTiles-0.0.1-SNAPSHOT"
+    },
+    "version" : "1.1"
+  },
+  "geometricError" : 1048576.0,
+  "root" : {
+    "boundingVolume" : {
+      "box" : [ 0.5, 0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0 ]
+    },
+    "geometricError" : 1024.0,
+    "refine" : "REPLACE",
+    "transform" : [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0 ],
+    "content" : {
+      "uri" : "content.glb"
+    }
+  }
+}

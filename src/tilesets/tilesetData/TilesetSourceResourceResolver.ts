@@ -18,8 +18,14 @@ export class TilesetSourceResourceResolver implements ResourceResolver {
     this._tilesetSource = tilesetSource;
   }
 
+  /** {@inheritDoc ResourceResolver.resolveUri} */
+  resolveUri(uri: string): string {
+    const resolved = Paths.join(this._basePath, uri);
+    return resolved;
+  }
+
   /** {@inheritDoc ResourceResolver.resolveData} */
-  async resolveData(uri: string): Promise<Buffer | null> {
+  async resolveData(uri: string): Promise<Buffer | undefined> {
     return this.resolveDataInternal(uri);
   }
 
@@ -27,26 +33,26 @@ export class TilesetSourceResourceResolver implements ResourceResolver {
   async resolveDataPartial(
     uri: string,
     maxBytes: number
-  ): Promise<Buffer | null> {
+  ): Promise<Buffer | undefined> {
     const buffer = await this.resolveDataInternal(uri);
     if (!buffer) {
-      return null;
+      return undefined;
     }
     return buffer.subarray(0, maxBytes);
   }
 
-  private async resolveDataInternal(uri: string): Promise<Buffer | null> {
+  private async resolveDataInternal(uri: string): Promise<Buffer | undefined> {
     if (Uris.isDataUri(uri)) {
       const data = Buffer.from(uri.split(",")[1], "base64");
       return data;
     }
     if (Uris.isAbsoluteUri(uri)) {
-      return null;
+      return undefined;
     }
-    const localUri = Paths.join(this._basePath, uri);
-    const value = this._tilesetSource.getValue(localUri);
+    const localUri = this.resolveUri(uri);
+    const value = await this._tilesetSource.getValue(localUri);
     if (!value) {
-      return null;
+      return undefined;
     }
     return value;
   }

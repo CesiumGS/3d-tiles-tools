@@ -44,16 +44,30 @@ for (const testCase of testCases) {
       targetName = testCase.targetName;
     });
 
-    afterEach(function () {
+    afterEach(async function () {
+      // If there is an open target, then make sure that
+      // 'end' was called to release the output file
+      // (ignoring possible errors)
+      if (tilesetTarget) {
+        try {
+          await tilesetTarget.end();
+        } catch (e) {
+          // Ignored
+        }
+      }
       SpecHelpers.forceDeleteDirectory(
         SPECS_DATA_BASE_DIRECTORY + "/output/target"
       );
     });
 
-    it("throws when trying to access it before calling 'begin'", function () {
-      expect(function () {
-        tilesetTarget.addEntry("tileset.json", Buffer.alloc(1));
-      }).toThrowError();
+    it("throws when trying to access it before calling 'begin'", async function () {
+      await expectAsync(
+        (async function () {
+          return await tilesetTarget.addEntry("tileset.json", Buffer.alloc(1));
+        })()
+        //  ^ This () is important to really CALL the anonymous function
+        // and return a promise.
+      ).toBeRejectedWithError();
     });
 
     it("throws when trying to call 'end' before calling 'begin'", async function () {
@@ -67,32 +81,40 @@ for (const testCase of testCases) {
     });
 
     it("throws when trying to call 'begin' twice", async function () {
-      tilesetTarget.begin(targetName, true);
-      expect(function () {
-        tilesetTarget.begin(targetName, true);
-      }).toThrowError();
-      await tilesetTarget.end();
+      await expectAsync(
+        (async function () {
+          await tilesetTarget.begin(targetName, true);
+          await tilesetTarget.begin(targetName, true);
+          return await tilesetTarget.end();
+        })()
+        //  ^ This () is important to really CALL the anonymous function
+        // and return a promise.
+      ).toBeRejectedWithError();
     });
 
     it("allows access after calling 'begin' and before calling 'end'", async function () {
-      tilesetTarget.begin(targetName, true);
-      tilesetTarget.addEntry("tileset.json", Buffer.alloc(1));
+      await tilesetTarget.begin(targetName, true);
+      await tilesetTarget.addEntry("tileset.json", Buffer.alloc(1));
       await tilesetTarget.end();
     });
 
     it("throws when trying to access it after calling 'end'", async function () {
-      tilesetTarget.begin(targetName, true);
-      await tilesetTarget.end();
-      expect(function () {
-        tilesetTarget.addEntry("tileset.json", Buffer.alloc(1));
-      }).toThrowError();
+      await expectAsync(
+        (async function () {
+          await tilesetTarget.begin(targetName, true);
+          await tilesetTarget.end();
+          return await tilesetTarget.addEntry("tileset.json", Buffer.alloc(1));
+        })()
+        //  ^ This () is important to really CALL the anonymous function
+        // and return a promise.
+      ).toBeRejectedWithError();
     });
 
     it("throws when trying to call 'end' twice", async function () {
-      tilesetTarget.begin(targetName, true);
-      await tilesetTarget.end();
       await expectAsync(
         (async function () {
+          await tilesetTarget.begin(targetName, true);
+          await tilesetTarget.end();
           return await tilesetTarget.end();
         })()
         //  ^ This () is important to really CALL the anonymous function

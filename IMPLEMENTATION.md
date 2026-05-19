@@ -69,8 +69,11 @@ After extracting the API definition files, `api-documenter` is used to generate 
       - Build (compile TypeScript to JavaScript)
       - Run the unit tests
       - Generate the documentation
+      - Extract the API definition files
       - Update the third-party information
     - Package the build output folder into a TAR file
+
+- Ensure that any new classes are properly exported in the `/etc/3d-tiles-tools.api.md` file
 
 - Verify the contents of the resulting TAR file. If there are unwanted files, add these files to `.npmignore` and re-generate the tarball
 

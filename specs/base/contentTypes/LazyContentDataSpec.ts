@@ -5,14 +5,17 @@ import { ResourceResolver } from "../../../src/base";
 
 function createTestResourceResolver(): ResourceResolver {
   return {
-    async resolveData(uri: string): Promise<Buffer | null> {
-      return null;
+    resolveUri(uri: string) {
+      return uri;
+    },
+    async resolveData(uri: string): Promise<Buffer | undefined> {
+      return undefined;
     },
     async resolveDataPartial(
       uri: string,
       maxBytes: number
-    ): Promise<Buffer | null> {
-      return null;
+    ): Promise<Buffer | undefined> {
+      return undefined;
     },
     derive(uri: string): ResourceResolver {
       return this;

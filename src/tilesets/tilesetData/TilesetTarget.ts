@@ -1,6 +1,9 @@
 /**
  * An interface for classes that can receive tileset data.
  *
+ * Note that all methods defined by this interface are *asynchronous*.
+ * Callers will usually have to `await` the result when calling them.
+ *
  * @internal
  */
 export interface TilesetTarget {
@@ -15,7 +18,7 @@ export interface TilesetTarget {
    * @throws {@link TilesetError} If the output is a file that already
    * exists, and `overwrite` was not true.
    */
-  begin(fullOutputName: string, overwrite: boolean): void;
+  begin(fullOutputName: string, overwrite: boolean): Promise<void>;
 
   /**
    * Add the given entry to the output.
@@ -24,7 +27,7 @@ export interface TilesetTarget {
    * @param content - The value for the entry
    * @throws {@link TilesetError} If `begin` was not called yet
    */
-  addEntry(key: string, content: Buffer): void;
+  addEntry(key: string, content: Buffer): Promise<void>;
 
   /**
    * Finalize the creation of the tileset data.

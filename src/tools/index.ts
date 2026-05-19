@@ -7,6 +7,7 @@ export * from "./contentProcessing/GltfPipelineLegacy";
 export * from "./contentProcessing/GltfTransform";
 export * from "./contentProcessing/GltfTransformTextures";
 export * from "./contentProcessing/GltfUtilities";
+export * from "./contentProcessing/VertexProcessing";
 
 export * from "./draco/AttributeInfo";
 export * from "./draco/ComponentDataType";
@@ -48,6 +49,7 @@ export * from "./migration/TypeDetection";
 
 export * from "./tilesetProcessing/BasicTilesetProcessor";
 export * from "./tilesetProcessing/BoundingVolumes";
+export * from "./tilesetProcessing/BoundingVolumesContainment";
 export * from "./tilesetProcessing/TileContentProcessing";
 export * from "./tilesetProcessing/TileContentProcessor";
 export * from "./tilesetProcessing/TileContentProcessors";
@@ -61,6 +63,8 @@ export * from "./tilesetProcessing/TilesetDataProcessor";
 export * from "./tilesetProcessing/TilesetEntryProcessor";
 export * from "./tilesetProcessing/TilesetJsonCreator";
 export * from "./tilesetProcessing/TilesetMerger";
+export * from "./tilesetProcessing/TilesetMerger3tz";
+export * from "./tilesetProcessing/TilesetMergers";
 export * from "./tilesetProcessing/TilesetOperations";
 export * from "./tilesetProcessing/TilesetProcessing";
 export * from "./tilesetProcessing/TilesetProcessor";
@@ -77,3 +81,8 @@ export * from "./gltfExtensionsUtils/StringBuilder";
 export * from "./gltfExtensionsUtils/StructuralMetadataPropertyTables";
 export * from "./gltfExtensionsUtils/StructuralMetadataUtils";
 export * from "./gltfExtensionsUtils/StructuralMetadataMerger";
+
+export * from "./packageServer/PackageServer";
+export * from "./packageServer/PackageServerOptions";
+export * from "./packageServer/PackagePath";
+export * from "./packageServer/ContentDataTypeUtilities";

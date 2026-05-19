@@ -271,6 +271,17 @@ function parseToolArgs(a: string[]) {
       }
     )
     .command(
+      "mergeJson3tz",
+      "Merge any number of tilesets that are packaged as 3TZ files into a single tileset that " +
+        "uses the 'MAXAR_content_3tz' extension to refer to the input files using relative paths. " +
+        "If any of the inputs is a directory name, then all '.3tz' files from this directory will " +
+        "be considered as input files, recursively.",
+      {
+        i: inputArrayDefinition,
+        o: outputStringDefinition,
+      }
+    )
+    .command(
       "upgrade",
       "Upgrades legacy tilesets to comply to the 3D Tiles specification.\n\n" +
         "By default, this will upgrade legacy tilesets to comply to 3D Tiles 1.0. " +
@@ -310,6 +321,33 @@ function parseToolArgs(a: string[]) {
       { i: inputStringDefinition, o: outputStringDefinition }
     )
     .command(
+      "serve",
+      "Creates a server that serves a directory that may contain tileset packages.",
+      {
+        i: inputStringDefinition,
+        host: {
+          default: "localhost",
+          description: "The host name for the server",
+          type: "string",
+        },
+        port: {
+          default: 8003,
+          description: "The port number for the server",
+          type: "number",
+        },
+        cors: {
+          default: false,
+          description: "Whether CORS should be enabled",
+          type: "boolean",
+        },
+        developmentMode: {
+          default: false,
+          description: "Disables caching and enables additional log output",
+          type: "boolean",
+        },
+      }
+    )
+    .command(
       "tilesetToDatabase",
       "Create a sqlite database for a tileset. (Deprecated - use 'convert' instead)",
       {
@@ -338,6 +376,12 @@ function parseToolArgs(a: string[]) {
             "An array of either two or three values, which are the (longitude, latitude) " +
             "or (longitude, latitude, height) of the target position. The longitude and " +
             "latitude are given in degrees, and the height is given in meters.",
+          type: "array",
+        },
+        rotationDegrees: {
+          description:
+            "An array of three values, which are the (heading, pitch, roll) " +
+            "of the target rotation. The heading, pitch, and roll are given in degrees.",
           type: "array",
         },
       }
@@ -550,20 +594,34 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
     await ToolsMain.merge(inputs, output, force);
   } else if (command === "mergeJson") {
     await ToolsMain.mergeJson(inputs, output, force);
+  } else if (command === "mergeJson3tz") {
+    await ToolsMain.mergeJson3tz(inputs, output, force);
   } else if (command === "pipeline") {
     await ToolsMain.pipeline(input, force);
   } else if (command === "analyze") {
     ToolsMain.analyze(input, output, force);
+  } else if (command === "serve") {
+    const host = toolArgs.host ?? "localhost";
+    const port = toolArgs.port ?? 8003;
+    const cors = toolArgs.cors ?? false;
+    const developmentMode = toolArgs.developmentMode ?? false;
+    await ToolsMain.serve(input, host, port, cors, developmentMode);
   } else if (command === "createTilesetJson") {
     const cartographicPositionDegrees = validateOptionalNumberArray(
       toolArgs.cartographicPositionDegrees,
       2,
       3
     );
+    const rotationDegrees = validateOptionalNumberArray(
+      toolArgs.rotationDegrees,
+      3,
+      3
+    );
     await ToolsMain.createTilesetJson(
       input,
       output,
       cartographicPositionDegrees,
+      rotationDegrees,
       force
     );
   } else {
@@ -579,4 +637,4 @@ async function runChecked() {
   }
 }
 
-runChecked();
+void runChecked();

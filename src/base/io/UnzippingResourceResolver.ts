@@ -17,11 +17,16 @@ export class UnzippingResourceResolver implements ResourceResolver {
     this._delegate = delegate;
   }
 
+  /** {@inheritDoc ResourceResolver.resolveUri} */
+  resolveUri(uri: string): string {
+    return this._delegate.resolveUri(uri);
+  }
+
   /** {@inheritDoc ResourceResolver.resolveData} */
-  async resolveData(uri: string): Promise<Buffer | null> {
+  async resolveData(uri: string): Promise<Buffer | undefined> {
     const delegateData = await this._delegate.resolveData(uri);
-    if (delegateData === null) {
-      return null;
+    if (delegateData === undefined) {
+      return undefined;
     }
     const isGzipped = Buffers.isGzipped(delegateData);
     if (!isGzipped) {
@@ -35,21 +40,21 @@ export class UnzippingResourceResolver implements ResourceResolver {
   async resolveDataPartial(
     uri: string,
     maxBytes: number
-  ): Promise<Buffer | null> {
+  ): Promise<Buffer | undefined> {
     const partialDelegateData = await this._delegate.resolveDataPartial(
       uri,
       maxBytes
     );
-    if (partialDelegateData === null) {
-      return null;
+    if (partialDelegateData === undefined) {
+      return undefined;
     }
     const isGzipped = Buffers.isGzipped(partialDelegateData);
     if (!isGzipped) {
       return partialDelegateData;
     }
     const fullDelegateData = await this._delegate.resolveData(uri);
-    if (fullDelegateData === null) {
-      return null;
+    if (fullDelegateData === undefined) {
+      return undefined;
     }
     const data = zlib.gunzipSync(fullDelegateData);
     return data;

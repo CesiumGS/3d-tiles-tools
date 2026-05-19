@@ -6,7 +6,7 @@ import { TilesetError } from "../tilesetData/TilesetError";
 import { IndexEntry } from "./IndexEntry";
 
 // NOTE: These functions are carved out and ported to TypeScript from
-// https://github.com/bjornblissing/3d-tiles-tools/blob/2f4844d5bdd704509bff65199898981228594aaa/validator/lib/archive.js
+// https://github.com/bjornblissing/3d-tiles-validator/blob/2f4844d5bdd704509bff65199898981228594aaa/validator/lib/archive.js
 // TODO: The given implementation does not handle hash collisions!
 // NOTE: Fixed several issues for ZIP64 and large ZIP files. Some of the
 // changes are marked with "ZIP64_BUGFIX", but details have to be taken
@@ -37,7 +37,7 @@ export class ArchiveFunctions3tz {
     fd: number,
     stat: { size: number }
   ) {
-    const bytesToRead = 320;
+    const bytesToRead = Math.min(320, stat.size);
     const buffer = Buffer.alloc(bytesToRead);
     const offset = stat.size - bytesToRead;
     const length = bytesToRead;
@@ -138,33 +138,41 @@ export class ArchiveFunctions3tz {
       );
     }
 
-    const localFileDataSize =
-      ArchiveFunctions3tz.ZIP_LOCAL_FILE_HEADER_STATIC_SIZE +
-      filename_size +
-      +48 /* over-estimated local file header extra field size, to try and read all data in one go */ +
-      Number(comp_size);
-    const localFileDataBuffer = Buffer.alloc(localFileDataSize);
-
-    fs.readSync(fd, localFileDataBuffer, 0, localFileDataSize, offset);
-
-    // ok, skip past the filename and extras and we have our data
-    const local_comp_size = localFileDataBuffer.readUInt32LE(18);
-    const local_filename_size = localFileDataBuffer.readUInt16LE(26);
-    const local_extra_size = localFileDataBuffer.readUInt16LE(28);
-    const dataStartOffset =
-      ArchiveFunctions3tz.ZIP_LOCAL_FILE_HEADER_STATIC_SIZE +
-      local_filename_size +
-      local_extra_size;
-    const fileDataBuffer = localFileDataBuffer.slice(
-      dataStartOffset,
-      dataStartOffset + local_comp_size
+    // Read the local file header (Section 4.3.7)
+    const localFileHeaderBuffer = Buffer.alloc(
+      ArchiveFunctions3tz.ZIP_LOCAL_FILE_HEADER_STATIC_SIZE
     );
-    if (fileDataBuffer.length === 0) {
-      throw new TilesetError(
-        `Failed to get file data at offset ${dataStartOffset}`
+    fs.readSync(
+      fd,
+      localFileHeaderBuffer,
+      0,
+      ArchiveFunctions3tz.ZIP_LOCAL_FILE_HEADER_STATIC_SIZE,
+      offset
+    );
+
+    // Obtain the size information from the header that is
+    // required for accessing the actual file data (Section 4.3.8)
+    const local_comp_size = localFileHeaderBuffer.readUInt32LE(18);
+    const local_filename_size = localFileHeaderBuffer.readUInt16LE(26);
+    const local_extra_size = localFileHeaderBuffer.readUInt16LE(28);
+
+    // Read the actual file data into a buffer
+    const localFileDataBuffer = Buffer.alloc(local_comp_size);
+    const localFileDataOffset =
+      offset +
+      BigInt(
+        ArchiveFunctions3tz.ZIP_LOCAL_FILE_HEADER_STATIC_SIZE +
+          local_filename_size +
+          local_extra_size
       );
-    }
-    return fileDataBuffer;
+    fs.readSync(
+      fd,
+      localFileDataBuffer,
+      0,
+      local_comp_size,
+      localFileDataOffset
+    );
+    return localFileDataBuffer;
   }
 
   private static parseIndexData(buffer: Buffer): IndexEntry[] {

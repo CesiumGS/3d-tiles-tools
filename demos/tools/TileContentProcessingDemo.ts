@@ -11,7 +11,7 @@ import { TileContentProcessorsGltfpack } from "3d-tiles-tools";
 import { GltfPackOptions } from "3d-tiles-tools";
 
 // The intention of this demo is to show the effects of compression that
-// may be applied with glTF-Transform,  gltf-pipeline, or gltfpack. To
+// may be applied with glTF-Transform, gltf-pipeline, or gltfpack. To
 // show these effects, the input tilesets should be large and complex.
 // Therefore, the input here is not part of the repository.
 const tilesetSourceName = "./input/TestTileset";
@@ -92,6 +92,8 @@ async function runDemoGltfPack() {
   );
 }
 
-runDemo();
-
-runDemoGltfPack();
+async function run() {
+  await runDemo();
+  await runDemoGltfPack();
+}
+void run();

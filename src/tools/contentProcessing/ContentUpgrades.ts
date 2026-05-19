@@ -21,15 +21,25 @@ export class ContentUpgrades {
    * @param inputBuffer - The input buffer
    * @param options - Options that will be passed to the
    * `gltf-pipeline` when the GLB is processed.
+   * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
    * @returns The upgraded buffer
    */
   static async upgradeB3dmGltf1ToGltf2(
     inputBuffer: Buffer,
-    options: any
+    options: any,
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
   ): Promise<Buffer> {
     const inputTileData = TileFormats.readTileData(inputBuffer);
     const inputGlb = inputTileData.payload;
-    const outputGlb = await GltfUtilities.upgradeGlb(inputGlb, options);
+    let outputGlb = await GltfUtilities.upgradeGlb(inputGlb, options);
+
+    // Replace the CESIUM_RTC extension with a translation
+    // of the root node if necessary
+    outputGlb = GltfUtilities.replaceCesiumRtcExtensionInGltf2Glb(
+      outputGlb,
+      gltfUpAxis
+    );
+
     const outputTileData = TileFormats.createB3dmTileDataFromGlb(
       outputGlb,
       inputTileData.featureTable.json,
@@ -49,15 +59,25 @@ export class ContentUpgrades {
    * @param inputBuffer - The input buffer
    * @param options - Options that will be passed to the
    * `gltf-pipeline` when the GLB is processed.
+   * @param gltfUpAxis - The glTF up-axis, defaulting to "Y"
    * @returns The upgraded buffer
    */
   static async upgradeI3dmGltf1ToGltf2(
     inputBuffer: Buffer,
-    options: any
+    options: any,
+    gltfUpAxis: "X" | "Y" | "Z" | undefined
   ): Promise<Buffer> {
     const inputTileData = TileFormats.readTileData(inputBuffer);
     const inputGlb = inputTileData.payload;
-    const outputGlb = await GltfUtilities.upgradeGlb(inputGlb, options);
+    let outputGlb = await GltfUtilities.upgradeGlb(inputGlb, options);
+
+    // Replace the CESIUM_RTC extension with a translation
+    // of the root node if necessary
+    outputGlb = GltfUtilities.replaceCesiumRtcExtensionInGltf2Glb(
+      outputGlb,
+      gltfUpAxis
+    );
+
     const outputTileData = TileFormats.createI3dmTileDataFromGlb(
       outputGlb,
       inputTileData.featureTable.json,

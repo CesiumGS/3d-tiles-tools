@@ -36,7 +36,24 @@ export class VecMath {
    *
    * @returns The matrix
    */
-  static createYupToZupPacked4() {
+  static createYupToZupPacked4(): [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+  ] {
     return [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1];
   }
 
@@ -45,8 +62,51 @@ export class VecMath {
    *
    * @returns The matrix
    */
-  static createZupToYupPacked4() {
+  static createZupToYupPacked4(): [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+  ] {
     return [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
+  }
+
+  /**
+   * Create a 4x4 X-up-to-Y-up conversion matrix as a flat array
+   *
+   * @returns The matrix
+   */
+  static createXupToYupPacked4(): [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+  ] {
+    return [0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
   }
 
   /**
@@ -328,9 +388,12 @@ export class VecMath {
 
     Matrix4.getScale(matrix4, scale);
 
-    const t = Cartesian3.pack(translation, Array<number>(3));
-    const r = Quaternion.pack(quaternion, Array<number>(4));
-    const s = Cartesian3.pack(scale, Array<number>(3));
+    const t = Array<number>(3);
+    const r = Array<number>(4);
+    const s = Array<number>(3);
+    Cartesian3.pack(translation, t);
+    Quaternion.pack(quaternion, r);
+    Cartesian3.pack(scale, s);
     return {
       t: t,
       r: r,

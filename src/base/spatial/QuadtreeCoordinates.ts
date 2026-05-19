@@ -32,9 +32,9 @@ export class QuadtreeCoordinates implements TreeCoordinates {
   }
 
   /** {@inheritDoc TreeCoordinates.parent} */
-  parent(): QuadtreeCoordinates | null {
+  parent(): QuadtreeCoordinates | undefined {
     if (this._level === 0) {
-      return null;
+      return undefined;
     }
     const pLevel = this._level - 1;
     const px = this._x >> 1;

@@ -66,7 +66,7 @@ export class TilesetTraverser {
    * @param resourceResolver - The `ResourceResolver` that is used to
    * resolve resources like external metadata schema files, subtree
    * files for implicit tilesets, or external tilesets.
-   * @param options - Options for the traveral process.
+   * @param options - Options for the traversal process.
    */
   constructor(
     baseUri: string,
@@ -122,13 +122,19 @@ export class TilesetTraverser {
     schema: Schema | undefined,
     traversalCallback: TraversalCallback
   ): Promise<void> {
-    await this.traverseInternal(tileset.root, schema, traversalCallback);
+    await this.traverseInternal(
+      tileset,
+      tileset.root,
+      schema,
+      traversalCallback
+    );
   }
 
   /**
    * Traverses the hierarchy of tiles, starting at the
    * given tile.
    *
+   * @param tileset - The `Tileset`
    * @param tile - The `Tile` where the traversal should start
    * @param schema - The schema from the `tileset.schema` or the
    * `tileset.schemaUri`, or `undefined` if the tileset does
@@ -137,22 +143,25 @@ export class TilesetTraverser {
    * @returns A Promise that resolves when the traversal finished
    */
   async traverseWithSchemaAt(
+    tileset: Tileset,
     tile: Tile,
     schema: Schema | undefined,
     traversalCallback: TraversalCallback
   ): Promise<void> {
-    await this.traverseInternal(tile, schema, traversalCallback);
+    await this.traverseInternal(tileset, tile, schema, traversalCallback);
   }
 
   /**
    * Actual implementation of the traversal.
    *
-   * @param tile - The `Tile` where to start the traversal
    * @param tileset - The `Tileset`
+   * @param tile - The `Tile` where to start the traversal
+   * @param schema - The `Schema` of the tileset
    * @param traversalCallback - The `TraversalCallback`
    * @returns A Promise that resolves when the traversal finished
    */
   private async traverseInternal(
+    tileset: Tileset,
     tile: Tile,
     schema: Schema | undefined,
     traversalCallback: TraversalCallback
@@ -162,10 +171,12 @@ export class TilesetTraverser {
     const stack: TraversedTile[] = [];
 
     const traversalRoot = ExplicitTraversedTile.createRoot(
+      tileset,
       tile,
       schema,
       this.resourceResolver
     );
+
     stack.push(traversalRoot);
 
     while (stack.length > 0) {

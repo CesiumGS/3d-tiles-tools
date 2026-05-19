@@ -1,5 +1,6 @@
 import { ResourceResolver } from "../../base";
 
+import { Tileset } from "../../structure";
 import { Tile } from "../../structure";
 import { Content } from "../../structure";
 import { TileImplicitTiling } from "../../structure";
@@ -9,8 +10,6 @@ import { Schema } from "../../structure";
 import { TraversedTile } from "./TraversedTile";
 import { ExplicitTraversedTiles } from "./ExplicitTraversedTiles";
 import { MetadataSemanticOverrides } from "./MetadataSemanticOverrides";
-
-import { ImplicitTilings } from "../implicitTiling/ImplicitTilings";
 
 import { Tiles } from "../tilesets/Tiles";
 
@@ -25,6 +24,11 @@ export class ExplicitTraversedTile implements TraversedTile {
    * The parent tile, or `undefined` if this is the root
    */
   private readonly _parent: TraversedTile | undefined;
+
+  /**
+   * The `Tileset` that this tile belongs to
+   */
+  private readonly _tileset: Tileset;
 
   /**
    * The `Tile` object that this traversed tile was created for
@@ -63,6 +67,7 @@ export class ExplicitTraversedTile implements TraversedTile {
    * Convenience function to create the root tile for a tile
    * traversal.
    *
+   * @param tileset - The tileset itself
    * @param root - The root tile from the tileset
    * @param schema - The optional metadata schema
    * @param resourceResolver - The `ResourceResolver` for
@@ -70,11 +75,13 @@ export class ExplicitTraversedTile implements TraversedTile {
    * @returns The root `TraversedTile`
    */
   static createRoot(
+    tileset: Tileset,
     root: Tile,
     schema: Schema | undefined,
     resourceResolver: ResourceResolver
   ): TraversedTile {
     const traversedRoot = new ExplicitTraversedTile(
+      tileset,
       root,
       "/root",
       0,
@@ -88,6 +95,7 @@ export class ExplicitTraversedTile implements TraversedTile {
   /**
    * Creates a new instance
    *
+   * @param tileset - The tileset that this tile belongs to
    * @param tile - The `Tile` from the tileset JSON
    * @param path - A JSON-path-like string describing this tile
    * @param level - The level, referring to the root of the
@@ -98,6 +106,7 @@ export class ExplicitTraversedTile implements TraversedTile {
    * external references (like subtree files)
    */
   constructor(
+    tileset: Tileset,
     tile: Tile,
     path: string,
     level: number,
@@ -105,6 +114,7 @@ export class ExplicitTraversedTile implements TraversedTile {
     schema: Schema | undefined,
     resourceResolver: ResourceResolver
   ) {
+    this._tileset = tileset;
     this._tile = tile;
     this._path = path;
     this._level = level;
@@ -189,6 +199,7 @@ export class ExplicitTraversedTile implements TraversedTile {
     const schema = this._schema;
     if (implicitTiling) {
       const children = await ExplicitTraversedTiles.createTraversedChildren(
+        this._tileset,
         implicitTiling,
         schema,
         this,
@@ -207,6 +218,7 @@ export class ExplicitTraversedTile implements TraversedTile {
       const child = children[i];
       const childPath = `${this.path}/children/${i}`;
       const traversedChild = new ExplicitTraversedTile(
+        this._tileset,
         child,
         childPath,
         childLevel,
@@ -269,18 +281,12 @@ export class ExplicitTraversedTile implements TraversedTile {
 
   /** {@inheritDoc TraversedTile.getSubtreeUri} */
   getSubtreeUri(): string | undefined {
-    const implicitTiling = this._tile.implicitTiling;
-    if (!implicitTiling) {
-      return undefined;
-    }
-    const rootCoordinates =
-      ImplicitTilings.createRootCoordinates(implicitTiling);
-    const subtreeUri = ImplicitTilings.substituteTemplateUri(
-      implicitTiling.subdivisionScheme,
-      implicitTiling.subtrees.uri,
-      rootCoordinates
-    );
-    return subtreeUri;
+    return undefined;
+  }
+
+  /** {@inheritDoc TraversedTile.getTileset} */
+  getTileset(): Tileset {
+    return this._tileset;
   }
 
   /**

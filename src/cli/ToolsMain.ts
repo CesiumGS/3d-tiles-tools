@@ -6,6 +6,7 @@ import { DeveloperError } from "../base";
 import { Buffers } from "../base";
 import { Iterables } from "../base";
 import { ContentDataTypes } from "../base";
+import { ContentDataTypeRegistry } from "../base";
 
 import { TileFormats } from "../tilesets";
 import { TileDataLayouts } from "../tilesets";
@@ -13,16 +14,15 @@ import { TileFormatError } from "../tilesets";
 
 import { ContentOps } from "../tools";
 import { GltfUtilities } from "../tools";
-
 import { PipelineExecutor } from "../tools";
 import { Pipelines } from "../tools";
-
 import { TilesetOperations } from "../tools";
 import { TileFormatsMigration } from "../tools";
 import { TilesetConverter } from "../tools";
 import { TilesetJsonCreator } from "../tools";
 
-import { ContentDataTypeRegistry } from "../base";
+import { PackageServer } from "../tools/packageServer/PackageServer";
+import { PackageServerOptions } from "../tools/packageServer/PackageServerOptions";
 
 import { Loggers } from "../base";
 const logger = Loggers.get("CLI");
@@ -64,8 +64,10 @@ export class ToolsMain {
 
     ToolsMain.ensureCanWrite(output, force);
     const inputBuffer = fs.readFileSync(input);
+    const gltfUpAxis = "Y";
     const outputBuffer = await TileFormatsMigration.convertB3dmToGlb(
-      inputBuffer
+      inputBuffer,
+      gltfUpAxis
     );
     fs.writeFileSync(output, outputBuffer);
 
@@ -98,9 +100,11 @@ export class ToolsMain {
 
     // Prepare the resolver for external GLBs in I3DM
     const externalGlbResolver = ToolsMain.createResolver(input);
+    const gltfUpAxis = "Y";
     const outputBuffer = await TileFormatsMigration.convertI3dmToGlb(
       inputBuffer,
-      externalGlbResolver
+      externalGlbResolver,
+      gltfUpAxis
     );
     fs.writeFileSync(output, outputBuffer);
 
@@ -577,6 +581,18 @@ export class ToolsMain {
     logger.debug(`Executing merge DONE`);
   }
 
+  static async mergeJson3tz(inputs: string[], output: string, force: boolean) {
+    logger.debug(`Executing mergeJson3tz`);
+    logger.debug(`  inputs: ${inputs}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+
+    ToolsMain.ensureCanWrite(output, force);
+    await TilesetOperations.mergeJson3tz(inputs, output, force);
+
+    logger.debug(`Executing merge DONE`);
+  }
+
   static async pipeline(input: string, force: boolean) {
     logger.debug(`Executing pipeline`);
     logger.debug(`  input: ${input}`);
@@ -594,6 +610,7 @@ export class ToolsMain {
     inputName: string,
     output: string,
     cartographicPositionDegrees: number[] | undefined,
+    rotationDegrees: number[] | undefined,
     force: boolean
   ) {
     logger.debug(`Executing createTilesetJson`);
@@ -621,10 +638,25 @@ export class ToolsMain {
       contentUris
     );
 
-    if (cartographicPositionDegrees !== undefined) {
+    if (
+      cartographicPositionDegrees !== undefined &&
+      rotationDegrees !== undefined
+    ) {
       logger.info(
         `Creating tileset at cartographic position: ` +
-          `${cartographicPositionDegrees} (in degress)`
+          `${cartographicPositionDegrees} (in degrees) and rotation: ` +
+          `${rotationDegrees} (in degrees)`
+      );
+      const transform =
+        TilesetJsonCreator.computeTransformFromCartographicPositionAndRotationDegrees(
+          cartographicPositionDegrees,
+          rotationDegrees
+        );
+      tileset.root.transform = transform;
+    } else if (cartographicPositionDegrees !== undefined) {
+      logger.info(
+        `Creating tileset at cartographic position: ` +
+          `${cartographicPositionDegrees} (in degrees)`
       );
       const transform =
         TilesetJsonCreator.computeTransformFromCartographicPositionDegrees(
@@ -639,6 +671,37 @@ export class ToolsMain {
     fs.writeFileSync(output, Buffer.from(tilesetJsonString));
 
     logger.debug(`Executing createTilesetJson DONE`);
+  }
+
+  static async serve(
+    sourceName: string,
+    host: string,
+    port: number,
+    cors: boolean,
+    developmentMode: boolean
+  ) {
+    logger.debug(`Executing serve`);
+    logger.debug(`  sourceName: ${sourceName}`);
+    logger.debug(`  host: ${host}`);
+    logger.debug(`  port: ${port}`);
+    logger.debug(`  cors: ${cors}`);
+    logger.debug(`  developmentMode: ${developmentMode}`);
+
+    let baseDirectory = sourceName;
+    if (!Paths.isDirectory(sourceName)) {
+      baseDirectory = path.dirname(sourceName);
+    }
+    const packageServer = new PackageServer(
+      baseDirectory,
+      cors,
+      developmentMode
+    );
+    const packageServerOptions: PackageServerOptions = {
+      host: host,
+      port: port,
+      sourceName: sourceName,
+    };
+    await packageServer.start(packageServerOptions);
   }
 
   /**

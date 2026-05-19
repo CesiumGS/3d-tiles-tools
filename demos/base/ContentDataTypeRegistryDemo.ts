@@ -30,4 +30,4 @@ async function testContentDataTypeRegistry() {
   }
 }
 
-testContentDataTypeRegistry();
+void testContentDataTypeRegistry();

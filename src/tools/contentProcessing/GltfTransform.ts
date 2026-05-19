@@ -26,7 +26,7 @@ import { StructuralMetadataMerger } from "../gltfExtensionsUtils/StructuralMetad
  */
 export class GltfTransform {
   /**
-   * The `gltf-transform` IO handler, intialized lazily and cached
+   * The `gltf-transform` IO handler, initialized lazily and cached
    * in `getIO`.
    */
   private static io: NodeIO | undefined;
