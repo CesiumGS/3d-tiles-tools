@@ -40,9 +40,9 @@ async function recreateTileset() {
 
 // Create one entry for the list of examples that can
 // be selected in the dropdown menu.
-function createSampleOption(name) {
+function createSampleOption(name, info) {
   return {
-    text: name,
+    text: name + (info ?? ""),
     onselect: async function () {
 	  currentTilesetName = name;
       doZoom = true;
@@ -60,7 +60,7 @@ const sampleOptions = [
   createSampleOption("glTF1-y-up-with-gltfUpAxis-y"),
   createSampleOption("glTF1-z-up"),
   createSampleOption("glTF1-z-up-with-gltfUpAxis-z"),
-  createSampleOption("glTF1-z-up-instanced"),
+  createSampleOption("glTF1-z-up-instanced", " (wrong BB)"),
   createSampleOption("glTF1-z-up-instanced-with-gltfUpAxis-z"),
   createSampleOption("glTF2"),
 ];
