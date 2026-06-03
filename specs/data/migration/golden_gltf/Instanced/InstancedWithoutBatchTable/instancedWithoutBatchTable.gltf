@@ -5,31 +5,10 @@
   },
   "accessors": [
     {
-      "type": "VEC3",
-      "componentType": 5126,
-      "count": 25,
-      "bufferView": 0,
-      "byteOffset": 0
-    },
-    {
-      "type": "VEC4",
-      "componentType": 5126,
-      "count": 25,
-      "bufferView": 0,
-      "byteOffset": 300
-    },
-    {
-      "type": "VEC3",
-      "componentType": 5126,
-      "count": 25,
-      "bufferView": 0,
-      "byteOffset": 700
-    },
-    {
       "type": "SCALAR",
       "componentType": 5123,
       "count": 36,
-      "bufferView": 1,
+      "bufferView": 0,
       "byteOffset": 0
     },
     {
@@ -46,35 +25,56 @@
         -10,
         -10.000003814697266
       ],
-      "bufferView": 2,
+      "bufferView": 1,
       "byteOffset": 0
     },
     {
       "type": "VEC3",
       "componentType": 5126,
       "count": 24,
-      "bufferView": 2,
+      "bufferView": 1,
       "byteOffset": 12
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 25,
+      "bufferView": 2,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC4",
+      "componentType": 5126,
+      "count": 25,
+      "bufferView": 2,
+      "byteOffset": 300
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 25,
+      "bufferView": 2,
+      "byteOffset": 700
     }
   ],
   "bufferViews": [
     {
       "buffer": 0,
       "byteOffset": 0,
-      "byteLength": 1000
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 1000,
       "byteLength": 72,
       "target": 34963
     },
     {
       "buffer": 0,
-      "byteOffset": 1072,
+      "byteOffset": 72,
       "byteLength": 576,
       "byteStride": 24,
       "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 648,
+      "byteLength": 1000
     }
   ],
   "buffers": [
@@ -94,12 +94,12 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 4,
-            "NORMAL": 5
+            "POSITION": 1,
+            "NORMAL": 2
           },
           "mode": 4,
           "material": 0,
-          "indices": 3
+          "indices": 0
         }
       ]
     }
@@ -110,9 +110,9 @@
       "extensions": {
         "EXT_mesh_gpu_instancing": {
           "attributes": {
-            "TRANSLATION": 0,
-            "ROTATION": 1,
-            "SCALE": 2
+            "TRANSLATION": 3,
+            "ROTATION": 4,
+            "SCALE": 5
           }
         }
       }
