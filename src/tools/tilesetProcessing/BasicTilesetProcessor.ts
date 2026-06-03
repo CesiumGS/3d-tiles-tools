@@ -434,7 +434,7 @@ export class BasicTilesetProcessor extends TilesetProcessor {
       const sourceContentUri = content.uri;
       const fullSourceContentUri = Paths.join(basePath, sourceContentUri);
 
-      let fullTargetContentUri;
+      let fullTargetContentUri: string | undefined;
       if (this.isProcessed(fullSourceContentUri)) {
         fullTargetContentUri = this.getTargetKey(fullSourceContentUri);
       } else {
