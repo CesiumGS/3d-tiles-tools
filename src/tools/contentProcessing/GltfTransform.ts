@@ -51,8 +51,6 @@ export class GltfTransform {
       "meshopt.decoder": MeshoptDecoder,
       "meshopt.encoder": MeshoptEncoder,
     });
-    // Note: The order of the calls matters.
-    // EXTInstanceFeatures depends on the EXTStructuralMetadata
     io.registerExtensions([EXTInstanceFeatures]);
     GltfTransform.io = io;
     return io;
