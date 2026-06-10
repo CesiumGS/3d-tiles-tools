@@ -135,7 +135,8 @@ export class StructuralMetadataMerger {
           copiedSchemaJson
         );
         copiedStructuralMetadata.setSchema(copiedSchema);
-        copiedStructuralMetadata.setSchemaUri(null as any);
+        // The empty string counts as "not present" in glTF-Transform
+        copiedStructuralMetadata.setSchemaUri("");
       }
 
       await targetDocument.transform(unpartition());
@@ -217,10 +218,11 @@ export class StructuralMetadataMerger {
       );
 
       // If the target schema was resolved from a URI, then assign
-      // the newly created object to the target, and set the
-      // schemaUri of the target to null
+      // the newly created object to the target, and clear the
+      // schemaUri of the target
       targetStructuralMetadata.setSchema(targetSchema);
-      targetStructuralMetadata.setSchemaUri(null as any);
+        // The empty string counts as "not present" in glTF-Transform
+      targetStructuralMetadata.setSchemaUri("");
     } else {
       targetSchema = targetStructuralMetadata.getSchema();
     }

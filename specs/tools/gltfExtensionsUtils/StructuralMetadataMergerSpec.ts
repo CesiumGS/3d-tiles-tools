@@ -902,12 +902,13 @@ describe("StructuralMetadataMerger", function () {
     // There should be one class
     expect(getMetadataClassNames(document).length).toBe(1);
 
-    // The schemaUri in the result should be "null"
+    // The schemaUri in the result should be the empty string
+    // (representing "not present" in glTF-Transform)
     const root = document.getRoot();
     const structuralMetadata = root.getExtension<StructuralMetadata>(
       "EXT_structural_metadata"
     );
-    expect(structuralMetadata?.getSchemaUri()).toBe(null as any);
+    expect(structuralMetadata?.getSchemaUri()).toBe("");
 
     await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
       document,
@@ -919,8 +920,9 @@ describe("StructuralMetadataMerger", function () {
     // There should be two classes
     expect(getMetadataClassNames(document).length).toBe(2);
 
-    // The schemaUri in the result should still be "null"
-    expect(structuralMetadata?.getSchemaUri()).toBe(null as any);
+    // The schemaUri in the result should still be the empty string
+    // (representing "not present" in glTF-Transform)
+    expect(structuralMetadata?.getSchemaUri()).toBe("");
 
     if (SERIALIZE_DOCUMENTS) {
       const io = await GltfTransform.getIO();
