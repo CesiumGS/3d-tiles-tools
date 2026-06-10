@@ -12,12 +12,12 @@ export class StringPropertyModel implements PropertyModel {
 
   private readonly valuesBuffer: Buffer;
   private readonly stringOffsetsBuffer: Buffer;
-  private readonly stringOffsetType: string;
+  private readonly stringOffsetType: string | undefined;
 
   constructor(
     valuesBuffer: Buffer,
     stringOffsetsBuffer: Buffer,
-    stringOffsetType: string
+    stringOffsetType: string | undefined
   ) {
     this.valuesBuffer = valuesBuffer;
     this.stringOffsetsBuffer = stringOffsetsBuffer;
@@ -30,10 +30,11 @@ export class StringPropertyModel implements PropertyModel {
     const stringOffsetsBuffer = this.stringOffsetsBuffer;
     const stringOffsetType = this.stringOffsetType;
 
+    const localStringOffsetType = stringOffsetType ?? "UINT32";
     const stringSlice = BinaryPropertyModels.computeSlice(
       index,
       stringOffsetsBuffer,
-      stringOffsetType,
+      localStringOffsetType,
       undefined
     );
     const stringOffset = stringSlice.offset;

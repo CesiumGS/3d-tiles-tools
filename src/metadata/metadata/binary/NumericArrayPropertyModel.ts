@@ -17,7 +17,7 @@ export class NumericArrayPropertyModel implements PropertyModel {
   private readonly valuesBuffer: Buffer;
   private readonly componentType: string;
   private readonly arrayOffsetsBuffer: Buffer | undefined;
-  private readonly arrayOffsetType: string;
+  private readonly arrayOffsetType: string | undefined;
   private readonly count: number | undefined;
 
   constructor(
@@ -25,7 +25,7 @@ export class NumericArrayPropertyModel implements PropertyModel {
     valuesBuffer: Buffer,
     componentType: string,
     arrayOffsetsBuffer: Buffer | undefined,
-    arrayOffsetType: string,
+    arrayOffsetType: string | undefined,
     count: number | undefined
   ) {
     this.type = type;
@@ -46,10 +46,11 @@ export class NumericArrayPropertyModel implements PropertyModel {
     const count = this.count;
     const componentCount = MetadataTypes.componentCountForType(type);
 
+    const localArrayOffsetType = arrayOffsetType ?? "UINT32";
     const arraySlice = BinaryPropertyModels.computeSlice(
       index,
       arrayOffsetsBuffer,
-      arrayOffsetType,
+      localArrayOffsetType,
       count
     );
     const arrayOffset = arraySlice.offset;

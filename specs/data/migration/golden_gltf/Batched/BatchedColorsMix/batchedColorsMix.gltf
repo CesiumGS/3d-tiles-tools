@@ -515,55 +515,55 @@
   ],
   "scene": 0,
   "extensionsUsed": [
-    "EXT_structural_metadata",
-    "EXT_mesh_features"
+    "EXT_mesh_features",
+    "EXT_structural_metadata"
   ],
   "extensions": {
     "EXT_structural_metadata": {
       "schema": {
         "id": "ID_batch_table",
-        "name": "Generated from batch_table",
         "classes": {
           "class_batch_table": {
-            "name": "Generated from batch_table",
             "properties": {
               "id": {
+                "type": "SCALAR",
+                "required": true,
                 "name": "id",
                 "description": "Generated from id",
-                "type": "SCALAR",
-                "componentType": "UINT8",
-                "required": true
+                "componentType": "UINT8"
               },
               "Longitude": {
+                "type": "SCALAR",
+                "required": true,
                 "name": "Longitude",
                 "description": "Generated from Longitude",
-                "type": "SCALAR",
-                "componentType": "FLOAT32",
-                "required": true
+                "componentType": "FLOAT32"
               },
               "Latitude": {
+                "type": "SCALAR",
+                "required": true,
                 "name": "Latitude",
                 "description": "Generated from Latitude",
-                "type": "SCALAR",
-                "componentType": "FLOAT32",
-                "required": true
+                "componentType": "FLOAT32"
               },
               "Height": {
+                "type": "SCALAR",
+                "required": true,
                 "name": "Height",
                 "description": "Generated from Height",
-                "type": "SCALAR",
-                "componentType": "FLOAT32",
-                "required": true
+                "componentType": "FLOAT32"
               }
-            }
+            },
+            "name": "Generated from batch_table"
           }
-        }
+        },
+        "name": "Generated from batch_table"
       },
       "propertyTables": [
         {
-          "name": "Property Table",
           "class": "class_batch_table",
           "count": 10,
+          "name": "Property Table",
           "properties": {
             "id": {
               "values": 2

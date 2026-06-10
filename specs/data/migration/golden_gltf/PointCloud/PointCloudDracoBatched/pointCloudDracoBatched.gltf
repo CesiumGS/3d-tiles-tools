@@ -143,40 +143,40 @@
     "EXT_structural_metadata": {
       "schema": {
         "id": "ID_batch_table",
-        "name": "Generated from batch_table",
         "classes": {
           "class_batch_table": {
-            "name": "Generated from batch_table",
             "properties": {
               "name": {
-                "name": "name",
-                "description": "Generated from name",
                 "type": "STRING",
-                "required": true
+                "required": true,
+                "name": "name",
+                "description": "Generated from name"
               },
               "dimensions": {
+                "type": "VEC3",
+                "required": true,
                 "name": "dimensions",
                 "description": "Generated from dimensions",
-                "type": "VEC3",
-                "componentType": "FLOAT32",
-                "required": true
+                "componentType": "FLOAT32"
               },
               "id": {
+                "type": "SCALAR",
+                "required": true,
                 "name": "id",
                 "description": "Generated from id",
-                "type": "SCALAR",
-                "componentType": "UINT32",
-                "required": true
+                "componentType": "UINT32"
               }
-            }
+            },
+            "name": "Generated from batch_table"
           }
-        }
+        },
+        "name": "Generated from batch_table"
       },
       "propertyTables": [
         {
-          "name": "Property Table",
           "class": "class_batch_table",
           "count": 8,
+          "name": "Property Table",
           "properties": {
             "name": {
               "values": 1,

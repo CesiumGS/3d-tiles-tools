@@ -7,34 +7,6 @@
     {
       "type": "VEC3",
       "componentType": 5126,
-      "count": 25,
-      "bufferView": 1,
-      "byteOffset": 0
-    },
-    {
-      "type": "VEC4",
-      "componentType": 5126,
-      "count": 25,
-      "bufferView": 1,
-      "byteOffset": 300
-    },
-    {
-      "type": "VEC3",
-      "componentType": 5126,
-      "count": 25,
-      "bufferView": 1,
-      "byteOffset": 700
-    },
-    {
-      "type": "SCALAR",
-      "componentType": 5123,
-      "count": 25,
-      "bufferView": 1,
-      "byteOffset": 1000
-    },
-    {
-      "type": "VEC3",
-      "componentType": 5126,
       "count": 24,
       "max": [
         10,
@@ -46,29 +18,57 @@
         -10,
         -10
       ],
-      "bufferView": 2,
+      "bufferView": 1,
       "byteOffset": 0
     },
     {
       "type": "VEC3",
       "componentType": 5126,
       "count": 24,
-      "bufferView": 2,
+      "bufferView": 1,
       "byteOffset": 12
     },
     {
       "type": "VEC2",
       "componentType": 5126,
       "count": 24,
-      "bufferView": 2,
+      "bufferView": 1,
       "byteOffset": 24
     },
     {
       "type": "SCALAR",
       "componentType": 5123,
       "count": 36,
+      "bufferView": 2,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 25,
       "bufferView": 3,
       "byteOffset": 0
+    },
+    {
+      "type": "VEC4",
+      "componentType": 5126,
+      "count": 25,
+      "bufferView": 3,
+      "byteOffset": 300
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 25,
+      "bufferView": 3,
+      "byteOffset": 700
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 25,
+      "bufferView": 3,
+      "byteOffset": 1000
     }
   ],
   "bufferViews": [
@@ -80,20 +80,20 @@
     {
       "buffer": 0,
       "byteOffset": 0,
-      "byteLength": 1052
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 1052,
       "byteLength": 768,
       "byteStride": 32,
       "target": 34962
     },
     {
       "buffer": 0,
-      "byteOffset": 1820,
+      "byteOffset": 768,
       "byteLength": 72,
       "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 840,
+      "byteLength": 1052
     },
     {
       "buffer": 0,
@@ -143,13 +143,13 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 4,
-            "NORMAL": 5,
-            "TEXCOORD_0": 6
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
           },
           "mode": 4,
           "material": 0,
-          "indices": 7
+          "indices": 3
         }
       ]
     }
@@ -169,10 +169,10 @@
         },
         "EXT_mesh_gpu_instancing": {
           "attributes": {
-            "TRANSLATION": 0,
-            "ROTATION": 1,
-            "SCALE": 2,
-            "_FEATURE_ID_0": 3
+            "TRANSLATION": 4,
+            "ROTATION": 5,
+            "SCALE": 6,
+            "_FEATURE_ID_0": 7
           }
         }
       }
@@ -197,9 +197,9 @@
   ],
   "scene": 0,
   "extensionsUsed": [
-    "EXT_structural_metadata",
     "EXT_instance_features",
-    "EXT_mesh_gpu_instancing"
+    "EXT_mesh_gpu_instancing",
+    "EXT_structural_metadata"
   ],
   "extensionsRequired": [
     "EXT_mesh_gpu_instancing"
@@ -208,27 +208,27 @@
     "EXT_structural_metadata": {
       "schema": {
         "id": "ID_batch_table",
-        "name": "Generated from batch_table",
         "classes": {
           "class_batch_table": {
-            "name": "Generated from batch_table",
             "properties": {
               "Height": {
+                "type": "SCALAR",
+                "required": true,
                 "name": "Height",
                 "description": "Generated from Height",
-                "type": "SCALAR",
-                "componentType": "UINT8",
-                "required": true
+                "componentType": "UINT8"
               }
-            }
+            },
+            "name": "Generated from batch_table"
           }
-        }
+        },
+        "name": "Generated from batch_table"
       },
       "propertyTables": [
         {
-          "name": "Property Table",
           "class": "class_batch_table",
           "count": 25,
+          "name": "Property Table",
           "properties": {
             "Height": {
               "values": 4

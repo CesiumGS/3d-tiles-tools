@@ -13,8 +13,6 @@ import { unpartition } from "@gltf-transform/functions";
 
 import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
 
-import { EXTStructuralMetadata } from "../../gltf-extensions";
-import { EXTMeshFeatures } from "../../gltf-extensions";
 import { EXTInstanceFeatures } from "../../gltf-extensions";
 
 import { StructuralMetadataMerger } from "../gltfExtensionsUtils/StructuralMetadataMerger";
@@ -53,12 +51,6 @@ export class GltfTransform {
       "meshopt.decoder": MeshoptDecoder,
       "meshopt.encoder": MeshoptEncoder,
     });
-    // Note: The order of these calls matters. The EXTMeshFeatures and
-    // EXTInstanceFeatures depend on the EXTStructuralMetadata, because
-    // they may refer to PropertyTable objects via their FeatureId.
-    // So the EXTStructuralMetadata has to be read first.
-    io.registerExtensions([EXTStructuralMetadata]);
-    io.registerExtensions([EXTMeshFeatures]);
     io.registerExtensions([EXTInstanceFeatures]);
     GltfTransform.io = io;
     return io;

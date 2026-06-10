@@ -4,23 +4,24 @@ import { Document } from "@gltf-transform/core";
 import { Property } from "@gltf-transform/core";
 import { IProperty } from "@gltf-transform/core";
 
+import { copyToDocument } from "@gltf-transform/functions";
+import { mergeDocuments } from "@gltf-transform/functions";
 import { unpartition } from "@gltf-transform/functions";
 
-import { EXTStructuralMetadata } from "../../gltf-extensions/";
-import { StructuralMetadata } from "../../gltf-extensions/";
-import { MeshPrimitiveStructuralMetadata } from "../../gltf-extensions/";
-import { StructuralMetadataSchema as Schema } from "../../gltf-extensions/";
-import { StructuralMetadataClass as Class } from "../../gltf-extensions/";
-import { StructuralMetadataPropertyTable as PropertyTable } from "../../gltf-extensions/";
-import { StructuralMetadataPropertyTexture as PropertyTexture } from "../../gltf-extensions/";
-import { StructuralMetadataPropertyAttribute as PropertyAttribute } from "../../gltf-extensions/";
+import { EXTStructuralMetadata } from "@gltf-transform/extensions";
+import { StructuralMetadata } from "@gltf-transform/extensions";
+import { Class } from "@gltf-transform/extensions";
+import { MeshPrimitiveStructuralMetadata } from "@gltf-transform/extensions";
+import { PropertyAttribute } from "@gltf-transform/extensions";
+import { PropertyTable } from "@gltf-transform/extensions";
+import { PropertyTexture } from "@gltf-transform/extensions";
+import { Schema } from "@gltf-transform/extensions";
 
-import { mergeDocuments } from "./StructuralMetadataMergeUtilities";
-import { copyToDocument } from "./StructuralMetadataMergeUtilities";
+import { StructuralMetadataSchemas } from "./StructuralMetadataSchemas";
 
 import { MetadataError } from "../../metadata";
-import { Loggers } from "../../base/";
 
+import { Loggers } from "../../base/";
 const logger = Loggers.get("gltfExtensionsUtils");
 function log(object: any) {
   logger.debug(object);
@@ -124,15 +125,18 @@ export class StructuralMetadataMerger {
       // For the copied metadata, ensure that it does not use a schemaUri
       // any more, but instead, contains the inlined schema directly
       const copiedSchemaUri = copiedStructuralMetadata.getSchemaUri();
-      if (copiedSchemaUri !== null) {
+      if (copiedSchemaUri !== null && copiedSchemaUri.length !== 0) {
         const targetExtStructuralMetadata = targetDocument.createExtension(
           EXTStructuralMetadata
         );
         const copiedSchemaJson = await schemaUriResolver(copiedSchemaUri);
-        const copiedSchema =
-          targetExtStructuralMetadata.createSchemaFrom(copiedSchemaJson);
+        const copiedSchema = StructuralMetadataSchemas.createSchemaFrom(
+          targetExtStructuralMetadata,
+          copiedSchemaJson
+        );
         copiedStructuralMetadata.setSchema(copiedSchema);
-        copiedStructuralMetadata.setSchemaUri(null);
+        // The empty string counts as "not present" in glTF-Transform
+        copiedStructuralMetadata.setSchemaUri("");
       }
 
       await targetDocument.transform(unpartition());
@@ -190,30 +194,35 @@ export class StructuralMetadataMerger {
 
     let sourceSchema: Schema | null;
     const sourceSchemaUri = sourceStructuralMetadata.getSchemaUri();
-    if (sourceSchemaUri !== null) {
+    if (sourceSchemaUri !== null && sourceSchemaUri.length !== 0) {
       const sourceSchemaJson = await schemaUriResolver(sourceSchemaUri);
       // TODO Will the fact that the TARGET extension object
       // is used here cause trouble when running copyToDocument?
       // In any case, the object should NOT be created in the
       // source (because the source should not be modified!)
-      sourceSchema =
-        targetExtStructuralMetadata.createSchemaFrom(sourceSchemaJson);
+      sourceSchema = StructuralMetadataSchemas.createSchemaFrom(
+        targetExtStructuralMetadata,
+        sourceSchemaJson
+      );
     } else {
       sourceSchema = sourceStructuralMetadata.getSchema();
     }
 
     let targetSchema: Schema | null;
     const targetSchemaUri = targetStructuralMetadata.getSchemaUri();
-    if (targetSchemaUri !== null) {
+    if (targetSchemaUri !== null && targetSchemaUri.length !== 0) {
       const targetSchemaJson = await schemaUriResolver(targetSchemaUri);
-      targetSchema =
-        targetExtStructuralMetadata.createSchemaFrom(targetSchemaJson);
+      targetSchema = StructuralMetadataSchemas.createSchemaFrom(
+        targetExtStructuralMetadata,
+        targetSchemaJson
+      );
 
       // If the target schema was resolved from a URI, then assign
-      // the newly created object to the target, and set the
-      // schemaUri of the target to null
+      // the newly created object to the target, and clear the
+      // schemaUri of the target
       targetStructuralMetadata.setSchema(targetSchema);
-      targetStructuralMetadata.setSchemaUri(null);
+      // The empty string counts as "not present" in glTF-Transform
+      targetStructuralMetadata.setSchemaUri("");
     } else {
       targetSchema = targetStructuralMetadata.getSchema();
     }
@@ -958,7 +967,7 @@ export class StructuralMetadataMerger {
 
   /**
    * Returns whether the given array of glTF-Transform `Property` objects
-   * contains an objec that is equal to the given one, based on the
+   * contains an object that is equal to the given one, based on the
    * glTF-Transform `Property.equal` implementation.
    *
    * @param properties - The properties

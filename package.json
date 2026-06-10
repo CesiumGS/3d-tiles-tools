@@ -27,9 +27,9 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@gltf-transform/core": "^3.9.0",
-    "@gltf-transform/extensions": "^3.9.0",
-    "@gltf-transform/functions": "^3.9.0",
+    "@gltf-transform/core": "^4.4.0",
+    "@gltf-transform/extensions": "^4.4.0",
+    "@gltf-transform/functions": "^4.4.0",
     "archiver": "^5.3.1",
     "better-sqlite3": "^11.5.0",
     "cesium": "^1.103.0",
@@ -43,7 +43,7 @@
     "pino": "^8.15.0",
     "pino-pretty": "^10.2.0",
     "seedrandom": "^3.0.5",
-    "sharp": "^0.32.1",
+    "sharp": "0.33.5",
     "yargs": "^17.5.1"
   },
   "devDependencies": {
@@ -85,13 +85,13 @@
     "about:package-clean": "echo 'Delete the contents of the 'build' output folder'",
     "about:package-prepare": "echo 'Prepare a package: Linting, formatting, build, test, documentation, and third-party information updates'",
     "about:package": "echo 'Prepare a package that can then be published on NPM'",
-    "start": "npx ts-node src/main.ts",
+    "start": "npx tsx src/main.ts",
     "eslint": "eslint \"./**/*.ts\" --cache",
     "build": "tsc --build --verbose --force && npm run build-post",
     "build-post": "npm run build-post-ktx && npm run build-post-cli",
     "build-post-ktx": "npx copyfiles --flat ./src/ktx/ktx/external/basis_encoder.* ./build/src/ktx/ktx/external",
     "build-post-cli": "npx copyfiles --flat ./bin/cli.mjs ./build/src",
-    "test": "npx ts-node node_modules/jasmine/bin/jasmine.js --config=specs/jasmine.json",
+    "test": "npx tsx node_modules/jasmine/bin/jasmine.js --config=specs/jasmine.json",
     "coverage": "npx c8 --clean npm run test",
     "prettier-check": "prettier --check \"**/*\"",
     "prettier": "prettier --write \"**/*\"",

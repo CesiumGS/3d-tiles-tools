@@ -3,17 +3,18 @@ import { Document } from "@gltf-transform/core";
 import NdArray from "ndarray";
 import { savePixels } from "ndarray-pixels";
 
-import { EXTStructuralMetadata } from "../../../src/gltf-extensions";
-import { MeshPrimitiveStructuralMetadata } from "../../../src/gltf-extensions";
-import { StructuralMetadata } from "../../../src/gltf-extensions";
-import { StructuralMetadataSchema as Schema } from "../../../src/gltf-extensions";
-import { StructuralMetadataClass as Class } from "../../../src/gltf-extensions";
-import { StructuralMetadataPropertyTable as PropertyTable } from "../../../src/gltf-extensions";
-import { StructuralMetadataPropertyAttribute as PropertyAttribute } from "../../../src/gltf-extensions";
-import { StructuralMetadataPropertyTexture as PropertyTexture } from "../../../src/gltf-extensions";
+import { EXTStructuralMetadata } from "@gltf-transform/extensions";
+import { StructuralMetadata } from "@gltf-transform/extensions";
+import { MeshPrimitiveStructuralMetadata } from "@gltf-transform/extensions";
+import { Schema } from "@gltf-transform/extensions";
+import { Class } from "@gltf-transform/extensions";
+import { PropertyTable } from "@gltf-transform/extensions";
+import { PropertyAttribute } from "@gltf-transform/extensions";
+import { PropertyTexture } from "@gltf-transform/extensions";
 
 import { BinaryPropertyTableBuilder } from "../../../src/metadata/";
 
+import { StructuralMetadataSchemas } from "../../../src/tools/";
 import { GltfTransform } from "../../../src/tools/";
 import { StructuralMetadataPropertyTables } from "../../../src/tools/";
 import { StructuralMetadataMerger } from "../../../src/tools/";
@@ -31,7 +32,9 @@ const LOG_SERIALIZED_DOCUMENTS = false;
 
 // A dummy resolver for the `schemaUri` that may be found in metadata
 const specSchemaUriResolver = async (schemaUri: string) => {
-  console.error("The specSchemaUriResolver should not be called!");
+  console.error(
+    `The specSchemaUriResolver should not be called, was called with '${schemaUri}'`
+  );
   const schema = {
     id: "SPEC_SCHEMA_FROM_URI_" + schemaUri,
   };
@@ -276,7 +279,10 @@ function obtainStructuralMetadata(document: Document): StructuralMetadata {
 function assignMetadataSchema(document: Document, schemaJson: any) {
   const extStructuralMetadata = document.createExtension(EXTStructuralMetadata);
   const structuralMetadata = obtainStructuralMetadata(document);
-  const metadataSchema = extStructuralMetadata.createSchemaFrom(schemaJson);
+  const metadataSchema = StructuralMetadataSchemas.createSchemaFrom(
+    extStructuralMetadata,
+    schemaJson
+  );
   structuralMetadata.setSchema(metadataSchema);
 }
 
@@ -430,7 +436,6 @@ async function addSpecPropertyTexture(
   const image = await savePixels(pixels, "image/png");
   const texture = document.createTexture();
   texture.setImage(image);
-  texture.setURI("propertyTexture.png");
 
   // Create and add a property texture with the following structure:
   // {
@@ -897,12 +902,13 @@ describe("StructuralMetadataMerger", function () {
     // There should be one class
     expect(getMetadataClassNames(document).length).toBe(1);
 
-    // The schemaUri in the result should be "null"
+    // The schemaUri in the result should be the empty string
+    // (representing "not present" in glTF-Transform)
     const root = document.getRoot();
     const structuralMetadata = root.getExtension<StructuralMetadata>(
       "EXT_structural_metadata"
     );
-    expect(structuralMetadata?.getSchemaUri()).toBe(null);
+    expect(structuralMetadata?.getSchemaUri()).toBe("");
 
     await StructuralMetadataMerger.mergeDocumentsWithStructuralMetadata(
       document,
@@ -914,8 +920,9 @@ describe("StructuralMetadataMerger", function () {
     // There should be two classes
     expect(getMetadataClassNames(document).length).toBe(2);
 
-    // The schemaUri in the result should still be "null"
-    expect(structuralMetadata?.getSchemaUri()).toBe(null);
+    // The schemaUri in the result should still be the empty string
+    // (representing "not present" in glTF-Transform)
+    expect(structuralMetadata?.getSchemaUri()).toBe("");
 
     if (SERIALIZE_DOCUMENTS) {
       const io = await GltfTransform.getIO();

@@ -7,9 +7,8 @@ import { Buffer as GltfBuffer } from "@gltf-transform/core";
 import { quantize } from "@gltf-transform/functions";
 import { QuantizeOptions } from "@gltf-transform/functions";
 
+import { EXTMeshFeatures, Features } from "@gltf-transform/extensions";
 import { KHRMeshQuantization } from "@gltf-transform/extensions";
-
-import { EXTMeshFeatures } from "../../gltf-extensions";
 
 import { Iterables } from "../../base";
 
@@ -235,8 +234,8 @@ export class GltfTransformPointClouds {
     buffer: GltfBuffer,
     primitive: Primitive
   ) {
-    let extMeshFeatures;
-    let meshFeatures;
+    let extMeshFeatures: EXTMeshFeatures | undefined;
+    let meshFeatures: Features | undefined;
 
     const attributes = readablePointCloud.getAttributes();
     for (const attributeName of attributes) {
@@ -266,14 +265,14 @@ export class GltfTransformPointClouds {
 
         const featureCount = new Set([...featureIdValues]).size;
 
-        const featureId = extMeshFeatures.createFeatureId();
+        const featureId = extMeshFeatures.createFeatureID();
         featureId.setAttribute(attributeNumber);
         featureId.setFeatureCount(featureCount);
 
         if (!meshFeatures) {
-          meshFeatures = extMeshFeatures.createMeshFeatures();
+          meshFeatures = extMeshFeatures.createFeatures();
         }
-        meshFeatures.addFeatureId(featureId);
+        meshFeatures.addFeatureID(featureId);
       }
     }
 

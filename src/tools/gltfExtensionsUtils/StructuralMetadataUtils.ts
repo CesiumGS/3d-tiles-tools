@@ -2,21 +2,21 @@ import { Document } from "@gltf-transform/core";
 import { Mesh } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 
-import { StructuralMetadataClass as Class } from "../../gltf-extensions";
-import { StructuralMetadataClassProperty as ClassProperty } from "../../gltf-extensions";
-import { MeshPrimitiveStructuralMetadata } from "../../gltf-extensions";
-import { StructuralMetadataPropertyAttribute as PropertyAttribute } from "../../gltf-extensions";
-import { StructuralMetadataPropertyAttributeProperty as PropertyAttributeProperty } from "../../gltf-extensions";
-import { StructuralMetadataPropertyTable as PropertyTable } from "../../gltf-extensions";
-import { StructuralMetadataPropertyTableProperty as PropertyTableProperty } from "../../gltf-extensions";
-import { StructuralMetadataPropertyTexture as PropertyTexture } from "../../gltf-extensions";
-import { StructuralMetadataPropertyTextureProperty as PropertyTextureProperty } from "../../gltf-extensions";
-import { StructuralMetadataSchema as Schema } from "../../gltf-extensions";
-import { StructuralMetadata } from "../../gltf-extensions";
-
 import { BinaryPropertyModels } from "../../metadata";
 
 import { StringBuilder } from "./StringBuilder";
+
+import { StructuralMetadata } from "@gltf-transform/extensions";
+import { Class } from "@gltf-transform/extensions";
+import { ClassProperty } from "@gltf-transform/extensions";
+import { MeshPrimitiveStructuralMetadata } from "@gltf-transform/extensions";
+import { PropertyAttribute } from "@gltf-transform/extensions";
+import { PropertyAttributeProperty } from "@gltf-transform/extensions";
+import { PropertyTable } from "@gltf-transform/extensions";
+import { PropertyTableProperty } from "@gltf-transform/extensions";
+import { PropertyTexture } from "@gltf-transform/extensions";
+import { PropertyTextureProperty } from "@gltf-transform/extensions";
+import { Schema } from "@gltf-transform/extensions";
 
 /**
  * Utilities related to the glTF `EXT_structural_metadata` extension.
@@ -88,7 +88,7 @@ export class StructuralMetadataUtils {
     propertyTable: PropertyTable,
     schema: Schema | null
   ) {
-    sb.addLine("name: ", propertyTable.getObjectName());
+    sb.addLine("name: ", propertyTable.getName());
     sb.addLine("class: ", propertyTable.getClass());
     sb.addLine("count: ", propertyTable.getCount());
     sb.addLine("properties:");
@@ -154,16 +154,14 @@ export class StructuralMetadataUtils {
     if (arrayOffsets) {
       arrayOffsetsBufferViewData = Buffer.from(arrayOffsets);
     }
-    const arrayOffsetType =
-      propertyTableProperty.getArrayOffsetType() ?? "UINT32";
+    const arrayOffsetType = propertyTableProperty.getArrayOffsetType();
 
     const stringOffsets = propertyTableProperty.getStringOffsets();
     let stringOffsetsBufferViewData: Buffer | undefined;
     if (stringOffsets) {
       stringOffsetsBufferViewData = Buffer.from(stringOffsets);
     }
-    const stringOffsetType =
-      propertyTableProperty.getStringOffsetType() ?? "UINT32";
+    const stringOffsetType = propertyTableProperty.getStringOffsetType();
 
     let enumValueType: string | undefined = undefined;
     const enumType = classProperty.getEnumType();
@@ -226,7 +224,7 @@ export class StructuralMetadataUtils {
 
   private static createSchemaString(sb: StringBuilder, schema: Schema) {
     sb.addLine("id: ", schema.getId());
-    sb.addLine("name: ", schema.getObjectName());
+    sb.addLine("name: ", schema.getName());
     sb.addLine("description: ", schema.getDescription());
     sb.addLine("version: ", schema.getVersion());
     sb.addLine("classes: ");
@@ -245,7 +243,7 @@ export class StructuralMetadataUtils {
   }
 
   private static createClassString(sb: StringBuilder, classObject: Class) {
-    sb.addLine("name: ", classObject.getObjectName());
+    sb.addLine("name: ", classObject.getName());
     sb.addLine("description: ", classObject.getDescription());
     sb.addLine("properties:");
     const propertyKeys = classObject.listPropertyKeys();
@@ -266,7 +264,7 @@ export class StructuralMetadataUtils {
     sb: StringBuilder,
     classProperty: ClassProperty
   ) {
-    sb.addLine("name: ", classProperty.getObjectName());
+    sb.addLine("name: ", classProperty.getName());
     sb.addLine("description: ", classProperty.getDescription());
     sb.addLine("type: ", classProperty.getType());
     sb.addLine("componentType: ", classProperty.getComponentType());
@@ -368,7 +366,7 @@ export class StructuralMetadataUtils {
     sb: StringBuilder,
     propertyTexture: PropertyTexture
   ) {
-    sb.addLine("name: ", propertyTexture.getObjectName());
+    sb.addLine("name: ", propertyTexture.getName());
     sb.addLine("class: ", propertyTexture.getClass());
     sb.addLine("properties:");
     const propertyKeys = propertyTexture.listPropertyKeys();
@@ -405,7 +403,7 @@ export class StructuralMetadataUtils {
     sb: StringBuilder,
     propertyAttribute: PropertyAttribute
   ) {
-    sb.addLine("name: ", propertyAttribute.getObjectName());
+    sb.addLine("name: ", propertyAttribute.getName());
     sb.addLine("class: ", propertyAttribute.getClass());
     sb.addLine("properties:");
     const propertyKeys = propertyAttribute.listPropertyKeys();

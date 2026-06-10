@@ -383,19 +383,15 @@ export class BinaryPropertyTables {
   // A rewrite would have been taken less time and resulted in cleaner code,
   // but it should do what it is supposed to do for now...
 
-  private static toBuffer(arrayBuffer: ArrayBuffer): Buffer {
-    const buffer = Buffer.from(arrayBuffer);
-    return buffer;
-  }
-
   private static createBuffer(
     values: any,
     componentType: string | undefined
   ): Buffer {
-    const buffer = BinaryPropertyTables.toBuffer(
-      BinaryPropertyTables.createBufferInternal(values, componentType)
+    const array = BinaryPropertyTables.createBufferInternal(
+      values,
+      componentType
     );
-    return buffer;
+    return Buffer.from(array);
   }
 
   private static createBufferInternal(
@@ -429,9 +425,8 @@ export class BinaryPropertyTables {
   }
 
   private static createStringBuffer(values: any): Buffer {
-    return BinaryPropertyTables.toBuffer(
-      BinaryPropertyTables.createStringBufferInternal(values)
-    );
+    const array = BinaryPropertyTables.createStringBufferInternal(values);
+    return Buffer.from(array);
   }
 
   private static createStringBufferInternal(inputValues: any): Uint8Array {
@@ -441,9 +436,8 @@ export class BinaryPropertyTables {
   }
 
   private static createBooleanBuffer(values: any): Buffer {
-    return BinaryPropertyTables.toBuffer(
-      BinaryPropertyTables.createBooleanBufferInternal(values)
-    );
+    const array = BinaryPropertyTables.createBooleanBufferInternal(values);
+    return Buffer.from(array);
   }
 
   private static createBooleanBufferInternal(inputValues: any): Uint8Array {
