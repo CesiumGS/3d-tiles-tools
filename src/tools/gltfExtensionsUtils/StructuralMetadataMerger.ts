@@ -221,7 +221,7 @@ export class StructuralMetadataMerger {
       // the newly created object to the target, and clear the
       // schemaUri of the target
       targetStructuralMetadata.setSchema(targetSchema);
-        // The empty string counts as "not present" in glTF-Transform
+      // The empty string counts as "not present" in glTF-Transform
       targetStructuralMetadata.setSchemaUri("");
     } else {
       targetSchema = targetStructuralMetadata.getSchema();
