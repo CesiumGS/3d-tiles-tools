@@ -52,6 +52,7 @@
     "@types/jasmine": "^4.0.3",
     "@typescript-eslint/eslint-plugin": "^5.38.0",
     "@typescript-eslint/parser": "^5.38.0",
+    "@types/node": "18.19.115",
     "@types/yargs": "^17.0.22",
     "c8": "^8.0.1",
     "del-cli": "^5.0.0",
