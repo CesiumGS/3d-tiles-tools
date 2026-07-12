@@ -108,9 +108,9 @@ export class PackageServer {
   }
 
   /**
-   * Start the server based on the given options
+   * Start the server based on the given options.
    *
-   * @param options The options
+   * @param options - The options
    */
   async start(options: PackageServerOptions) {
     const host = options.host;
@@ -157,8 +157,8 @@ export class PackageServer {
   /**
    * The request handler for the node http server
    *
-   * @param req The request
-   * @param res The response
+   * @param req - The request
+   * @param res - The response
    */
   private async handleRequest(
     req: http.IncomingMessage,
@@ -200,7 +200,7 @@ export class PackageServer {
    * because why should a logger offer the option to pass in the
    * desired log level, right?
    *
-   * @param output The output
+   * @param output - The output
    */
   private logInfo(output: any) {
     if (logger[this.logInfoLevel] === undefined) {
@@ -213,7 +213,7 @@ export class PackageServer {
   /**
    * Print the given output to the logger, using the 'logDebugLevel'
    *
-   * @param output The output
+   * @param output - The output
    */
   private logDebug(output: any) {
     if (logger[this.logDebugLevel] === undefined) {
@@ -323,7 +323,7 @@ export class PackageServer {
    *
    * See postProcessTileFor3tz for details.
    *
-   * @param packagePrefix The prefix for the URLs
+   * @param packagePrefix - The prefix for the URLs
    * @param tileset - The tileset
    */
   private static postProcessTilesetFor3tz(
@@ -340,7 +340,7 @@ export class PackageServer {
    * This will update all 'content.uri' strings as necessary to handle
    * 3TZ files. See expandContent3tzUri for details.
    *
-   * @param packagePrefix The prefix for the URLs
+   * @param packagePrefix - The prefix for the URLs
    * @param tile - The tile
    */
   private static postProcessTileFor3tz(packagePrefix: string, tile: Tile) {
@@ -371,7 +371,7 @@ export class PackageServer {
    * If the URI will be prefixed with the given string, unless it
    * refers to a 3TZ file or an entry of a 3TZ file.
    *
-   * @param packagePrefix The prefix for the URLs
+   * @param packagePrefix - The prefix for the URLs
    * @param uri - The content URI
    * @returns The updated content URI
    */

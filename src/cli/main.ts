@@ -37,7 +37,7 @@ const inputStringDefinition: any = {
 };
 
 // The definition of the 'input' option that is used for
-// all commands that only multiple inputs, to be
+// all commands that allow multiple inputs, to be
 // passed to the yargs 'command' definitions.
 const inputArrayDefinition: any = {
   alias: "input",
@@ -49,6 +49,9 @@ const inputArrayDefinition: any = {
   demandOption: true,
 };
 
+// The definition of the 'output' option that is used for
+// all commands that create a single output, to be
+// passed to the yargs 'command' definitions.
 const outputStringDefinition: any = {
   alias: "output",
   description: "Output path for the command.",
