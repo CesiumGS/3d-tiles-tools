@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+### 0.5.4 - 2026-07-12
+
+- Added a command line function to create a tileset JSON file that refers to several `.3tz` files, using the `MAXAR_content_3tz` extension, via [#200](https://github.com/CesiumGS/3d-tiles-tools/pull/200)
+- Added a command line function to start a server that can serve tileset data from a directory, a `.3tz` file, or a `.3dtiles` file, via [#86](https://github.com/CesiumGS/3d-tiles-tools/pull/86)
+- Updated the glTF-Transform dependency to version 4.4.0 via [#185](https://github.com/CesiumGS/3d-tiles-tools/pull/185). This version contains implementations for the `EXT_mesh_features` and `EXT_structural_metadata` extensions that had originally been implemented as part of the 3D Tiles Tools, so these implementations have been removed from the 3D Tiles Tools.
+
 ### 0.5.3 - 2026-03-15
 
 - Added export declarations for the new classes that have been introduced in 0.5.2
