@@ -218,9 +218,9 @@ export class TilesetMerger3tz {
    *
    * Their children, transform, and implicit tiling will be deleted.
    *
-   * @param tilesets The input tilesets
-   * @param tilesetSourceDirectories The directory names of the inputs
-   * @param tilesetSourceFileNames The file names of the inputs
+   * @param tilesets - The input tilesets
+   * @param tilesetSourceDirectories - The directory names of the inputs
+   * @param tilesetSourceFileNames - The file names of the inputs
    * @returns The children
    */
   static getChildren3tz(

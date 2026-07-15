@@ -81,7 +81,7 @@ export class ContentDataTypeUtilities {
    * given content data type, or `undefined` if the given type is
    * `undefined` or not known.
    *
-   * @param contentDataType The `ContentDataType` string
+   * @param contentDataType - The `ContentDataType` string
    * @returns The file extension, without `.` dot
    */
   static getFileExtension(
@@ -98,7 +98,7 @@ export class ContentDataTypeUtilities {
    * Returns the MIME type for the given content data type, or
    * `undefined` if the given type is `undefined` or not known.
    *
-   * @param contentDataType The `ContentDataType` string
+   * @param contentDataType - The `ContentDataType` string
    * @returns The file extension, without `.` dot
    */
   static getMimeType(contentDataType: string | undefined): string | undefined {

@@ -11,16 +11,19 @@ import { Database } from 'better-sqlite3';
 import { Document } from '@gltf-transform/core';
 import { Extension } from '@gltf-transform/core';
 import { ExtensionProperty } from '@gltf-transform/core';
+import { EXTStructuralMetadata } from '@gltf-transform/extensions';
+import { FeatureID } from '@gltf-transform/extensions';
 import { IProperty } from '@gltf-transform/core';
 import { Logger } from 'pino';
 import { NodeIO } from '@gltf-transform/core';
 import { Nullable } from '@gltf-transform/core';
 import { PathLike } from 'fs';
 import { Primitive } from '@gltf-transform/core';
+import { PropertyTable as PropertyTable_2 } from '@gltf-transform/extensions';
 import { PropertyType } from '@gltf-transform/core';
 import { ReaderContext } from '@gltf-transform/core';
-import { Texture } from '@gltf-transform/core';
-import { TextureInfo } from '@gltf-transform/core';
+import { RefSet } from '@gltf-transform/core';
+import { Schema as Schema_2 } from '@gltf-transform/extensions';
 import { Transform } from '@gltf-transform/core';
 import { TypedArray } from '@gltf-transform/core';
 import { WriterContext } from '@gltf-transform/core';
@@ -337,7 +340,7 @@ export class BinarySubtreeDataResolver {
 
 // @internal
 export class BooleanArrayPropertyModel implements PropertyModel {
-    constructor(valuesBuffer: Buffer, arrayOffsetsBuffer: Buffer | undefined, arrayOffsetType: string, count: number | undefined);
+    constructor(valuesBuffer: Buffer, arrayOffsetsBuffer: Buffer | undefined, arrayOffsetType: string | undefined, count: number | undefined);
     getPropertyValue(index: number): boolean[];
 }
 
@@ -574,6 +577,12 @@ export class ContentDataTypes {
 }
 
 // @internal
+export class ContentDataTypeUtilities {
+    static getFileExtension(contentDataType: string | undefined): string | undefined;
+    static getMimeType(contentDataType: string | undefined): string | undefined;
+}
+
+// @internal
 export class ContentError extends Error {
     constructor(message: string);
     // (undocumented)
@@ -730,34 +739,6 @@ export class DracoError extends Error {
     toString: () => string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "IElementStructuralMetadata" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class ElementStructuralMetadata extends ExtensionProperty<IElementStructuralMetadata> {
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // Warning: (ae-forgotten-export) The symbol "NAME" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    extensionName: typeof NAME;
-    // (undocumented)
-    protected getDefaults(): Nullable<IElementStructuralMetadata>;
-    // (undocumented)
-    getIndex(): number | null;
-    // (undocumented)
-    getPropertyTable(): StructuralMetadataPropertyTable | null;
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    parentTypes: [PropertyType.NODE];
-    // (undocumented)
-    propertyType: "ElementStructuralMetadata";
-    // (undocumented)
-    setIndex(index: number | null): this;
-    // (undocumented)
-    setPropertyTable(propertyTable: StructuralMetadataPropertyTable | null): this;
-}
-
 // @internal
 export interface EnumValue extends RootProperty {
     description?: string;
@@ -819,121 +800,6 @@ export class EXTInstanceFeatures extends Extension {
     read(context: ReaderContext): this;
     // (undocumented)
     write(context: WriterContext): this;
-}
-
-// @internal
-export class EXTMeshFeatures extends Extension {
-    // (undocumented)
-    createFeatureId(): MeshFeaturesFeatureId;
-    // (undocumented)
-    createFeatureIdTexture(): FeatureIdTexture;
-    // (undocumented)
-    createMeshFeatures(): MeshFeatures;
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    readonly extensionName = "EXT_mesh_features";
-    // (undocumented)
-    read(context: ReaderContext): this;
-    // (undocumented)
-    write(context: WriterContext): this;
-}
-
-// @internal
-export class EXTStructuralMetadata extends Extension {
-    // (undocumented)
-    createClass(): StructuralMetadataClass;
-    // Warning: (ae-forgotten-export) The symbol "ClassDef" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    createClassFrom(classDef: ClassDef): StructuralMetadataClass;
-    // (undocumented)
-    createClassProperty(): StructuralMetadataClassProperty;
-    // Warning: (ae-forgotten-export) The symbol "ClassPropertyDef" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    createClassPropertyFrom(classPropertyDef: ClassPropertyDef): StructuralMetadataClassProperty;
-    // (undocumented)
-    createElementStructuralMetadata(): ElementStructuralMetadata;
-    // (undocumented)
-    createEnum(): StructuralMetadataEnum;
-    // Warning: (ae-forgotten-export) The symbol "EnumDef" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    createEnumFrom(enumDef: EnumDef): StructuralMetadataEnum;
-    // (undocumented)
-    createEnumValue(): StructuralMetadataEnumValue;
-    // Warning: (ae-forgotten-export) The symbol "EnumValueDef" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    createEnumValueFrom(enumValueDef: EnumValueDef): StructuralMetadataEnumValue;
-    // (undocumented)
-    createMeshPrimitiveStructuralMetadata(): MeshPrimitiveStructuralMetadata;
-    // (undocumented)
-    createPropertyAttribute(): StructuralMetadataPropertyAttribute;
-    // (undocumented)
-    createPropertyAttributeProperty(): StructuralMetadataPropertyAttributeProperty;
-    // (undocumented)
-    createPropertyTable(): StructuralMetadataPropertyTable;
-    // (undocumented)
-    createPropertyTableProperty(): StructuralMetadataPropertyTableProperty;
-    // (undocumented)
-    createPropertyTexture(): StructuralMetadataPropertyTexture;
-    // (undocumented)
-    createPropertyTextureProperty(): StructuralMetadataPropertyTextureProperty;
-    // (undocumented)
-    createSchema(): StructuralMetadataSchema;
-    // Warning: (ae-forgotten-export) The symbol "SchemaDef" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    createSchemaFrom(schemaDef: SchemaDef): StructuralMetadataSchema;
-    // (undocumented)
-    createStructuralMetadata(): StructuralMetadata;
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    readonly extensionName = "EXT_structural_metadata";
-    prewrite(context: WriterContext, propertyType: PropertyType): this;
-    // (undocumented)
-    readonly prewriteTypes: PropertyType[];
-    // (undocumented)
-    read(context: ReaderContext): this;
-    // (undocumented)
-    write(context: WriterContext): this;
-}
-
-// Warning: (ae-forgotten-export) The symbol "IFeatureIdTexture" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class FeatureIdTexture extends ExtensionProperty<IFeatureIdTexture> {
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // Warning: (ae-forgotten-export) The symbol "NAME_3" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    extensionName: typeof NAME_3;
-    // (undocumented)
-    getChannels(): number[];
-    // (undocumented)
-    protected getDefaults(): Nullable<IFeatureIdTexture> & {
-        channels: number[];
-        texture: null;
-        textureInfo: TextureInfo;
-    };
-    // (undocumented)
-    getTexture(): Texture | null;
-    // (undocumented)
-    getTextureInfo(): TextureInfo | null;
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    parentTypes: ["FeatureId"];
-    // (undocumented)
-    propertyType: "FeatureIdTexture";
-    // (undocumented)
-    setChannels(channels: number[]): this;
-    // (undocumented)
-    setTexture(texture: Texture | null): this;
 }
 
 // @internal
@@ -1135,13 +1001,13 @@ export class InstanceFeatures extends ExtensionProperty<IInstanceFeatures> {
     addFeatureId(featureId: InstanceFeaturesFeatureId): this;
     // (undocumented)
     static EXTENSION_NAME: string;
-    // Warning: (ae-forgotten-export) The symbol "NAME_2" needs to be exported by the entry point index.d.ts
+    // Warning: (ae-forgotten-export) The symbol "NAME" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    extensionName: typeof NAME_2;
+    extensionName: typeof NAME;
     // (undocumented)
     protected getDefaults(): Nullable<IInstanceFeatures> & {
-        featureIds: never[];
+        featureIds: RefSet<InstanceFeaturesFeatureId>;
     };
     // (undocumented)
     protected init(): void;
@@ -1162,7 +1028,7 @@ export class InstanceFeaturesFeatureId extends ExtensionProperty<IFeatureId> {
     // (undocumented)
     static EXTENSION_NAME: string;
     // (undocumented)
-    extensionName: typeof NAME_2;
+    extensionName: typeof NAME;
     // Warning: (ae-forgotten-export) The symbol "FeatureIdAttribute" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -1181,7 +1047,7 @@ export class InstanceFeaturesFeatureId extends ExtensionProperty<IFeatureId> {
     // (undocumented)
     getNullFeatureId(): number | null;
     // (undocumented)
-    getPropertyTable(): StructuralMetadataPropertyTable | null;
+    getPropertyTable(): PropertyTable_2 | null;
     // (undocumented)
     protected init(): void;
     // (undocumented)
@@ -1197,7 +1063,7 @@ export class InstanceFeaturesFeatureId extends ExtensionProperty<IFeatureId> {
     // (undocumented)
     setNullFeatureId(nullFeatureId: number | null): this;
     // (undocumented)
-    setPropertyTable(propertyTable: StructuralMetadataPropertyTable | null): this;
+    setPropertyTable(propertyTable: PropertyTable_2 | null): this;
 }
 
 // @internal
@@ -1276,118 +1142,9 @@ export class Loggers {
     static setLevel(level: string): void;
 }
 
-// Warning: (ae-forgotten-export) The symbol "IMeshFeatures" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class MeshFeatures extends ExtensionProperty<IMeshFeatures> {
-    // (undocumented)
-    addFeatureId(featureId: MeshFeaturesFeatureId): this;
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    extensionName: typeof NAME_3;
-    // (undocumented)
-    protected getDefaults(): Nullable<IMeshFeatures> & {
-        featureIds: never[];
-    };
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    listFeatureIds(): MeshFeaturesFeatureId[];
-    // (undocumented)
-    parentTypes: [PropertyType.PRIMITIVE];
-    // (undocumented)
-    propertyType: "MeshFeatures";
-    // (undocumented)
-    removeFeatureId(featureId: MeshFeaturesFeatureId): this;
-}
-
-// Warning: (ae-forgotten-export) The symbol "IFeatureId_2" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class MeshFeaturesFeatureId extends ExtensionProperty<IFeatureId_2> {
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    extensionName: typeof NAME_3;
-    // Warning: (ae-forgotten-export) The symbol "FeatureIdAttribute_2" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    getAttribute(): FeatureIdAttribute_2 | null;
-    // (undocumented)
-    protected getDefaults(): Nullable<IFeatureId_2> & {
-        nullFeatureId: null;
-        label: null;
-        attribute: null;
-        texture: null;
-        propertyTable: null;
-    };
-    // (undocumented)
-    getFeatureCount(): number;
-    // (undocumented)
-    getLabel(): string | null;
-    // (undocumented)
-    getNullFeatureId(): number | null;
-    // (undocumented)
-    getPropertyTable(): StructuralMetadataPropertyTable | null;
-    // (undocumented)
-    getTexture(): FeatureIdTexture | null;
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    parentTypes: ["MeshFeatures"];
-    // (undocumented)
-    propertyType: "FeatureId";
-    // (undocumented)
-    setAttribute(attribute: FeatureIdAttribute_2 | null): this;
-    // (undocumented)
-    setFeatureCount(featureCount: number): this;
-    // (undocumented)
-    setLabel(label: string | null): this;
-    // (undocumented)
-    setNullFeatureId(nullFeatureId: number | null): this;
-    // (undocumented)
-    setPropertyTable(propertyTable: StructuralMetadataPropertyTable | null): this;
-    // (undocumented)
-    setTexture(texture: FeatureIdTexture | null): this;
-}
-
 // @internal
 export class MeshFeaturesUtils {
     static createMeshFeaturesInfoString(document: Document): string;
-}
-
-// Warning: (ae-forgotten-export) The symbol "IMeshPrimitiveStructuralMetadata" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class MeshPrimitiveStructuralMetadata extends ExtensionProperty<IMeshPrimitiveStructuralMetadata> {
-    // (undocumented)
-    addPropertyAttribute(propertyAttribute: StructuralMetadataPropertyAttribute): this;
-    // (undocumented)
-    addPropertyTexture(propertyTexture: StructuralMetadataPropertyTexture): this;
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    extensionName: typeof NAME;
-    // (undocumented)
-    protected getDefaults(): Nullable<IMeshPrimitiveStructuralMetadata> & {
-        propertyTextures: never[];
-        propertyAttributes: never[];
-    };
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    listPropertyAttributes(): StructuralMetadataPropertyAttribute[];
-    // (undocumented)
-    listPropertyTextures(): StructuralMetadataPropertyTexture[];
-    // (undocumented)
-    parentTypes: [PropertyType.PRIMITIVE];
-    // (undocumented)
-    propertyType: "MeshPrimitiveStructuralMetadata";
-    // (undocumented)
-    removePropertyAttribute(propertyAttribute: StructuralMetadataPropertyAttribute): this;
-    // (undocumented)
-    removePropertyTexture(propertyTexture: StructuralMetadataPropertyTexture): this;
 }
 
 // @internal
@@ -1543,7 +1300,7 @@ export class NumberTypeDescriptions {
 
 // @internal
 export class NumericArrayPropertyModel implements PropertyModel {
-    constructor(type: string, valuesBuffer: Buffer, componentType: string, arrayOffsetsBuffer: Buffer | undefined, arrayOffsetType: string, count: number | undefined);
+    constructor(type: string, valuesBuffer: Buffer, componentType: string, arrayOffsetsBuffer: Buffer | undefined, arrayOffsetType: string | undefined, count: number | undefined);
     getPropertyValue(index: number): (number | bigint | (number | bigint)[])[];
 }
 
@@ -1587,6 +1344,29 @@ export class Octrees {
     static coordinatesForLevel(level: number): Generator<OctreeCoordinates, void, unknown>;
     static isValid(c: OctreeCoordinates): boolean;
 }
+
+// @internal
+export class PackagePath {
+    constructor(fullUrlPathname: string);
+    static computeResolved3tzContainerPath(urlPathname: string): string | undefined;
+    readonly containerPath: string;
+    readonly innerFilePath: string;
+}
+
+// @internal
+export class PackageServer {
+    constructor(baseDirectory: string, cors: boolean, developmentMode: boolean);
+    resolveContent(packagePath: PackagePath): Promise<Buffer | undefined>;
+    start(options: PackageServerOptions): Promise<void>;
+    stop(): Promise<void>;
+}
+
+// @internal
+export type PackageServerOptions = {
+    host: string;
+    port: number;
+    sourceName: string;
+};
 
 // @internal
 export class Paths {
@@ -1705,9 +1485,6 @@ export interface PropertyTableProperty extends RootProperty {
     stringOffsetType?: string;
     values: number;
 }
-
-// @internal
-export type PropertyTablePropertyOffsetType = "UINT8" | "UINT16" | "UINT32" | "UINT64";
 
 // @internal
 export class QuadtreeCoordinates implements TreeCoordinates {
@@ -1833,7 +1610,7 @@ export interface StatisticsClassProperty extends RootProperty {
 
 // @internal
 export class StringArrayPropertyModel implements PropertyModel {
-    constructor(valuesBuffer: Buffer, arrayOffsetsBuffer: Buffer | undefined, arrayOffsetType: string, stringOffsetsBuffer: Buffer, stringOffsetType: string, count: number | undefined);
+    constructor(valuesBuffer: Buffer, arrayOffsetsBuffer: Buffer | undefined, arrayOffsetType: string | undefined, stringOffsetsBuffer: Buffer, stringOffsetType: string | undefined, count: number | undefined);
     getPropertyValue(index: number): string[];
 }
 
@@ -1852,268 +1629,8 @@ export class StringBuilder {
 
 // @internal
 export class StringPropertyModel implements PropertyModel {
-    constructor(valuesBuffer: Buffer, stringOffsetsBuffer: Buffer, stringOffsetType: string);
+    constructor(valuesBuffer: Buffer, stringOffsetsBuffer: Buffer, stringOffsetType: string | undefined);
     getPropertyValue(index: number): string;
-}
-
-// Warning: (ae-forgotten-export) The symbol "IStructuralMetadata" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class StructuralMetadata extends ExtensionProperty<IStructuralMetadata> {
-    // (undocumented)
-    addPropertyAttribute(propertyAttribute: StructuralMetadataPropertyAttribute): this;
-    // (undocumented)
-    addPropertyTable(propertyTable: StructuralMetadataPropertyTable): this;
-    // (undocumented)
-    addPropertyTexture(propertyTexture: StructuralMetadataPropertyTexture): this;
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    extensionName: typeof NAME;
-    // (undocumented)
-    protected getDefaults(): Nullable<IStructuralMetadata> & {
-        schema: null;
-        schemaUri: null;
-        propertyTables: never[];
-        propertyTextures: never[];
-        propertyAttributes: never[];
-    };
-    // (undocumented)
-    getSchema(): StructuralMetadataSchema | null;
-    // (undocumented)
-    getSchemaUri(): string | null;
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    listPropertyAttributes(): StructuralMetadataPropertyAttribute[];
-    // (undocumented)
-    listPropertyTables(): StructuralMetadataPropertyTable[];
-    // (undocumented)
-    listPropertyTextures(): StructuralMetadataPropertyTexture[];
-    // (undocumented)
-    parentTypes: [PropertyType.ROOT];
-    // (undocumented)
-    propertyType: "StructuralMetadata";
-    // (undocumented)
-    removePropertyAttribute(propertyAttribute: StructuralMetadataPropertyAttribute): this;
-    // (undocumented)
-    removePropertyTable(propertyTable: StructuralMetadataPropertyTable): this;
-    // (undocumented)
-    removePropertyTexture(propertyTexture: StructuralMetadataPropertyTexture): this;
-    // (undocumented)
-    setSchema(schema: StructuralMetadataSchema | null): this;
-    // (undocumented)
-    setSchemaUri(schemaUri: string | null): this;
-}
-
-// Warning: (ae-forgotten-export) The symbol "IClass" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class StructuralMetadataClass extends ExtensionProperty<IClass> {
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    extensionName: typeof NAME;
-    // (undocumented)
-    protected getDefaults(): Nullable<IClass> & {
-        objectName: null;
-        description: null;
-        properties: {};
-    };
-    // (undocumented)
-    getDescription(): string | null;
-    // (undocumented)
-    getObjectName(): string | null;
-    // (undocumented)
-    getProperty(key: string): StructuralMetadataClassProperty | null;
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    listPropertyKeys(): string[];
-    // (undocumented)
-    listPropertyValues(): StructuralMetadataClassProperty[];
-    // (undocumented)
-    parentTypes: ["Schema"];
-    // (undocumented)
-    propertyType: "Class";
-    // (undocumented)
-    setDescription(description: string | null): this;
-    // (undocumented)
-    setObjectName(name: string | null): this;
-    // (undocumented)
-    setProperty(key: string, value: StructuralMetadataClassProperty | null): this;
-}
-
-// Warning: (ae-forgotten-export) The symbol "IClassProperty" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class StructuralMetadataClassProperty extends ExtensionProperty<IClassProperty> {
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    extensionName: typeof NAME;
-    // (undocumented)
-    getArray(): boolean;
-    // Warning: (ae-forgotten-export) The symbol "ClassPropertyComponentType" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    getComponentType(): ClassPropertyComponentType | null;
-    // (undocumented)
-    getCount(): number | null;
-    // (undocumented)
-    getDefault(): any;
-    // (undocumented)
-    protected getDefaults(): Nullable<IClassProperty> & {
-        objectName: null;
-        description: null;
-        componentType: null;
-        enumType: null;
-        array: null;
-        count: null;
-        normalized: null;
-        offset: null;
-        scale: null;
-        max: null;
-        min: null;
-        required: null;
-        noData: null;
-        default: null;
-    };
-    // (undocumented)
-    getDescription(): string | null;
-    // (undocumented)
-    getEnumType(): string | null;
-    // (undocumented)
-    getMax(): any;
-    // (undocumented)
-    getMin(): any;
-    // (undocumented)
-    getNoData(): any;
-    // (undocumented)
-    getNormalized(): boolean;
-    // (undocumented)
-    getObjectName(): string | null;
-    // (undocumented)
-    getOffset(): any;
-    // (undocumented)
-    getRequired(): boolean;
-    // (undocumented)
-    getScale(): any;
-    // Warning: (ae-forgotten-export) The symbol "ClassPropertyType" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    getType(): ClassPropertyType;
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    parentTypes: ["Class"];
-    // (undocumented)
-    propertyType: "ClassProperty";
-    // (undocumented)
-    setArray(array: boolean): this;
-    // (undocumented)
-    setComponentType(componentType: ClassPropertyComponentType | null): this;
-    // (undocumented)
-    setCount(count: number | null): this;
-    // (undocumented)
-    setDefault(defaultValue: any): this;
-    // (undocumented)
-    setDescription(description: string | null): this;
-    // (undocumented)
-    setEnumType(enumType: string | null): this;
-    // (undocumented)
-    setMax(max: any): this;
-    // (undocumented)
-    setMin(min: any): this;
-    // (undocumented)
-    setNoData(noData: any): this;
-    // (undocumented)
-    setNormalized(normalized: boolean): this;
-    // (undocumented)
-    setObjectName(name: string | null): this;
-    // (undocumented)
-    setOffset(offset: any): this;
-    // (undocumented)
-    setRequired(required: boolean): this;
-    // (undocumented)
-    setScale(scale: any): this;
-    // (undocumented)
-    setType(type: ClassPropertyType): this;
-}
-
-// Warning: (ae-forgotten-export) The symbol "IEnum" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class StructuralMetadataEnum extends ExtensionProperty<IEnum> {
-    // (undocumented)
-    addEnumValue(enumValue: StructuralMetadataEnumValue): this;
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    extensionName: typeof NAME;
-    // (undocumented)
-    protected getDefaults(): Nullable<IEnum> & {
-        objectName: null;
-        description: null;
-        valueType: string;
-        values: never[];
-    };
-    // (undocumented)
-    getDescription(): string | null;
-    // (undocumented)
-    getObjectName(): string | null;
-    // Warning: (ae-forgotten-export) The symbol "EnumValueType" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    getValueType(): EnumValueType;
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    listValues(): StructuralMetadataEnumValue[];
-    // (undocumented)
-    parentTypes: ["Schema"];
-    // (undocumented)
-    propertyType: "Enum";
-    // (undocumented)
-    removeEnumValue(enumValue: StructuralMetadataEnumValue): this;
-    // (undocumented)
-    setDescription(description: string | null): this;
-    // (undocumented)
-    setObjectName(name: string | null): this;
-    // (undocumented)
-    setValueType(valueType: EnumValueType): this;
-}
-
-// Warning: (ae-forgotten-export) The symbol "IEnumValue" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class StructuralMetadataEnumValue extends ExtensionProperty<IEnumValue> {
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    extensionName: typeof NAME;
-    // (undocumented)
-    protected getDefaults(): Nullable<IEnumValue> & {
-        description: null;
-    };
-    // (undocumented)
-    getDescription(): string | null;
-    // (undocumented)
-    getObjectName(): string;
-    // (undocumented)
-    getValue(): number;
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    parentTypes: ["Enum"];
-    // (undocumented)
-    propertyType: "EnumValue";
-    // (undocumented)
-    setDescription(description: string | null): this;
-    // (undocumented)
-    setObjectName(name: string): this;
-    // (undocumented)
-    setValue(value: number): this;
 }
 
 // @internal
@@ -2122,338 +1639,14 @@ export class StructuralMetadataMerger {
     static setMergedSchemaIdSuffix(mergedSchemaIdSuffix: string | undefined): void;
 }
 
-// Warning: (ae-forgotten-export) The symbol "IPropertyAttribute" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class StructuralMetadataPropertyAttribute extends ExtensionProperty<IPropertyAttribute> {
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    extensionName: typeof NAME;
-    // (undocumented)
-    getClass(): string;
-    // (undocumented)
-    protected getDefaults(): Nullable<IPropertyAttribute> & {
-        objectName: null;
-        properties: {};
-    };
-    // (undocumented)
-    getObjectName(): string | null;
-    // (undocumented)
-    getProperty(key: string): StructuralMetadataPropertyAttributeProperty | null;
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    listPropertyKeys(): string[];
-    // (undocumented)
-    listPropertyValues(): StructuralMetadataPropertyAttributeProperty[];
-    // (undocumented)
-    parentTypes: ["StructuralMetadata"];
-    // (undocumented)
-    propertyType: "PropertyAttribute";
-    // (undocumented)
-    setClass(_class: string): this;
-    // (undocumented)
-    setObjectName(name: string | null): this;
-    // (undocumented)
-    setProperty(key: string, value: StructuralMetadataPropertyAttributeProperty | null): this;
-}
-
-// Warning: (ae-forgotten-export) The symbol "IPropertyAttributeProperty" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class StructuralMetadataPropertyAttributeProperty extends ExtensionProperty<IPropertyAttributeProperty> {
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    extensionName: typeof NAME;
-    // (undocumented)
-    getAttribute(): string;
-    // (undocumented)
-    protected getDefaults(): Nullable<IPropertyAttributeProperty> & {
-        offset: null;
-        scale: null;
-        max: null;
-        min: null;
-    };
-    // (undocumented)
-    getMax(): any;
-    // (undocumented)
-    getMin(): any;
-    // (undocumented)
-    getOffset(): any;
-    // (undocumented)
-    getScale(): any;
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    parentTypes: ["PropertyAttribute"];
-    // (undocumented)
-    propertyType: "PropertyAttributeProperty";
-    // (undocumented)
-    setAttribute(attribute: string): this;
-    // (undocumented)
-    setMax(max: any): this;
-    // (undocumented)
-    setMin(min: any): this;
-    // (undocumented)
-    setOffset(offset: any): this;
-    // (undocumented)
-    setScale(scale: any): this;
-}
-
-// Warning: (ae-forgotten-export) The symbol "IPropertyTable" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class StructuralMetadataPropertyTable extends ExtensionProperty<IPropertyTable> {
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    extensionName: typeof NAME;
-    // (undocumented)
-    getClass(): string;
-    // (undocumented)
-    getCount(): number;
-    // (undocumented)
-    protected getDefaults(): Nullable<IPropertyTable> & {
-        objectName: null;
-        properties: {};
-    };
-    // (undocumented)
-    getObjectName(): string | null;
-    // (undocumented)
-    getProperty(key: string): StructuralMetadataPropertyTableProperty | null;
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    listPropertyKeys(): string[];
-    // (undocumented)
-    listPropertyValues(): StructuralMetadataPropertyTableProperty[];
-    // (undocumented)
-    parentTypes: ["StructuralMetadata"];
-    // (undocumented)
-    propertyType: "PropertyTable";
-    // (undocumented)
-    setClass(className: string): this;
-    // (undocumented)
-    setCount(count: number): this;
-    // (undocumented)
-    setObjectName(name: string | null): this;
-    // (undocumented)
-    setProperty(key: string, value: StructuralMetadataPropertyTableProperty | null): this;
-}
-
-// Warning: (ae-forgotten-export) The symbol "IPropertyTableProperty" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class StructuralMetadataPropertyTableProperty extends ExtensionProperty<IPropertyTableProperty> {
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    extensionName: typeof NAME;
-    // (undocumented)
-    getArrayOffsets(): Uint8Array | null;
-    // (undocumented)
-    getArrayOffsetType(): PropertyTablePropertyOffsetType;
-    // (undocumented)
-    protected getDefaults(): Nullable<IPropertyTableProperty> & {
-        arrayOffsets: null;
-        stringOffsets: null;
-        arrayOffsetType: null;
-        stringOffsetType: null;
-        offset: null;
-        scale: null;
-        max: null;
-        min: null;
-    };
-    // (undocumented)
-    getMax(): any;
-    // (undocumented)
-    getMin(): any;
-    // (undocumented)
-    getOffset(): any;
-    // (undocumented)
-    getScale(): any;
-    // (undocumented)
-    getStringOffsets(): Uint8Array | null;
-    // (undocumented)
-    getStringOffsetType(): PropertyTablePropertyOffsetType;
-    // (undocumented)
-    getValues(): Uint8Array;
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    parentTypes: ["PropertyTable"];
-    // (undocumented)
-    propertyType: "PropertyTableProperty";
-    // (undocumented)
-    setArrayOffsets(arrayOffsets: Uint8Array): this;
-    // (undocumented)
-    setArrayOffsetType(arrayOffsetType: PropertyTablePropertyOffsetType): this;
-    // (undocumented)
-    setMax(max: any): this;
-    // (undocumented)
-    setMin(min: any): this;
-    // (undocumented)
-    setOffset(offset: any): this;
-    // (undocumented)
-    setScale(scale: any): this;
-    // (undocumented)
-    setStringOffsets(stringOffsets: Uint8Array): this;
-    // (undocumented)
-    setStringOffsetType(stringOffsetType: PropertyTablePropertyOffsetType): this;
-    // (undocumented)
-    setValues(values: Uint8Array): this;
-}
-
 // @internal
 export class StructuralMetadataPropertyTables {
-    static create(extStructuralMetadata: EXTStructuralMetadata, binaryPropertyTable: BinaryPropertyTable): StructuralMetadataPropertyTable;
+    static create(extStructuralMetadata: EXTStructuralMetadata, binaryPropertyTable: BinaryPropertyTable): PropertyTable_2;
 }
 
-// Warning: (ae-forgotten-export) The symbol "IPropertyTexture" needs to be exported by the entry point index.d.ts
-//
 // @internal
-export class StructuralMetadataPropertyTexture extends ExtensionProperty<IPropertyTexture> {
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    extensionName: typeof NAME;
-    // (undocumented)
-    getClass(): string;
-    // (undocumented)
-    protected getDefaults(): Nullable<IPropertyTexture> & {
-        objectName: null;
-        properties: {};
-    };
-    // (undocumented)
-    getObjectName(): string | null;
-    // (undocumented)
-    getProperty(key: string): StructuralMetadataPropertyTextureProperty | null;
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    listPropertyKeys(): string[];
-    // (undocumented)
-    listPropertyValues(): StructuralMetadataPropertyTextureProperty[];
-    // (undocumented)
-    parentTypes: ["StructuralMetadata"];
-    // (undocumented)
-    propertyType: "PropertyTexture";
-    // (undocumented)
-    setClass(_class: string): this;
-    // (undocumented)
-    setObjectName(name: string | null): this;
-    // (undocumented)
-    setProperty(key: string, value: StructuralMetadataPropertyTextureProperty | null): this;
-}
-
-// Warning: (ae-forgotten-export) The symbol "IPropertyTextureProperty" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class StructuralMetadataPropertyTextureProperty extends ExtensionProperty<IPropertyTextureProperty> {
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    extensionName: typeof NAME;
-    // (undocumented)
-    getChannels(): number[];
-    // (undocumented)
-    protected getDefaults(): Nullable<IPropertyTextureProperty> & {
-        channels: number[];
-        texture: null;
-        textureInfo: TextureInfo;
-        offset: null;
-        scale: null;
-        max: null;
-        min: null;
-    };
-    // (undocumented)
-    getMax(): any;
-    // (undocumented)
-    getMin(): any;
-    // (undocumented)
-    getOffset(): any;
-    // (undocumented)
-    getScale(): any;
-    // (undocumented)
-    getTexture(): Texture | null;
-    // (undocumented)
-    getTextureInfo(): TextureInfo | null;
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    parentTypes: ["PropertyTexture"];
-    // (undocumented)
-    propertyType: "PropertyTextureProperty";
-    // (undocumented)
-    setChannels(channels: number[]): this;
-    // (undocumented)
-    setMax(max: any): this;
-    // (undocumented)
-    setMin(min: any): this;
-    // (undocumented)
-    setOffset(offset: any): this;
-    // (undocumented)
-    setScale(scale: any): this;
-    // (undocumented)
-    setTexture(texture: Texture | null): this;
-}
-
-// Warning: (ae-forgotten-export) The symbol "ISchema" needs to be exported by the entry point index.d.ts
-//
-// @internal
-export class StructuralMetadataSchema extends ExtensionProperty<ISchema> {
-    // (undocumented)
-    static EXTENSION_NAME: string;
-    // (undocumented)
-    extensionName: typeof NAME;
-    // (undocumented)
-    getClass(key: string): StructuralMetadataClass | null;
-    // (undocumented)
-    protected getDefaults(): Nullable<ISchema> & {
-        objectName: null;
-        description: null;
-        version: null;
-        classes: {};
-        enums: {};
-    };
-    // (undocumented)
-    getDescription(): string | null;
-    // (undocumented)
-    getEnum(key: string): StructuralMetadataEnum | null;
-    // (undocumented)
-    getId(): string;
-    // (undocumented)
-    getObjectName(): string | null;
-    // (undocumented)
-    getVersion(): string | null;
-    // (undocumented)
-    protected init(): void;
-    // (undocumented)
-    listClassKeys(): string[];
-    // (undocumented)
-    listClassValues(): StructuralMetadataClass[];
-    // (undocumented)
-    listEnumKeys(): string[];
-    // (undocumented)
-    listEnumValues(): StructuralMetadataEnum[];
-    // (undocumented)
-    parentTypes: ["StructuralMetadata"];
-    // (undocumented)
-    propertyType: "Schema";
-    // (undocumented)
-    setClass(key: string, value: StructuralMetadataClass | null): this;
-    // (undocumented)
-    setDescription(description: string | null): this;
-    // (undocumented)
-    setEnum(key: string, value: StructuralMetadataEnum | null): this;
-    // (undocumented)
-    setId(name: string): this;
-    // (undocumented)
-    setObjectName(name: string | null): this;
-    // (undocumented)
-    setVersion(version: string | null): this;
+export class StructuralMetadataSchemas {
+    static createSchemaFrom(ext: EXTStructuralMetadata, schemaDef: any): Schema_2;
 }
 
 // @internal
@@ -2824,8 +2017,27 @@ export class TilesetJsonCreator {
 export class TilesetMerger {
     constructor();
     merge(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
-    mergeData(tilesetSources: TilesetSource[], tilesetSourceJsonFileNames: string[] | undefined, tilesetTarget: TilesetTarget, tilesetTargetJsonFileName: string): Promise<void>;
     mergeJson(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
+}
+
+// @internal
+export class TilesetMerger3tz {
+    constructor();
+    static getChildren3tz(tilesets: Tileset[], tilesetSourceDirectories: string[], tilesetSourceFileNames: string[]): Tile[];
+    mergeJson3tz(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
+}
+
+// @internal
+export class TilesetMergers {
+    static createUnique(prefix: string, existing: string[]): string;
+    // (undocumented)
+    static getBoundingBox(tileset: Tileset): number[];
+    // (undocumented)
+    static getChildren(tilesets: Tileset[], externalTilesetDirectories: string[], tilesetJsonFileNames: string[]): Tile[];
+    // (undocumented)
+    static getMergedBox(tilesets: Tileset[]): number[];
+    // (undocumented)
+    static getMergedGeometricError(tilesets: Tileset[]): number;
 }
 
 // @internal
@@ -2839,6 +2051,7 @@ export class TilesetOperations {
     static combine(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean): Promise<void>;
     static merge(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
     static mergeJson(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
+    static mergeJson3tz(tilesetSourceNames: string[], tilesetTargetName: string, overwrite: boolean): Promise<void>;
     static upgrade(tilesetSourceName: string, tilesetTargetName: string, overwrite: boolean, targetVersion: string, gltfUpgradeOptions: any): Promise<void>;
     static upgradeTileset(tileset: Tileset, targetVersion: string): Promise<void>;
 }
@@ -3105,7 +2318,7 @@ export class TileTableDataPnts {
 
 // @internal
 export class TileTableDataToMeshFeatures {
-    static convertBatchIdToMeshFeatures(document: Document, primitive: Primitive, batchIdToFeatureIdAccessor: Map<Accessor, Accessor>): MeshFeaturesFeatureId | undefined;
+    static convertBatchIdToMeshFeatures(document: Document, primitive: Primitive, batchIdToFeatureIdAccessor: Map<Accessor, Accessor>): FeatureID | undefined;
 }
 
 // @internal
@@ -3113,7 +2326,7 @@ export class TileTableDataToStructuralMetadata {
     static assignPerPointProperties(document: Document, primitive: Primitive, batchTable: BatchTable, batchTableBinary: Buffer, externalProperties: {
         [key: string]: PropertyModel;
     }, numRows: number): void;
-    static convertBatchTableToPropertyTable(document: Document, batchTable: BatchTable, batchTableBinary: Buffer, numRows: number): StructuralMetadataPropertyTable | undefined;
+    static convertBatchTableToPropertyTable(document: Document, batchTable: BatchTable, batchTableBinary: Buffer, numRows: number): PropertyTable_2 | undefined;
 }
 
 // @internal

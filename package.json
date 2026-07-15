@@ -1,6 +1,6 @@
 {
   "name": "3d-tiles-tools",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "license": "Apache-2.0",
   "description": "3D Tiles tools",
   "author": {
@@ -52,6 +52,7 @@
     "@types/jasmine": "^4.0.3",
     "@typescript-eslint/eslint-plugin": "^5.38.0",
     "@typescript-eslint/parser": "^5.38.0",
+    "@types/node": "18.19.115",
     "@types/yargs": "^17.0.22",
     "c8": "^8.0.1",
     "del-cli": "^5.0.0",
@@ -85,7 +86,7 @@
     "about:package-clean": "echo 'Delete the contents of the 'build' output folder'",
     "about:package-prepare": "echo 'Prepare a package: Linting, formatting, build, test, documentation, and third-party information updates'",
     "about:package": "echo 'Prepare a package that can then be published on NPM'",
-    "start": "npx tsx src/main.ts",
+    "start": "npx ts-node src/cli/main.ts",
     "eslint": "eslint \"./**/*.ts\" --cache",
     "build": "tsc --build --verbose --force && npm run build-post",
     "build-post": "npm run build-post-ktx && npm run build-post-cli",

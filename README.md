@@ -335,6 +335,13 @@ npx 3d-tiles-tools createTilesetJson -i ./input/ -o ./output/tileset.json --cart
 ```
 This creates the specified tileset JSON file, which will refer to all tile content files in the given input directory as its tile contents. The root node of the tileset will have a transform that will place it at the given cartographic position, with the specified rotation.
 
+### Server
+
+The `3d-tiles-tools` can act as a server for tilesets. These tilesets can either be stored as files in directories, or they can be a `.3tz` or `.3dtiles` file. The content of these files will be delivered by the server directly, without having to fully extract the respective file. For example, in order to start a server that provides the contents of a 3TZ file:
+
+`npx 3d-tiles-tools serve --cors --input ./data/example.3tz`
+
+The command accepts additional `--host` and `--port` arguments, which default to `localhost` and `8003`, respectively.
 
 
 ### Pipeline 

@@ -11,7 +11,7 @@ The `TilesetSource3tz` should be able to read various 3TZ files:
 
 - `valid.3tz` is a valid 3TZ. Hence the name.
 - `validSmall.3tz` is a regression test: It is a 3TZ that is smaller 
-  than 320 bytes, which previusly caused the archive functions to
+  than 320 bytes, which previously caused the archive functions to
   crash (See https://github.com/CesiumGS/3d-tiles-tools/pull/173)
 - `validWith64byteExtrasInZipFileHeader.3tz` is another regression test: 
   It is 3TZ where the ZIP file headers contain 64 bytes in their `extras`
