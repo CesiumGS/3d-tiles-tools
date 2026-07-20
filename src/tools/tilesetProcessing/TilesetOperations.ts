@@ -9,6 +9,7 @@ import { TilesetCombiner } from "./TilesetCombiner";
 import { TilesetMerger } from "./TilesetMerger";
 import { TilesetMerger3tz } from "./TilesetMerger3tz";
 import { TilesetUpgrader } from "./TilesetUpgrader";
+import { TilesetSplatUpgrader } from "./TilesetSplatUpgrader";
 
 /**
  * Convenience methods for executing the `combine`, `merge`, and
@@ -177,5 +178,40 @@ export class TilesetOperations {
       gltfUpgradeOptions
     );
     await tilesetUpgrader.upgradeTileset(tileset);
+  }
+
+  /**
+   * Performs the `upgradeSplats` command line operation to upgrade a 3DGS
+   * tileset from the legacy beta extensions to final extensions.
+   *
+   * @param tilesetSourceName - The tileset source name
+   * @param tilesetTargetName - The tileset target name
+   * @param overwrite - Whether the target should be overwritten if
+   * it already exists
+   */
+  static async upgradeSplats(
+    tilesetSourceName: string,
+    tilesetTargetName: string,
+    overwrite: boolean
+  ) {
+    const tilesetSplatUpgrader = new TilesetSplatUpgrader();
+    await tilesetSplatUpgrader.upgrade(
+      tilesetSourceName,
+      tilesetTargetName,
+      overwrite
+    );
+  }
+
+  /**
+   * Performs the `upgradeSplats` operation directly on a 3DGS tileset
+   *
+   * @param tileset - The tileset
+   * @param targetVersion - The target version - 1.0 or 1.1
+   * @returns A promise that resolves when the process is finished
+   * @throws TilesetError When the input could not be processed
+   */
+  static async upgradeSplatsTileset(tileset: Tileset) {
+    const tilesetSplatUpgrader = new TilesetSplatUpgrader();
+    await tilesetSplatUpgrader.upgradeTileset(tileset);
   }
 }

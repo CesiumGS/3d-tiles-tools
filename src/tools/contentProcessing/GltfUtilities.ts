@@ -12,6 +12,78 @@ import { Loggers } from "../../base";
 const logger = Loggers.get("contentProcessing");
 
 /**
+ * Type representing a KHR_spz_gaussian_splats_compression extension object in the glTF JSON.
+ */
+type GltfKhrSpzGaussianSplatsCompression = {
+  /**
+   * The index of the buffer view containing the relevant data.
+   */
+  bufferView?: number;
+};
+
+/**
+ * Type representing a KHR_gaussian_splatting extension object in the glTF JSON.
+ */
+type GltfKhrGaussianSplattingExtension = {
+  /**
+   * The extensions for this object.
+   */
+  extensions?: { [key: string]: GltfKhrGaussianSplattingCompressionSpz2 };
+};
+
+/**
+ * Type representing a KHR_gaussian_splatting_compression_spz_2 extension object in the glTF JSON.
+ */
+type GltfKhrGaussianSplattingCompressionSpz2 = {
+  /**
+   * The index of the buffer view containing the relevant data.
+   */
+  bufferView?: number;
+};
+
+/**
+ * Type representing a glTF Attribute within the glTF JSON.
+ */
+type GltfAttribute = { [key: string]: number };
+
+/**
+ * Type representing a Primitive object within the glTF JSON.
+ */
+type GltfPrimitive = {
+  /**
+   * The attributes for this primitive.
+   */
+  attributes?: GltfAttribute;
+
+  /**
+   * The extensions for this object.
+   */
+  extensions?: {
+    [key: string]: GltfKhrSpzGaussianSplatsCompression &
+      GltfKhrGaussianSplattingExtension;
+  };
+};
+
+/**
+ * Type representing a Mesh object within the glTF JSON.
+ */
+type GltfMesh = {
+  /**
+   * The primitives for this mesh.
+   */
+  primitives?: GltfPrimitive[];
+};
+
+/**
+ * Type representing a glTF JSON structure.
+ */
+export type GltfJson = {
+  extensionsUsed?: string[];
+  extensionsRequired?: string[];
+  meshes?: GltfMesh[];
+};
+
+/**
  * Internal utility methods related to glTF/GLB data.
  *
  * @internal
@@ -562,5 +634,123 @@ export class GltfUtilities {
       preprocessedGlb,
       decodeMatrices
     );
+  }
+
+  static replaceLegacyGaussianSplattingExtensionGlb(glbBuffer: Buffer): Buffer {
+    const gltfData = GltfUtilities.extractDataFromGlb(glbBuffer);
+    const gltfJson = JSON.parse(gltfData.jsonData.toString("utf8")) as GltfJson;
+    const extensionsUsed = gltfJson.extensionsUsed || [];
+    if (!extensionsUsed.includes("KHR_spz_gaussian_splats_compression")) {
+      return glbBuffer;
+    }
+
+    logger.info("Found legacy 3DGS extension in glb. Upgrading.");
+    GltfUtilities.replaceLegacyGaussianSplattingExtensionGltf(gltfJson);
+    const gltfJsonBuffer = Buffer.from(JSON.stringify(gltfJson, null, 2));
+    return GltfUtilities.createGlb2FromData(gltfJsonBuffer, gltfData.binData);
+  }
+
+  static replaceLegacyGaussianSplattingExtensionGltf2Json(
+    gltfJsonBuffer: Buffer
+  ): Buffer {
+    const gltfJson = JSON.parse(gltfJsonBuffer.toString("utf8")) as GltfJson;
+    const extensionsUsed = gltfJson.extensionsUsed || [];
+    if (!extensionsUsed.includes("KHR_spz_gaussian_splats_compression")) {
+      return gltfJsonBuffer;
+    }
+
+    logger.info("Found legacy 3DGS extension in gltf. Upgrading.");
+    GltfUtilities.replaceLegacyGaussianSplattingExtensionGltf(gltfJson);
+    return Buffer.from(JSON.stringify(gltfJson, null, 2));
+  }
+
+  static replaceLegacyGaussianSplattingExtensionGltf(gltf: GltfJson) {
+    // Update the top level used and required properties.
+    gltf.extensionsUsed?.splice(
+      gltf.extensionsUsed.indexOf("KHR_spz_gaussian_splats_compression")
+    );
+    gltf.extensionsUsed?.push(
+      "KHR_gaussian_splatting",
+      "KHR_gaussian_splatting_compression_spz_2"
+    );
+
+    gltf.extensionsRequired?.splice(
+      gltf.extensionsRequired.indexOf("KHR_spz_gaussian_splats_compression")
+    );
+    gltf.extensionsRequired?.push(
+      "KHR_gaussian_splatting",
+      "KHR_gaussian_splatting_compression_spz_2"
+    );
+
+    // Update the mesh primitives.
+    const meshes = gltf.meshes || [];
+    for (const mesh of meshes) {
+      const primitives = mesh.primitives || [];
+
+      for (const primitive of primitives) {
+        this.updateGaussianSplattingPrimitiveAttributes(primitive);
+        this.updateGaussianSplattingPrimitiveExtensions(primitive);
+      }
+    }
+  }
+
+  private static updateGaussianSplattingPrimitiveExtensions(
+    primitive: GltfPrimitive
+  ) {
+    const extensions = primitive.extensions || {};
+
+    const legacyExtension: GltfKhrSpzGaussianSplatsCompression =
+      extensions["KHR_spz_gaussian_splats_compression"];
+    if (!legacyExtension) {
+      return;
+    }
+
+    const compressionExtension: GltfKhrGaussianSplattingCompressionSpz2 = {
+      bufferView: legacyExtension.bufferView,
+    };
+
+    const baseExtension: GltfKhrGaussianSplattingExtension = {
+      extensions: {
+        KHR_gaussian_splatting_compression_spz_2: compressionExtension,
+      },
+    };
+
+    // Perform the modifications
+    delete extensions["KHR_spz_gaussian_splats_compression"];
+    extensions["KHR_gaussian_splatting"] = baseExtension;
+  }
+
+  private static updateGaussianSplattingPrimitiveAttributes(
+    primitive: GltfPrimitive
+  ) {
+    if (!primitive.attributes) {
+      return;
+    }
+
+    const attributes: GltfAttribute = {};
+    const originalAttributesEntries = Object.entries(primitive.attributes);
+    let performedUpdate = false;
+
+    // Disabling this lint warning, since we can't mix const and let when
+    //   destructuring, and in this case it significantly simplifies the code.
+    // eslint-disable-next-line prefer-const
+    for (let [name, value] of originalAttributesEntries) {
+      if (
+        name === "_ROTATION" ||
+        name === "_SCALE" ||
+        name.startsWith("_SH_DEGREE_")
+      ) {
+        const nameRoot = name.substring(1);
+        name = `KHR_gaussian_splatting:${nameRoot}`;
+        performedUpdate = true;
+      }
+
+      attributes[name] = value;
+    }
+
+    // Replace the old with the new, if we actually have updates.
+    if (performedUpdate) {
+      primitive.attributes = attributes;
+    }
   }
 }
