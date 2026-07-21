@@ -14,6 +14,7 @@ import { unpartition } from "@gltf-transform/functions";
 import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
 
 import { EXTInstanceFeatures } from "../../gltf-extensions";
+import { CESIUMPrimitiveOutline } from "../../gltf-extensions";
 
 import { StructuralMetadataMerger } from "../gltfExtensionsUtils/StructuralMetadataMerger";
 
@@ -52,6 +53,7 @@ export class GltfTransform {
       "meshopt.encoder": MeshoptEncoder,
     });
     io.registerExtensions([EXTInstanceFeatures]);
+    io.registerExtensions([CESIUMPrimitiveOutline]);
     GltfTransform.io = io;
     return io;
   }
