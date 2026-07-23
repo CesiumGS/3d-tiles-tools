@@ -1,4 +1,5 @@
-import { PropertyType, Ref } from "@gltf-transform/core";
+import { WriterContext } from "@gltf-transform/core";
+import { PropertyType } from "@gltf-transform/core";
 import { IProperty } from "@gltf-transform/core";
 import { Accessor } from "@gltf-transform/core";
 import { ExtensionProperty } from "@gltf-transform/core";
@@ -35,6 +36,6 @@ export class PrimitiveOutline extends ExtensionProperty<IPrimitiveOutline> {
   }
 
   public setIndices(indices: Accessor): this {
-    return this.setRef("indices", indices, { usage: "OTHER" });
+    return this.setRef("indices", indices, { usage: WriterContext.BufferViewUsage.OTHER });
   }
 }
