@@ -36,6 +36,8 @@ export class PrimitiveOutline extends ExtensionProperty<IPrimitiveOutline> {
   }
 
   public setIndices(indices: Accessor): this {
-    return this.setRef("indices", indices, { usage: WriterContext.BufferViewUsage.OTHER });
+    return this.setRef("indices", indices, {
+      usage: WriterContext.BufferViewUsage.OTHER,
+    });
   }
 }
