@@ -67,17 +67,15 @@ export class CESIUMPrimitiveOutline extends Extension {
       return this;
     }
 
-    for (const mesh of this.document.getRoot().listMeshes()) {
-      const meshIndex = context.meshIndexMap.get(mesh);
-      if (meshIndex === undefined) {
-        continue;
-      }
-      const meshDef = meshDefs[meshIndex];
+    const meshes = this.document.getRoot().listMeshes();
+    for (let m = 0; m < meshes.length; m++) {
+      const mesh = meshes[m];
+      const meshDef = meshDefs[m];
       const primitives = mesh.listPrimitives();
       const primitiveDefs = meshDef.primitives;
-      for (let i = 0; i < primitiveDefs.length; i++) {
-        const primitive = primitives[i];
-        const primitiveDef = primitiveDefs[i];
+      for (let p = 0; p < primitiveDefs.length; p++) {
+        const primitive = primitives[p];
+        const primitiveDef = primitiveDefs[p];
         this.writePrimitive(context, primitive, primitiveDef);
       }
     }
@@ -95,6 +93,8 @@ export class CESIUMPrimitiveOutline extends Extension {
     }
     const indices = primitiveOutline.getIndices();
     if (!indices) {
+      const logger = this.document.getLogger();
+      logger.warn("Ignoring Invalid CESIUM_primitive_outline extension");
       return;
     }
     const indicesIndex = context.accessorIndexMap.get(indices);
