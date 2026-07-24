@@ -19,8 +19,11 @@ describe("CESIUMPrimitiveOutline", function () {
     const extension = primitive.getExtension<PrimitiveOutline>(
       "CESIUM_primitive_outline"
     );
-    const indices = extension?.getIndices();
-    const actual = [...indices?.getArray()];
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const indices = extension!.getIndices();
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const actual = [...indices!.getArray()];
 
     // See the README of the 'BoxPrimitiveOutline' test data
     // for a description of the outline indices
