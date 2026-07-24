@@ -94,7 +94,7 @@ export class CESIUMPrimitiveOutline extends Extension {
     const indices = primitiveOutline.getIndices();
     if (!indices) {
       const logger = this.document.getLogger();
-      logger.warn("Ignoring Invalid CESIUM_primitive_outline extension");
+      logger.warn("Ignoring invalid CESIUM_primitive_outline extension");
       return;
     }
     const indicesIndex = context.accessorIndexMap.get(indices);
