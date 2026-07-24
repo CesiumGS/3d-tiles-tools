@@ -1,5 +1,4 @@
 import { GLTF, Primitive } from "@gltf-transform/core";
-import { Node } from "@gltf-transform/core";
 import { Extension } from "@gltf-transform/core";
 import { ReaderContext } from "@gltf-transform/core";
 import { WriterContext } from "@gltf-transform/core";
