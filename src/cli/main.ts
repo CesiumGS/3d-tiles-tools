@@ -637,6 +637,7 @@ async function runChecked() {
     await run();
   } catch (e: any) {
     logger.error(e);
+    process.exitCode = 1;
   }
 }
 
