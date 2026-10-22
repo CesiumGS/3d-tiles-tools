@@ -18,3 +18,4 @@ package-lock.json
 /packages/**/build
 *.tsbuildinfo
 3d-tiles-tools-*.tgz
+.idea

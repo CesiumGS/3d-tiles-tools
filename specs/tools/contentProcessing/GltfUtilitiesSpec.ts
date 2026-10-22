@@ -2,7 +2,7 @@ import GltfPipeline from "gltf-pipeline";
 
 import fs from "fs";
 
-import { GltfUtilities } from "../../../src/tools";
+import { GltfJson, GltfUtilities } from "../../../src/tools";
 
 import { SpecHelpers } from "../../SpecHelpers";
 
@@ -147,5 +147,155 @@ describe("GltfUtilities", function () {
     const data = GltfUtilities.extractDataFromGlb(glb);
     expect(data.jsonData.length).not.toBe(0);
     expect(data.binData).toEqual(Buffer.from([]));
+  });
+
+  it("replaceLegacyGaussianSplattingExtensionGltf properly upgrades the legacy 3DGS glTF JSON to the current 3DGS glTF spec", function () {
+    // This is *not* a valid glTF file JSON, and isn't intended to be so.
+    //   This is basically the bare minimum we need for a test of the 3DGS
+    //   tileset upgrade process.
+    const legacyGltfJson: GltfJson = {
+      extensionsUsed: ["KHR_spz_gaussian_splats_compression"],
+      extensionsRequired: ["KHR_spz_gaussian_splats_compression"],
+      meshes: [
+        {
+          primitives: [
+            {
+              extensions: {
+                KHR_spz_gaussian_splats_compression: {
+                  bufferView: 0,
+                },
+              },
+              attributes: {
+                POSITION: 0,
+                COLOR_0: 1,
+                _ROTATION: 2,
+                _SCALE: 3,
+                _SH_DEGREE_1_COEF_0: 4,
+                _SH_DEGREE_1_COEF_1: 5,
+                _SH_DEGREE_1_COEF_2: 6,
+                _SH_DEGREE_2_COEF_0: 7,
+                _SH_DEGREE_2_COEF_1: 8,
+                _SH_DEGREE_2_COEF_2: 9,
+                _SH_DEGREE_2_COEF_3: 10,
+                _SH_DEGREE_2_COEF_4: 11,
+                _SH_DEGREE_3_COEF_0: 12,
+                _SH_DEGREE_3_COEF_1: 13,
+                _SH_DEGREE_3_COEF_2: 14,
+                _SH_DEGREE_3_COEF_3: 15,
+                _SH_DEGREE_3_COEF_4: 16,
+                _SH_DEGREE_3_COEF_5: 17,
+                _SH_DEGREE_3_COEF_6: 18,
+              },
+            },
+          ],
+        },
+      ],
+    };
+
+    // Same as above, but contains what we expect the result to be.
+    const currentGltfJson: GltfJson = {
+      extensionsUsed: [
+        "KHR_gaussian_splatting",
+        "KHR_gaussian_splatting_compression_spz_2",
+      ],
+      extensionsRequired: [
+        "KHR_gaussian_splatting",
+        "KHR_gaussian_splatting_compression_spz_2",
+      ],
+      meshes: [
+        {
+          primitives: [
+            {
+              extensions: {
+                KHR_gaussian_splatting: {
+                  extensions: {
+                    KHR_gaussian_splatting_compression_spz_2: {
+                      bufferView: 0,
+                    },
+                  },
+                },
+              },
+              attributes: {
+                POSITION: 0,
+                COLOR_0: 1,
+                "KHR_gaussian_splatting:ROTATION": 2,
+                "KHR_gaussian_splatting:SCALE": 3,
+                "KHR_gaussian_splatting:SH_DEGREE_1_COEF_0": 4,
+                "KHR_gaussian_splatting:SH_DEGREE_1_COEF_1": 5,
+                "KHR_gaussian_splatting:SH_DEGREE_1_COEF_2": 6,
+                "KHR_gaussian_splatting:SH_DEGREE_2_COEF_0": 7,
+                "KHR_gaussian_splatting:SH_DEGREE_2_COEF_1": 8,
+                "KHR_gaussian_splatting:SH_DEGREE_2_COEF_2": 9,
+                "KHR_gaussian_splatting:SH_DEGREE_2_COEF_3": 10,
+                "KHR_gaussian_splatting:SH_DEGREE_2_COEF_4": 11,
+                "KHR_gaussian_splatting:SH_DEGREE_3_COEF_0": 12,
+                "KHR_gaussian_splatting:SH_DEGREE_3_COEF_1": 13,
+                "KHR_gaussian_splatting:SH_DEGREE_3_COEF_2": 14,
+                "KHR_gaussian_splatting:SH_DEGREE_3_COEF_3": 15,
+                "KHR_gaussian_splatting:SH_DEGREE_3_COEF_4": 16,
+                "KHR_gaussian_splatting:SH_DEGREE_3_COEF_5": 17,
+                "KHR_gaussian_splatting:SH_DEGREE_3_COEF_6": 18,
+              },
+            },
+          ],
+        },
+      ],
+    };
+
+    const resultJson = structuredClone(legacyGltfJson);
+    GltfUtilities.replaceLegacyGaussianSplattingExtensionGltf(resultJson);
+
+    expect(resultJson).toEqual(currentGltfJson);
+  });
+
+  describe("replaceLegacyGaussianSplattingExtensionGlb", function () {
+    let glbBuffer: Buffer, resultBuffer: Buffer, fnSpy: jasmine.Spy;
+
+    beforeAll(function () {
+      glbBuffer = fs.readFileSync(
+        SPECS_DATA_BASE_DIRECTORY + "/gltf/splatting/UnitSH_legacy.glb"
+      );
+
+      // Spying on the replaceLegacyGaussianSplattingExtensionGltf function
+      //  so this test is specific to replaceLegacyGaussianSplattingExtensionGlb
+      fnSpy = spyOn(
+        GltfUtilities,
+        "replaceLegacyGaussianSplattingExtensionGltf"
+      );
+
+      resultBuffer =
+        GltfUtilities.replaceLegacyGaussianSplattingExtensionGlb(glbBuffer);
+    });
+
+    it("calls replaceLegacyGaussianSplattingExtensionGltf with a valid glTF JSON object", function () {
+      expect(fnSpy.calls.count()).toBe(1);
+    });
+
+    it("doesn't change the underlying bin data", function () {
+      const expectedData = GltfUtilities.extractDataFromGlb(glbBuffer);
+      const resultingData = GltfUtilities.extractDataFromGlb(resultBuffer);
+
+      expect(resultingData.binData).toEqual(expectedData.binData);
+    });
+  });
+
+  it("replaceLegacyGaussianSplattingExtensionGltf2Json calls replaceLegacyGaussianSplattingExtensionGltf with a valid glTF JSON object", function () {
+    const gltfJsonBuffer = fs.readFileSync(
+      SPECS_DATA_BASE_DIRECTORY + "/gltf/splatting/UnitSH_legacy.gltf"
+    );
+
+    // Spying on the replaceLegacyGaussianSplattingExtensionGltf function
+    //  so this test is specific to replaceLegacyGaussianSplattingExtensionGltf2Json
+    const fnSpy = spyOn(
+      GltfUtilities,
+      "replaceLegacyGaussianSplattingExtensionGltf"
+    );
+
+    // We don't have any data to verify here.
+    GltfUtilities.replaceLegacyGaussianSplattingExtensionGltf2Json(
+      gltfJsonBuffer
+    );
+
+    expect(fnSpy.calls.count()).toBe(1);
   });
 });
