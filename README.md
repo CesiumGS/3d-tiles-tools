@@ -142,6 +142,45 @@ When `--targetVersion 1.1` is given, then this will upgrade legacy tilesets to c
 > The conversion of the legacy tile formats to glTF should be considered as a _preview feature_. There are corner cases where the conversion is not possible generically - for example, when I3DM tile content contains glTF data that contains _animations_, or when a CMPT (indirectly) contains multiple glTF assets that already use the `EXT_structural_metadata` extension. The conditions under which the conversion is possible may be specified more explicitly in the future. 
 
 
+#### implicitToExplicit
+
+Convert a tileset that uses [implicit tiling](https://github.com/CesiumGS/3d-tiles/tree/main/specification/ImplicitTiling) into a tileset with an explicit tile hierarchy, for clients that do not support implicit tiling.
+```
+npx 3d-tiles-tools implicitToExplicit -i ./specs/data/tilesetProcessing/SparseImplicitQuadtree/tileset.json -o ./output/SparseImplicitQuadtree-explicit
+```
+
+Additional command line options:
+
+| Flag | Description | Required |
+| ---- | ----------- | -------- |
+|`--targetVersion`|The target version. May be `1.0`, `1.1`, or `both`.| No. Default: `1.0` |
+|`--bounds`|How bounding volumes are computed. May be `content` or `derived`.| No. Default: `content` |
+|`--padding`|Padding (in the units of the tile frame, usually meters) that is added around refined bounding volumes.| No. Default: `0` |
+|`--validate`|Whether the output should be validated with the 3D Tiles Validator. This requires the `3d-tiles-validator` package to be installed.| No. Default: `true` |
+|`--validateContent`|Whether tile content should be validated as well. This can be slow for large tilesets.| No. Default: `true` |
+
+The implicit tile hierarchy is traversed once, and each available tile becomes an explicit tile in the tileset JSON. Subtree files are omitted from the output.
+
+With `--bounds content`, the bounding volume of each tile is computed from the vertices of its content (GLB, B3DM, I3DM, PNTS, or CMPT), and the bounding volumes are unioned bottom-up so that each parent encloses its children. Bounding volume boxes keep the orientation of the original box. Regions and `3DTILES_bounding_volume_S2` volumes become regions. This is intended for tilesets whose implicit subdivision (or whose `TILE_BOUNDING_BOX` metadata) results in bounding volumes that are looser than, or do not enclose, the actual content. Metadata properties with bounding volume semantics are removed after the refinement, so that they do not override the refined volumes. With `--bounds derived`, the bounding volumes that are implied by the implicit subdivision are kept.
+
+With `--targetVersion 1.0`, the result is a 3D Tiles 1.0 tileset:
+
+- The asset version will be set to `'1.0'`.
+- GLB content will be wrapped into B3DM, and the content URIs will be renamed from `.glb` to `.b3dm`.
+- Metadata (`schema`, `schemaUri`, `statistics`, `groups`, and `metadata` of the tileset, tiles, and contents) will be removed. Metadata inside the glTF content is not affected.
+- Single-element `contents` arrays will become `content`. Tiles with multiple contents are rejected.
+- `3DTILES_bounding_volume_S2` bounding volumes will be converted to regions.
+- Declarations of extensions that became core features in 3D Tiles 1.1 will be removed from `extensionsUsed` and `extensionsRequired`.
+
+With `--targetVersion 1.1`, the glTF content and metadata entities are kept. With `--targetVersion both`, both versions are written into the subdirectories `1.0` and `1.1` of the output directory, from a single traversal.
+
+In both cases, tile and content metadata that is stored in subtree files is not carried over to the explicit tiles.
+
+A `conversion-report.json` file with statistics about the conversion is written into the output directory. This includes the number of tiles, the glTF extensions that are required by the content, a check that each parent bounding volume contains its children, and, for `--bounds content`, how many tiles had content outside their original bounding volume. When the `3d-tiles-validator` package is installed, each output is validated, and a `validation-report.json` is written next to its tileset JSON file.
+
+> Implementation note:
+>
+> External tilesets that are referred to as tile content are not converted. Use the `combine` command first. JSON glTF content (`.gltf`) cannot be wrapped into B3DM and is copied unchanged. Content that uses `EXT_mesh_gpu_instancing` keeps its original bounding volume.
 
 
 #### convert

@@ -17,6 +17,7 @@ import { GltfUtilities } from "../tools";
 import { PipelineExecutor } from "../tools";
 import { Pipelines } from "../tools";
 import { TilesetOperations } from "../tools";
+import { TargetVersion } from "../tools";
 import { TileFormatsMigration } from "../tools";
 import { TilesetConverter } from "../tools";
 import { TilesetJsonCreator } from "../tools";
@@ -555,6 +556,69 @@ export class ToolsMain {
     );
 
     logger.debug(`Executing upgrade DONE`);
+  }
+
+  static async implicitToExplicit(
+    input: string,
+    output: string,
+    force: boolean,
+    targetVersion: string,
+    bounds: string,
+    padding: number,
+    validate: boolean,
+    validateContent: boolean
+  ): Promise<boolean> {
+    logger.debug(`Executing implicitToExplicit`);
+    logger.debug(`  input: ${input}`);
+    logger.debug(`  output: ${output}`);
+    logger.debug(`  force: ${force}`);
+    logger.debug(`  targetVersion: ${targetVersion}`);
+    logger.debug(`  bounds: ${bounds}`);
+    logger.debug(`  padding: ${padding}`);
+    logger.debug(`  validate: ${validate}`);
+    logger.debug(`  validateContent: ${validateContent}`);
+
+    if (!["1.0", "1.1", "both"].includes(targetVersion)) {
+      throw new DeveloperError(
+        `The targetVersion must be '1.0', '1.1', or 'both', but is '${targetVersion}'`
+      );
+    }
+    if (!["content", "derived"].includes(bounds)) {
+      throw new DeveloperError(
+        `The bounds must be 'content' or 'derived', but is '${bounds}'`
+      );
+    }
+    if (!Number.isFinite(padding) || padding < 0) {
+      throw new DeveloperError(
+        `The padding must be a non-negative number, but is ${padding}`
+      );
+    }
+    const targetVersions: TargetVersion[] =
+      targetVersion === "both"
+        ? ["1.0", "1.1"]
+        : [targetVersion as TargetVersion];
+
+    ToolsMain.ensureCanWrite(output, force);
+    const report = await TilesetOperations.implicitToExplicit(input, output, {
+      targetVersions: targetVersions,
+      bounds: bounds as "content" | "derived",
+      padding: padding,
+      overwrite: force,
+      validate: validate,
+      validateContent: validateContent,
+    });
+
+    let success = true;
+    for (const outputInfo of report.outputs) {
+      if (outputInfo.validation && outputInfo.validation.numErrors > 0) {
+        success = false;
+      }
+      if (outputInfo.containment.pairsFailed > 0) {
+        success = false;
+      }
+    }
+    logger.debug(`Executing implicitToExplicit DONE`);
+    return success;
   }
 
   static async merge(inputs: string[], output: string, force: boolean) {
