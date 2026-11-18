@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+### Unreleased
+
+- Added the `implicitToExplicit` command line function that converts a tileset with implicit tiling into a tileset with an explicit tile hierarchy, for clients that do not support implicit tiling. The bounding volumes of the resulting tiles can be computed from the tile content. The result can be written as 3D Tiles 1.0 (with B3DM content), as 3D Tiles 1.1 (with glTF content), or both. When the `3d-tiles-validator` package is installed, the output is validated.
+
 ### 0.5.4 - 2026-07-12
 
 - Added a command line function to create a tileset JSON file that refers to several `.3tz` files, using the `MAXAR_content_3tz` extension, via [#200](https://github.com/CesiumGS/3d-tiles-tools/pull/200)

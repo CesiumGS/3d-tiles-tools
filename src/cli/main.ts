@@ -311,6 +311,64 @@ function parseToolArgs(a: string[]) {
         },
       }
     )
+    .command(
+      "implicitToExplicit",
+      "Converts a tileset that uses implicit tiling into a tileset with an " +
+        "explicit tile hierarchy, for clients that do not support implicit " +
+        "tiling.\n\n" +
+        "The implicit tile hierarchy is traversed once, and each available " +
+        "tile becomes an explicit tile. Subtree files are omitted from the " +
+        "output. By default, the bounding volumes are computed from the tile " +
+        "content and unioned so that each parent encloses its children.\n\n" +
+        "With '--targetVersion 1.0' (the default), GLB content is wrapped " +
+        "into B3DM, metadata and 3D Tiles 1.1 extension declarations are " +
+        "removed, and S2 bounding volumes are converted to regions. With " +
+        "'--targetVersion 1.1', glTF content is kept. With " +
+        "'--targetVersion both', both versions are written into the " +
+        "subdirectories '1.0' and '1.1' of the output, from a single " +
+        "traversal.\n\n" +
+        "When the '3d-tiles-validator' package is installed, each output " +
+        "is validated and a 'validation-report.json' is written next to it. " +
+        "A 'conversion-report.json' with statistics is always written.\n",
+      {
+        i: inputStringDefinition,
+        o: outputStringDefinition,
+        targetVersion: {
+          default: "1.0",
+          description: "The target version: '1.0', '1.1', or 'both'",
+          type: "string",
+        },
+        bounds: {
+          default: "content",
+          description:
+            "How bounding volumes are computed: 'content' tightens them " +
+            "from the tile geometry, 'derived' keeps the volumes implied by " +
+            "the implicit subdivision",
+          type: "string",
+        },
+        padding: {
+          default: 0,
+          description:
+            "Padding (in the units of the tile frame, usually meters) that " +
+            "is added around refined bounding volumes",
+          type: "number",
+        },
+        validate: {
+          default: true,
+          description:
+            "Whether the output should be validated with the 3D Tiles " +
+            "Validator (requires the '3d-tiles-validator' package)",
+          type: "boolean",
+        },
+        validateContent: {
+          default: true,
+          description:
+            "Whether tile content should be validated as well. This can be " +
+            "slow for large tilesets.",
+          type: "boolean",
+        },
+      }
+    )
     .command("pipeline", "Execute a pipeline that is provided as a JSON file", {
       i: inputStringDefinition,
     })
@@ -595,6 +653,20 @@ async function runCommand(command: string, toolArgs: any, optionArgs: any) {
     );
   } else if (command === "merge") {
     await ToolsMain.merge(inputs, output, force);
+  } else if (command === "implicitToExplicit") {
+    const success = await ToolsMain.implicitToExplicit(
+      input,
+      output,
+      force,
+      toolArgs.targetVersion ?? "1.0",
+      toolArgs.bounds ?? "content",
+      toolArgs.padding ?? 0,
+      toolArgs.validate ?? true,
+      toolArgs.validateContent ?? true
+    );
+    if (!success) {
+      process.exitCode = 1;
+    }
   } else if (command === "mergeJson") {
     await ToolsMain.mergeJson(inputs, output, force);
   } else if (command === "mergeJson3tz") {

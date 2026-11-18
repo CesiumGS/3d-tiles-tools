@@ -9,6 +9,9 @@ import { TilesetCombiner } from "./TilesetCombiner";
 import { TilesetMerger } from "./TilesetMerger";
 import { TilesetMerger3tz } from "./TilesetMerger3tz";
 import { TilesetUpgrader } from "./TilesetUpgrader";
+import { ImplicitToExplicit } from "./ImplicitToExplicit";
+import { ConversionOptions } from "./ImplicitToExplicit";
+import { ConversionReport } from "./ConversionReport";
 
 /**
  * Convenience methods for executing the `combine`, `merge`, and
@@ -177,5 +180,33 @@ export class TilesetOperations {
       gltfUpgradeOptions
     );
     await tilesetUpgrader.upgradeTileset(tileset);
+  }
+
+  /**
+   * Performs the `implicitToExplicit` command line operation.
+   *
+   * This converts a tileset that uses implicit tiling into a tileset
+   * with an explicit tile hierarchy, optionally refining the bounding
+   * volumes from the tile content, and writes it as 3D Tiles 1.0
+   * (with B3DM content) and/or 3D Tiles 1.1 (with glTF content).
+   *
+   * @param tilesetSourceName - The tileset source name
+   * @param tilesetTargetName - The tileset target name
+   * @param options - The conversion options
+   * @returns A promise that resolves to the conversion report
+   * @throws TilesetError When the input could not be processed,
+   * or when the output already exists and `options.overwrite` was
+   * `false`.
+   */
+  static async implicitToExplicit(
+    tilesetSourceName: string,
+    tilesetTargetName: string,
+    options: ConversionOptions
+  ): Promise<ConversionReport> {
+    return ImplicitToExplicit.convert(
+      tilesetSourceName,
+      tilesetTargetName,
+      options
+    );
   }
 }
