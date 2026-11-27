@@ -105,5 +105,10 @@
     "package-clean": "del-cli ./build/** del-cli ./temp/**",
     "package-prepare": "npm run eslint && npm run prettier-check && npm run build && npm run test && npm run coverage && npm run docs-generate && npm run generate-third-party",
     "package": "npm run package-clean && npm run package-prepare && npm pack"
+  },
+  "allowScripts": {
+    "better-sqlite3@12.11.1": true,
+    "sharp@0.33.5": true,
+    "sharp@0.34.5": true
   }
 }

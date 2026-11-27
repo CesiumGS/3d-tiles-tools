@@ -1,10 +1,11 @@
 import { Document } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
 
-import { EXTStructuralMetadata } from "3d-tiles-tools";
-import { StructuralMetadata } from "3d-tiles-tools";
+import { StructuralMetadata } from "@gltf-transform/extensions";
+import { EXTStructuralMetadata } from "@gltf-transform/extensions";
 
 import { BinaryPropertyTableBuilder } from "3d-tiles-tools";
+import { StructuralMetadataSchemas } from "3d-tiles-tools";
 import { BinaryPropertyTableModel } from "3d-tiles-tools";
 import { PropertyTableModels } from "3d-tiles-tools";
 
@@ -54,7 +55,10 @@ async function createExampleDocument(): Promise<Document> {
 
   // Create a 'Schema' object from the JSON input, and assign it
   // to the 'StructuralMetadata'
-  const schema = extStructuralMetadata.createSchemaFrom(exampleSchema as any);
+  const schema = StructuralMetadataSchemas.createSchemaFrom(
+    extStructuralMetadata,
+    exampleSchema as any
+  );
   structuralMetadata.setSchema(schema);
 
   // Use the `BinaryPropertyTableBuilder` to create a `BinaryPropertyTable`.

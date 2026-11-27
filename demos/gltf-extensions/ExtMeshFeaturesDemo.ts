@@ -1,11 +1,10 @@
 import { Accessor } from "@gltf-transform/core";
 import { Document } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
+import { EXTMeshFeatures } from "@gltf-transform/extensions";
 
 import { savePixels } from "ndarray-pixels";
 import NdArray from "ndarray";
-
-import { EXTMeshFeatures } from "3d-tiles-tools";
 
 import { MeshFeaturesUtils } from "3d-tiles-tools";
 
@@ -34,7 +33,7 @@ async function createExampleDocument(): Promise<Document> {
 
   // Create a `FeatureId` object. This object indicates that the IDs
   // are stored in the attribute `_FEATURE_ID_${attributeNumber}`
-  const featureIdFromAttribute = extMeshFeatures.createFeatureId();
+  const featureIdFromAttribute = extMeshFeatures.createFeatureID();
   featureIdFromAttribute.setFeatureCount(new Set(ids).size);
   featureIdFromAttribute.setAttribute(attributeNumber);
 
@@ -56,11 +55,11 @@ async function createExampleDocument(): Promise<Document> {
 
   // Create a `FeatureId´ object that represents
   // the feature ID texture
-  const featureIdFromTexture = extMeshFeatures.createFeatureId();
+  const featureIdFromTexture = extMeshFeatures.createFeatureID();
   featureIdFromTexture.setFeatureCount(sizeX * sizeY);
 
   // Create the actual feature ID texture
-  const featureIdTexture = extMeshFeatures.createFeatureIdTexture();
+  const featureIdTexture = extMeshFeatures.createFeatureIDTexture();
   featureIdTexture.setChannels([0]);
   featureIdTexture.setTexture(texture);
   featureIdFromTexture.setTexture(featureIdTexture);
@@ -68,9 +67,9 @@ async function createExampleDocument(): Promise<Document> {
   // Create a `MeshFeatures` object that contains the
   // created `FeatureID` objects, and store it as an
   // extension object in the `Primitive`
-  const meshFeatures = extMeshFeatures.createMeshFeatures();
-  meshFeatures.addFeatureId(featureIdFromAttribute);
-  meshFeatures.addFeatureId(featureIdFromTexture);
+  const meshFeatures = extMeshFeatures.createFeatures();
+  meshFeatures.addFeatureID(featureIdFromAttribute);
+  meshFeatures.addFeatureID(featureIdFromTexture);
   primitive.setExtension("EXT_mesh_features", meshFeatures);
 
   // Assign the `Primitive` to a `Mesh`

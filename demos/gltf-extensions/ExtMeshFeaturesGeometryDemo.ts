@@ -4,12 +4,11 @@ import { Accessor } from "@gltf-transform/core";
 import { Document } from "@gltf-transform/core";
 import { Primitive } from "@gltf-transform/core";
 import { NodeIO } from "@gltf-transform/core";
+import { FeatureID } from "@gltf-transform/extensions";
+import { EXTMeshFeatures } from "@gltf-transform/extensions";
 
 import { savePixels } from "ndarray-pixels";
 import NdArray from "ndarray";
-
-import { EXTMeshFeatures } from "3d-tiles-tools";
-import { MeshFeaturesFeatureId as FeatureId } from "3d-tiles-tools";
 
 import { MeshFeaturesUtils } from "3d-tiles-tools";
 
@@ -68,7 +67,7 @@ function createUnitSquarePrimitive(document: Document): Primitive {
 async function createFeatureIdFromTexture(
   document: Document,
   extMeshFeatures: EXTMeshFeatures
-): Promise<FeatureId> {
+): Promise<FeatureID> {
   // Create an image with integer values that serve as feature IDs.
   // The IDs are in the range (0...255) here, and therefore written
   // into the channel with index `3`, i.e. the alpha channel of the
@@ -90,11 +89,11 @@ async function createFeatureIdFromTexture(
 
   // Create a `FeatureId´ object that represents
   // the feature ID texture
-  const featureIdFromTexture = extMeshFeatures.createFeatureId();
+  const featureIdFromTexture = extMeshFeatures.createFeatureID();
   featureIdFromTexture.setFeatureCount(sizeX * sizeY);
 
   // Create the actual feature ID texture
-  const featureIdTexture = extMeshFeatures.createFeatureIdTexture();
+  const featureIdTexture = extMeshFeatures.createFeatureIDTexture();
   featureIdTexture.setChannels([0]);
   featureIdTexture.setTexture(texture);
   featureIdFromTexture.setTexture(featureIdTexture);
@@ -121,7 +120,7 @@ function createFeatureIdFromAttribute(
   primitive: Primitive,
   numVertices: number,
   id: number
-): FeatureId {
+): FeatureID {
   const root = document.getRoot();
   const buffer = root.listBuffers()[0];
 
@@ -140,7 +139,7 @@ function createFeatureIdFromAttribute(
 
   // Create a `FeatureId` object. This object indicates that the IDs
   // are stored in the attribute `_FEATURE_ID_${attributeNumber}`
-  const featureIdFromAttribute = extMeshFeatures.createFeatureId();
+  const featureIdFromAttribute = extMeshFeatures.createFeatureID();
   featureIdFromAttribute.setFeatureCount(new Set(ids).size);
   featureIdFromAttribute.setAttribute(attributeNumber);
 
@@ -180,9 +179,9 @@ async function assignExampleMeshFeatures(
   // Create a `MeshFeatures` object that contains the
   // created `FeatureID` objects, and store it as an
   // extension object in the `Primitive`
-  const meshFeatures = extMeshFeatures.createMeshFeatures();
-  meshFeatures.addFeatureId(featureIdFromAttribute);
-  meshFeatures.addFeatureId(featureIdFromTexture);
+  const meshFeatures = extMeshFeatures.createFeatures();
+  meshFeatures.addFeatureID(featureIdFromAttribute);
+  meshFeatures.addFeatureID(featureIdFromTexture);
   primitive.setExtension("EXT_mesh_features", meshFeatures);
 }
 
